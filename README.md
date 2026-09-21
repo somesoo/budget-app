@@ -1,15 +1,16 @@
 # Budget
 
 A shared budgeting app for two people. Adding an expense is three taps
-(category → amount → Save), no login. Data is shared and syncs live between
-phones through Supabase Realtime.
+(category → amount → Save). Data is shared and syncs live between phones
+through Supabase Realtime.
 
 ## Stack
 
 - React 18 + Vite + TypeScript
 - Tailwind CSS
-- TanStack Query (cache) + Supabase JS (data + realtime)
+- TanStack Query (cache) + Supabase JS (data, auth, realtime)
 - vite-plugin-pwa (installs to the phone's home screen)
+- Hosted on Vercel, database on Supabase
 
 ## Setup
 
@@ -19,103 +20,83 @@ phones through Supabase Realtime.
 2. In the **SQL Editor**, run in order:
    - `supabase/migrations/0001_init.sql` — tables, RLS, Realtime publication
    - `supabase/seed.sql` — 8 starting categories with limits + a savings goal
-3. Check **Database → Replication** to confirm `expenses`, `categories` and
-   `goals` are part of the `supabase_realtime` publication (the migration adds
-   them itself).
+3. Create the shared account: **Authentication → Users → Add user**, with
+   *Auto Confirm User* enabled. Use any email you both remember (it is not a
+   secret) and a strong password (that is the secret).
+4. Turn off public sign-ups: **Authentication → Providers → Email** → disable
+   *Enable sign-ups*. Otherwise anyone could create their own account and read
+   the budget.
+5. Now run `supabase/migrations/0002_require_login.sql`, which drops the
+   anonymous access policies and requires a signed-in user. Run it **after**
+   step 3, or the app locks itself out.
+6. Check **Database → Replication** that `expenses`, `categories` and `goals`
+   are in the `supabase_realtime` publication (the first migration adds them).
 
-With the Supabase CLI instead:
+### 2. Local development
 
 ```bash
-supabase link --project-ref <your-ref> && supabase db push
-```
-
-### 2. Frontend
-
-```bash
-cp .env.example .env   # paste the URL + anon key from Project Settings → API
+cp .env.example .env   # URL + anon key from Project Settings → API,
+                       # plus the account email from step 3
 npm install
 npm run dev
 ```
 
-Without the environment variables the app shows a setup screen instead of empty
-pages.
+Without `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` the app shows a setup
+screen instead of empty pages.
 
-### 3. Deploy
+### 3. Deploy to Vercel
 
-Build with `npm run build`; the output is the static `dist/` directory. Set the
-same two variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) wherever you
-build. See [Self-hosting on Linux](#self-hosting-on-linux) below, or use
-Vercel/Netlify. On the phone: open the site → "Add to Home Screen".
+1. **Add New → Project** and import this repository. Vercel detects Vite on its
+   own: build `npm run build`, output `dist`.
+2. Under **Settings → Environment Variables** add all three, for every
+   environment you use (Production, Preview, Development):
 
-## Self-hosting on Linux
+   | Name | Value |
+   | --- | --- |
+   | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` |
+   | `VITE_SUPABASE_ANON_KEY` | the project's anon key |
+   | `VITE_AUTH_EMAIL` | the shared account's email |
 
-The app is a static bundle — any web server will do.
+3. Deploy. Every push to `main` redeploys automatically.
 
-The repo is private, so the server needs read access. The simplest way is a
-deploy key: on the server run `ssh-keygen -t ed25519 -C budget-server -f
-~/.ssh/budget_deploy` (no passphrase), then add the contents of
-`~/.ssh/budget_deploy.pub` under **Settings → Deploy keys → Add deploy key** on
-GitHub (read-only is enough), and point SSH at it:
+`vercel.json` rewrites unknown paths to `index.html`, which is what makes
+client-side routes like `/history` work on a hard refresh.
 
-```
-# ~/.ssh/config
-Host github-budget
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/budget_deploy
-```
+**These variables are read at build time** and baked into the bundle, so
+changing one in Vercel requires a redeploy to take effect.
 
-One-time setup:
+On the phone: open the site → "Add to Home Screen". Vercel serves HTTPS, which
+a PWA requires.
 
-```bash
-git clone github-budget:somesoo/budget-app.git /srv/budget && cd /srv/budget
-cp .env.example .env   # fill in the Supabase URL + anon key
-npm ci && npm run build
-```
+## Signing in
 
-To update later:
+Both phones use the same account. The login screen asks only for a password —
+the email comes from `VITE_AUTH_EMAIL` — and the form is a normal username +
+password form, so the browser's password manager offers to save it.
 
-```bash
-cd /srv/budget && git pull && npm ci && npm run build
-```
+After a successful sign-in the Supabase session is stored in that device's
+localStorage and refreshed in the background, so you type the password once per
+phone and stay signed in. Settings has a *Sign out of this device* button.
 
-Point the web server at `/srv/budget/dist`. Because the app uses client-side
-routing, unknown paths have to fall back to `index.html` — for nginx:
-
-```nginx
-server {
-    listen 80;
-    server_name budget.example.com;
-    root /srv/budget/dist;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
-Serve it over HTTPS (e.g. `certbot --nginx`) — browsers only install a PWA and
-register a service worker on a secure origin.
-
-**Note on `.env`:** the variables are read at *build* time and baked into the
-bundle, so `.env` must exist on the machine that runs `npm run build`, and
-rebuilding is what applies a change.
+To change the password: **Authentication → Users → … → Reset password** in the
+Supabase dashboard. Existing sessions keep working; sign out on a device to
+force it to ask again.
 
 ## How it works
 
 ### Who is who
 
-On first launch the app asks "Who's using this phone?" and stores the answer in
-**that device's** `localStorage` (key `budget-app.device-person`). It never
-reaches the database, so one phone always knows it is Bubs and the other knows
-it is Meow. The switcher appears on the amount screen (changing the person for
-that one expense — say, when someone borrows the phone) and in Settings
-(changing the device setting for good).
+Being signed in says *this household*, not *which of us* — the app asks "Who's
+using this phone?" on first launch and stores the answer in **that device's**
+`localStorage` (key `budget-app.device-person`). It never reaches the database,
+so one phone always knows it is Bubs and the other knows it is Meow. The
+switcher on the amount screen changes the person for that one expense (when
+someone borrows the phone); the one in Settings changes the device for good.
 
 Both names live in [`src/config.ts`](src/config.ts) — change `PERSON_LABELS`
 there and the whole UI follows. The database stores the keys `bubs` and `meow`,
-which are also in a check constraint in the migration, so renaming the *keys*
-(as opposed to the labels) means a migration.
+which also appear in a check constraint in the first migration, so renaming the
+*keys* (as opposed to the labels) means a migration.
 
 ### Live sync
 
@@ -136,32 +117,36 @@ server replies.
 
 ## Data and privacy
 
-V1 has no login, by design. The app talks to the database with the `anon` key
-and the RLS policies allow that role to read and write everything. In practice
-that means **anyone who knows the project URL and the anon key can reach the
-data** (the key is visible in the frontend bundle). For a two-person household
-budget that is a deliberate trade-off; the way to change it is Supabase Auth
-plus RLS policies scoped to signed-in users.
+After `0002_require_login.sql`, every RLS policy requires an authenticated
+user, so the anon key in the bundle is useless on its own — the password is
+what protects the data. Two things are worth knowing:
+
+- Public sign-ups must stay disabled (step 4). With them on, anyone could
+  register and pass the `authenticated` check.
+- One shared account means the database cannot tell the two of you apart. Who
+  paid is attribution, not identity — anyone signed in can edit or delete any
+  expense.
 
 ## Layout
 
 ```
 src/
-├── components/   # CategoryGrid, CategoryTile, AmountPad, CalendarHeatmap, …
+├── components/   # CategoryGrid, CategoryTile, AmountPad, CalendarHeatmap, Login, …
 ├── pages/        # Home, Calendar, Summary, History, Settings
-├── hooks/        # useDeviceUser, useExpenses, useCategories, useRealtimeSync
+├── hooks/        # useDeviceUser, useSession, useExpenses, useRealtimeSync
 ├── lib/          # supabaseClient, calculations (limits, heatmap, colors, dates)
 ├── config.ts     # names, labels, quick amounts — all the tunables
 └── types/        # Expense, Category, Goal
 supabase/
 ├── migrations/0001_init.sql
+├── migrations/0002_require_login.sql
 └── seed.sql
 ```
 
-## Deliberately out of scope for V1
+## Deliberately out of scope
 
-Login, bank sync, push notifications, offline mode (beyond the PWA caching the
-app shell), CSV export, income / full cash flow, adding and deleting categories
-(V1 lets you edit the 8 starting ones: name, color, limit), and picking a date
-other than today when adding (a date can still be corrected by editing the
-expense in History).
+Separate accounts per person, bank sync, push notifications, offline mode
+(beyond the PWA caching the app shell), CSV export, income / full cash flow,
+adding and deleting categories (you can edit the 8 starting ones: name, color,
+limit), and picking a date other than today when adding (a date can still be
+corrected by editing the expense in History).

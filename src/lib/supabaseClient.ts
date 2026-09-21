@@ -14,7 +14,13 @@ export const supabase: SupabaseClient = createClient(
   url ?? 'http://localhost:54321',
   anonKey ?? 'public-anon-key-missing',
   {
-    auth: { persistSession: false },
+    auth: {
+      // the session is kept in localStorage and refreshed in the background,
+      // so the password is typed once per device
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    },
     realtime: { params: { eventsPerSecond: 5 } },
   },
 )

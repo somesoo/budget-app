@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/BottomNav'
+import { Login } from './components/Login'
 import { PersonOnboarding } from './components/PersonOnboarding'
 import { SetupNotice } from './components/SetupNotice'
 import { useDeviceUser } from './hooks/useDeviceUser'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
+import { useSession } from './hooks/useSession'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { Home } from './pages/Home'
 import { Calendar } from './pages/Calendar'
@@ -13,9 +15,13 @@ import { Settings } from './pages/Settings'
 
 export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
+  const { session, loading } = useSession()
   useRealtimeSync()
 
   if (!isSupabaseConfigured) return <SetupNotice />
+  // first paint restores the stored session — don't flash the login screen
+  if (loading) return <div className="min-h-[100dvh] bg-ink" />
+  if (!session) return <Login />
   if (!isChosen) return <PersonOnboarding onPick={setPerson} />
 
   return (

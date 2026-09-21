@@ -13,6 +13,12 @@ export const PERSON_LABELS: Record<Person, string> = {
   meow: 'Meow',
 }
 
+/**
+ * The shared account both of you sign in with. Not a secret (the password is),
+ * it just means the login screen only has to ask for a password.
+ */
+export const AUTH_EMAIL = (import.meta.env.VITE_AUTH_EMAIL as string | undefined) ?? ''
+
 /** Number formatting + currency suffix (amounts are stored as plain numbers). */
 export const LOCALE = 'en-GB'
 export const CURRENCY_SUFFIX = 'zł'

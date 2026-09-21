@@ -6,6 +6,7 @@ import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
 import { CURRENCY_SUFFIX } from '../config'
+import { supabase } from '../lib/supabaseClient'
 import { formatMoney, roundMoney } from '../lib/calculations'
 import type { Category } from '../types'
 
@@ -52,7 +53,7 @@ export function Settings() {
         </p>
       </section>
 
-      <section>
+      <section className="mb-6">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
           Shared savings goal
         </h2>
@@ -61,6 +62,14 @@ export function Settings() {
           onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
         />
       </section>
+
+      <button
+        type="button"
+        onClick={() => void supabase.auth.signOut()}
+        className="w-full rounded-2xl bg-white/5 py-3 text-sm font-semibold text-muted active:bg-white/10"
+      >
+        Sign out of this device
+      </button>
     </Screen>
   )
 }

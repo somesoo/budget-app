@@ -26,6 +26,9 @@ export const CURRENCY_SUFFIX = 'zł'
 /** Big one-tap buttons on the amount screen. */
 export const QUICK_AMOUNTS = [10, 20, 50, 100]
 
+/** One-tap contributions on the savings goal. */
+export const GOAL_QUICK_AMOUNTS = [50, 100, 200, 500]
+
 /** Fine-tuning steps shown once an amount is set. */
 export const FINE_TUNE_STEPS = [-5, -1, 1, 5]
 

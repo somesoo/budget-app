@@ -26,6 +26,38 @@ export function useGoal() {
   })
 }
 
+/**
+ * Pay into (or take out of) the goal. The addition happens in the database via
+ * `add_to_goal`, so two phones contributing at the same time cannot overwrite
+ * each other. A negative delta withdraws; the function clamps at zero.
+ */
+export function useAddToGoal() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ goalId, delta }: { goalId: string; delta: number }) => {
+      const { error } = await supabase.rpc('add_to_goal', {
+        goal_id: goalId,
+        delta,
+      })
+      if (error) throw error
+    },
+    onMutate: async ({ delta }) => {
+      await qc.cancelQueries({ queryKey: goalKey })
+      const previous = qc.getQueryData<Goal | null>(goalKey)
+      qc.setQueryData<Goal | null>(goalKey, (old) =>
+        old ? { ...old, current_amount: Math.max(old.current_amount + delta, 0) } : old,
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous !== undefined) qc.setQueryData(goalKey, ctx.previous)
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: goalKey })
+    },
+  })
+}
+
 export function useUpsertGoal() {
   const qc = useQueryClient()
   return useMutation({

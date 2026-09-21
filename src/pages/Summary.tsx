@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { SummaryBars } from '../components/SummaryBars'
+import { GoalProgress } from '../components/GoalProgress'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { useCategories } from '../hooks/useCategories'
 import { useExpenses } from '../hooks/useExpenses'
-import { useGoal } from '../hooks/useGoal'
+import { useAddToGoal, useGoal } from '../hooks/useGoal'
 import { PERSON_LABELS } from '../config'
 import {
   currentMonthKey,
@@ -20,15 +21,12 @@ export function Summary() {
   const { data: categories = [] } = useCategories()
   const { data: expenses = [] } = useExpenses(month)
   const { data: goal } = useGoal()
+  const addToGoal = useAddToGoal()
 
   const total = sumExpenses(expenses)
   const byCategory = sumByCategory(expenses)
   const byPerson = sumByPerson(expenses)
   const totalLimit = categories.reduce((acc, c) => acc + c.monthly_limit, 0)
-  const goalProgress =
-    goal && goal.target_amount > 0
-      ? Math.min(goal.current_amount / goal.target_amount, 1) * 100
-      : 0
 
   return (
     <Screen title="Summary" action={<MonthSwitcher month={month} onChange={setMonth} />}>
@@ -73,18 +71,11 @@ export function Summary() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
             Goal: {goal.name}
           </h2>
-          <div className="rounded-2xl bg-white/5 p-4">
-            <div className="mb-2 flex items-baseline justify-between text-sm">
-              <span className="font-semibold text-white">{formatMoney(goal.current_amount)}</span>
-              <span className="text-muted">of {formatMoney(goal.target_amount)}</span>
-            </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-emerald-400 transition-[width] duration-500"
-                style={{ width: `${goalProgress}%` }}
-              />
-            </div>
-          </div>
+          <GoalProgress
+            goal={goal}
+            pending={addToGoal.isPending}
+            onAdd={(delta) => addToGoal.mutate({ goalId: goal.id, delta })}
+          />
         </section>
       )}
     </Screen>

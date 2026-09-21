@@ -34,7 +34,9 @@ through Supabase Realtime.
 5. Now paste and run `supabase/migrations/0002_require_login.sql`, which drops
    the anonymous access policies and requires a signed-in user. Run it
    **after** step 3, or the app locks itself out.
-6. Check **Database → Replication** that `expenses`, `categories` and `goals`
+6. Paste and run `supabase/migrations/0003_add_to_goal.sql`, which adds the
+   function that pays into the savings goal.
+7. Check **Database → Replication** that `expenses`, `categories` and `goals`
    are in the `supabase_realtime` publication (the first migration adds them).
 
 ### 2. Local development
@@ -120,6 +122,20 @@ TanStack Query cache, so the other person's category tile updates without a
 refresh. Saving is also optimistic — the tile grows immediately, before the
 server replies.
 
+### The savings goal
+
+The goal card on **Summary** is where money goes in: *Add money* → a quick
+amount or a typed one → confirm. A leading minus takes money back out, and the
+balance never goes below zero. Settings is for the goal's name, its target and
+correcting the saved total outright.
+
+The addition runs in the database through the `add_to_goal` function rather
+than in the browser. Reading the balance, adding to it locally and writing it
+back would lose a contribution whenever both phones paid in at the same moment.
+
+The goal holds a running total, not a list of contributions — it does not
+record who paid in or when. A contributions history would be a separate table.
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
@@ -154,6 +170,7 @@ src/
 supabase/
 ├── migrations/0001_init.sql
 ├── migrations/0002_require_login.sql
+├── migrations/0003_add_to_goal.sql
 └── seed.sql
 ```
 

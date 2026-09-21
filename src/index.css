@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: theme('colors.ink');
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ink text-slate-100 antialiased;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    overscroll-behavior-y: none;
+  }
+
+  /* form fields must not trigger zoom on iOS → 16px minimum */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+
+  input[type='color'] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    padding: 0;
+  }
+}

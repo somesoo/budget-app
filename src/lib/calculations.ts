@@ -60,6 +60,21 @@ export function formatMonth(month: MonthKey): string {
   return monthFormatter.format(new Date(y, m - 1, 1))
 }
 
+const monthShortFormatter = new Intl.DateTimeFormat(LOCALE, { month: 'short' })
+const monthNameFormatter = new Intl.DateTimeFormat(LOCALE, { month: 'long' })
+
+/** "Sep" — axis labels. */
+export function formatMonthShort(month: MonthKey): string {
+  const [y, m] = month.split('-').map(Number)
+  return monthShortFormatter.format(new Date(y, m - 1, 1))
+}
+
+/** "September" — in sentences, where the year is obvious. */
+export function formatMonthName(month: MonthKey): string {
+  const [y, m] = month.split('-').map(Number)
+  return monthNameFormatter.format(new Date(y, m - 1, 1))
+}
+
 /** "5 September 2026" */
 export function formatDayLong(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number)
@@ -110,6 +125,14 @@ export function formatAmount(amount: number): string {
 /** With currency: "1,569.00 zł" */
 export function formatMoney(amount: number): string {
   return `${preciseFormatter.format(amount)} ${CURRENCY_SUFFIX}`
+}
+
+/**
+ * Whole złoty: "7,136 zł". For estimates — projections, averages — where the
+ * grosze would claim a precision the number doesn't have.
+ */
+export function formatMoneyWhole(amount: number): string {
+  return `${amountFormatter.format(Math.round(amount))} ${CURRENCY_SUFFIX}`
 }
 
 export function roundMoney(amount: number): number {

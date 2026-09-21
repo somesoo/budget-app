@@ -149,6 +149,43 @@ back would lose a contribution whenever both phones paid in at the same moment.
 The goal holds a running total, not a list of contributions — it does not
 record who paid in or when. A contributions history would be a separate table.
 
+### Insights
+
+A tab of charts over the last six months, all scoped by the month switcher at
+the top:
+
+- **Projected month end** and **vs last month** — headline numbers.
+- **Pace** — cumulative spending through the month against an even spread of
+  your limits. Scrub with a finger for any day's figures.
+- **Month by month** — totals per month, the selected one highlighted, limits
+  as a dashed line.
+- **Change by category** — each category up or down against the previous
+  month, centred on zero.
+- **Who spent what** — Bubs and Meow per month.
+- **Everyday spending by weekday** — average per weekday.
+
+Every chart has a *Show numbers* table under it.
+
+A few rules keep the charts honest rather than just pretty:
+
+- **A running month is compared like-for-like.** On the 21st, category changes
+  compare days 1–21 of both months, the month-by-month headline uses the
+  projection, and the current month's segment on the trend line is dashed.
+  Measuring 21 days against 31 would make almost everything look "down".
+- **Estimates are rounded to whole złoty** — a projection to the grosz claims
+  precision it doesn't have.
+- **Months before your first expense are left out**, not plotted as zeros.
+- **The weekday chart leaves out single expenses of 1,000 zł or more**
+  (`WEEKDAY_EXCLUDE_FROM` in `src/config.ts`), otherwise rent makes whatever
+  weekday it falls on look like your priciest day.
+- **Categories are named on every row, never identified by color alone.** The
+  seeded category colors fail colorblind separation (Health vs Other is
+  near-identical under deuteranopia), so no chart asks you to match a category
+  by its color. The series colors the charts do use were checked with a
+  palette validator against the card background.
+
+Charts are hand-drawn SVG — no charting library, so the bundle stays small.
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
@@ -175,9 +212,10 @@ what protects the data. Two things are worth knowing:
 ```
 src/
 ├── components/   # CategoryGrid, CategoryTile, AmountPad, CalendarHeatmap, Login, …
-├── pages/        # Home, Calendar, Summary, History, Settings
+│   └── charts/   # PaceChart, ColumnChart, CategoryDeltaBars, PersonLines
+├── pages/        # Home, Calendar, Summary, History, Insights, Settings
 ├── hooks/        # useDeviceUser, useSession, useExpenses, useRealtimeSync
-├── lib/          # supabaseClient, calculations (limits, heatmap, colors, dates)
+├── lib/          # supabaseClient, calculations, insights (chart aggregations)
 ├── config.ts     # names, labels, quick amounts — all the tunables
 └── types/        # Expense, Category, Goal
 supabase/

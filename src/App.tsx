@@ -12,6 +12,7 @@ import { Calendar } from './pages/Calendar'
 import { Summary } from './pages/Summary'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
+import { Insights } from './pages/Insights'
 
 export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/summary" element={<Summary />} />
         <Route path="/history" element={<History />} />
+        <Route path="/insights" element={<Insights />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

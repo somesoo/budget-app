@@ -34,3 +34,22 @@ export const FINE_TUNE_STEPS = [-5, -1, 1, 5]
 
 /** Week starts on Monday. */
 export const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+export const WEEKDAY_NAMES = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+]
+
+/** How many months the Insights tab looks back over. */
+export const INSIGHTS_MONTHS = 6
+
+/**
+ * Single expenses at or above this are left out of the weekday chart. It's
+ * about everyday habits — without this, rent makes whichever weekday it lands
+ * on look like your most expensive day.
+ */
+export const WEEKDAY_EXCLUDE_FROM = 1000

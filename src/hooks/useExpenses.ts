@@ -35,6 +35,38 @@ export function useExpenses(month: MonthKey) {
   })
 }
 
+const PAGE_SIZE = 1000 // Supabase's default max rows per response
+
+/**
+ * Every expense between two dates, inclusive. Pages through the results,
+ * because a multi-month window can exceed the per-request row cap and a
+ * silently truncated list would make every chart quietly wrong.
+ * The key sits under ['expenses'], so realtime invalidation covers it too.
+ */
+export function useExpensesBetween(from: string, to: string) {
+  return useQuery({
+    queryKey: ['expenses', 'range', from, to],
+    queryFn: async (): Promise<Expense[]> => {
+      const rows: Expense[] = []
+      for (let offset = 0; ; offset += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from('expenses')
+          .select('id, amount, category_id, person, note, expense_date, created_at')
+          .gte('expense_date', from)
+          .lte('expense_date', to)
+          .order('expense_date', { ascending: true })
+          .order('id', { ascending: true })
+          .range(offset, offset + PAGE_SIZE - 1)
+        if (error) throw error
+        rows.push(...(data ?? []).map(normalize))
+        if (!data || data.length < PAGE_SIZE) return rows
+      }
+    },
+    // keep the previous window on screen while a new one loads — no flash
+    placeholderData: (previous) => previous,
+  })
+}
+
 export function useAddExpense() {
   const qc = useQueryClient()
   return useMutation({
@@ -62,8 +94,9 @@ export function useAddExpense() {
     onError: (_err, _vars, ctx) => {
       if (ctx?.previous) qc.setQueryData(ctx.key, ctx.previous)
     },
-    onSettled: (_data, _err, vars) => {
-      void qc.invalidateQueries({ queryKey: expensesKey(monthKeyOfDate(vars.expense_date)) })
+    onSettled: () => {
+      // every cached month and range window, not just the month written to
+      void qc.invalidateQueries({ queryKey: ['expenses'] })
     },
   })
 }

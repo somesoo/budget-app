@@ -8,6 +8,7 @@ import { useAddExpense, useExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import {
   currentMonthKey,
+  formatDayLong,
   formatMoney,
   sumByCategory,
   sumExpenses,
@@ -50,21 +51,22 @@ export function Home() {
         onPersonChange={setEntryPerson}
         onCancel={() => setSelected(null)}
         saving={addExpense.isPending}
-        onSave={({ amount, person, note }) => {
+        onSave={({ amount, person, note, date }) => {
           addExpense.mutate(
             {
               amount,
               category_id: selected.id,
               person,
               note,
-              expense_date: todayKey(),
+              expense_date: date,
             },
             {
               onError: (err) => setToast(`Not saved: ${(err as Error).message}`),
             },
           )
           setSelected(null)
-          setToast('Saved')
+          // a backdated expense may not move the tiles on screen, so say where it went
+          setToast(date === todayKey() ? 'Saved' : `Saved · ${formatDayLong(date)}`)
         }}
       />
     )

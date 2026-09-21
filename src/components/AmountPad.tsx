@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import { QuickAmountButtons } from './QuickAmountButtons'
 import { FineTuneButtons } from './FineTuneButtons'
 import { UserSwitcher } from './UserSwitcher'
+import { DatePicker } from './DatePicker'
 import { CURRENCY_SUFFIX } from '../config'
-import { readableTextColor, roundMoney } from '../lib/calculations'
+import { readableTextColor, roundMoney, todayKey } from '../lib/calculations'
 import type { Category, Person } from '../types'
 
 interface Props {
@@ -11,7 +12,12 @@ interface Props {
   person: Person
   onPersonChange: (person: Person) => void
   onCancel: () => void
-  onSave: (input: { amount: number; person: Person; note: string | null }) => void
+  onSave: (input: {
+    amount: number
+    person: Person
+    note: string | null
+    date: string
+  }) => void
   saving: boolean
 }
 
@@ -27,8 +33,8 @@ function formatInput(value: number): string {
 
 /**
  * Amount screen: quick amounts → fine-tuning → save.
- * Date is always today (no picker in V1), the person comes from this phone's
- * cache, the note is optional.
+ * The date defaults to today and the person comes from this phone's cache, so
+ * the common case is three taps; both can be changed before saving.
  */
 export function AmountPad({
   category,
@@ -41,6 +47,7 @@ export function AmountPad({
   const [amountText, setAmountText] = useState('')
   const [note, setNote] = useState('')
   const [quickPick, setQuickPick] = useState<number | null>(null)
+  const [date, setDate] = useState(todayKey())
   const inputRef = useRef<HTMLInputElement>(null)
 
   const amount = parseAmount(amountText)
@@ -112,6 +119,11 @@ export function AmountPad({
           <UserSwitcher value={person} onChange={onPersonChange} />
         </div>
 
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-muted">Date</span>
+          <DatePicker value={date} onChange={setDate} />
+        </div>
+
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -125,7 +137,9 @@ export function AmountPad({
         <button
           type="button"
           disabled={!canSave}
-          onClick={() => onSave({ amount, person, note: note.trim() ? note.trim() : null })}
+          onClick={() =>
+            onSave({ amount, person, note: note.trim() ? note.trim() : null, date })
+          }
           className="h-16 w-full rounded-3xl text-xl font-bold transition active:scale-[0.99] disabled:opacity-40"
           style={{ backgroundColor: category.color, color: readableTextColor(category.color) }}
         >

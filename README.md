@@ -122,6 +122,19 @@ TanStack Query cache, so the other person's category tile updates without a
 refresh. Saving is also optimistic — the tile grows immediately, before the
 server replies.
 
+### Backdating an expense
+
+The amount screen has a date row: **Today** (preselected, so the common case
+stays three taps), **Yest.** and a picker for anything older. Future dates are
+not offered — they would land outside the month you are looking at.
+
+Saving with an older date confirms the date in the toast, because a backdated
+expense often changes nothing on screen: the tiles show the current month, so
+an expense filed to last month moves no bar. Look for it under History or
+Calendar with that month selected.
+
+A date can also be corrected afterwards by tapping the expense in History.
+
 ### The savings goal
 
 The goal card on **Summary** is where money goes in: *Add money* → a quick
@@ -179,5 +192,4 @@ supabase/
 Separate accounts per person, bank sync, push notifications, offline mode
 (beyond the PWA caching the app shell), CSV export, income / full cash flow,
 adding and deleting categories (you can edit the 8 starting ones: name, color,
-limit), and picking a date other than today when adding (a date can still be
-corrected by editing the expense in History).
+limit), and recurring or future-dated expenses.

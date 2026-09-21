@@ -17,6 +17,12 @@ export function todayKey(): string {
   return toDateKey(new Date())
 }
 
+export function yesterdayKey(): string {
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+  return toDateKey(d)
+}
+
 export function toMonthKey(date: Date): MonthKey {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}`
 }
@@ -58,6 +64,14 @@ export function formatMonth(month: MonthKey): string {
 export function formatDayLong(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number)
   return dayFormatter.format(new Date(y, m - 1, d))
+}
+
+const shortDayFormatter = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short' })
+
+/** "5 Sep" — for tight spaces like the date chip. */
+export function formatDayShort(dateKey: string): string {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  return shortDayFormatter.format(new Date(y, m - 1, d))
 }
 
 /**

@@ -49,6 +49,15 @@ npm run dev
 Without `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` the app shows a setup
 screen instead of empty pages.
 
+Two things the Supabase dashboard will try to talk you into:
+
+- It shows a **Next.js** snippet by default, with `NEXT_PUBLIC_*` names. This
+  is a Vite app and only reads `VITE_*` — copy the values, not the names.
+- A new project labels its key **publishable** (`sb_publishable_…`). That is
+  the anon key's replacement and belongs in `VITE_SUPABASE_ANON_KEY`.
+
+Vite reads `.env` at startup, so restart `npm run dev` after editing it.
+
 ### 3. Deploy to Vercel
 
 1. **Add New → Project** and import this repository. Vercel detects Vite on its

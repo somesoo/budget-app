@@ -49,10 +49,26 @@ Vercel/Netlify. On the phone: open the site → "Add to Home Screen".
 
 ## Self-hosting on Linux
 
-The app is a static bundle — any web server will do. One-time setup:
+The app is a static bundle — any web server will do.
+
+The repo is private, so the server needs read access. The simplest way is a
+deploy key: on the server run `ssh-keygen -t ed25519 -C budget-server -f
+~/.ssh/budget_deploy` (no passphrase), then add the contents of
+`~/.ssh/budget_deploy.pub` under **Settings → Deploy keys → Add deploy key** on
+GitHub (read-only is enough), and point SSH at it:
+
+```
+# ~/.ssh/config
+Host github-budget
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/budget_deploy
+```
+
+One-time setup:
 
 ```bash
-git clone <this-repo> /srv/budget && cd /srv/budget
+git clone github-budget:somesoo/budget-app.git /srv/budget && cd /srv/budget
 cp .env.example .env   # fill in the Supabase URL + anon key
 npm ci && npm run build
 ```

@@ -17,18 +17,23 @@ through Supabase Realtime.
 ### 1. Supabase project
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. In the **SQL Editor**, run in order:
+2. Open the **SQL Editor** and run these two files — open each one, copy its
+   *contents* into the editor and press Run (pasting the filename gives you a
+   syntax error):
    - `supabase/migrations/0001_init.sql` — tables, RLS, Realtime publication
    - `supabase/seed.sql` — 8 starting categories with limits + a savings goal
+
+   On a Mac, `pbcopy < supabase/migrations/0001_init.sql` puts a file straight
+   on the clipboard.
 3. Create the shared account: **Authentication → Users → Add user**, with
    *Auto Confirm User* enabled. Use any email you both remember (it is not a
    secret) and a strong password (that is the secret).
 4. Turn off public sign-ups: **Authentication → Providers → Email** → disable
    *Enable sign-ups*. Otherwise anyone could create their own account and read
    the budget.
-5. Now run `supabase/migrations/0002_require_login.sql`, which drops the
-   anonymous access policies and requires a signed-in user. Run it **after**
-   step 3, or the app locks itself out.
+5. Now paste and run `supabase/migrations/0002_require_login.sql`, which drops
+   the anonymous access policies and requires a signed-in user. Run it
+   **after** step 3, or the app locks itself out.
 6. Check **Database → Replication** that `expenses`, `categories` and `goals`
    are in the `supabase_realtime` publication (the first migration adds them).
 

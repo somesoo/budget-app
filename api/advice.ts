@@ -8,12 +8,21 @@ import type { AdviceRequest } from '../src/lib/forecast'
  * Runs on Vercel so the Gemini key never reaches the browser. Env vars:
  *   GEMINI_API_KEY   required, server-only (no VITE_ prefix!)
  *   GEMINI_MODEL     optional, defaults below
+ *   GEMINI_FALLBACK_MODEL   optional; tried when the main model stays overloaded
  *   VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY   already set for the frontend;
  *                    used here to check the caller is signed in
  */
 
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
+// A different model, so a busy one doesn't take the whole feature down.
+const DEFAULT_FALLBACK_MODEL = 'gemini-3.5-flash'
 const MAX_BODY_CHARS = 20_000
+
+/** Google's side is busy or broken — worth another try. Anything else is our problem. */
+const RETRYABLE = new Set([500, 502, 503, 504])
+const RETRY_DELAY_MS = 1000
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const SYSTEM_PROMPT = `You are a practical budgeting assistant for a couple in Poland who share one household budget. Amounts are Polish złoty (PLN).
 
@@ -102,35 +111,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Unexpected request shape' })
   }
 
-  const gemini = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts: [{ text: JSON.stringify(body) }] }],
-        generationConfig: {
-          temperature: 0.4,
-          responseMimeType: 'application/json',
-          responseSchema: RESPONSE_SCHEMA,
-        },
-      }),
+  const request = JSON.stringify({
+    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents: [{ role: 'user', parts: [{ text: JSON.stringify(body) }] }],
+    generationConfig: {
+      temperature: 0.4,
+      responseMimeType: 'application/json',
+      responseSchema: RESPONSE_SCHEMA,
     },
-  )
+  })
+  const ask = (m: string) =>
+    fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+        body: request,
+      },
+    )
 
-  if (!gemini.ok) {
+  // Overload (503) is common and usually brief: retry the main model once,
+  // then try a different model before giving up.
+  const fallback = process.env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL
+  const attempts = [model, model, ...(fallback !== model ? [fallback] : [])]
+  let gemini: Response | null = null
+  let usedModel = model
+  for (const [i, m] of attempts.entries()) {
+    if (i > 0) await sleep(RETRY_DELAY_MS * i)
+    usedModel = m
+    gemini = await ask(m)
+    if (gemini.ok || !RETRYABLE.has(gemini.status)) break
     // details go to the Vercel log, not to the browser
-    console.error('Gemini error', gemini.status, await gemini.text())
+    console.error(`Gemini ${m} attempt ${i + 1}:`, gemini.status, await gemini.text())
+  }
+
+  if (!gemini || !gemini.ok) {
+    const status = gemini?.status ?? 0
+    if (gemini && !RETRYABLE.has(status)) console.error('Gemini error', status, await gemini.text())
     const hint =
-      gemini.status === 404
-        ? ` — model "${model}" not found; set GEMINI_MODEL`
-        : gemini.status === 429
+      status === 404
+        ? ` — model "${usedModel}" not found; set GEMINI_MODEL`
+        : status === 429
           ? ' — rate limit or quota reached, try again later'
-          : gemini.status === 400 || gemini.status === 403
+          : status === 400 || status === 403
             ? ' — check GEMINI_API_KEY'
-            : ''
-    return res.status(502).json({ error: `Gemini request failed (${gemini.status})${hint}` })
+            : RETRYABLE.has(status)
+              ? ' — Gemini is overloaded right now, try again in a minute'
+              : ''
+    return res.status(502).json({ error: `Gemini request failed (${status})${hint}` })
   }
 
   const data = (await gemini.json()) as {
@@ -160,5 +188,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(502).json({ error: 'Gemini returned no recommendations — try again' })
   }
 
-  return res.status(200).json({ summary: clip(parsed.summary, 400), recommendations, model })
+  return res
+    .status(200)
+    .json({ summary: clip(parsed.summary, 400), recommendations, model: usedModel })
 }

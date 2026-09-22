@@ -77,6 +77,7 @@ Vite reads `.env` at startup, so restart `npm run dev` after editing it.
    | `VITE_AUTH_EMAIL` | the shared account's email |
    | `GEMINI_API_KEY` | your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix** |
    | `GEMINI_MODEL` | optional, defaults to `gemini-3.5-flash-lite` |
+   | `GEMINI_FALLBACK_MODEL` | optional, defaults to `gemini-3.5-flash`; used when the main model stays overloaded |
 
    The prefix matters: anything starting with `VITE_` is compiled into the
    JavaScript every visitor downloads. `GEMINI_API_KEY` stays on the server,
@@ -226,6 +227,14 @@ through a Vercel function at `api/advice.ts`:
   sanitises what comes back.
 - The result is saved in the `advice` table, so the other phone sees the same
   advice without another call. "Refresh" asks again.
+
+**When Gemini is busy.** A 503 from Google means the model is overloaded — it's
+on their side and usually passes within a minute, and it's more frequent on
+the free tier. The function retries the main model once, then tries
+`GEMINI_FALLBACK_MODEL`, so most of these never reach you. If one still does,
+the card says so; the exact reply from Google is in Vercel → your project →
+Logs. Other codes are not retried, because retrying won't fix them: 400/403
+is the key, 404 the model name, 429 your quota.
 
 **Free vs paid Gemini tier:** on Google's free API tier, submitted data may be
 used to improve Google's products and may be read by human reviewers; the paid

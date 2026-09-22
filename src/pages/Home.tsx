@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { CategoryGrid } from '../components/CategoryGrid'
 import { AmountPad } from '../components/AmountPad'
+import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
 import { useCategories } from '../hooks/useCategories'
 import { useAddExpense, useExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
+import { useAddIncome } from '../hooks/useIncomes'
 import {
   currentMonthKey,
   formatDayLong,
@@ -22,6 +24,8 @@ export function Home() {
   const { data: categories = [], isLoading, error } = useCategories()
   const { data: expenses = [] } = useExpenses(month)
   const addExpense = useAddExpense()
+  const addIncome = useAddIncome()
+  const [incomeOpen, setIncomeOpen] = useState(false)
 
   const [selected, setSelected] = useState<Category | null>(null)
   // Person for this one expense — defaults to whoever owns the phone, but can be
@@ -41,6 +45,25 @@ export function Home() {
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
     setSelected(category)
+  }
+
+  if (incomeOpen) {
+    return (
+      <IncomePad
+        person={entryPerson}
+        onPersonChange={setEntryPerson}
+        onCancel={() => setIncomeOpen(false)}
+        saving={addIncome.isPending}
+        onSave={({ amount, person, note, date }) => {
+          addIncome.mutate(
+            { amount, person, note, income_date: date },
+            { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
+          )
+          setIncomeOpen(false)
+          setToast(date === todayKey() ? 'Income saved' : `Income saved · ${formatDayLong(date)}`)
+        }}
+      />
+    )
   }
 
   if (selected) {
@@ -77,9 +100,21 @@ export function Home() {
       title="What for?"
       action={devicePerson && <UserSwitcher value={devicePerson} onChange={setDevicePerson} />}
     >
-      <p className="mb-4 text-sm text-muted">
-        This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
-      </p>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="text-sm text-muted">
+          This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setEntryPerson(devicePerson ?? 'bubs')
+            setIncomeOpen(true)
+          }}
+          className="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1.5 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-400/30 active:bg-emerald-400/25"
+        >
+          + Income
+        </button>
+      </div>
 
       {error && (
         <p className="mb-4 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">

@@ -6,10 +6,12 @@ import { Screen } from '../components/Screen'
 import { useCategories } from '../hooks/useCategories'
 import { useExpenses } from '../hooks/useExpenses'
 import { useAddToGoal, useGoal } from '../hooks/useGoal'
+import { useIncomesBetween } from '../hooks/useIncomes'
 import { PERSON_LABELS } from '../config'
 import {
   currentMonthKey,
   formatMoney,
+  monthRange,
   sumByCategory,
   sumByPerson,
   sumExpenses,
@@ -22,6 +24,9 @@ export function Summary() {
   const { data: expenses = [] } = useExpenses(month)
   const { data: goal } = useGoal()
   const addToGoal = useAddToGoal()
+  const { from, to } = monthRange(month)
+  const { data: incomes = [] } = useIncomesBetween(from, to)
+  const income = incomes.reduce((a, i) => a + i.amount, 0)
 
   const total = sumExpenses(expenses)
   const byCategory = sumByCategory(expenses)
@@ -37,6 +42,21 @@ export function Summary() {
           <p className="mt-1 text-sm text-muted">
             of {formatMoney(totalLimit)} in limits · {Math.round((total / totalLimit) * 100)}%
           </p>
+        )}
+        {income > 0 && (
+          <div className="mt-3 flex gap-4 border-t border-white/10 pt-3 text-sm">
+            <p className="text-muted">
+              Income <span className="font-semibold text-emerald-300">{formatMoney(income)}</span>
+            </p>
+            <p className="text-muted">
+              Left{' '}
+              <span
+                className={`font-semibold ${income - total < 0 ? 'text-red-400' : 'text-white'}`}
+              >
+                {formatMoney(income - total)}
+              </span>
+            </p>
+          </div>
         )}
       </div>
 

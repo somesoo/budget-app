@@ -36,8 +36,11 @@ through Supabase Realtime.
    **after** step 3, or the app locks itself out.
 6. Paste and run `supabase/migrations/0003_add_to_goal.sql`, which adds the
    function that pays into the savings goal.
-7. Check **Database → Replication** that `expenses`, `categories` and `goals`
-   are in the `supabase_realtime` publication (the first migration adds them).
+7. Paste and run `supabase/migrations/0004_income_and_advice.sql` — the income
+   table and the stored recommendations.
+8. Check **Database → Replication** that `expenses`, `categories` and `goals`
+   (and, after step 7, `incomes` and `advice`) are in the `supabase_realtime`
+   publication — the migrations add them.
 
 ### 2. Local development
 
@@ -72,6 +75,12 @@ Vite reads `.env` at startup, so restart `npm run dev` after editing it.
    | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` |
    | `VITE_SUPABASE_ANON_KEY` | the project's anon key |
    | `VITE_AUTH_EMAIL` | the shared account's email |
+   | `GEMINI_API_KEY` | your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix** |
+   | `GEMINI_MODEL` | optional, defaults to `gemini-3.5-flash-lite` |
+
+   The prefix matters: anything starting with `VITE_` is compiled into the
+   JavaScript every visitor downloads. `GEMINI_API_KEY` stays on the server,
+   where only `/api/advice` can read it.
 
 3. Deploy. Every push to `main` redeploys automatically.
 
@@ -186,6 +195,47 @@ A few rules keep the charts honest rather than just pretty:
 
 Charts are hand-drawn SVG — no charting library, so the bundle stays small.
 
+### Income, forecast and recommendations
+
+**Income.** "+ Income" on the Add tab logs a paycheck — who received it, the
+date, a note. The last amount per person is offered as a one-tap chip, since
+salaries repeat. Paychecks are listed, edited and deleted under History →
+Income.
+
+**Forecast** (top of Insights) is plain arithmetic, done in code:
+
+- *Expected income* per person: this month's logged paychecks, or — until one
+  is logged — that person's average month, marked "expected". Once a paycheck
+  is logged it wins even if it's lower than usual; the forecast errs towards
+  caution.
+- *Projected spending*: this month's pace extended to month end.
+- *Left over*, savings rate, how much a day you can still spend to break even,
+  and roughly how many months to the savings goal at this month's surplus.
+
+**Recommendations** come from Gemini, on request ("Get recommendations"),
+through a Vercel function at `api/advice.ts`:
+
+- The browser sends the month's **totals only** — income per person, spending
+  and limit per category with a typical month, the Bubs/Meow split, the goal.
+  No notes, no individual expenses, no email. The card's "What gets sent to
+  Gemini?" link says the same.
+- The function checks the caller is signed in to your Supabase before calling
+  Gemini, so the URL alone can't spend your quota.
+- Gemini is told the numbers are already computed and not to recalculate them,
+  and the answer is constrained to a JSON schema; the function also caps and
+  sanitises what comes back.
+- The result is saved in the `advice` table, so the other phone sees the same
+  advice without another call. "Refresh" asks again.
+
+**Free vs paid Gemini tier:** on Google's free API tier, submitted data may be
+used to improve Google's products and may be read by human reviewers; the paid
+tier excludes both. Only aggregates are sent, but monthly income is still
+personal — decide which tier you're comfortable with.
+
+**Locally**, `npm run dev` doesn't run `/api` functions; the card says so
+instead of failing. To try recommendations locally, use the Vercel CLI:
+`vercel dev` (with `GEMINI_API_KEY` in `.env`, which is git-ignored).
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
@@ -215,19 +265,22 @@ src/
 │   └── charts/   # PaceChart, ColumnChart, CategoryDeltaBars, PersonLines
 ├── pages/        # Home, Calendar, Summary, History, Insights, Settings
 ├── hooks/        # useDeviceUser, useSession, useExpenses, useRealtimeSync
-├── lib/          # supabaseClient, calculations, insights (chart aggregations)
+├── lib/          # supabaseClient, calculations, insights, forecast
 ├── config.ts     # names, labels, quick amounts — all the tunables
 └── types/        # Expense, Category, Goal
+api/
+└── advice.ts     # Vercel function: auth check → Gemini → recommendations
 supabase/
 ├── migrations/0001_init.sql
 ├── migrations/0002_require_login.sql
 ├── migrations/0003_add_to_goal.sql
+├── migrations/0004_income_and_advice.sql
 └── seed.sql
 ```
 
 ## Deliberately out of scope
 
-Separate accounts per person, bank sync, push notifications, offline mode
-(beyond the PWA caching the app shell), CSV export, income / full cash flow,
+Separate accounts per person, bank sync, recurring income that logs itself, push notifications, offline mode
+(beyond the PWA caching the app shell), CSV export, income in the Calendar view,
 adding and deleting categories (you can edit the 8 starting ones: name, color,
 limit), and recurring or future-dated expenses.

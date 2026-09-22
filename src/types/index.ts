@@ -30,3 +30,30 @@ export interface Goal {
 }
 
 export type NewExpense = Omit<Expense, 'id' | 'created_at'>
+
+export interface Income {
+  id: string
+  amount: number
+  person: Person
+  note: string | null
+  /** ISO date, YYYY-MM-DD, local time. */
+  income_date: string
+  created_at: string
+}
+
+export type NewIncome = Omit<Income, 'id' | 'created_at'>
+
+/** One recommendation as returned by /api/advice (Gemini, schema-constrained). */
+export interface Recommendation {
+  title: string
+  detail: string
+  /** Rough monthly effect in złoty, if the model could ground one in the data. */
+  monthlyImpact: number | null
+}
+
+export interface Advice {
+  id: string
+  month: string
+  content: { summary: string; recommendations: Recommendation[]; model: string }
+  created_at: string
+}

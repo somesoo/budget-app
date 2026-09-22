@@ -51,6 +51,12 @@ export function useRealtimeSync(): SyncStatus {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, () => {
         void qc.invalidateQueries({ queryKey: goalKey })
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'incomes' }, () => {
+        void qc.invalidateQueries({ queryKey: ['incomes'] })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'advice' }, () => {
+        void qc.invalidateQueries({ queryKey: ['advice'] })
+      })
       .subscribe((state) => {
         if (state === 'SUBSCRIBED') setStatus('live')
         else if (state === 'CLOSED' || state === 'CHANNEL_ERROR' || state === 'TIMED_OUT') {

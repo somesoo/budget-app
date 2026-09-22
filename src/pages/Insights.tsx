@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from 'react'
+import { AdviceCard } from '../components/AdviceCard'
+import { ForecastCard } from '../components/ForecastCard'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { CategoryDeltaBars } from '../components/charts/CategoryDeltaBars'
@@ -17,6 +19,9 @@ import {
 } from '../config'
 import { useCategories } from '../hooks/useCategories'
 import { useExpensesBetween } from '../hooks/useExpenses'
+import { useGoal } from '../hooks/useGoal'
+import { useIncomesBetween } from '../hooks/useIncomes'
+import { buildAdviceRequest, monthForecast } from '../lib/forecast'
 import {
   currentMonthKey,
   daysInMonth,
@@ -42,7 +47,7 @@ import {
   weekdayAverages,
   windowRange,
 } from '../lib/insights'
-import { PERSONS, type Expense } from '../types'
+import { PERSONS, type Expense, type Goal, type Income } from '../types'
 
 export function Insights() {
   const [month, setMonth] = useState<MonthKey>(currentMonthKey())
@@ -51,6 +56,8 @@ export function Insights() {
 
   const { data: categories = [] } = useCategories()
   const { data: expenses, isLoading, isPlaceholderData, error } = useExpensesBetween(from, to)
+  const { data: incomes = [] } = useIncomesBetween(from, to)
+  const { data: goal } = useGoal()
 
   return (
     <Screen title="Insights" action={<MonthSwitcher month={month} onChange={setMonth} />}>
@@ -71,6 +78,8 @@ export function Insights() {
             expenses={expenses}
             totalLimit={categories.reduce((acc, c) => acc + c.monthly_limit, 0)}
             categories={categories}
+            incomes={incomes}
+            goal={goal}
           />
         </div>
       )}
@@ -84,9 +93,19 @@ interface BodyProps {
   expenses: Expense[]
   totalLimit: number
   categories: Parameters<typeof categoryDeltas>[1]
+  incomes: Income[]
+  goal: Goal | null | undefined
 }
 
-function InsightsBody({ month, months, expenses, totalLimit, categories }: BodyProps) {
+function InsightsBody({
+  month,
+  months,
+  expenses,
+  totalLimit,
+  categories,
+  incomes,
+  goal,
+}: BodyProps) {
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
     return <Notice>Nothing to chart yet — add a few expenses and come back.</Notice>
@@ -111,6 +130,7 @@ function InsightsBody({ month, months, expenses, totalLimit, categories }: BodyP
 
   const projected = isCurrent ? projectMonthEnd(spent, month) : spent
   const points = pacePoints(expenses, month, totalLimit)
+  const forecast = monthForecast({ month, isCurrent, expenses, incomes, goal })
 
   return (
     <>
@@ -122,6 +142,14 @@ function InsightsBody({ month, months, expenses, totalLimit, categories }: BodyP
         change={change}
         prevName={prevName}
         sameSpan={isCurrent}
+      />
+
+      <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
+
+      <AdviceCard
+        month={month}
+        isCurrent={isCurrent}
+        buildRequest={() => buildAdviceRequest({ month, expenses, categories, goal, forecast })}
       />
 
       <ChartCard

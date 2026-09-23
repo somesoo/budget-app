@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { CalendarHeatmap } from '../components/CalendarHeatmap'
 import { EntryEditor } from '../components/history/EntryEditor'
 import { EntryRow } from '../components/history/EntryRow'
 import { UndoToast } from '../components/history/UndoToast'
@@ -58,6 +59,13 @@ export function History() {
   const [categoryId, setCategoryId] = useState<string | null>(null)
   const [editing, setEditing] = useState<Entry | null>(null)
   const [deleted, setDeleted] = useState<Entry | null>(null)
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [day, setDay] = useState<string | null>(null)
+
+  const changeMonth = (next: string) => {
+    setMonth(next)
+    setDay(null)
+  }
 
   const { from, to } = monthRange(month)
   const { data: categories = [] } = useCategories()
@@ -66,7 +74,9 @@ export function History() {
   const searching = sanitizeSearch(query).length >= 2 || parseAmountQuery(query) !== null
   const matchingCategoryIds = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return q.length >= 2 ? categories.filter((c) => c.name.toLowerCase().includes(q)).map((c) => c.id) : []
+    return q.length >= 2
+      ? categories.filter((c) => c.name.toLowerCase().includes(q)).map((c) => c.id)
+      : []
   }, [categories, query])
 
   const monthExpenses = useExpenses(month)
@@ -89,12 +99,20 @@ export function History() {
 
   // a category only exists on expenses, so picking one narrows to those
   const effectiveKind: Kind = categoryId ? 'expense' : kind
-  const entries = toEntries(expenses, incomes).filter(
+  const matching = toEntries(expenses, incomes).filter(
     (e) =>
       (effectiveKind === 'all' || e.kind === effectiveKind) &&
       (!person || e.item.person === person) &&
       (!categoryId || (e.kind === 'expense' && e.item.category_id === categoryId)),
   )
+  // the calendar picks a day out of whatever the filters leave
+  const calendarOn = showCalendar && !searching
+  const entries = calendarOn && day ? matching.filter((e) => e.date === day) : matching
+  const spentByDay: Record<string, number> = {}
+  for (const e of matching) {
+    if (e.kind === 'expense')
+      spentByDay[e.date] = roundMoney((spentByDay[e.date] ?? 0) + e.item.amount)
+  }
   const groups = groupByDay(entries)
   const sum = totals(entries)
   const net = roundMoney(sum.earned - sum.spent)
@@ -124,34 +142,58 @@ export function History() {
   return (
     <Screen
       title="History"
-      action={searching ? null : <MonthSwitcher month={month} onChange={setMonth} />}
+      action={searching ? null : <MonthSwitcher month={month} onChange={changeMonth} />}
     >
       {/* the status bar is translucent in the installed app; this strip keeps
           the list from showing through it above the sticky day headers */}
       <div aria-hidden className="fixed inset-x-0 top-0 z-20 h-[env(safe-area-inset-top)] bg-ink" />
 
-      {/* ---------- search ---------- */}
-      <div className="relative mb-3">
-        <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-          ⌕
-        </span>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search title, category or amount"
-          aria-label="Search all transactions"
-          enterKeyHint="search"
-          className="w-full rounded-xl bg-white/5 py-2.5 pl-9 pr-10 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/70 focus:ring-white/40 [&::-webkit-search-cancel-button]:hidden"
-        />
-        {query && (
+      {/* ---------- search, and the calendar view beside it ---------- */}
+      <div className="mb-3 flex gap-2">
+        <div className="relative min-w-0 flex-1">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          >
+            ⌕
+          </span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search title, category or amount"
+            aria-label="Search all transactions"
+            enterKeyHint="search"
+            className="w-full rounded-xl bg-white/5 py-2.5 pl-9 pr-10 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/70 focus:ring-white/40 [&::-webkit-search-cancel-button]:hidden"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-lg text-muted active:bg-white/10"
+            >
+              ×
+            </button>
+          )}
+        </div>
+        {!searching && (
           <button
             type="button"
-            onClick={() => setQuery('')}
-            aria-label="Clear search"
-            className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-lg text-muted active:bg-white/10"
+            onClick={() => {
+              setShowCalendar((v) => !v)
+              setDay(null)
+            }}
+            aria-pressed={showCalendar}
+            aria-label="Calendar view"
+            title="Calendar view"
+            className={`flex w-11 shrink-0 items-center justify-center rounded-xl text-lg ring-1 transition ${
+              showCalendar
+                ? 'bg-white text-ink ring-white'
+                : 'bg-white/5 text-muted ring-white/10 active:bg-white/10'
+            }`}
           >
-            ×
+            ▦
           </button>
         )}
       </div>
@@ -191,16 +233,35 @@ export function History() {
 
       {effectiveKind !== 'income' && categories.length > 0 && (
         <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
-          {categories.map((c) => (
-            <Chip
-              key={c.id}
-              active={categoryId === c.id}
-              color={c.color}
-              onClick={() => setCategoryId(categoryId === c.id ? null : c.id)}
-            >
-              {c.name}
-            </Chip>
-          ))}
+          {categories
+            .filter((c) => !c.archived || c.id === categoryId)
+            .map((c) => (
+              <Chip
+                key={c.id}
+                active={categoryId === c.id}
+                color={c.color}
+                onClick={() => setCategoryId(categoryId === c.id ? null : c.id)}
+              >
+                {c.name}
+              </Chip>
+            ))}
+        </div>
+      )}
+
+      {calendarOn && (
+        <div className="mb-4 rounded-3xl bg-white/[0.04] p-3 ring-1 ring-white/5">
+          <CalendarHeatmap
+            month={month}
+            totalsByDay={spentByDay}
+            monthTotal={totals(matching).spent}
+            selectedDay={day}
+            onSelectDay={setDay}
+          />
+          <p className="mt-2 text-center text-xs text-muted">
+            {day
+              ? 'Tap the day again to see the whole month'
+              : 'Darker = more spent than an average day · tap a day'}
+          </p>
         </div>
       )}
 
@@ -218,11 +279,19 @@ export function History() {
       <p className="mb-4 flex items-center justify-between text-xs text-muted">
         <span>
           {entries.length} {pluralize(entries.length, 'transaction', 'transactions')}
-          {searching ? ' across all months' : ` in ${formatMonthName(month)}`}
+          {searching
+            ? ' across all months'
+            : calendarOn && day
+              ? ` on ${dayHeading(day).subtitle ?? dayHeading(day).title}`
+              : ` in ${formatMonthName(month)}`}
           {searching && expenses.length >= SEARCH_LIMIT && ` · showing the newest ${SEARCH_LIMIT}`}
         </span>
         {filtered && (
-          <button type="button" onClick={clearFilters} className="text-xs font-semibold text-white active:opacity-60">
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-xs font-semibold text-white active:opacity-60"
+          >
             Clear filters
           </button>
         )}
@@ -281,7 +350,9 @@ export function History() {
                       <EntryRow
                         entry={entry}
                         categories={categoryMap}
-                        onOpen={entry.id.startsWith('optimistic-') ? undefined : () => setEditing(entry)}
+                        onOpen={
+                          entry.id.startsWith('optimistic-') ? undefined : () => setEditing(entry)
+                        }
                       />
                     </li>
                   ))}
@@ -332,11 +403,19 @@ function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition ${
-        active ? 'text-white ring-white/60' : 'bg-white/5 text-slate-300 ring-white/10 active:bg-white/10'
+        active
+          ? 'text-white ring-white/60'
+          : 'bg-white/5 text-slate-300 ring-white/10 active:bg-white/10'
       }`}
-      style={active ? { backgroundColor: color ? withAlpha(color, 0.3) : 'rgba(255,255,255,0.18)' } : undefined}
+      style={
+        active
+          ? { backgroundColor: color ? withAlpha(color, 0.3) : 'rgba(255,255,255,0.18)' }
+          : undefined
+      }
     >
-      {color && <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />}
+      {color && (
+        <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+      )}
       {children}
     </button>
   )
@@ -351,7 +430,8 @@ function Stat({
   value: string
   tone?: 'positive' | 'negative'
 }) {
-  const color = tone === 'positive' ? 'text-emerald-300' : tone === 'negative' ? 'text-red-300' : 'text-white'
+  const color =
+    tone === 'positive' ? 'text-emerald-300' : tone === 'negative' ? 'text-red-300' : 'text-white'
   return (
     <div className="min-w-0 rounded-2xl bg-white/5 px-3 py-2.5">
       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>

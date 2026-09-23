@@ -89,26 +89,36 @@ export function EntryEditor({
         {isExpense && (
           <Field label="Category">
             <div className="flex flex-wrap gap-2">
-              {categories.map((c) => {
-                const active = c.id === categoryId
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setCategoryId(c.id)}
-                    aria-pressed={active}
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ring-white/10 transition"
-                    style={
-                      active
-                        ? { backgroundColor: withAlpha(c.color, 0.28), color: '#fff', boxShadow: `inset 0 0 0 2px ${c.color}` }
-                        : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#cbd5e1' }
-                    }
-                  >
-                    <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
-                    {c.name}
-                  </button>
-                )
-              })}
+              {categories
+                .filter((c) => !c.archived || c.id === initialCategory)
+                .map((c) => {
+                  const active = c.id === categoryId
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setCategoryId(c.id)}
+                      aria-pressed={active}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ring-white/10 transition"
+                      style={
+                        active
+                          ? {
+                              backgroundColor: withAlpha(c.color, 0.28),
+                              color: '#fff',
+                              boxShadow: `inset 0 0 0 2px ${c.color}`,
+                            }
+                          : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#cbd5e1' }
+                      }
+                    >
+                      <span
+                        aria-hidden
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: c.color }}
+                      />
+                      {c.name}
+                    </button>
+                  )
+                })}
             </div>
           </Field>
         )}

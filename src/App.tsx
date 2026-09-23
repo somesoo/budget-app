@@ -8,8 +8,7 @@ import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { useSession } from './hooks/useSession'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { Home } from './pages/Home'
-import { Calendar } from './pages/Calendar'
-import { Summary } from './pages/Summary'
+import { Budget } from './pages/Budget'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
 import { Insights } from './pages/Insights'
@@ -29,9 +28,11 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/summary" element={<Summary />} />
         <Route path="/history" element={<History />} />
+        <Route path="/budget" element={<Budget />} />
+        {/* old tabs, kept so a bookmarked or installed link still lands somewhere */}
+        <Route path="/calendar" element={<Navigate to="/history" replace />} />
+        <Route path="/summary" element={<Navigate to="/budget" replace />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />

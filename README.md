@@ -38,9 +38,12 @@ through Supabase Realtime.
    function that pays into the savings goal.
 7. Paste and run `supabase/migrations/0004_income_and_advice.sql` — the income
    table and the stored recommendations.
-8. Check **Database → Replication** that `expenses`, `categories` and `goals`
-   (and, after step 7, `incomes` and `advice`) are in the `supabase_realtime`
-   publication — the migrations add them.
+8. Paste and run `supabase/migrations/0005_budget_plans.sql` — monthly budget
+   plans and hideable categories. The app keeps working without it (no plans,
+   nothing hidden), so it's fine to deploy first and run this after.
+9. Check **Database → Replication** that `expenses`, `categories` and `goals`
+   (and, after steps 7–8, `incomes`, `advice` and `budgets`) are in the
+   `supabase_realtime` publication — the migrations add them.
 
 ### 2. Local development
 
@@ -140,14 +143,54 @@ not offered — they would land outside the month you are looking at.
 
 Saving with an older date confirms the date in the toast, because a backdated
 expense often changes nothing on screen: the tiles show the current month, so
-an expense filed to last month moves no bar. Look for it under History or
-Calendar with that month selected.
+an expense filed to last month moves no bar. Look for it under History with
+that month selected (the ▦ button next to search shows it as a calendar).
 
 A date can also be corrected afterwards by tapping the expense in History.
 
+### Budget: a plan per month
+
+No two months cost the same — December has presents, March the car
+insurance — so each month can have its own plan: expected income, what to put
+aside, and a limit per category. It lives in the `budgets` table, one row per
+month. A month without a plan falls back to the default limits from Settings.
+
+Everything that measures against limits — the Add screen's tiles and "left"
+figure, the Budget tab's bars, the Insights pace line — uses the selected
+month's plan (`useMonthCategories`).
+
+The **Budget** tab shows the month against its plan: spent of planned, what's
+left per day, income and savings against what was planned, per-category bars.
+Its month switcher goes up to three months ahead; a future month shows its
+plan, or an invitation to make one. In the running month a card leads to
+planning the next one.
+
+The **planner** is zero-based: income − savings − every category's limit
+should come to 0, so each złoty has a job, and it tells you what's left
+unassigned or how far over you are. For each category it shows what it has
+actually cost — *typical* (average of the last 3 complete months), *last*
+month, and the same month a year ago — each one tap to adopt, rounded up to
+10 zł. *Start from* refills everything from last month's plan, typical
+spending, or the defaults. "What's different about this month?" is a free-text
+note saved with the plan.
+
+**AI draft** (`api/plan.ts`) sends Gemini monthly totals per category and of
+income for up to 12 months, the goal and your note — no individual expenses —
+and gets back a limit and a one-line reason per category, suggested savings and
+a few tips. Nothing is applied until you tap a suggestion or *Use all*, and
+nothing is stored until you save the plan. The same privacy note as for
+recommendations below applies, and your note is sent verbatim.
+
+### Categories
+
+Settings edits each category's name, color and default limit, adds new ones,
+and hides old ones. Hiding (the `archived` column) rather than deleting,
+because expenses reference their category: a hidden category disappears from
+the Add screen, the pickers and planning, while its old expenses keep it.
+
 ### The savings goal
 
-The goal card on **Summary** is where money goes in: *Add money* → a quick
+The goal card on **Budget** is where money goes in: *Add money* → a quick
 amount or a typed one → confirm. A leading minus takes money back out, and the
 balance never goes below zero. Settings is for the goal's name, its target and
 correcting the saved total outright.
@@ -200,8 +243,8 @@ Charts are hand-drawn SVG — no charting library, so the bundle stays small.
 
 **Income.** "+ Income" on the Add tab logs a paycheck — who received it, the
 date, a note. The last amount per person is offered as a one-tap chip, since
-salaries repeat. Paychecks are listed, edited and deleted under History →
-Income.
+salaries repeat. Paychecks show up in History alongside expenses, where
+they are edited and deleted like any other entry.
 
 **Forecast** (top of Insights) is plain arithmetic, done in code:
 
@@ -214,7 +257,8 @@ Income.
   and roughly how many months to the savings goal at this month's surplus.
 
 **Recommendations** come from Gemini, on request ("Get recommendations"),
-through a Vercel function at `api/advice.ts`:
+through a Vercel function at `api/advice.ts` (the sign-in check, retries and
+model fallback shared with `api/plan.ts` live in `api/_gemini.ts`):
 
 - The browser sends the month's **totals only** — income per person, spending
   and limit per category with a typical month, the Bubs/Meow split, the goal.
@@ -272,24 +316,26 @@ what protects the data. Two things are worth knowing:
 src/
 ├── components/   # CategoryGrid, CategoryTile, AmountPad, CalendarHeatmap, Login, …
 │   └── charts/   # PaceChart, ColumnChart, CategoryDeltaBars, PersonLines
-├── pages/        # Home, Calendar, Summary, History, Insights, Settings
+├── pages/        # Home, History, Budget, Insights, Settings
 ├── hooks/        # useDeviceUser, useSession, useExpenses, useRealtimeSync
-├── lib/          # supabaseClient, calculations, insights, forecast
+├── lib/          # supabaseClient, calculations, insights, forecast, history, planning
 ├── config.ts     # names, labels, quick amounts — all the tunables
 └── types/        # Expense, Category, Goal
 api/
-└── advice.ts     # Vercel function: auth check → Gemini → recommendations
+├── _gemini.ts    # shared: sign-in check, Gemini call with retry + fallback
+├── advice.ts     # recommendations for the running month
+└── plan.ts       # a drafted budget for a month
 supabase/
 ├── migrations/0001_init.sql
 ├── migrations/0002_require_login.sql
 ├── migrations/0003_add_to_goal.sql
 ├── migrations/0004_income_and_advice.sql
+├── migrations/0005_budget_plans.sql
 └── seed.sql
 ```
 
 ## Deliberately out of scope
 
 Separate accounts per person, bank sync, recurring income that logs itself, push notifications, offline mode
-(beyond the PWA caching the app shell), CSV export, income in the Calendar view,
-adding and deleting categories (you can edit the 8 starting ones: name, color,
-limit), and recurring or future-dated expenses.
+(beyond the PWA caching the app shell), CSV export, deleting categories (hide
+them instead), and recurring or future-dated expenses.

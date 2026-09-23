@@ -1,28 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 // type-only: erased at build time, so no browser code (import.meta.env) runs here
 import type { AdviceRequest } from '../src/lib/forecast'
+import { MAX_BODY_CHARS, askGemini, authorize, clip, isName, isNum, isNumOrNull } from './_gemini.js'
 
 /*
  * POST /api/advice — turns the month's aggregates into recommendations.
- *
- * Runs on Vercel so the Gemini key never reaches the browser. Env vars:
- *   GEMINI_API_KEY   required, server-only (no VITE_ prefix!)
- *   GEMINI_MODEL     optional, defaults below
- *   GEMINI_FALLBACK_MODEL   optional; tried when the main model stays overloaded
- *   VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY   already set for the frontend;
- *                    used here to check the caller is signed in
+ * Runs on Vercel so the Gemini key never reaches the browser; env vars and
+ * the retry logic are in _gemini.ts.
  */
-
-const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
-// A different model, so a busy one doesn't take the whole feature down.
-const DEFAULT_FALLBACK_MODEL = 'gemini-3.5-flash'
-const MAX_BODY_CHARS = 20_000
-
-/** Google's side is busy or broken — worth another try. Anything else is our problem. */
-const RETRYABLE = new Set([500, 502, 503, 504])
-const RETRY_DELAY_MS = 1000
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const SYSTEM_PROMPT = `You are a practical budgeting assistant for a couple in Poland who share one household budget. Amounts are Polish złoty (PLN).
 
@@ -56,10 +41,6 @@ const RESPONSE_SCHEMA = {
   required: ['summary', 'recommendations'],
 }
 
-const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
-const isNumOrNull = (v: unknown) => v === null || isNum(v)
-const isName = (v: unknown) => typeof v === 'string' && v.length > 0 && v.length <= 60
-
 /** Shape check on what the browser sent — it's user input like any other. */
 function isAdviceRequest(b: unknown): b is AdviceRequest {
   if (!b || typeof b !== 'object') return false
@@ -84,94 +65,17 @@ function isAdviceRequest(b: unknown): b is AdviceRequest {
   )
 }
 
-const clip = (s: unknown, max: number) => (typeof s === 'string' ? s.trim().slice(0, max) : '')
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' })
-
-  const apiKey = process.env.GEMINI_API_KEY
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY
-  if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY is not set on the server' })
-  if (!supabaseUrl || !anonKey) {
-    return res.status(500).json({ error: 'Supabase env vars are not set on the server' })
-  }
-
-  // Only a signed-in member of this household may spend the Gemini quota.
-  const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '')
-  if (!token) return res.status(401).json({ error: 'Not signed in' })
-  const who = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: { apikey: anonKey, authorization: `Bearer ${token}` },
-  })
-  if (!who.ok) return res.status(401).json({ error: 'Not signed in' })
+  if (!(await authorize(req, res))) return
 
   const body: unknown = req.body
   if (JSON.stringify(body ?? null).length > MAX_BODY_CHARS || !isAdviceRequest(body)) {
     return res.status(400).json({ error: 'Unexpected request shape' })
   }
 
-  const request = JSON.stringify({
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-    contents: [{ role: 'user', parts: [{ text: JSON.stringify(body) }] }],
-    generationConfig: {
-      temperature: 0.4,
-      responseMimeType: 'application/json',
-      responseSchema: RESPONSE_SCHEMA,
-    },
-  })
-  const ask = (m: string) =>
-    fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`,
-      {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
-        body: request,
-      },
-    )
-
-  // Overload (503) is common and usually brief: retry the main model once,
-  // then try a different model before giving up.
-  const fallback = process.env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL
-  const attempts = [model, model, ...(fallback !== model ? [fallback] : [])]
-  let gemini: Response | null = null
-  let usedModel = model
-  for (const [i, m] of attempts.entries()) {
-    if (i > 0) await sleep(RETRY_DELAY_MS * i)
-    usedModel = m
-    gemini = await ask(m)
-    if (gemini.ok || !RETRYABLE.has(gemini.status)) break
-    // details go to the Vercel log, not to the browser
-    console.error(`Gemini ${m} attempt ${i + 1}:`, gemini.status, await gemini.text())
-  }
-
-  if (!gemini || !gemini.ok) {
-    const status = gemini?.status ?? 0
-    if (gemini && !RETRYABLE.has(status)) console.error('Gemini error', status, await gemini.text())
-    const hint =
-      status === 404
-        ? ` — model "${usedModel}" not found; set GEMINI_MODEL`
-        : status === 429
-          ? ' — rate limit or quota reached, try again later'
-          : status === 400 || status === 403
-            ? ' — check GEMINI_API_KEY'
-            : RETRYABLE.has(status)
-              ? ' — Gemini is overloaded right now, try again in a minute'
-              : ''
-    return res.status(502).json({ error: `Gemini request failed (${status})${hint}` })
-  }
-
-  const data = (await gemini.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[]
-  }
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-  let parsed: { summary?: unknown; recommendations?: unknown }
-  try {
-    parsed = JSON.parse(text ?? '')
-  } catch {
-    console.error('Gemini returned non-JSON', text)
-    return res.status(502).json({ error: 'Gemini returned an unreadable answer — try again' })
-  }
+  const result = await askGemini({ systemPrompt: SYSTEM_PROMPT, input: body, schema: RESPONSE_SCHEMA })
+  if (!result.ok) return res.status(502).json({ error: result.error })
+  const { parsed } = result
 
   // Whatever came back is rendered as plain text by React; still, cap sizes
   // and drop anything that doesn't match the schema.
@@ -190,5 +94,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   return res
     .status(200)
-    .json({ summary: clip(parsed.summary, 400), recommendations, model: usedModel })
+    .json({ summary: clip(parsed.summary, 400), recommendations, model: result.model })
 }

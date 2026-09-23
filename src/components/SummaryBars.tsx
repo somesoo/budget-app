@@ -23,7 +23,8 @@ export function SummaryBars({ categories, spentByCategory }: Props) {
               <span className="truncate text-sm font-medium text-white">{category.name}</span>
               <span className="shrink-0 text-sm tabular-nums text-muted">
                 <span className={over ? 'font-semibold text-red-400' : 'text-white'}>
-                  {formatAmount(spent)}
+                  {/* whole złoty: an overview, and "241.5" reads like a typo */}
+                  {formatAmount(Math.round(spent))}
                 </span>
                 {category.monthly_limit > 0
                   ? ` / ${formatAmount(category.monthly_limit)} ${CURRENCY_SUFFIX} · ${Math.round(ratio * 100)}%`

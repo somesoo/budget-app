@@ -6,7 +6,7 @@ import { SpendDonut } from '../components/charts/SpendDonut'
 import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
-import { useCategories } from '../hooks/useCategories'
+import { useMonthCategories } from '../hooks/useBudgets'
 import { useAddExpense, useExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
@@ -14,6 +14,7 @@ import {
   currentMonthKey,
   formatDayLong,
   formatMoney,
+  formatMoneyCompact,
   sumByCategory,
   sumExpenses,
   todayKey,
@@ -24,7 +25,9 @@ import type { Category, Person } from '../types'
 export function Home() {
   const month = currentMonthKey()
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
-  const { data: categories = [], isLoading, error } = useCategories()
+  // limits come from this month's plan where it has one
+  const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
+  const categories = allCategories.filter((c) => !c.archived)
   const { data: expenses = [] } = useExpenses(month)
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
@@ -44,7 +47,9 @@ export function Home() {
 
   const spentByCategory = sumByCategory(expenses)
   const monthTotal = sumExpenses(expenses)
-  const slices = categorySlices(expenses, categories)
+  const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
+  const left = monthLimit - monthTotal
+  const slices = categorySlices(expenses, allCategories)
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -107,6 +112,12 @@ export function Home() {
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-muted">
           This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
+          {monthLimit > 0 && (
+            <span className={left < 0 ? 'text-red-300' : ''}>
+              {' '}
+              · {left < 0 ? `${formatMoneyCompact(-left)} over` : `${formatMoneyCompact(left)} left`}
+            </span>
+          )}
         </p>
         <button
           type="button"

@@ -7,8 +7,11 @@ export interface Category {
   id: string
   name: string
   color: string
+  /** The default limit — a month with its own plan (BudgetPlan.limits) overrides it. */
   monthly_limit: number
   sort_order: number
+  /** Hidden from adding and planning; old expenses still show its name. */
+  archived: boolean
 }
 
 export interface Expense {
@@ -56,4 +59,27 @@ export interface Advice {
   month: string
   content: { summary: string; recommendations: Recommendation[]; model: string }
   created_at: string
+}
+
+/** One month's plan. Months differ, so each can set its own numbers. */
+export interface BudgetPlan {
+  month: string
+  /** Income the plan counts on. */
+  income: number
+  /** What the month means to put aside. */
+  savings: number
+  /** Category id → limit for this month. A missing id falls back to the category's default. */
+  limits: Record<string, number>
+  /** What's unusual about the month, in your own words. */
+  note: string | null
+  updated_at: string
+}
+
+/** A drafted plan as returned by /api/plan (Gemini, schema-constrained). */
+export interface PlanSuggestion {
+  summary: string
+  savings: number | null
+  categories: { id: string; amount: number; reason: string }[]
+  tips: string[]
+  model: string
 }

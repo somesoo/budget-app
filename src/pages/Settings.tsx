@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { UserSwitcher } from '../components/UserSwitcher'
-import { useCategories, useUpdateCategory } from '../hooks/useCategories'
+import { useAddCategory, useCategories, useUpdateCategory } from '../hooks/useCategories'
 import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
@@ -14,7 +14,11 @@ export function Settings() {
   const { person, setPerson } = useDeviceUser()
   const { data: categories = [] } = useCategories()
   const updateCategory = useUpdateCategory()
-  const { data: goal } = useGoal()
+  const addCategory = useAddCategory()
+  const [showHidden, setShowHidden] = useState(false)
+  const active = categories.filter((c) => !c.archived)
+  const hidden = categories.filter((c) => c.archived)
+  const { data: goal, isLoading: goalLoading } = useGoal()
   const upsertGoal = useUpsertGoal()
   const status = useRealtimeStatus()
 
@@ -34,33 +38,92 @@ export function Settings() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-          Categories and limits
+        <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">
+          Categories and default limits
         </h2>
+        <p className="mb-3 text-xs text-muted">
+          A month you plan in the Budget tab uses its own limits; these apply to months without a
+          plan.
+        </p>
         <ul className="space-y-2">
-          {categories.map((category) => (
+          {active.map((category) => (
             <li key={category.id}>
               <CategoryRow
                 category={category}
                 onSave={(patch) => updateCategory.mutate({ id: category.id, ...patch })}
+                onHide={() => updateCategory.mutate({ id: category.id, archived: true })}
               />
             </li>
           ))}
         </ul>
         <p className="mt-2 text-xs text-muted">
-          Limits total: {formatMoney(categories.reduce((acc, c) => acc + c.monthly_limit, 0))} /
+          Default limits total: {formatMoney(active.reduce((acc, c) => acc + c.monthly_limit, 0))} /
           month
         </p>
+
+        <NewCategory
+          pending={addCategory.isPending}
+          error={addCategory.error ? (addCategory.error as Error).message : null}
+          onAdd={(c, done) => addCategory.mutate(c, { onSuccess: done })}
+        />
+
+        {hidden.length > 0 && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setShowHidden((v) => !v)}
+              aria-expanded={showHidden}
+              className="text-sm font-medium text-muted active:text-white"
+            >
+              {showHidden ? 'Hide' : 'Show'} hidden categories ({hidden.length})
+            </button>
+            {showHidden && (
+              <ul className="mt-2 space-y-2">
+                {hidden.map((c) => (
+                  <li
+                    key={c.id}
+                    className="flex items-center gap-3 rounded-2xl bg-white/[0.03] px-3 py-2.5"
+                  >
+                    <span
+                      aria-hidden
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    <span className="flex-1 text-[15px] text-muted">{c.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateCategory.mutate({ id: c.id, archived: false })}
+                      className="rounded-xl px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/15 active:bg-white/10"
+                    >
+                      Show again
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-xs text-muted">
+              Hidden categories are gone from the Add screen and planning; their old expenses keep
+              them.
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="mb-6">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
           Shared savings goal
         </h2>
-        <GoalEditor
-          goal={goal ?? null}
-          onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
-        />
+        {/* keyed so the fields fill in once the goal has loaded — otherwise they'd
+            keep the empty defaults and "Save goal" would write zeros over it */}
+        {goalLoading ? (
+          <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
+        ) : (
+          <GoalEditor
+            key={goal?.id ?? 'new'}
+            goal={goal ?? null}
+            onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
+          />
+        )}
       </section>
 
       <button
@@ -77,9 +140,10 @@ export function Settings() {
 interface RowProps {
   category: Category
   onSave: (patch: Partial<Category>) => void
+  onHide: () => void
 }
 
-function CategoryRow({ category, onSave }: RowProps) {
+function CategoryRow({ category, onSave, onHide }: RowProps) {
   const [name, setName] = useState(category.name)
   const [color, setColor] = useState(category.color)
   const [limit, setLimit] = useState(String(category.monthly_limit))
@@ -136,6 +200,132 @@ function CategoryRow({ category, onSave }: RowProps) {
           className="w-16 bg-transparent py-2 text-right text-[15px] tabular-nums text-white outline-none"
         />
         <span className="text-xs text-muted">{CURRENCY_SUFFIX}</span>
+      </div>
+
+      <button
+        type="button"
+        onClick={onHide}
+        aria-label={`Hide ${category.name}`}
+        title="Hide"
+        className="-mr-1 flex h-9 w-8 shrink-0 items-center justify-center rounded-xl text-muted active:bg-white/10"
+      >
+        ⊘
+      </button>
+    </div>
+  )
+}
+
+const NEW_CATEGORY_COLORS = [
+  '#f59e0b',
+  '#ef4444',
+  '#84cc16',
+  '#06b6d4',
+  '#8b5cf6',
+  '#f43f5e',
+  '#10b981',
+  '#eab308',
+]
+
+function NewCategory({
+  pending,
+  error,
+  onAdd,
+}: {
+  pending: boolean
+  error: string | null
+  onAdd: (
+    category: { name: string; color: string; monthly_limit: number },
+    done: () => void,
+  ) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [limit, setLimit] = useState('')
+  const [color, setColor] = useState(NEW_CATEGORY_COLORS[0])
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-3 w-full rounded-2xl border border-dashed border-white/20 py-3 text-sm font-semibold text-muted active:bg-white/5"
+      >
+        + Add a category
+      </button>
+    )
+  }
+
+  const submit = () => {
+    if (!name.trim()) return
+    onAdd(
+      {
+        name: name.trim(),
+        color,
+        monthly_limit: roundMoney(Number.parseFloat(limit.replace(',', '.')) || 0),
+      },
+      () => {
+        setName('')
+        setLimit('')
+        setOpen(false)
+      },
+    )
+  }
+
+  return (
+    <div className="mt-3 space-y-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+      <div className="flex gap-2">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name, e.g. Gifts"
+          aria-label="New category name"
+          maxLength={40}
+          autoFocus
+          className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60"
+        />
+        <div className="flex w-28 shrink-0 items-center gap-1 rounded-xl bg-white/5 px-2 ring-1 ring-white/10">
+          <input
+            value={limit}
+            onChange={(e) => setLimit(e.target.value.replace(/[^\d.,]/g, ''))}
+            inputMode="decimal"
+            placeholder="Limit"
+            aria-label="Default monthly limit"
+            className="w-full bg-transparent py-2 text-right tabular-nums text-white outline-none placeholder:text-muted/60"
+          />
+          <span className="text-xs text-muted">{CURRENCY_SUFFIX}</span>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Color">
+        {NEW_CATEGORY_COLORS.map((c) => (
+          <button
+            key={c}
+            type="button"
+            role="radio"
+            aria-checked={color === c}
+            aria-label={c}
+            onClick={() => setColor(c)}
+            className={`h-8 w-8 rounded-full ${color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-card' : ''}`}
+            style={{ backgroundColor: c }}
+          />
+        ))}
+      </div>
+      {error && <p className="text-sm text-red-300">Not added: {error}</p>}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="flex-1 rounded-xl bg-white/5 py-2.5 text-sm font-semibold text-muted"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={!name.trim() || pending}
+          className="flex-1 rounded-xl bg-white py-2.5 text-sm font-semibold text-ink disabled:opacity-40"
+        >
+          Add category
+        </button>
       </div>
     </div>
   )

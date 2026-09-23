@@ -1,16 +1,19 @@
 import type { Category, Expense, Person } from '../types'
 import {
+  categoryById,
   daysInMonth,
   monthKeyOfDate,
   monthRange,
   roundMoney,
   shiftMonth,
+  sumByCategory,
+  sumExpenses,
   todayKey,
   type MonthKey,
 } from './calculations'
 
-/* Pure aggregations behind the Insights tab. Everything takes the raw expense
-   list for a window of months and derives what one chart needs. */
+/* Pure aggregations behind the charts. Everything takes the raw expense list
+   for a window of months and derives what one chart needs. */
 
 /** `count` months ending at `month`, oldest first. */
 export function monthsEndingAt(month: MonthKey, count: number): MonthKey[] {
@@ -210,4 +213,65 @@ export function compactAmount(value: number): string {
     return `${Number.isInteger(k) ? k : k.toFixed(1)}k`
   }
   return String(Math.round(value))
+}
+
+/* ---------- what the month went on ---------- */
+
+/** Id of the slice that stands for the folded tail, not a real category. */
+export const REST_SLICE_ID = '__rest__'
+
+export interface CategorySlice {
+  id: string
+  name: string
+  /** The category's own color — null for the folded tail, which isn't one category. */
+  color: string | null
+  amount: number
+  /** Share of the month's spending, 0–1. */
+  share: number
+}
+
+/**
+ * The month's spending as part-to-whole slices, biggest first.
+ *
+ * Everything past `maxSlices` folds into a single grey one: a donut is only
+ * readable at a glance up to about six segments, and the tail is made of
+ * categories too small to aim at anyway.
+ */
+export function categorySlices(
+  expenses: Expense[],
+  categories: Category[],
+  maxSlices = 6,
+): CategorySlice[] {
+  const total = sumExpenses(expenses)
+  if (total <= 0) return []
+
+  const byId = categoryById(categories)
+  const ranked = Object.entries(sumByCategory(expenses))
+    .map(([id, amount]) => ({ category: byId[id], amount }))
+    // an expense can outlive its category — it still counts, but has nothing to draw
+    .filter((row) => row.category && row.amount > 0)
+    .sort((a, b) => b.amount - a.amount)
+
+  const keep = ranked.length > maxSlices ? maxSlices - 1 : maxSlices
+  const slices: CategorySlice[] = ranked.slice(0, keep).map(({ category, amount }) => ({
+    id: category.id,
+    name: category.name,
+    color: category.color,
+    amount,
+    share: amount / total,
+  }))
+
+  const tail = ranked.slice(keep)
+  if (tail.length > 0) {
+    const amount = roundMoney(tail.reduce((acc, row) => acc + row.amount, 0))
+    slices.push({
+      id: REST_SLICE_ID,
+      name: `Everything else (${tail.length})`,
+      color: null,
+      amount,
+      share: amount / total,
+    })
+  }
+
+  return slices
 }

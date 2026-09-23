@@ -69,7 +69,6 @@ export function Calendar() {
           <TransactionList
             expenses={dayExpenses}
             categories={categoryById(categories)}
-            showDate={false}
             emptyLabel="Nothing spent that day"
           />
         </section>

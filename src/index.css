@@ -29,3 +29,13 @@
     padding: 0;
   }
 }
+
+@layer utilities {
+  /* horizontally scrolling chip rows: swipeable, but without a scrollbar */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

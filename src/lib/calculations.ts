@@ -127,6 +127,11 @@ export function formatMoney(amount: number): string {
   return `${preciseFormatter.format(amount)} ${CURRENCY_SUFFIX}`
 }
 
+/** "7,550 zł" for a round amount, "482.50 zł" otherwise — totals in tight spaces. */
+export function formatMoneyCompact(amount: number): string {
+  return Number.isInteger(amount) ? `${amountFormatter.format(amount)} ${CURRENCY_SUFFIX}` : formatMoney(amount)
+}
+
 /**
  * Whole złoty: "7,136 zł". For estimates — projections, averages — where the
  * grosze would claim a precision the number doesn't have.

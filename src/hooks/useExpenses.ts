@@ -1,9 +1,24 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { monthKeyOfDate, monthRange, type MonthKey } from '../lib/calculations'
+import { parseAmountQuery, sanitizeSearch } from '../lib/history'
 import type { Expense, NewExpense } from '../types'
 
 export const expensesKey = (month: MonthKey) => ['expenses', month] as const
+
+const COLUMNS = 'id, amount, category_id, person, note, expense_date, created_at'
+
+/**
+ * Whether a row dated `date` belongs in the cached list under `key` — a
+ * month list, a date range, or (anything else, e.g. search) always.
+ */
+function keyCoversDate(key: QueryKey, date: string): boolean {
+  if (key[1] === 'range') return date >= String(key[2]) && date <= String(key[3])
+  if (typeof key[1] === 'string' && /^\d{4}-\d{2}$/.test(key[1])) {
+    return monthKeyOfDate(date) === key[1]
+  }
+  return true
+}
 
 function normalize(row: Record<string, unknown>): Expense {
   return {
@@ -24,7 +39,7 @@ export function useExpenses(month: MonthKey) {
       const { from, to } = monthRange(month)
       const { data, error } = await supabase
         .from('expenses')
-        .select('id, amount, category_id, person, note, expense_date, created_at')
+        .select(COLUMNS)
         .gte('expense_date', from)
         .lte('expense_date', to)
         .order('expense_date', { ascending: false })
@@ -51,7 +66,7 @@ export function useExpensesBetween(from: string, to: string) {
       for (let offset = 0; ; offset += PAGE_SIZE) {
         const { data, error } = await supabase
           .from('expenses')
-          .select('id, amount, category_id, person, note, expense_date, created_at')
+          .select(COLUMNS)
           .gte('expense_date', from)
           .lte('expense_date', to)
           .order('expense_date', { ascending: true })
@@ -74,7 +89,7 @@ export function useAddExpense() {
       const { data, error } = await supabase
         .from('expenses')
         .insert(expense)
-        .select('id, amount, category_id, person, note, expense_date, created_at')
+        .select(COLUMNS)
         .single()
       if (error) throw error
       return normalize(data)
@@ -108,11 +123,86 @@ export function useUpdateExpense() {
       const { error } = await supabase.from('expenses').update(patch).eq('id', id)
       if (error) throw error
     },
+    // the edit shows at once; a changed date moves the row out of a month it
+    // no longer belongs to, the refetch below brings it into the new one
+    onMutate: async ({ id, ...patch }) => {
+      await qc.cancelQueries({ queryKey: ['expenses'] })
+      const snapshots = qc.getQueriesData<Expense[]>({ queryKey: ['expenses'] })
+      for (const [key, list] of snapshots) {
+        if (!list) continue
+        qc.setQueryData<Expense[]>(
+          key,
+          list.flatMap((e) => {
+            if (e.id !== id) return [e]
+            const next = { ...e, ...patch }
+            return keyCoversDate(key, next.expense_date) ? [next] : []
+          }),
+        )
+      }
+      return { snapshots }
+    },
+    onError: (_err, _vars, ctx) => {
+      for (const [key, list] of ctx?.snapshots ?? []) qc.setQueryData(key, list)
+    },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['expenses'] })
     },
   })
 }
+
+/**
+ * Puts a just-deleted expense back — same id and timestamps, so to the rest
+ * of the app it's as if it was never gone. Backs the "Undo" after a delete.
+ */
+export function useRestoreExpense() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (expense: Expense) => {
+      const { error } = await supabase.from('expenses').insert(expense)
+      if (error) throw error
+    },
+    onMutate: async (expense) => {
+      await qc.cancelQueries({ queryKey: ['expenses'] })
+      const key = expensesKey(monthKeyOfDate(expense.expense_date))
+      qc.setQueryData<Expense[]>(key, (old) => (old ? [expense, ...old] : old))
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: ['expenses'] })
+    },
+  })
+}
+
+/**
+ * Expenses from any month whose title contains `query`, whose category is one
+ * of `categoryIds` (the caller matches category names), or — when the query
+ * is a number — whose amount is exactly that. Newest first, capped.
+ */
+export function useSearchExpenses(query: string, categoryIds: string[]) {
+  const q = sanitizeSearch(query)
+  const amount = parseAmountQuery(query)
+  return useQuery({
+    queryKey: ['expenses', 'search', q, categoryIds],
+    enabled: q.length >= 2 || amount !== null,
+    queryFn: async (): Promise<Expense[]> => {
+      const clauses = [`note.ilike."%${q}%"`]
+      if (categoryIds.length > 0) clauses.push(`category_id.in.(${categoryIds.join(',')})`)
+      if (amount !== null) clauses.push(`amount.eq.${amount}`)
+      const { data, error } = await supabase
+        .from('expenses')
+        .select(COLUMNS)
+        .or(clauses.join(','))
+        .order('expense_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(SEARCH_LIMIT)
+      if (error) throw error
+      return (data ?? []).map(normalize)
+    },
+    placeholderData: (previous) => previous,
+  })
+}
+
+/** Results past this are cut off; the page says so when it happens. */
+export const SEARCH_LIMIT = 200
 
 export function useDeleteExpense() {
   const qc = useQueryClient()

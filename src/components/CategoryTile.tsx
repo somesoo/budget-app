@@ -17,11 +17,14 @@ interface Props {
 
 const OVER_LIMIT_COLOR = '#dc2626'
 
-// The tile has a fixed height (h-32), so we know at which fill level the
-// category color reaches each line of text and the contrast has to flip.
-const FILL_REACHES_AMOUNT = 37
-const FILL_REACHES_SUBLINE = 16
-const FILL_REACHES_TITLE = 92
+// The tile has a fixed height (h-24), so we know at which fill level the
+// category color has swallowed each line of text and the contrast has to flip.
+// Each line flips only once the fill covers it *completely* — flipping halfway
+// puts dark text on the dark half of its own line, which is the one combination
+// that can't be read at all.
+const FILL_COVERS_AMOUNT = 52
+const FILL_COVERS_SUBLINE = 27
+const FILL_COVERS_TITLE = 90
 
 /**
  * Category tile filled from the bottom in proportion to the monthly limit used.
@@ -33,15 +36,15 @@ export function CategoryTile({ category, spent, onClick }: Props) {
   const fill = fillPercent(spent, category.monthly_limit)
 
   const onFill = readableTextColor(category.color)
-  const titleColor = over || fill < FILL_REACHES_TITLE ? '#ffffff' : onFill
-  const amountColor = over || fill < FILL_REACHES_AMOUNT ? '#ffffff' : onFill
-  const subLineColor = over || fill < FILL_REACHES_SUBLINE ? '#ffffff' : onFill
+  const titleColor = over || fill < FILL_COVERS_TITLE ? '#ffffff' : onFill
+  const amountColor = over || fill < FILL_COVERS_AMOUNT ? '#ffffff' : onFill
+  const subLineColor = over || fill < FILL_COVERS_SUBLINE ? '#ffffff' : onFill
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="relative flex h-32 w-full touch-manipulation flex-col justify-between overflow-hidden rounded-3xl p-3 text-left ring-1 ring-white/10 transition active:scale-[0.97]"
+      className="relative flex h-24 w-full touch-manipulation flex-col justify-between overflow-hidden rounded-2xl p-2.5 text-left ring-1 ring-white/10 transition active:scale-[0.97]"
       style={{ backgroundColor: over ? OVER_LIMIT_COLOR : withAlpha(category.color, 0.18) }}
     >
       {!over && (
@@ -54,13 +57,13 @@ export function CategoryTile({ category, spent, onClick }: Props) {
 
       <div className="relative flex items-start justify-between gap-1">
         <span
-          className="text-[15px] font-semibold leading-tight drop-shadow-sm"
+          className="text-[13px] font-semibold leading-tight drop-shadow-sm"
           style={{ color: titleColor }}
         >
           {category.name}
         </span>
         {over && (
-          <span aria-label="over limit" className="text-lg leading-none">
+          <span aria-label="over limit" className="text-base leading-none">
             ⚠️
           </span>
         )}
@@ -68,13 +71,13 @@ export function CategoryTile({ category, spent, onClick }: Props) {
 
       <div className="relative">
         <div
-          className="text-xl font-bold tabular-nums drop-shadow-sm"
+          className="text-lg font-bold leading-6 tabular-nums drop-shadow-sm"
           style={{ color: amountColor }}
         >
           {formatAmount(spent)} {CURRENCY_SUFFIX}
         </div>
         <div
-          className="text-xs font-medium opacity-80 tabular-nums"
+          className="text-[11px] font-medium leading-4 opacity-90 drop-shadow-sm tabular-nums"
           style={{ color: subLineColor }}
         >
           {category.monthly_limit > 0

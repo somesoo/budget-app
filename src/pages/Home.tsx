@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { CategoryGrid } from '../components/CategoryGrid'
 import { AmountPad } from '../components/AmountPad'
+import { ChartCard } from '../components/charts/ChartCard'
+import { SpendDonut } from '../components/charts/SpendDonut'
 import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
@@ -16,6 +18,7 @@ import {
   sumExpenses,
   todayKey,
 } from '../lib/calculations'
+import { categorySlices } from '../lib/insights'
 import type { Category, Person } from '../types'
 
 export function Home() {
@@ -41,6 +44,7 @@ export function Home() {
 
   const spentByCategory = sumByCategory(expenses)
   const monthTotal = sumExpenses(expenses)
+  const slices = categorySlices(expenses, categories)
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -122,10 +126,20 @@ export function Home() {
         </p>
       )}
 
+      {/* Nothing spent yet means nothing to divide up — the donut only appears
+          once it has something to say. */}
+      {slices.length > 0 && (
+        <div className="mb-4">
+          <ChartCard title="Where it goes">
+            <SpendDonut slices={slices} />
+          </ChartCard>
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-32 animate-pulse rounded-3xl bg-white/5" />
+            <div key={i} className="h-24 animate-pulse rounded-2xl bg-white/5" />
           ))}
         </div>
       ) : (

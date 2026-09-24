@@ -10,7 +10,8 @@ export function useCategories() {
     queryFn: async (): Promise<Category[]> => {
       const { data, error } = await supabase
         .from('categories')
-        // '*' rather than a column list: `archived` arrives with migration 0005,
+        // '*' rather than a column list: `archived` and `show_in_chart` arrive with
+        // migrations 0005 and 0006,
         // and the app must keep working on a database that hasn't run it yet
         .select('*')
         .order('sort_order', { ascending: true })
@@ -22,6 +23,8 @@ export function useCategories() {
         monthly_limit: Number(c.monthly_limit),
         sort_order: Number(c.sort_order),
         archived: Boolean(c.archived),
+        // absent until migration 0006 — and absent means shown
+        show_in_chart: c.show_in_chart !== false,
       }))
     },
     staleTime: 60_000,

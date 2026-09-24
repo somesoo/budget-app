@@ -41,7 +41,10 @@ through Supabase Realtime.
 8. Paste and run `supabase/migrations/0005_budget_plans.sql` — monthly budget
    plans and hideable categories. The app keeps working without it (no plans,
    nothing hidden), so it's fine to deploy first and run this after.
-9. Check **Database → Replication** that `expenses`, `categories` and `goals`
+9. Paste and run `supabase/migrations/0006_chart_exclusion.sql` — lets a
+   category be left out of the "Where it goes" donut. Also optional for the
+   app to run.
+10. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–8, `incomes`, `advice` and `budgets`) are in the
    `supabase_realtime` publication — the migrations add them.
 
@@ -184,7 +187,10 @@ recommendations below applies, and your note is sent verbatim.
 ### Categories
 
 Settings edits each category's name, color and default limit, adds new ones,
-and hides old ones. Hiding (the `archived` column) rather than deleting,
+and hides old ones. The small donut button next to each one takes it out of
+the Add tab's "Where it goes" chart — meant for fixed costs like rent, which
+would otherwise shrink every other slice to a sliver. They still count in every
+total, limit and plan, and the chart names what it left out. Hiding (the `archived` column) rather than deleting,
 because expenses reference their category: a hidden category disappears from
 the Add screen, the pickers and planning, while its old expenses keep it.
 
@@ -289,6 +295,16 @@ personal — decide which tier you're comfortable with.
 instead of failing. To try recommendations locally, use the Vercel CLI:
 `vercel dev` (with `GEMINI_API_KEY` in `.env`, which is git-ignored).
 
+### The Add tab fits one screen
+
+The Add tab never scrolls vertically. The tiles take whatever height is left
+under the donut: as many rows as fit at the minimum tile size (66 px, three
+lines of text), stretched to fill the space; tiles that still don't fit go
+onto further pages you swipe left and right (`CategoryPager`, CSS
+scroll-snap), with dots underneath. Because tile height varies, the points at
+which a tile's text flips to dark as the fill rises are computed from the
+actual height (`CategoryTile`).
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
@@ -331,6 +347,7 @@ supabase/
 ├── migrations/0003_add_to_goal.sql
 ├── migrations/0004_income_and_advice.sql
 ├── migrations/0005_budget_plans.sql
+├── migrations/0006_chart_exclusion.sql
 └── seed.sql
 ```
 

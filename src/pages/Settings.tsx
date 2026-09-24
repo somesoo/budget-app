@@ -52,6 +52,9 @@ export function Settings() {
                 category={category}
                 onSave={(patch) => updateCategory.mutate({ id: category.id, ...patch })}
                 onHide={() => updateCategory.mutate({ id: category.id, archived: true })}
+                onToggleChart={() =>
+                  updateCategory.mutate({ id: category.id, show_in_chart: !category.show_in_chart })
+                }
               />
             </li>
           ))}
@@ -59,6 +62,10 @@ export function Settings() {
         <p className="mt-2 text-xs text-muted">
           Default limits total: {formatMoney(active.reduce((acc, c) => acc + c.monthly_limit, 0))} /
           month
+        </p>
+        <p className="mt-1 flex flex-wrap items-center gap-x-1 text-xs text-muted">
+          <ChartIcon on /> in the “Where it goes” chart, <ChartIcon on={false} /> left out — tap to
+          leave out fixed costs like rent, which still count everywhere else. ⊘ hides the category.
         </p>
 
         <NewCategory
@@ -141,9 +148,10 @@ interface RowProps {
   category: Category
   onSave: (patch: Partial<Category>) => void
   onHide: () => void
+  onToggleChart: () => void
 }
 
-function CategoryRow({ category, onSave, onHide }: RowProps) {
+function CategoryRow({ category, onSave, onHide, onToggleChart }: RowProps) {
   const [name, setName] = useState(category.name)
   const [color, setColor] = useState(category.color)
   const [limit, setLimit] = useState(String(category.monthly_limit))
@@ -201,6 +209,17 @@ function CategoryRow({ category, onSave, onHide }: RowProps) {
         />
         <span className="text-xs text-muted">{CURRENCY_SUFFIX}</span>
       </div>
+
+      <button
+        type="button"
+        onClick={onToggleChart}
+        aria-pressed={category.show_in_chart}
+        aria-label={`Show ${category.name} in the spending chart`}
+        title={category.show_in_chart ? 'In the chart' : 'Left out of the chart'}
+        className="flex h-9 w-8 shrink-0 items-center justify-center rounded-xl active:bg-white/10"
+      >
+        <ChartIcon on={category.show_in_chart} />
+      </button>
 
       <button
         type="button"
@@ -398,5 +417,25 @@ function GoalEditor({ goal, onSave }: GoalProps) {
         {goal ? 'Save goal' : 'Create goal'}
       </button>
     </div>
+  )
+}
+
+/**
+ * A little donut with a slice in it; an empty, dimmed ring when the category
+ * is left out of the chart. (Deliberately not struck through — that would read
+ * like the ⊘ hide button next to it.)
+ */
+function ChartIcon({ on }: { on: boolean }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      aria-hidden
+      className={on ? 'text-white' : 'text-white/25'}
+    >
+      <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
+      {on && <path d="M9 3 A6 6 0 0 1 15 9" fill="none" stroke="#34d399" strokeWidth="3" />}
+    </svg>
   )
 }

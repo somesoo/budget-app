@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CategoryGrid } from '../components/CategoryGrid'
+import { CategoryPager } from '../components/CategoryPager'
 import { AmountPad } from '../components/AmountPad'
 import { ChartCard } from '../components/charts/ChartCard'
 import { SpendDonut } from '../components/charts/SpendDonut'
@@ -50,6 +50,8 @@ export function Home() {
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
   const left = monthLimit - monthTotal
   const slices = categorySlices(expenses, allCategories)
+  // switched out of the donut in Settings (rent and the like), but spent on this month
+  const leftOut = allCategories.filter((c) => !c.show_in_chart && (spentByCategory[c.id] ?? 0) > 0)
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -108,14 +110,16 @@ export function Home() {
     <Screen
       title="What for?"
       action={devicePerson && <UserSwitcher value={devicePerson} onChange={setDevicePerson} />}
+      fill
     >
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
         <p className="text-sm text-muted">
           This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
           {monthLimit > 0 && (
             <span className={left < 0 ? 'text-red-300' : ''}>
               {' '}
-              · {left < 0 ? `${formatMoneyCompact(-left)} over` : `${formatMoneyCompact(left)} left`}
+              ·{' '}
+              {left < 0 ? `${formatMoneyCompact(-left)} over` : `${formatMoneyCompact(left)} left`}
             </span>
           )}
         </p>
@@ -132,7 +136,7 @@ export function Home() {
       </div>
 
       {error && (
-        <p className="mb-4 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
+        <p className="mb-3 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
           Could not load categories: {(error as Error).message}
         </p>
       )}
@@ -140,21 +144,29 @@ export function Home() {
       {/* Nothing spent yet means nothing to divide up — the donut only appears
           once it has something to say. */}
       {slices.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-3 shrink-0">
           <ChartCard title="Where it goes">
             <SpendDonut slices={slices} />
+            {leftOut.length > 0 && (
+              <p className="mt-2 truncate text-xs text-muted">
+                Not in the chart:{' '}
+                {leftOut
+                  .map((c) => `${c.name} ${formatMoneyCompact(Math.round(spentByCategory[c.id]))}`)
+                  .join(' · ')}
+              </p>
+            )}
           </ChartCard>
         </div>
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-2.5">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl bg-white/5" />
+        <div className="grid grid-cols-3 gap-2">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="h-20 animate-pulse rounded-2xl bg-white/5" />
           ))}
         </div>
       ) : (
-        <CategoryGrid
+        <CategoryPager
           categories={categories}
           spentByCategory={spentByCategory}
           onSelect={openCategory}

@@ -12,6 +12,8 @@ export interface Category {
   sort_order: number
   /** Hidden from adding and planning; old expenses still show its name. */
   archived: boolean
+  /** In the Home donut. Off for fixed costs like rent, which would swamp it. */
+  show_in_chart: boolean
 }
 
 export interface Expense {

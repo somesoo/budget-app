@@ -233,6 +233,10 @@ export interface CategorySlice {
 /**
  * The month's spending as part-to-whole slices, biggest first.
  *
+ * Categories switched out of the chart (`show_in_chart`, e.g. rent) are left
+ * out entirely, shares included — the donut answers "where does the money we
+ * steer go", and a fixed cost would shrink everything else to slivers.
+ *
  * Everything past `maxSlices` folds into a single grey one: a donut is only
  * readable at a glance up to about six segments, and the tail is made of
  * categories too small to aim at anyway.
@@ -242,11 +246,12 @@ export function categorySlices(
   categories: Category[],
   maxSlices = 6,
 ): CategorySlice[] {
-  const total = sumExpenses(expenses)
+  const byId = categoryById(categories)
+  const charted = expenses.filter((e) => byId[e.category_id]?.show_in_chart !== false)
+  const total = sumExpenses(charted)
   if (total <= 0) return []
 
-  const byId = categoryById(categories)
-  const ranked = Object.entries(sumByCategory(expenses))
+  const ranked = Object.entries(sumByCategory(charted))
     .map(([id, amount]) => ({ category: byId[id], amount }))
     // an expense can outlive its category — it still counts, but has nothing to draw
     .filter((row) => row.category && row.amount > 0)

@@ -1,4 +1,5 @@
 import { LOCALE } from '../config'
+import type { Recurring, Suggestion } from './suggestions'
 import type { BudgetPlan, Category, Expense, Goal, Income } from '../types'
 import {
   currentMonthKey,
@@ -179,9 +180,11 @@ export function draftTotals(draft: PlanDraft, activeIds: string[]) {
 /* ---------- what the server (and Gemini) receives ---------- */
 
 /**
- * Aggregates only, as for /api/advice: monthly totals per category and of
- * income, the goal, and the note you typed about the month. Categories go by
- * a short key rather than their database id.
+ * Monthly totals per category and of income, the goal, the note you typed
+ * about the month, and what the app suggests from the history: including the
+ * names of yearly bills and regular payments (their notes), so the draft can
+ * plan for them by name. Categories go by a short key rather than their
+ * database id.
  */
 export interface PlanRequest {
   month: MonthKey
@@ -201,6 +204,10 @@ export interface PlanRequest {
   }[]
   goal: { name: string; target: number; saved: number } | null
   note: string | null
+  /** What the app itself suggests from the history (lib/suggestions), for the draft to weigh. */
+  suggestions: { key: string; kind: string; proposed: number; title: string; detail: string }[]
+  /** Payments that come every month: the certain part of the plan. */
+  recurring: { key: string; note: string; amount: number }[]
 }
 
 const shortMonth = new Intl.DateTimeFormat(LOCALE, { month: 'short', year: 'numeric' })
@@ -210,8 +217,10 @@ export function buildPlanRequest(args: {
   draft: PlanDraft
   baseline: PlanBaseline
   goal: Goal | null | undefined
+  suggestions?: Suggestion[]
+  recurring?: Recurring[]
 }): { request: PlanRequest; keyToId: Record<string, string> } {
-  const { target, draft, baseline, goal } = args
+  const { target, draft, baseline, goal, suggestions = [], recurring = [] } = args
   const keyToId: Record<string, string> = {}
   const categories = baseline.categories.map((b, i) => {
     const key = `c${i + 1}`
@@ -226,6 +235,8 @@ export function buildPlanRequest(args: {
       sameMonthLastYear: b.sameMonthLastYear === null ? null : Math.round(b.sameMonthLastYear),
     }
   })
+
+  const idToKey = Object.fromEntries(Object.entries(keyToId).map(([key, id]) => [id, key]))
 
   return {
     keyToId,
@@ -248,6 +259,23 @@ export function buildPlanRequest(args: {
         ? { name: goal.name, target: goal.target_amount, saved: goal.current_amount }
         : null,
       note: draft.note.trim() ? draft.note.trim().slice(0, 500) : null,
+      suggestions: suggestions
+        .filter((x) => idToKey[x.categoryId])
+        .map((x) => ({
+          key: idToKey[x.categoryId],
+          kind: x.kind,
+          proposed: x.limit,
+          title: x.title.slice(0, 120),
+          detail: x.detail.slice(0, 300),
+        })),
+      recurring: recurring
+        .filter((r) => idToKey[r.categoryId])
+        .slice(0, 20)
+        .map((r) => ({
+          key: idToKey[r.categoryId],
+          note: r.note.slice(0, 60),
+          amount: Math.round(r.amount),
+        })),
     },
   }
 }

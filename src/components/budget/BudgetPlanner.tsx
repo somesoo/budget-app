@@ -164,7 +164,14 @@ export function BudgetPlanner({ month, onClose }: Props) {
   }
 
   const askAi = () => {
-    const { request, keyToId } = buildPlanRequest({ target: month, draft, baseline, goal })
+    const { request, keyToId } = buildPlanRequest({
+      target: month,
+      draft,
+      baseline,
+      goal,
+      suggestions,
+      recurring,
+    })
     suggest.mutate(request, {
       onSuccess: (s) =>
         setAi({
@@ -386,8 +393,8 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 </p>
               )}
               <p className="mt-2 text-[11px] leading-relaxed text-muted">
-                Sent to Gemini: monthly totals per category and of income, the goal, and your note.
-                No individual expenses.
+                Sent to Gemini: monthly totals per category and of income, the goal, your note, and
+                the suggestions above, with the names of yearly bills and regular payments.
               </p>
             </section>
 

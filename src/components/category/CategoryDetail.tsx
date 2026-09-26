@@ -39,6 +39,8 @@ interface Props {
   draftLimits?: Record<string, number>
   /** In the planner: an input for this category's limit, shown with the forecast. */
   limitEditor?: ReactNode
+  /** In the planner: suggestions for this category, under the limit. */
+  planExtras?: ReactNode
   /** Makes the rows of the share pane jump to that category. */
   onSelectCategory?: (id: string) => void
 }
@@ -54,6 +56,7 @@ export function CategoryDetail({
   month,
   draftLimits,
   limitEditor,
+  planExtras,
   onSelectCategory,
 }: Props) {
   const { from, to } = windowRange(detailWindow(month))
@@ -88,6 +91,7 @@ export function CategoryDetail({
         month={month}
         history={history}
         limitEditor={limitEditor}
+        extras={planExtras}
       />
       <SharePane
         category={category}
@@ -242,11 +246,13 @@ function ForecastPane({
   month,
   history,
   limitEditor,
+  extras,
 }: {
   category: Category
   month: MonthKey
   history: CategoryHistory
   limitEditor?: ReactNode
+  extras?: ReactNode
 }) {
   const current = currentMonthKey()
   const limit = category.monthly_limit
@@ -256,23 +262,41 @@ function ForecastPane({
       <div className="w-36 shrink-0">{limitEditor}</div>
     </div>
   )
+  const planned = (
+    <>
+      {editor}
+      {extras && <div className="mb-4">{extras}</div>}
+    </>
+  )
 
   if (month > current) {
     const columns = [
       history.sameMonthLastYear !== null && history.sameMonthLastYear > 0
-        ? { key: 'ly', label: `${formatMonthShort(month)} last yr`, value: history.sameMonthLastYear }
+        ? {
+            key: 'ly',
+            label: `${formatMonthShort(month)} last yr`,
+            value: history.sameMonthLastYear,
+          }
         : null,
       history.previous
-        ? { key: 'prev', label: formatMonthShort(history.previous.month), value: history.previous.total }
+        ? {
+            key: 'prev',
+            label: formatMonthShort(history.previous.month),
+            value: history.previous.total,
+          }
         : null,
-      history.typical !== null ? { key: 'typical', label: 'Typical', value: history.typical } : null,
+      history.typical !== null
+        ? { key: 'typical', label: 'Typical', value: history.typical }
+        : null,
       { key: 'plan', label: 'Plan', value: limit },
     ].filter((c): c is { key: string; label: string; value: number } => c !== null)
 
     return (
       <Pane title={`Plan for ${formatMonthName(month)}`}>
-        {editor}
-        <p className="text-[15px] leading-snug text-white">{planHeadline(limit, history.typical)}</p>
+        {planned}
+        <p className="text-[15px] leading-snug text-white">
+          {planHeadline(limit, history.typical)}
+        </p>
         <div className="mt-3">
           <ColumnChart
             ariaLabel={`${category.name}: the plan against past months`}
@@ -295,8 +319,12 @@ function ForecastPane({
   const perDay = limit > spent && daysLeft > 0 ? (limit - spent) / daysLeft : null
 
   return (
-    <Pane title={isCurrent ? `Forecast for ${formatMonthName(month)}` : `How ${formatMonthName(month)} went`}>
-      {editor}
+    <Pane
+      title={
+        isCurrent ? `Forecast for ${formatMonthName(month)}` : `How ${formatMonthName(month)} went`
+      }
+    >
+      {planned}
       <div className="grid grid-cols-3 gap-3">
         <Stat label={isCurrent ? 'Spent so far' : 'Spent'} value={formatMoneyWhole(spent)} />
         {isCurrent && (
@@ -309,7 +337,13 @@ function ForecastPane({
         <Stat label="Limit" value={limit > 0 ? formatMoneyWhole(limit) : 'None'} />
       </div>
       <p className="mt-3 text-[15px] leading-snug text-white">
-        {forecastHeadline({ spent, projected, limit, isCurrent, monthName: formatMonthName(month) })}
+        {forecastHeadline({
+          spent,
+          projected,
+          limit,
+          isCurrent,
+          monthName: formatMonthName(month),
+        })}
         {perDay !== null && (
           <span className="text-slate-300">
             {' '}
@@ -340,7 +374,8 @@ function forecastHeadline(args: {
       : `Ended ${formatMoneyWhole(-diff)} under the limit.`
   }
   if (spent === 0) return 'Nothing spent here yet this month.'
-  if (limit <= 0) return `At this pace, about ${formatMoneyWhole(projected)} by the end of the month.`
+  if (limit <= 0)
+    return `At this pace, about ${formatMoneyWhole(projected)} by the end of the month.`
   const diff = projected - limit
   return diff > 0
     ? `At this pace it ends about ${formatMoneyWhole(diff)} over the limit.`
@@ -348,7 +383,8 @@ function forecastHeadline(args: {
 }
 
 function planHeadline(limit: number, typical: number | null): string {
-  if (typical === null) return `Planned at ${formatMoneyWhole(limit)}. No complete month to compare with yet.`
+  if (typical === null)
+    return `Planned at ${formatMoneyWhole(limit)}. No complete month to compare with yet.`
   const diff = limit - typical
   if (Math.abs(diff) < 1) return `Planned right at a typical month, ${formatMoneyWhole(limit)}.`
   return diff > 0
@@ -403,7 +439,9 @@ function SharePane({
     return (
       <Pane title={title}>
         <Empty>
-          {isFuture ? 'No limits planned yet.' : `Nothing spent in ${formatMonthName(month)}${month === current ? ' yet' : ''}.`}
+          {isFuture
+            ? 'No limits planned yet.'
+            : `Nothing spent in ${formatMonthName(month)}${month === current ? ' yet' : ''}.`}
         </Empty>
       </Pane>
     )
@@ -415,15 +453,18 @@ function SharePane({
         {focus ? (
           <>
             <strong className="font-semibold">{percent(focus.share)}</strong> of{' '}
-            {isFuture ? `what ${formatMonthName(month)} plans to spend` : `${formatMonthName(month)}’s spending`}
+            {isFuture
+              ? `what ${formatMonthName(month)} plans to spend`
+              : `${formatMonthName(month)}’s spending`}
             .
           </>
         ) : (
-          <>Nothing in {category.name} {isFuture ? 'planned' : 'spent'} for {formatMonthName(month)}.</>
+          <>
+            Nothing in {category.name} {isFuture ? 'planned' : 'spent'} for {formatMonthName(month)}
+            .
+          </>
         )}
-        {usual && (
-          <span className="text-slate-300"> Usually {percent(usual.share)}.</span>
-        )}
+        {usual && <span className="text-slate-300"> Usually {percent(usual.share)}.</span>}
       </p>
 
       <ul className="mt-3 grid gap-0.5">

@@ -7,6 +7,7 @@ import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
+import { MonthReviewCard } from '../components/budget/MonthReviewCard'
 import { useBudget, useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { useExpenses } from '../hooks/useExpenses'
@@ -88,6 +89,7 @@ export function Budget() {
           plan={plan}
           categories={categories}
           onPlan={() => setPlanning(month)}
+          onOpenMonth={setMonth}
           aside={goalSection}
         >
           {month === current && (
@@ -118,6 +120,9 @@ export function Budget() {
   )
 }
 
+/** How long into a month the review of the one before stays up. */
+const REVIEW_DAYS = 7
+
 const sumLimits = (plan: BudgetPlan) =>
   roundMoney(Object.values(plan.limits).reduce((a, b) => a + b, 0))
 
@@ -128,6 +133,7 @@ function MonthStatus({
   plan,
   categories,
   onPlan,
+  onOpenMonth,
   aside,
   children,
 }: {
@@ -135,6 +141,7 @@ function MonthStatus({
   plan: BudgetPlan | null
   categories: Category[]
   onPlan: () => void
+  onOpenMonth: (month: MonthKey) => void
   /** Under everything on a phone, under the month's numbers on a laptop. */
   aside?: ReactNode
   /** Goes between the month's numbers and its categories. */
@@ -225,6 +232,15 @@ function MonthStatus({
               </p>
             )}
           </section>
+
+          {/* the first week of a month is when last month's lessons are useful */}
+          {isCurrent && elapsedDays(month) <= REVIEW_DAYS && (
+            <MonthReviewCard
+              month={shiftMonth(month, -1)}
+              onPlan={plan ? undefined : onPlan}
+              onOpen={() => onOpenMonth(shiftMonth(month, -1))}
+            />
+          )}
 
           {isCurrent && alerts.length > 0 && (
             <section className="mb-6" aria-label="Warnings">

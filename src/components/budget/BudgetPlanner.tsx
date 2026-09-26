@@ -1,7 +1,8 @@
-import { ArrowLeft, CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
+import { ArrowLeft, CaretLeft, CaretRight, Check, Lightbulb, Sparkle } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MoneyInput } from './MoneyInput'
 import { CategoryDetail } from '../category/CategoryDetail'
+import { PlanCheckList, RecurringList, SuggestionList } from './PlanSuggestions'
 import { CURRENCY_SUFFIX, LOCALE } from '../../config'
 import {
   useBudget,
@@ -34,6 +35,7 @@ import {
   type FillSource,
   type PlanDraft,
 } from '../../lib/planning'
+import { planChecks, planSuggestions, recurringCosts, type Suggestion } from '../../lib/suggestions'
 import type { PlanSuggestion } from '../../types'
 
 interface Props {
@@ -129,6 +131,28 @@ export function BudgetPlanner({ month, onClose }: Props) {
     )
 
   const aiById = new Map((ai?.categories ?? []).map((c) => [c.id, c]))
+
+  // worked out against the draft as it stands: an applied suggestion drops out
+  const history = expenses.data ?? []
+  const suggestions = planSuggestions({
+    target: month,
+    baseline,
+    draftLimits: draft.limits,
+    expenses: history,
+  })
+  const suggestedIds = new Set(suggestions.map((s) => s.categoryId))
+  const recurring = recurringCosts(history, baseline.months)
+  const checks = planChecks({ draft, baseline, activeIds, goal })
+  const categoriesById = Object.fromEntries(allCategories.map((c) => [c.id, c]))
+  const applySuggestion = (s: Suggestion) =>
+    setDraft((d) => {
+      if (!d) return d
+      const note =
+        s.noteLine && !d.note.includes(s.noteLine)
+          ? [d.note.trim(), s.noteLine].filter(Boolean).join(', ')
+          : d.note
+      return { ...d, limits: { ...d.limits, [s.categoryId]: s.limit }, note }
+    })
   const applyAi = () => {
     if (!ai) return
     setDraft((d) => {
@@ -207,6 +231,12 @@ export function BudgetPlanner({ month, onClose }: Props) {
           draftLimits={draft.limits}
           onSelect={setFocused}
           onBack={() => setFocused(null)}
+          extras={(id) => {
+            const mine = suggestions.filter((s) => s.categoryId === id)
+            return mine.length > 0 ? (
+              <SuggestionList suggestions={mine} onApply={applySuggestion} compact />
+            ) : null
+          }}
           editor={(id, name) => (
             <MoneyInput
               label={`${name} limit`}
@@ -216,270 +246,309 @@ export function BudgetPlanner({ month, onClose }: Props) {
           )}
         />
       ) : (
-      <div className="space-y-5 px-4 pb-6 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:px-0">
-        <div className="space-y-5 lg:sticky lg:top-0">
-        {/* ---------- the whole month on one card ---------- */}
-        <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-          <Row
-            label="Income"
-            hint={
-              baseline.typicalIncome !== null && baseline.typicalIncome !== draft.income ? (
-                <Hint
-                  onClick={() =>
-                    setDraft({ ...draft, income: Math.round(baseline.typicalIncome!) })
-                  }
-                >
-                  typical {formatAmount(Math.round(baseline.typicalIncome))}
-                </Hint>
-              ) : null
-            }
-          >
-            <MoneyInput
-              label="Planned income"
-              value={draft.income}
-              onChange={(income) => setDraft({ ...draft, income })}
-            />
-          </Row>
-          <Row
-            label="Savings"
-            hint={
-              goal ? (
-                <span className="text-xs text-muted">
-                  {monthsToGoal
-                    ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`
-                    : goalLeft > 0
-                      ? `${formatAmount(goalLeft)} to ${goal.name}`
-                      : `${goal.name} reached`}
+        <div className="space-y-5 px-4 pb-6 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:px-0">
+          <div className="space-y-5 lg:sticky lg:top-0">
+            {/* ---------- the whole month on one card ---------- */}
+            <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+              <Row
+                label="Income"
+                hint={
+                  baseline.typicalIncome !== null && baseline.typicalIncome !== draft.income ? (
+                    <Hint
+                      onClick={() =>
+                        setDraft({ ...draft, income: Math.round(baseline.typicalIncome!) })
+                      }
+                    >
+                      typical {formatAmount(Math.round(baseline.typicalIncome))}
+                    </Hint>
+                  ) : null
+                }
+              >
+                <MoneyInput
+                  label="Planned income"
+                  value={draft.income}
+                  onChange={(income) => setDraft({ ...draft, income })}
+                />
+              </Row>
+              <Row
+                label="Savings"
+                hint={
+                  goal ? (
+                    <span className="text-xs text-muted">
+                      {monthsToGoal
+                        ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`
+                        : goalLeft > 0
+                          ? `${formatAmount(goalLeft)} to ${goal.name}`
+                          : `${goal.name} reached`}
+                    </span>
+                  ) : null
+                }
+              >
+                <MoneyInput
+                  label="Planned savings"
+                  value={draft.savings}
+                  onChange={(savings) => setDraft({ ...draft, savings })}
+                />
+              </Row>
+              <div className="mt-3 flex items-baseline justify-between border-t border-white/10 pt-3 text-sm">
+                <span className="text-muted">Spending limits</span>
+                <span className="font-semibold tabular-nums text-white">
+                  {formatMoneyCompact(spending)}
                 </span>
-              ) : null
-            }
-          >
-            <MoneyInput
-              label="Planned savings"
-              value={draft.savings}
-              onChange={(savings) => setDraft({ ...draft, savings })}
-            />
-          </Row>
-          <div className="mt-3 flex items-baseline justify-between border-t border-white/10 pt-3 text-sm">
-            <span className="text-muted">Spending limits</span>
-            <span className="font-semibold tabular-nums text-white">
-              {formatMoneyCompact(spending)}
-            </span>
-          </div>
-          <UnassignedBar income={draft.income} unassigned={unassigned} />
-        </section>
+              </div>
+              <UnassignedBar income={draft.income} unassigned={unassigned} />
+            </section>
 
-        {/* ---------- what makes this month different ---------- */}
-        <section>
-          <label
-            htmlFor="plan-note"
-            className="mb-1.5 block text-base font-semibold text-white"
-          >
-            What’s different about {formatMonthName(month)}?
-          </label>
-          <textarea
-            id="plan-note"
-            value={draft.note}
-            onChange={(e) => setDraft({ ...draft, note: e.target.value })}
-            maxLength={500}
-            rows={2}
-            placeholder="e.g. car insurance 1,200 zł, a birthday, a weekend in Kraków"
-            className="w-full resize-none rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
-          />
-          <p className="mt-1 text-xs text-muted">
-            Saved with the plan, and the AI draft takes it into account.
-          </p>
-        </section>
+            {/* ---------- what makes this month different ---------- */}
+            <section>
+              <label
+                htmlFor="plan-note"
+                className="mb-1.5 block text-base font-semibold text-white"
+              >
+                What’s different about {formatMonthName(month)}?
+              </label>
+              <textarea
+                id="plan-note"
+                value={draft.note}
+                onChange={(e) => setDraft({ ...draft, note: e.target.value })}
+                maxLength={500}
+                rows={2}
+                placeholder="e.g. car insurance 1,200 zł, a birthday, a weekend in Kraków"
+                className="w-full resize-none rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
+              />
+              <p className="mt-1 text-xs text-muted">
+                Saved with the plan, and the AI draft takes it into account.
+              </p>
+            </section>
 
-        {/* ---------- AI draft ---------- */}
-        <section className="rounded-3xl bg-accent/10 p-4 ring-1 ring-accent/25">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
-              <Sparkle weight="fill" aria-hidden />
-              AI draft
-            </h2>
-            {ai && (
+            {/* ---------- AI draft ---------- */}
+            <section className="rounded-3xl bg-accent/10 p-4 ring-1 ring-accent/25">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
+                  <Sparkle weight="fill" aria-hidden />
+                  AI draft
+                </h2>
+                {ai && (
+                  <button
+                    type="button"
+                    onClick={applyAi}
+                    className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
+                  >
+                    Use all
+                  </button>
+                )}
+              </div>
+              {ai ? (
+                <div className="mt-2 space-y-2">
+                  <p className="text-[15px] leading-snug text-white">{plainDashes(ai.summary)}</p>
+                  {ai.savings !== null && (
+                    <p className="text-sm text-slate-300">
+                      Suggested savings:{' '}
+                      <span className="font-semibold text-white">
+                        {formatAmount(ai.savings)} {CURRENCY_SUFFIX}
+                      </span>
+                    </p>
+                  )}
+                  {ai.tips.length > 0 && (
+                    <ul className="list-disc space-y-1 pl-5 text-sm leading-snug text-slate-300">
+                      {ai.tips.map((t, i) => (
+                        <li key={i}>{plainDashes(t)}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="text-xs text-muted">
+                    Per-category suggestions are shown under each category. Written by {ai.model}. A
+                    suggestion, not financial advice.
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-slate-300">
+                  Drafts limits from{' '}
+                  {baseline.months.length
+                    ? `your last ${baseline.months.length} ${baseline.months.length === 1 ? 'month' : 'months'}`
+                    : 'your defaults'}
+                  , the season and your note above.
+                </p>
+              )}
               <button
                 type="button"
-                onClick={applyAi}
-                className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
+                onClick={askAi}
+                disabled={suggest.isPending}
+                className="mt-3 w-full rounded-2xl bg-white/10 py-2.5 text-sm font-semibold text-white ring-1 ring-white/15 active:bg-white/20 disabled:opacity-50"
               >
-                Use all
+                {suggest.isPending ? 'Thinking…' : ai ? 'Draft again' : 'Draft a plan with AI'}
+              </button>
+              {suggest.error && (
+                <p className="mt-2 text-sm text-red-300">
+                  {suggest.error instanceof PlanUnavailableError
+                    ? suggest.error.message
+                    : `Couldn’t draft a plan: ${(suggest.error as Error).message}`}
+                </p>
+              )}
+              <p className="mt-2 text-[11px] leading-relaxed text-muted">
+                Sent to Gemini: monthly totals per category and of income, the goal, and your note.
+                No individual expenses.
+              </p>
+            </section>
+
+            {/* ---------- from the history ---------- */}
+            {suggestions.length > 0 && (
+              <section aria-labelledby="plan-suggestions">
+                <h2 id="plan-suggestions" className="mb-2 text-base font-semibold text-white">
+                  Suggestions
+                </h2>
+                <SuggestionList suggestions={suggestions} onApply={applySuggestion} />
+              </section>
+            )}
+
+            {recurring.length > 0 && (
+              <section aria-labelledby="plan-recurring">
+                <h2 id="plan-recurring" className="mb-2 text-base font-semibold text-white">
+                  Already certain
+                </h2>
+                <RecurringList items={recurring} categories={categoriesById} />
+              </section>
+            )}
+
+            <section aria-labelledby="plan-check">
+              <h2 id="plan-check" className="mb-2 text-base font-semibold text-white">
+                Before you save
+              </h2>
+              <PlanCheckList checks={checks} />
+            </section>
+          </div>
+
+          {/* ---------- per category ---------- */}
+          <div className="space-y-5">
+            <section>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <h2 className="text-base font-semibold text-white">Limits</h2>
+                <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
+                  {previous.data && (
+                    <FillChip onClick={() => fill('previous')}>
+                      {formatMonthName(prevMonth)}’s plan
+                    </FillChip>
+                  )}
+                  {baseline.months.length > 0 && (
+                    <FillChip onClick={() => fill('typical')}>Typical</FillChip>
+                  )}
+                  <FillChip onClick={() => fill('defaults')}>Defaults</FillChip>
+                </div>
+              </div>
+              <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
+                {baseline.categories.map(({ category, typical, last, sameMonthLastYear }) => {
+                  const value = draft.limits[category.id] ?? 0
+                  const suggestion = aiById.get(category.id)
+                  return (
+                    <li key={category.id} className="px-3 py-3">
+                      <div className="flex items-center gap-3">
+                        <span
+                          aria-hidden
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: category.color }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFocused(category.id)}
+                          title="History, forecast and share"
+                          className="group flex min-w-0 flex-1 items-center gap-1 text-left"
+                        >
+                          <span className="truncate text-[15px] font-medium text-white decoration-white/30 underline-offset-4 group-hover:underline">
+                            {category.name}
+                          </span>
+                          {suggestedIds.has(category.id) && (
+                            <Lightbulb
+                              weight="fill"
+                              aria-label="Has a suggestion"
+                              className="shrink-0 text-accent-soft"
+                            />
+                          )}
+                          <CaretRight
+                            aria-hidden
+                            className="shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-white"
+                          />
+                        </button>
+                        <div className="w-32 shrink-0">
+                          <MoneyInput
+                            label={`${category.name} limit`}
+                            value={value}
+                            onChange={(v) => setLimit(category.id, v)}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5 pl-5">
+                        {typical !== null && (
+                          <Hint
+                            active={value === roundUpPlan(typical)}
+                            onClick={() => setLimit(category.id, roundUpPlan(typical))}
+                          >
+                            typical {formatAmount(Math.round(typical))}
+                          </Hint>
+                        )}
+                        {last !== null && (
+                          <Hint
+                            active={value === roundUpPlan(last)}
+                            onClick={() => setLimit(category.id, roundUpPlan(last))}
+                          >
+                            last {formatAmount(Math.round(last))}
+                          </Hint>
+                        )}
+                        {sameMonthLastYear !== null && sameMonthLastYear > 0 && (
+                          <Hint
+                            active={value === roundUpPlan(sameMonthLastYear)}
+                            onClick={() => setLimit(category.id, roundUpPlan(sameMonthLastYear))}
+                          >
+                            {lastYearLabel} {formatAmount(Math.round(sameMonthLastYear))}
+                          </Hint>
+                        )}
+                      </div>
+                      {suggestion && (
+                        <button
+                          type="button"
+                          onClick={() => setLimit(category.id, suggestion.amount)}
+                          className={`mt-2 ml-5 block rounded-xl px-2.5 py-1.5 text-left text-xs leading-snug ring-1 transition ${
+                            value === suggestion.amount
+                              ? 'bg-accent/15 text-accent-soft ring-accent/40'
+                              : 'bg-white/5 text-slate-100 ring-white/10 hover:bg-white/10 active:bg-white/10'
+                          }`}
+                        >
+                          <span className="font-semibold">
+                            <Sparkle
+                              weight="fill"
+                              aria-hidden
+                              className="inline-block align-[-0.125em]"
+                            />{' '}
+                            {formatAmount(suggestion.amount)} {CURRENCY_SUFFIX}
+                            {value === suggestion.amount ? ' · used' : ' · tap to use'}
+                          </span>
+                          <span className="block text-slate-300">
+                            {plainDashes(suggestion.reason)}
+                          </span>
+                        </button>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+              {baseline.months.length > 0 && (
+                <p className="mt-2 text-xs text-muted">
+                  “Typical” is the average of the last {Math.min(3, baseline.months.length)}{' '}
+                  complete months. Chips round up to 10 {CURRENCY_SUFFIX}.
+                </p>
+              )}
+            </section>
+
+            {existing.data && (
+              <button
+                type="button"
+                onClick={() => remove.mutate(month, { onSuccess: onClose })}
+                className="w-full rounded-2xl py-3 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 active:bg-red-500/10"
+              >
+                Remove {formatMonthName(month)}’s plan (back to default limits)
               </button>
             )}
           </div>
-          {ai ? (
-            <div className="mt-2 space-y-2">
-              <p className="text-[15px] leading-snug text-white">{plainDashes(ai.summary)}</p>
-              {ai.savings !== null && (
-                <p className="text-sm text-slate-300">
-                  Suggested savings:{' '}
-                  <span className="font-semibold text-white">
-                    {formatAmount(ai.savings)} {CURRENCY_SUFFIX}
-                  </span>
-                </p>
-              )}
-              {ai.tips.length > 0 && (
-                <ul className="list-disc space-y-1 pl-5 text-sm leading-snug text-slate-300">
-                  {ai.tips.map((t, i) => (
-                    <li key={i}>{plainDashes(t)}</li>
-                  ))}
-                </ul>
-              )}
-              <p className="text-xs text-muted">
-                Per-category suggestions are shown under each category. Written by {ai.model}. A
-                suggestion, not financial advice.
-              </p>
-            </div>
-          ) : (
-            <p className="mt-1 text-sm text-slate-300">
-              Drafts limits from{' '}
-              {baseline.months.length
-                ? `your last ${baseline.months.length} ${baseline.months.length === 1 ? 'month' : 'months'}`
-                : 'your defaults'}
-              , the season and your note above.
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={askAi}
-            disabled={suggest.isPending}
-            className="mt-3 w-full rounded-2xl bg-white/10 py-2.5 text-sm font-semibold text-white ring-1 ring-white/15 active:bg-white/20 disabled:opacity-50"
-          >
-            {suggest.isPending ? 'Thinking…' : ai ? 'Draft again' : 'Draft a plan with AI'}
-          </button>
-          {suggest.error && (
-            <p className="mt-2 text-sm text-red-300">
-              {suggest.error instanceof PlanUnavailableError
-                ? suggest.error.message
-                : `Couldn’t draft a plan: ${(suggest.error as Error).message}`}
-            </p>
-          )}
-          <p className="mt-2 text-[11px] leading-relaxed text-muted">
-            Sent to Gemini: monthly totals per category and of income, the goal, and your note. No
-            individual expenses.
-          </p>
-        </section>
-
         </div>
-
-        {/* ---------- per category ---------- */}
-        <div className="space-y-5">
-        <section>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <h2 className="text-base font-semibold text-white">Limits</h2>
-            <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
-              {previous.data && (
-                <FillChip onClick={() => fill('previous')}>
-                  {formatMonthName(prevMonth)}’s plan
-                </FillChip>
-              )}
-              {baseline.months.length > 0 && (
-                <FillChip onClick={() => fill('typical')}>Typical</FillChip>
-              )}
-              <FillChip onClick={() => fill('defaults')}>Defaults</FillChip>
-            </div>
-          </div>
-          <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
-            {baseline.categories.map(({ category, typical, last, sameMonthLastYear }) => {
-              const value = draft.limits[category.id] ?? 0
-              const suggestion = aiById.get(category.id)
-              return (
-                <li key={category.id} className="px-3 py-3">
-                  <div className="flex items-center gap-3">
-                    <span
-                      aria-hidden
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setFocused(category.id)}
-                      title="History, forecast and share"
-                      className="group flex min-w-0 flex-1 items-center gap-1 text-left"
-                    >
-                      <span className="truncate text-[15px] font-medium text-white decoration-white/30 underline-offset-4 group-hover:underline">
-                        {category.name}
-                      </span>
-                      <CaretRight
-                        aria-hidden
-                        className="shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-white"
-                      />
-                    </button>
-                    <div className="w-32 shrink-0">
-                      <MoneyInput
-                        label={`${category.name} limit`}
-                        value={value}
-                        onChange={(v) => setLimit(category.id, v)}
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5 pl-5">
-                    {typical !== null && (
-                      <Hint
-                        active={value === roundUpPlan(typical)}
-                        onClick={() => setLimit(category.id, roundUpPlan(typical))}
-                      >
-                        typical {formatAmount(Math.round(typical))}
-                      </Hint>
-                    )}
-                    {last !== null && (
-                      <Hint
-                        active={value === roundUpPlan(last)}
-                        onClick={() => setLimit(category.id, roundUpPlan(last))}
-                      >
-                        last {formatAmount(Math.round(last))}
-                      </Hint>
-                    )}
-                    {sameMonthLastYear !== null && sameMonthLastYear > 0 && (
-                      <Hint
-                        active={value === roundUpPlan(sameMonthLastYear)}
-                        onClick={() => setLimit(category.id, roundUpPlan(sameMonthLastYear))}
-                      >
-                        {lastYearLabel} {formatAmount(Math.round(sameMonthLastYear))}
-                      </Hint>
-                    )}
-                  </div>
-                  {suggestion && (
-                    <button
-                      type="button"
-                      onClick={() => setLimit(category.id, suggestion.amount)}
-                      className={`mt-2 ml-5 block rounded-xl px-2.5 py-1.5 text-left text-xs leading-snug ring-1 transition ${
-                        value === suggestion.amount
-                          ? 'bg-accent/15 text-accent-soft ring-accent/40'
-                          : 'bg-white/5 text-slate-100 ring-white/10 hover:bg-white/10 active:bg-white/10'
-                      }`}
-                    >
-                      <span className="font-semibold">
-                        <Sparkle weight="fill" aria-hidden className="inline-block align-[-0.125em]" /> {formatAmount(suggestion.amount)} {CURRENCY_SUFFIX}
-                        {value === suggestion.amount ? ' · used' : ' · tap to use'}
-                      </span>
-                      <span className="block text-slate-300">{plainDashes(suggestion.reason)}</span>
-                    </button>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-          {baseline.months.length > 0 && (
-            <p className="mt-2 text-xs text-muted">
-              “Typical” is the average of the last {Math.min(3, baseline.months.length)} complete
-              months. Chips round up to 10 {CURRENCY_SUFFIX}.
-            </p>
-          )}
-        </section>
-
-        {existing.data && (
-          <button
-            type="button"
-            onClick={() => remove.mutate(month, { onSuccess: onClose })}
-            className="w-full rounded-2xl py-3 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 active:bg-red-500/10"
-          >
-            Remove {formatMonthName(month)}’s plan (back to default limits)
-          </button>
-        )}
-        </div>
-      </div>
       )}
     </Shell>
   )
@@ -615,7 +684,8 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
       >
         {balanced ? (
           <>
-            Every złoty has a job <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" />
+            Every złoty has a job{' '}
+            <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" />
           </>
         ) : over ? (
           'Over income by'
@@ -656,6 +726,7 @@ function FocusedCategory({
   onSelect,
   onBack,
   editor,
+  extras,
 }: {
   month: MonthKey
   categoryId: string
@@ -664,6 +735,8 @@ function FocusedCategory({
   onSelect: (id: string) => void
   onBack: () => void
   editor: (id: string, name: string) => ReactNode
+  /** This category's suggestions, shown with the forecast. */
+  extras: (id: string) => ReactNode
 }) {
   const index = categories.findIndex((c) => c.id === categoryId)
   const category = categories[index]
@@ -681,7 +754,11 @@ function FocusedCategory({
         </button>
         <h2 className="flex min-w-0 flex-1 items-center gap-2.5 text-xl font-bold text-white">
           {category && (
-            <span aria-hidden className="h-3 w-3 shrink-0 rounded" style={{ backgroundColor: category.color }} />
+            <span
+              aria-hidden
+              className="h-3 w-3 shrink-0 rounded"
+              style={{ backgroundColor: category.color }}
+            />
           )}
           <span className="truncate">{category?.name}</span>
           <span className="hidden truncate text-base font-medium text-muted short:lg:inline">
@@ -717,6 +794,7 @@ function FocusedCategory({
           month={month}
           draftLimits={draftLimits}
           limitEditor={category && editor(category.id, category.name)}
+          planExtras={category && extras(category.id)}
           onSelectCategory={onSelect}
         />
       </div>

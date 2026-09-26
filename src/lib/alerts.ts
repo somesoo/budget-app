@@ -16,10 +16,10 @@ export const NEAR_RATIO = 0.8
 
 export type LimitLevel = 'ok' | 'near' | 'over'
 
-export function limitLevel(spent: number, limit: number): LimitLevel {
+export function limitLevel(spent: number, limit: number, nearRatio = NEAR_RATIO): LimitLevel {
   if (limit <= 0) return 'ok'
   if (spent > limit) return 'over'
-  return spent / limit >= NEAR_RATIO ? 'near' : 'ok'
+  return spent / limit >= nearRatio ? 'near' : 'ok'
 }
 
 export interface LimitImpact {
@@ -35,14 +35,19 @@ export interface LimitImpact {
 }
 
 /** What one more expense does to a category's month. */
-export function limitImpact(spent: number, amount: number, limit: number): LimitImpact {
+export function limitImpact(
+  spent: number,
+  amount: number,
+  limit: number,
+  nearRatio = NEAR_RATIO,
+): LimitImpact {
   const after = roundMoney(spent + amount)
   return {
     before: spent,
     after,
     limit,
-    levelBefore: limitLevel(spent, limit),
-    levelAfter: limitLevel(after, limit),
+    levelBefore: limitLevel(spent, limit, nearRatio),
+    levelAfter: limitLevel(after, limit, nearRatio),
     overBy: limit > 0 ? Math.max(roundMoney(after - limit), 0) : 0,
     left: limit > 0 ? Math.max(roundMoney(limit - after), 0) : 0,
   }
@@ -94,13 +99,16 @@ export function budgetAlerts(args: {
   month: MonthKey
   expenses: Expense[]
   categories: Category[]
+  /** This device's preferences: where "close to the limit" starts, and whether pace warns. */
+  nearRatio?: number
+  pace?: boolean
 }): BudgetAlert[] {
-  const { month, categories } = args
+  const { month, categories, nearRatio = NEAR_RATIO, pace = true } = args
   const expenses = args.expenses.filter((e) => monthKeyOfDate(e.expense_date) === month)
   const elapsed = elapsedDays(month)
   // today still counts: it can still be spent in, as the Budget tab says too
   const daysLeft = elapsed > 0 ? daysInMonth(month) - elapsed + 1 : 0
-  const paceOn = elapsed >= PACE_MIN_DAYS && daysLeft > 0
+  const paceOn = pace && elapsed >= PACE_MIN_DAYS && daysLeft > 0
 
   const spentBy = new Map<string, number>()
   const countBy = new Map<string, number>()
@@ -115,7 +123,7 @@ export function budgetAlerts(args: {
     const limit = category.monthly_limit
     if (category.archived && spent === 0) continue
     if (limit <= 0) continue
-    const level = limitLevel(spent, limit)
+    const level = limitLevel(spent, limit, nearRatio)
     const projected =
       paceOn &&
       category.show_in_chart !== false &&

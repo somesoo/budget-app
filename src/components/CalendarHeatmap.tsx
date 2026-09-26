@@ -1,13 +1,8 @@
 import { WEEKDAY_LABELS } from '../config'
-import {
-  daysInMonth,
-  heatIntensity,
-  monthGrid,
-  todayKey,
-  type MonthKey,
-} from '../lib/calculations'
+import { daysInMonth, heatIntensity, monthGrid, todayKey, type MonthKey } from '../lib/calculations'
 
-const HEAT_COLOR = '249, 115, 22' // orange — the more spent, the stronger
+/** The app's accent (CHART.accent): the more spent, the stronger. */
+const HEAT_COLOR = '57, 135, 229'
 
 interface Props {
   month: MonthKey
@@ -63,9 +58,7 @@ export function CalendarHeatmap({
                     : 'rgba(255,255,255,0.04)',
               }}
             >
-              <span className="text-[13px] font-semibold leading-none text-white">
-                {dayNumber}
-              </span>
+              <span className="text-[13px] font-semibold leading-none text-white">{dayNumber}</span>
               {total > 0 && (
                 <span className="mt-1 text-[10px] leading-none tabular-nums text-white/85">
                   {Math.round(total)}

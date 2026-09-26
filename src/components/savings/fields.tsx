@@ -103,3 +103,41 @@ export function SubmitRow({
     </div>
   )
 }
+
+/** On/off, with its label on the left: a row of the settings. */
+export function Switch({
+  label,
+  help,
+  checked,
+  onChange,
+}: {
+  label: string
+  help?: string
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center gap-3 text-left"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] text-white">{label}</span>
+        {help && <span className="block text-xs leading-snug text-muted">{help}</span>}
+      </span>
+      <span
+        aria-hidden
+        className={`relative h-6 w-10 shrink-0 rounded-full transition ${checked ? 'bg-accent' : 'bg-white/15'}`}
+      >
+        <span
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-slate-50 shadow transition-[left] ${
+            checked ? 'left-[18px]' : 'left-0.5'
+          }`}
+        />
+      </span>
+    </button>
+  )
+}

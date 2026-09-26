@@ -17,6 +17,7 @@ import { useAddExpense, useMonthlyExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
 import { LAPTOP, useMediaQuery } from '../hooks/useMediaQuery'
+import { usePrefs } from '../hooks/usePrefs'
 import {
   currentMonthKey,
   formatDayLong,
@@ -63,6 +64,7 @@ export function Home() {
   const leftOut = allCategories.filter((c) => !c.show_in_chart && (spentByCategory[c.id] ?? 0) > 0)
 
   const laptop = useMediaQuery(LAPTOP)
+  const prefs = usePrefs()
   const { alerts } = useBudgetAlerts()
 
   const projects = useProjectSummaries()
@@ -126,7 +128,10 @@ export function Home() {
           // a backdated expense lands in another month, whose limits aren't on screen
           const crossed =
             selected.kind === 'project' || monthKeyOfDate(date) === month
-              ? crossingNote(selected, limitImpact(spentOf(selected), amount, limitOf(selected)))
+              ? crossingNote(
+                  selected,
+                  limitImpact(spentOf(selected), amount, limitOf(selected), prefs.nearRatio),
+                )
               : null
           setToast(
             crossed

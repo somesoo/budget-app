@@ -3,6 +3,7 @@ import { ALERT_RANK, alertSubject, budgetAlerts, type BudgetAlert } from '../lib
 import { currentMonthKey } from '../lib/calculations'
 import { useMonthCategories } from './useBudgets'
 import { useMonthlyExpenses } from './useExpenses'
+import { usePrefs } from './usePrefs'
 
 /*
  * Dismissed warnings live in this browser only: a per-device convenience,
@@ -36,6 +37,26 @@ function dismissAlert(alert: BudgetAlert) {
   for (const l of listeners) l()
 }
 
+/** Brings every dismissed warning back (Settings). */
+export function resetDismissedAlerts() {
+  dismissed = []
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // nothing stored to remove
+  }
+  for (const l of listeners) l()
+}
+
+/** How many warnings this device has dismissed this month. */
+export function useDismissedCount() {
+  return useSyncExternalStore(
+    subscribe,
+    () => dismissed.length,
+    () => dismissed.length,
+  )
+}
+
 const subscribe = (l: () => void) => {
   listeners.add(l)
   return () => listeners.delete(l)
@@ -63,6 +84,7 @@ export function useBudgetAlerts() {
   const month = currentMonthKey()
   const { data: categories } = useMonthCategories(month)
   const { data: expenses } = useMonthlyExpenses(month)
+  const prefs = usePrefs()
   const ids = useSyncExternalStore(
     subscribe,
     () => dismissed,
@@ -70,8 +92,17 @@ export function useBudgetAlerts() {
   )
 
   const all = useMemo(
-    () => (categories && expenses ? budgetAlerts({ month, expenses, categories }) : []),
-    [month, categories, expenses],
+    () =>
+      categories && expenses
+        ? budgetAlerts({
+            month,
+            expenses,
+            categories,
+            nearRatio: prefs.nearRatio,
+            pace: prefs.paceWarnings,
+          })
+        : [],
+    [month, categories, expenses, prefs.nearRatio, prefs.paceWarnings],
   )
   const visible = useMemo(() => all.filter((a) => !isDismissed(a, ids)), [all, ids])
 

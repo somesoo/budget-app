@@ -1,6 +1,7 @@
 import { Receipt } from '@phosphor-icons/react'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
-import { CURRENCY_SUFFIX, QUICK_AMOUNTS } from '../../config'
+import { CURRENCY_SUFFIX } from '../../config'
+import { usePrefs } from '../../hooks/usePrefs'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useProjectSummaries } from '../../hooks/useProjectSummaries'
@@ -66,6 +67,7 @@ export function DesktopAdd() {
   const addIncome = useAddIncome()
   const actions = useEntryActions()
   const { alerts } = useBudgetAlerts()
+  const prefs = usePrefs()
   const projectSummaries = useProjectSummaries()
 
   const [mode, setMode] = useState<Mode>('expense')
@@ -154,7 +156,12 @@ export function DesktopAdd() {
         inThisMonth || isProjectPick
           ? crossingNote(
               selected,
-              limitImpact(spentByCategory[selected.id] ?? 0, entry.amount, selected.monthly_limit),
+              limitImpact(
+                spentByCategory[selected.id] ?? 0,
+                entry.amount,
+                selected.monthly_limit,
+                prefs.nearRatio,
+              ),
             )
           : null
       setToast(
@@ -340,7 +347,7 @@ export function DesktopAdd() {
 
           {mode === 'expense' && (
             <div className="mt-3 grid grid-cols-4 gap-2">
-              {QUICK_AMOUNTS.map((amount) => (
+              {prefs.quickAmounts.map((amount) => (
                 <button
                   key={amount}
                   type="button"

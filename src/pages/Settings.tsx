@@ -1,430 +1,485 @@
-import { CaretRight, ChartDonut, EyeSlash } from '@phosphor-icons/react'
+import {
+  AirplaneTilt,
+  CaretRight,
+  ChartDonut,
+  DownloadSimple,
+  Plus,
+  SignOut,
+  WifiHigh,
+  WifiSlash,
+} from '@phosphor-icons/react'
 import { useState } from 'react'
-import { Screen } from '../components/Screen'
-import { UserSwitcher } from '../components/UserSwitcher'
-import { useAddCategory, useCategories, useUpdateCategory } from '../hooks/useCategories'
-import { useGoal, useUpsertGoal } from '../hooks/useGoal'
-import { useDeviceUser } from '../hooks/useDeviceUser'
-import { useRealtimeStatus } from '../hooks/useRealtimeSync'
-import { useSavings } from '../hooks/useSavings'
-import { ProjectSheet } from '../components/projects/ProjectSheet'
 import { Link } from 'react-router-dom'
-import { CURRENCY_SUFFIX } from '../config'
+import { MoneyInput } from '../components/budget/MoneyInput'
+import { ProjectSheet } from '../components/projects/ProjectSheet'
+import { Screen } from '../components/Screen'
+import { Segments, Switch } from '../components/savings/fields'
+import { CategorySheet } from '../components/settings/CategorySheet'
+import { CardAction, SettingsCard } from '../components/settings/SettingsCard'
+import { UserSwitcher } from '../components/UserSwitcher'
+import { resetDismissedAlerts, useDismissedCount } from '../hooks/useBudgetAlerts'
+import { useCategories } from '../hooks/useCategories'
+import { useDeviceUser } from '../hooks/useDeviceUser'
+import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
+import { useGoal, useUpsertGoal } from '../hooks/useGoal'
+import { DEFAULT_PREFS, setPrefs, usePrefs } from '../hooks/usePrefs'
+import { useRealtimeStatus } from '../hooks/useRealtimeSync'
+import { useSavingsOverview } from '../hooks/useSavings'
+import { useSession } from '../hooks/useSession'
+import {
+  currentMonthKey,
+  formatAmount,
+  formatMoney,
+  formatMoneyWhole,
+  roundMoney,
+  shiftMonth,
+  sumByCategory,
+} from '../lib/calculations'
+import { downloadCsv } from '../lib/exportCsv'
+import { monthsEndingAt, windowRange } from '../lib/insights'
 import { supabase } from '../lib/supabaseClient'
-import { formatMoney, roundMoney } from '../lib/calculations'
 import type { Category } from '../types'
 
+/** Months averaged for the "typical" figure next to each limit. */
+const TYPICAL_MONTHS = 3
+
+type CategoryEdit = { category?: Category } | null
+
+/**
+ * Settings in compact cards. Shared settings (categories, trips) change both
+ * phones; the ones marked "this device" stay on this one.
+ */
 export function Settings() {
-  const { person, setPerson } = useDeviceUser()
   const { data: categories = [] } = useCategories()
-  const updateCategory = useUpdateCategory()
-  const addCategory = useAddCategory()
-  const [showHidden, setShowHidden] = useState(false)
-  // projects have their own section below
-  const monthly = categories.filter((c) => c.kind !== 'project')
-  const active = monthly.filter((c) => !c.archived)
-  const hidden = monthly.filter((c) => c.archived)
-  const { data: goal, isLoading: goalLoading } = useGoal()
-  const upsertGoal = useUpsertGoal()
-  const status = useRealtimeStatus()
-  const savingsReady = useSavings().data?.available ?? false
-  const projects = categories.filter((c) => c.kind === 'project')
+  const savings = useSavingsOverview()
+  const [editing, setEditing] = useState<CategoryEdit>(null)
   const [projectSheet, setProjectSheet] = useState<Category | 'new' | null>(null)
 
+  // what each category has actually cost lately, next to its limit
+  const months = monthsEndingAt(shiftMonth(currentMonthKey(), -1), TYPICAL_MONTHS)
+  const { from, to } = windowRange(months)
+  const { data: recent } = useMonthlyExpensesBetween(from, to)
+  const typicalOf = (id: string) =>
+    recent ? roundMoney((sumByCategory(recent)[id] ?? 0) / TYPICAL_MONTHS) : undefined
+
+  const monthly = categories.filter((c) => c.kind !== 'project')
+  const active = monthly.filter((c) => !c.archived)
+  const projects = categories.filter((c) => c.kind === 'project')
+
   return (
-    <Screen title="Settings">
-      <section className="mb-6 rounded-2xl bg-white/5 p-4">
-        <p className="mb-3 text-sm text-muted">
-          This phone is <span className="text-xs">(stored locally, not in the database)</span>
-        </p>
-        {person && <UserSwitcher value={person} onChange={setPerson} size="lg" />}
-        <p className="mt-3 text-xs text-muted">
-          Sync:{' '}
-          <span className={status === 'live' ? 'text-positive' : 'text-amber-400'}>
-            {status === 'live' ? 'live' : status === 'connecting' ? 'connecting…' : 'offline'}
-          </span>
-        </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="mb-1 text-base font-semibold text-white">Categories and default limits</h2>
-        <p className="mb-3 text-xs text-muted">
-          A month you plan in the Budget tab uses its own limits; these apply to months without a
-          plan.
-        </p>
-        <ul className="space-y-2">
-          {active.map((category) => (
-            <li key={category.id}>
-              <CategoryRow
-                category={category}
-                onSave={(patch) => updateCategory.mutate({ id: category.id, ...patch })}
-                onHide={() => updateCategory.mutate({ id: category.id, archived: true })}
-                onToggleChart={() =>
-                  updateCategory.mutate({ id: category.id, show_in_chart: !category.show_in_chart })
-                }
-              />
-            </li>
-          ))}
-        </ul>
-        <p className="mt-2 text-xs text-muted">
-          Default limits total: {formatMoney(active.reduce((acc, c) => acc + c.monthly_limit, 0))} /
-          month
-        </p>
-        <p className="mt-1 flex flex-wrap items-center gap-x-1 text-xs text-muted">
-          <ChartIcon on /> in the “Where it goes” chart, <ChartIcon on={false} /> left out. Tap to
-          leave out fixed costs like rent, which still count everywhere else.{' '}
-          <EyeSlash aria-hidden className="text-sm" /> hides the category.
-        </p>
-
-        <NewCategory
-          pending={addCategory.isPending}
-          error={addCategory.error ? (addCategory.error as Error).message : null}
-          onAdd={(c, done) => addCategory.mutate(c, { onSuccess: done })}
-        />
-
-        {hidden.length > 0 && (
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setShowHidden((v) => !v)}
-              aria-expanded={showHidden}
-              className="text-sm font-medium text-muted active:text-white"
-            >
-              {showHidden ? 'Hide' : 'Show'} hidden categories ({hidden.length})
-            </button>
-            {showHidden && (
-              <ul className="mt-2 space-y-2">
-                {hidden.map((c) => (
-                  <li
-                    key={c.id}
-                    className="flex items-center gap-3 rounded-2xl bg-white/[0.03] px-3 py-2.5"
-                  >
-                    <span
-                      aria-hidden
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: c.color }}
-                    />
-                    <span className="flex-1 text-[15px] text-muted">{c.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => updateCategory.mutate({ id: c.id, archived: false })}
-                      className="rounded-xl px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/15 active:bg-white/10"
-                    >
-                      Show again
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="mt-2 text-xs text-muted">
-              Hidden categories are gone from the Add screen and planning; their old expenses keep
-              them.
-            </p>
-          </div>
-        )}
-      </section>
-
-      {savingsReady && (
-        <section className="mb-6">
-          <div className="mb-1 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-white">Trips and projects</h2>
-            <button
-              type="button"
-              onClick={() => setProjectSheet('new')}
-              className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
-            >
-              New
-            </button>
-          </div>
-          <p className="mb-3 text-xs text-muted">
-            A category that doesn’t start over each month: its own budget for the whole trip,
-            outside the monthly limits.
-          </p>
-          {projects.length === 0 ? (
-            <p className="text-sm text-muted">None yet.</p>
-          ) : (
-            <ul className="space-y-2">
-              {projects.map((p) => (
-                <li key={p.id}>
-                  <button
-                    type="button"
-                    onClick={() => setProjectSheet(p)}
-                    className={`flex w-full items-center gap-3 rounded-2xl bg-white/5 px-4 py-3 text-left ring-1 ring-white/10 hover:bg-white/10 ${
-                      p.archived ? 'opacity-60' : ''
-                    }`}
-                  >
-                    <span
-                      aria-hidden
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: p.color }}
-                    />
-                    <span className="min-w-0 flex-1 truncate text-[15px] text-white">{p.name}</span>
-                    <span className="shrink-0 text-sm tabular-nums text-muted">
-                      {p.archived
-                        ? 'Finished'
-                        : p.budget_total
-                          ? formatMoney(p.budget_total)
-                          : 'No budget'}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+    <Screen title="Settings" wide>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+        <div className="space-y-4">
+          <DeviceCard />
+          <CategoriesCard
+            categories={monthly}
+            typicalOf={typicalOf}
+            onEdit={(category) => setEditing({ category })}
+            onNew={() => setEditing({})}
+          />
+          {savings.available && (
+            <ProjectsSettings
+              projects={projects}
+              onEdit={setProjectSheet}
+              onNew={() => setProjectSheet('new')}
+            />
           )}
-        </section>
-      )}
+        </div>
+        <div className="space-y-4">
+          <AddScreenCard />
+          <WarningsCard />
+          <SavingsSettings
+            available={savings.available}
+            accounts={savings.accounts.length}
+            goals={savings.goals.length}
+          />
+          <DataCard categories={categories} />
+          <AccountCard />
+        </div>
+      </div>
 
+      {editing && (
+        <CategorySheet
+          category={editing.category}
+          typical={editing.category ? typicalOf(editing.category.id) : undefined}
+          neighbours={
+            editing.category
+              ? {
+                  up: active[active.findIndex((c) => c.id === editing.category!.id) - 1],
+                  down: active[active.findIndex((c) => c.id === editing.category!.id) + 1],
+                }
+              : undefined
+          }
+          onClose={() => setEditing(null)}
+        />
+      )}
       {projectSheet && (
         <ProjectSheet
           project={projectSheet === 'new' ? undefined : projectSheet}
           onClose={() => setProjectSheet(null)}
         />
       )}
-
-      {savingsReady ? (
-        <section className="mb-6">
-          <h2 className="mb-2 text-base font-semibold text-white">Savings goals</h2>
-          <Link
-            to="/savings"
-            className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3 text-sm text-slate-200 ring-1 ring-white/10 hover:bg-white/10"
-          >
-            Goals and accounts are in the Savings tab
-            <CaretRight aria-hidden className="text-muted" />
-          </Link>
-        </section>
-      ) : (
-        <section className="mb-6">
-          <h2 className="mb-3 text-base font-semibold text-white">Shared savings goal</h2>
-          {/* keyed so the fields fill in once the goal has loaded — otherwise they'd
-            keep the empty defaults and "Save goal" would write zeros over it */}
-          {goalLoading ? (
-            <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
-          ) : (
-            <GoalEditor
-              key={goal?.id ?? 'new'}
-              goal={goal ?? null}
-              onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
-            />
-          )}
-        </section>
-      )}
-
-      <button
-        type="button"
-        onClick={() => void supabase.auth.signOut()}
-        className="w-full rounded-2xl bg-white/5 py-3 text-sm font-semibold text-muted active:bg-white/10"
-      >
-        Sign out of this device
-      </button>
     </Screen>
   )
 }
 
-interface RowProps {
-  category: Category
-  onSave: (patch: Partial<Category>) => void
-  onHide: () => void
-  onToggleChart: () => void
-}
+/* ---------- this device ---------- */
 
-function CategoryRow({ category, onSave, onHide, onToggleChart }: RowProps) {
-  const [name, setName] = useState(category.name)
-  const [color, setColor] = useState(category.color)
-  const [limit, setLimit] = useState(String(category.monthly_limit))
-
-  const commitName = () => {
-    const trimmed = name.trim()
-    if (!trimmed || trimmed === category.name) {
-      setName(category.name)
-      return
-    }
-    onSave({ name: trimmed })
-  }
-
-  const commitLimit = () => {
-    const parsed = roundMoney(Number.parseFloat(limit.replace(',', '.')) || 0)
-    if (parsed < 0 || parsed === category.monthly_limit) {
-      setLimit(String(category.monthly_limit))
-      return
-    }
-    onSave({ monthly_limit: parsed })
-  }
-
+function DeviceCard() {
+  const { person, setPerson } = useDeviceUser()
+  const status = useRealtimeStatus()
+  const live = status === 'live'
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-white/5 p-2.5 ring-1 ring-white/5">
-      <label className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl ring-1 ring-white/20">
-        <span className="sr-only">Color for {category.name}</span>
-        <span aria-hidden className="block h-full w-full" style={{ backgroundColor: color }} />
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          onBlur={() => {
-            if (color !== category.color) onSave({ color })
-          }}
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        />
-      </label>
-
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onBlur={commitName}
-        aria-label="Category name"
-        className="min-w-0 flex-1 rounded-xl bg-transparent px-2 py-2 text-[15px] font-medium text-white outline-none focus:bg-white/5"
-      />
-
-      <div className="flex shrink-0 items-center gap-1 rounded-xl bg-white/5 px-2">
-        <input
-          value={limit}
-          onChange={(e) => setLimit(e.target.value.replace(/[^\d.,]/g, ''))}
-          onBlur={commitLimit}
-          inputMode="decimal"
-          aria-label={`Monthly limit for ${category.name}`}
-          className="w-16 bg-transparent py-2 text-right text-[15px] tabular-nums text-white outline-none"
-        />
-        <span className="text-xs text-muted">{CURRENCY_SUFFIX}</span>
+    <SettingsCard title="This device" help="Who uses it. Kept on the phone, not in the database.">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {person && <UserSwitcher value={person} onChange={setPerson} />}
+        <span
+          className={`flex items-center gap-1.5 text-sm ${live ? 'text-positive' : 'text-amber-300'}`}
+        >
+          {live ? <WifiHigh aria-hidden /> : <WifiSlash aria-hidden />}
+          {live ? 'Syncing live' : status === 'connecting' ? 'Connecting…' : 'Offline'}
+        </span>
       </div>
-
-      <button
-        type="button"
-        onClick={onToggleChart}
-        aria-pressed={category.show_in_chart}
-        aria-label={`Show ${category.name} in the spending chart`}
-        title={category.show_in_chart ? 'In the chart' : 'Left out of the chart'}
-        className="flex h-9 w-8 shrink-0 items-center justify-center rounded-xl active:bg-white/10"
-      >
-        <ChartIcon on={category.show_in_chart} />
-      </button>
-
-      <button
-        type="button"
-        onClick={onHide}
-        aria-label={`Hide ${category.name}`}
-        title="Hide"
-        className="-mr-1 flex h-9 w-8 shrink-0 items-center justify-center rounded-xl text-muted active:bg-white/10"
-      >
-        <EyeSlash aria-hidden className="text-lg" />
-      </button>
-    </div>
+    </SettingsCard>
   )
 }
 
-const NEW_CATEGORY_COLORS = [
-  '#f59e0b',
-  '#ef4444',
-  '#84cc16',
-  '#06b6d4',
-  '#8b5cf6',
-  '#f43f5e',
-  '#10b981',
-  '#eab308',
-]
+/* ---------- categories ---------- */
 
-function NewCategory({
-  pending,
-  error,
-  onAdd,
+function CategoriesCard({
+  categories,
+  typicalOf,
+  onEdit,
+  onNew,
 }: {
-  pending: boolean
-  error: string | null
-  onAdd: (
-    category: { name: string; color: string; monthly_limit: number },
-    done: () => void,
-  ) => void
+  categories: Category[]
+  typicalOf: (id: string) => number | undefined
+  onEdit: (c: Category) => void
+  onNew: () => void
 }) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [limit, setLimit] = useState('')
-  const [color, setColor] = useState(NEW_CATEGORY_COLORS[0])
+  const [showHidden, setShowHidden] = useState(false)
+  const active = categories.filter((c) => !c.archived)
+  const hidden = categories.filter((c) => c.archived)
+  const totalLimit = active.reduce((a, c) => a + c.monthly_limit, 0)
+  const totalTypical = active.reduce((a, c) => a + (typicalOf(c.id) ?? 0), 0)
+  const hasTypical = active.some((c) => typicalOf(c.id) !== undefined)
 
-  if (!open) {
+  const row = (c: Category) => {
+    const typical = typicalOf(c.id)
+    const over = typical !== undefined && c.monthly_limit > 0 && typical > c.monthly_limit
     return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mt-3 w-full rounded-2xl border border-dashed border-white/20 py-3 text-sm font-semibold text-muted active:bg-white/5"
-      >
-        + Add a category
-      </button>
-    )
-  }
-
-  const submit = () => {
-    if (!name.trim()) return
-    onAdd(
-      {
-        name: name.trim(),
-        color,
-        monthly_limit: roundMoney(Number.parseFloat(limit.replace(',', '.')) || 0),
-      },
-      () => {
-        setName('')
-        setLimit('')
-        setOpen(false)
-      },
+      <li key={c.id}>
+        <button
+          type="button"
+          onClick={() => onEdit(c)}
+          className={`group grid w-full grid-cols-[auto_minmax(0,1fr)_4.5rem_5rem_auto] items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-white/5 ${
+            c.archived ? 'opacity-50' : ''
+          }`}
+        >
+          <span aria-hidden className="h-3 w-3 rounded" style={{ backgroundColor: c.color }} />
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate text-[15px] text-white">{c.name}</span>
+            {!c.show_in_chart && (
+              <ChartDonut
+                aria-label="Left out of the chart"
+                className="shrink-0 text-sm text-muted"
+              />
+            )}
+          </span>
+          <span
+            className={`text-right text-sm tabular-nums ${over ? 'text-amber-200' : 'text-muted'}`}
+            title={over ? 'Usually costs more than its limit' : undefined}
+          >
+            {typical === undefined ? '' : formatAmount(Math.round(typical))}
+          </span>
+          <span className="text-right text-[15px] font-semibold tabular-nums text-white">
+            {formatAmount(c.monthly_limit)}
+          </span>
+          <CaretRight aria-hidden className="text-muted transition group-hover:translate-x-0.5" />
+        </button>
+      </li>
     )
   }
 
   return (
-    <div className="mt-3 space-y-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-      <div className="flex gap-2">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Name, e.g. Gifts"
-          aria-label="New category name"
-          maxLength={40}
-          autoFocus
-          className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60"
-        />
-        <div className="flex w-28 shrink-0 items-center gap-1 rounded-xl bg-white/5 px-2 ring-1 ring-white/10">
-          <input
-            value={limit}
-            onChange={(e) => setLimit(e.target.value.replace(/[^\d.,]/g, ''))}
-            inputMode="decimal"
-            placeholder="Limit"
-            aria-label="Default monthly limit"
-            className="w-full bg-transparent py-2 text-right tabular-nums text-white outline-none placeholder:text-muted/60"
-          />
-          <span className="text-xs text-muted">{CURRENCY_SUFFIX}</span>
-        </div>
+    <SettingsCard
+      title="Categories"
+      help="Default limits: a month you plan in Budget uses its own."
+      action={
+        <CardAction onClick={onNew}>
+          <Plus weight="bold" aria-hidden /> New
+        </CardAction>
+      }
+    >
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_4.5rem_5rem_auto] gap-3 px-2 pb-1 text-xs text-muted">
+        <span className="w-3" />
+        <span>Name</span>
+        <span className="text-right">{hasTypical ? 'Usually' : ''}</span>
+        <span className="text-right">Limit</span>
+        <span className="w-4" />
       </div>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Color">
-        {NEW_CATEGORY_COLORS.map((c) => (
+      <ul className="divide-y divide-white/5">{active.map(row)}</ul>
+      <div className="mt-1 grid grid-cols-[auto_minmax(0,1fr)_4.5rem_5rem_auto] gap-3 border-t border-white/10 px-2 pt-2.5 text-sm">
+        <span className="w-3" />
+        <span className="text-muted">A month</span>
+        <span className="text-right tabular-nums text-muted">
+          {hasTypical ? formatAmount(Math.round(totalTypical)) : ''}
+        </span>
+        <span className="text-right font-semibold tabular-nums text-white">
+          {formatAmount(totalLimit)}
+        </span>
+        <span className="w-4" />
+      </div>
+      <p className="mt-3 text-xs leading-snug text-muted">
+        “Usually” is the average of the last {TYPICAL_MONTHS} complete months; amber when it runs
+        over the limit. <ChartDonut aria-hidden className="inline align-[-0.15em]" /> marks
+        categories left out of the Home chart.
+      </p>
+      {hidden.length > 0 && (
+        <>
           <button
-            key={c}
             type="button"
-            role="radio"
-            aria-checked={color === c}
-            aria-label={c}
-            onClick={() => setColor(c)}
-            className={`h-8 w-8 rounded-full ${color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-card' : ''}`}
-            style={{ backgroundColor: c }}
+            onClick={() => setShowHidden((v) => !v)}
+            aria-expanded={showHidden}
+            className="mt-3 text-sm font-medium text-muted hover:text-white"
+          >
+            {showHidden ? 'Hide' : 'Show'} {hidden.length} hidden
+          </button>
+          {showHidden && <ul className="mt-1 divide-y divide-white/5">{hidden.map(row)}</ul>}
+        </>
+      )}
+    </SettingsCard>
+  )
+}
+
+/* ---------- trips ---------- */
+
+function ProjectsSettings({
+  projects,
+  onEdit,
+  onNew,
+}: {
+  projects: Category[]
+  onEdit: (p: Category) => void
+  onNew: () => void
+}) {
+  return (
+    <SettingsCard
+      title="Trips and projects"
+      help="Their own budget for the whole of it, outside the monthly limits."
+      action={
+        <CardAction onClick={onNew}>
+          <Plus weight="bold" aria-hidden /> New
+        </CardAction>
+      }
+    >
+      {projects.length === 0 ? (
+        <p className="text-sm text-muted">None yet. A trip is a good first one.</p>
+      ) : (
+        <ul className="divide-y divide-white/5">
+          {projects.map((p) => (
+            <li key={p.id}>
+              <button
+                type="button"
+                onClick={() => onEdit(p)}
+                className={`flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-white/5 ${
+                  p.archived ? 'opacity-50' : ''
+                }`}
+              >
+                <AirplaneTilt weight="fill" aria-hidden style={{ color: p.color }} />
+                <span className="min-w-0 flex-1 truncate text-[15px] text-white">{p.name}</span>
+                <span className="shrink-0 text-sm tabular-nums text-muted">
+                  {p.archived
+                    ? 'Finished'
+                    : p.budget_total
+                      ? formatMoneyWhole(p.budget_total)
+                      : 'No budget'}
+                </span>
+                <CaretRight aria-hidden className="shrink-0 text-muted" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </SettingsCard>
+  )
+}
+
+/* ---------- this device: Add screen and warnings ---------- */
+
+function AddScreenCard() {
+  const prefs = usePrefs()
+  const set = (i: number, v: number) => {
+    const next = [...prefs.quickAmounts]
+    next[i] = v
+    if (next.every((n) => n > 0)) setPrefs({ quickAmounts: next })
+  }
+  const custom = prefs.quickAmounts.some((n, i) => n !== DEFAULT_PREFS.quickAmounts[i])
+  return (
+    <SettingsCard
+      title="Quick amounts"
+      help="The four one-tap amounts on Add. This device only."
+      action={
+        custom ? (
+          <CardAction onClick={() => setPrefs({ quickAmounts: DEFAULT_PREFS.quickAmounts })}>
+            Reset
+          </CardAction>
+        ) : undefined
+      }
+    >
+      <div className="grid grid-cols-4 gap-2">
+        {prefs.quickAmounts.map((n, i) => (
+          <MoneyInput
+            key={i}
+            value={n}
+            onChange={(v) => set(i, v)}
+            label={`Quick amount ${i + 1}`}
           />
         ))}
       </div>
-      {error && <p className="text-sm text-red-300">Not added: {error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="flex-1 rounded-xl bg-white/5 py-2.5 text-sm font-semibold text-muted"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!name.trim() || pending}
-          className="flex-1 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-ink disabled:opacity-40"
-        >
-          Add category
-        </button>
-      </div>
-    </div>
+    </SettingsCard>
   )
 }
+
+function WarningsCard() {
+  const prefs = usePrefs()
+  const dismissed = useDismissedCount()
+  return (
+    <SettingsCard
+      title="Warnings"
+      help="When the app says a category needs watching. This device only."
+    >
+      <div className="space-y-4">
+        <div>
+          <p className="mb-2 text-[15px] text-white">Warn when a category reaches</p>
+          <Segments
+            value={String(prefs.nearRatio)}
+            onChange={(v) => setPrefs({ nearRatio: Number(v) })}
+            options={[
+              { value: '0.7', label: '70%' },
+              { value: '0.8', label: '80%' },
+              { value: '0.9', label: '90%' },
+            ]}
+          />
+        </div>
+        <Switch
+          label="Warn about the pace"
+          help="When spending so far would take a category over by the month's end."
+          checked={prefs.paceWarnings}
+          onChange={(v) => setPrefs({ paceWarnings: v })}
+        />
+        {dismissed > 0 && (
+          <button
+            type="button"
+            onClick={resetDismissedAlerts}
+            className="text-sm font-semibold text-accent-soft hover:underline"
+          >
+            Bring back {dismissed} dismissed {dismissed === 1 ? 'warning' : 'warnings'}
+          </button>
+        )}
+      </div>
+    </SettingsCard>
+  )
+}
+
+/* ---------- savings ---------- */
+
+function SavingsSettings({
+  available,
+  accounts,
+  goals,
+}: {
+  available: boolean
+  accounts: number
+  goals: number
+}) {
+  const { data: goal, isLoading } = useGoal()
+  const upsertGoal = useUpsertGoal()
+  if (available) {
+    return (
+      <Link
+        to="/savings"
+        className="group flex items-center gap-3 rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 hover:bg-white/[0.07] lg:p-5"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-semibold text-white">Savings</span>
+          <span className="block text-xs text-muted">
+            {accounts} {accounts === 1 ? 'account' : 'accounts'}, {goals}{' '}
+            {goals === 1 ? 'goal' : 'goals'}: managed in the Savings tab
+          </span>
+        </span>
+        <CaretRight aria-hidden className="text-muted transition group-hover:translate-x-0.5" />
+      </Link>
+    )
+  }
+  return (
+    <SettingsCard title="Savings goal" help="Run migration 0007 for accounts and several goals.">
+      {/* keyed so the fields fill in once the goal has loaded, rather than
+          keeping empty defaults that "Save goal" would write over it */}
+      {isLoading ? (
+        <div className="h-40 animate-pulse rounded-2xl bg-white/5" />
+      ) : (
+        <GoalEditor
+          key={goal?.id ?? 'new'}
+          goal={goal ?? null}
+          onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
+        />
+      )}
+    </SettingsCard>
+  )
+}
+
+/* ---------- data and account ---------- */
+
+function DataCard({ categories }: { categories: Category[] }) {
+  const [state, setState] = useState<{ busy: boolean; message: string | null }>({
+    busy: false,
+    message: null,
+  })
+  const run = async () => {
+    setState({ busy: true, message: null })
+    try {
+      const count = await downloadCsv(categories)
+      setState({ busy: false, message: `Downloaded ${formatAmount(count)} entries.` })
+    } catch (err) {
+      setState({ busy: false, message: `Couldn’t export: ${(err as Error).message}` })
+    }
+  }
+  return (
+    <SettingsCard title="Your data" help="Every expense and income, as a spreadsheet (CSV).">
+      <button
+        type="button"
+        onClick={run}
+        disabled={state.busy}
+        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5 disabled:opacity-50"
+      >
+        <DownloadSimple aria-hidden />
+        {state.busy ? 'Preparing…' : 'Download CSV'}
+      </button>
+      {state.message && <p className="mt-2 text-xs text-muted">{state.message}</p>}
+    </SettingsCard>
+  )
+}
+
+function AccountCard() {
+  const { session } = useSession()
+  return (
+    <SettingsCard
+      title="Account"
+      help={session?.user.email ? `Signed in as ${session.user.email}` : undefined}
+    >
+      <button
+        type="button"
+        onClick={() => void supabase.auth.signOut()}
+        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+      >
+        <SignOut aria-hidden /> Sign out of this device
+      </button>
+    </SettingsCard>
+  )
+}
+
+/* ---------- before migration 0007: the single goal ---------- */
 
 interface GoalProps {
   goal: { id: string; name: string; target_amount: number; current_amount: number } | null
@@ -440,7 +495,7 @@ function GoalEditor({ goal, onSave }: GoalProps) {
   const progress = num(target) > 0 ? Math.min(num(current) / num(target), 1) * 100 : 0
 
   return (
-    <div className="space-y-3 rounded-2xl bg-white/5 p-4">
+    <div className="space-y-3">
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -493,16 +548,5 @@ function GoalEditor({ goal, onSave }: GoalProps) {
         {goal ? 'Save goal' : 'Create goal'}
       </button>
     </div>
-  )
-}
-
-/** A filled donut when the category is in the chart; an outline, dimmed, when it's left out. */
-function ChartIcon({ on }: { on: boolean }) {
-  return (
-    <ChartDonut
-      aria-hidden
-      weight={on ? 'fill' : 'regular'}
-      className={`text-lg ${on ? 'text-accent-soft' : 'text-white/30'}`}
-    />
   )
 }

@@ -1,4 +1,5 @@
-import { CURRENCY_SUFFIX, QUICK_AMOUNTS } from '../config'
+import { CURRENCY_SUFFIX } from '../config'
+import { usePrefs } from '../hooks/usePrefs'
 import { readableTextColor } from '../lib/calculations'
 
 interface Props {
@@ -7,11 +8,12 @@ interface Props {
   accent: string
 }
 
-/** The four big one-tap amounts. */
+/** The four big one-tap amounts (set per device in Settings). */
 export function QuickAmountButtons({ onPick, selected, accent }: Props) {
+  const { quickAmounts } = usePrefs()
   return (
     <div className="grid grid-cols-2 gap-3">
-      {QUICK_AMOUNTS.map((amount) => {
+      {quickAmounts.map((amount) => {
         const active = selected === amount
         return (
           <button

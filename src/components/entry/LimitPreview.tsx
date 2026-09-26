@@ -1,5 +1,6 @@
 import { Warning } from '@phosphor-icons/react'
 import { formatMoneyWhole } from '../../lib/calculations'
+import { usePrefs } from '../../hooks/usePrefs'
 import { limitImpact } from '../../lib/alerts'
 import type { Category } from '../../types'
 import { CHART } from '../charts/theme'
@@ -18,9 +19,10 @@ interface Props {
  * going over is something you see before saving rather than after.
  */
 export function LimitPreview({ category, spent, amount, project = false }: Props) {
+  const { nearRatio } = usePrefs()
   const limit = project ? (category.budget_total ?? 0) : category.monthly_limit
   if (limit <= 0) return null
-  const impact = limitImpact(spent, amount, limit)
+  const impact = limitImpact(spent, amount, limit, nearRatio)
   const scale = Math.max(impact.after, limit)
   const pct = (v: number) => `${(Math.min(v, scale) / scale) * 100}%`
   const warn = impact.levelAfter !== 'ok'

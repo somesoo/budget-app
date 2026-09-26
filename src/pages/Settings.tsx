@@ -318,7 +318,7 @@ function AddScreenCard() {
   return (
     <SettingsCard
       title="Quick amounts"
-      help="The four one-tap amounts on Add. This device only."
+      help="The four one-tap amounts on Add; tapping them adds up. This device only."
       action={
         custom ? (
           <CardAction onClick={() => setPrefs({ quickAmounts: DEFAULT_PREFS.quickAmounts })}>

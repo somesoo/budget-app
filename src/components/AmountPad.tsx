@@ -3,7 +3,6 @@ import { AmountField } from './entry/AmountField'
 import { LimitPreview } from './entry/LimitPreview'
 import { useAmountEntry } from './entry/useAmountEntry'
 import { QuickAmountButtons } from './QuickAmountButtons'
-import { FineTuneButtons } from './FineTuneButtons'
 import { DateChip, PersonToggle } from './HeaderControls'
 import { useState } from 'react'
 import { currentMonthKey, monthKeyOfDate, readableTextColor, todayKey } from '../lib/calculations'
@@ -21,7 +20,7 @@ interface Props {
 }
 
 /**
- * Amount screen: quick amounts → fine-tuning → save.
+ * Amount screen: quick amounts (they add up) or a typed amount, then save.
  * The date defaults to today and the person comes from this phone's cache, so
  * the common case is still three taps; both sit in the header, one tap away.
  * The title goes above the amount, where the number keyboard can't cover it.
@@ -78,13 +77,7 @@ export function AmountPad({
 
         <AmountField value={entry.text} onChange={entry.type} label="Amount" />
 
-        <QuickAmountButtons
-          onPick={entry.pickQuick}
-          selected={entry.quickPick}
-          accent={category.color}
-        />
-
-        {amount > 0 && <FineTuneButtons onAdjust={entry.adjust} />}
+        <QuickAmountButtons onAdd={entry.add} onClear={entry.reset} amount={amount} />
 
         {/* only this month's spending is on screen to compare with */}
         {category.kind === 'project' ? (

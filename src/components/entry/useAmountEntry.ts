@@ -12,40 +12,21 @@ function formatInput(value: number): string {
 }
 
 /**
- * The amount being typed, the quick amount it came from (if any) and the
- * fine-tuning steps. Shared by the phone's amount screen and the laptop's
+ * The amount being typed, or added up from quick amounts. Shared by the phone's amount screen and the laptop's
  * entry panel, so both parse "12,50" the same way.
  */
 export function useAmountEntry() {
   const [text, setText] = useState('')
-  const [quickPick, setQuickPick] = useState<number | null>(null)
   const amount = parseAmount(text)
 
   return {
     text,
     amount,
-    quickPick,
-    pickQuick: (value: number) => {
-      setQuickPick(value)
-      setText(formatInput(value))
-    },
-    setExact: (value: number) => {
-      setQuickPick(null)
-      setText(formatInput(value))
-    },
-    adjust: (delta: number) => {
-      const next = Math.max(roundMoney(amount + delta), 0)
-      setQuickPick(null)
-      setText(next === 0 ? '' : formatInput(next))
-    },
+    /** Quick amounts add up: 10 twice is 20, 50 then 20 is 70. */
+    add: (value: number) => setText(formatInput(roundMoney(amount + value))),
+    setExact: (value: number) => setText(formatInput(value)),
     /** Typed by hand: digits plus a single decimal separator. */
-    type: (value: string) => {
-      setQuickPick(null)
-      setText(value.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1'))
-    },
-    reset: () => {
-      setQuickPick(null)
-      setText('')
-    },
+    type: (value: string) => setText(value.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1')),
+    reset: () => setText(''),
   }
 }

@@ -35,7 +35,6 @@ import { AlertStrip } from '../alerts/AlertList'
 import { AmountField } from '../entry/AmountField'
 import { LimitPreview } from '../entry/LimitPreview'
 import { useAmountEntry } from '../entry/useAmountEntry'
-import { FineTuneButtons } from '../FineTuneButtons'
 import { DateChip, PersonToggle } from '../HeaderControls'
 import { EntryDialogs } from '../history/EntryDialogs'
 import { UserSwitcher } from '../UserSwitcher'
@@ -346,25 +345,33 @@ export function DesktopAdd() {
           />
 
           {mode === 'expense' && (
-            <div className="mt-3 grid grid-cols-4 gap-2">
+            <div className="mt-3 grid grid-cols-[repeat(4,minmax(0,1fr))_auto] gap-2">
               {prefs.quickAmounts.map((amount) => (
                 <button
                   key={amount}
                   type="button"
                   onClick={() => {
-                    entry.pickQuick(amount)
+                    // they add up: 10 twice is 20
+                    entry.add(amount)
                     amountRef.current?.focus()
                   }}
-                  aria-pressed={entry.quickPick === amount}
-                  className={`h-11 rounded-xl text-sm font-semibold tabular-nums ring-1 transition ${
-                    entry.quickPick === amount
-                      ? 'bg-slate-50 text-ink ring-white'
-                      : 'bg-white/5 text-slate-100 ring-white/10 hover:bg-white/10'
-                  }`}
+                  aria-label={`Add ${amount} ${CURRENCY_SUFFIX}`}
+                  className="h-11 rounded-xl bg-white/5 text-sm font-semibold tabular-nums text-slate-100 ring-1 ring-white/10 transition hover:bg-white/10 active:scale-[0.97] active:bg-white/15"
                 >
-                  {amount} {CURRENCY_SUFFIX}
+                  +{amount} {CURRENCY_SUFFIX}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  entry.reset()
+                  amountRef.current?.focus()
+                }}
+                disabled={entry.amount <= 0}
+                className="h-11 rounded-xl px-3 text-sm font-semibold text-slate-300 ring-1 ring-white/10 hover:bg-white/5 disabled:opacity-30"
+              >
+                Clear
+              </button>
             </div>
           )}
           {mode === 'income' && lastIncome && (
@@ -383,11 +390,6 @@ export function DesktopAdd() {
               </span>
               {lastIncome.note && <span className="text-muted"> · {lastIncome.note}</span>}
             </button>
-          )}
-          {mode === 'expense' && entry.amount > 0 && (
-            <div className="mt-2">
-              <FineTuneButtons onAdjust={entry.adjust} />
-            </div>
           )}
 
           {mode === 'expense' && selected && (inThisMonth || isProjectPick) && (

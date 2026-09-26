@@ -2,6 +2,7 @@ import { Receipt } from '@phosphor-icons/react'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CURRENCY_SUFFIX, QUICK_AMOUNTS } from '../../config'
 import { useMonthCategories } from '../../hooks/useBudgets'
+import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { useEntryActions } from '../../hooks/useEntryActions'
 import { useAddExpense, useExpenses } from '../../hooks/useExpenses'
@@ -22,11 +23,13 @@ import {
   sumExpenses,
   todayKey,
 } from '../../lib/calculations'
+import { crossingNote, limitImpact } from '../../lib/alerts'
 import { toEntries } from '../../lib/history'
 import { categorySlices, elapsedDays } from '../../lib/insights'
 import type { Category, Person } from '../../types'
 import { CHART } from '../charts/theme'
 import { SpendDonut } from '../charts/SpendDonut'
+import { AlertStrip } from '../alerts/AlertList'
 import { AmountField } from '../entry/AmountField'
 import { LimitPreview } from '../entry/LimitPreview'
 import { useAmountEntry } from '../entry/useAmountEntry'
@@ -59,6 +62,7 @@ export function DesktopAdd() {
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
   const actions = useEntryActions()
+  const { alerts } = useBudgetAlerts()
 
   const [mode, setMode] = useState<Mode>('expense')
   const [query, setQuery] = useState('')
@@ -73,7 +77,7 @@ export function DesktopAdd() {
 
   useEffect(() => {
     if (!toast) return
-    const id = setTimeout(() => setToast(null), 2200)
+    const id = setTimeout(() => setToast(null), 3000)
     return () => clearTimeout(id)
   }, [toast])
 
@@ -131,7 +135,17 @@ export function DesktopAdd() {
         },
         { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
       )
-      setToast(`Saved ${formatMoney(entry.amount)} to ${selected.name}${where}`)
+      const crossed = inThisMonth
+        ? crossingNote(
+            selected,
+            limitImpact(spentByCategory[selected.id] ?? 0, entry.amount, selected.monthly_limit),
+          )
+        : null
+      setToast(
+        crossed
+          ? `Saved. ${crossed}`
+          : `Saved ${formatMoney(entry.amount)} to ${selected.name}${where}`,
+      )
     } else {
       addIncome.mutate(
         { amount: entry.amount, person, note: trimmed, income_date: date },
@@ -212,6 +226,11 @@ export function DesktopAdd() {
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_24rem] gap-6 wide:grid-cols-[minmax(0,1fr)_24rem_21rem]">
         {/* ---------- categories ---------- */}
         <section aria-label="Categories" className="flex min-h-0 flex-col">
+          {alerts.length > 0 && (
+            <div className="mb-3 shrink-0">
+              <AlertStrip alerts={alerts} />
+            </div>
+          )}
           {isLoading ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-3">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -291,7 +310,7 @@ export function DesktopAdd() {
             compact
           />
 
-      <input
+          <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             onKeyDown={onFieldKey}
@@ -345,8 +364,6 @@ export function DesktopAdd() {
               <FineTuneButtons onAdjust={entry.adjust} />
             </div>
           )}
-
-    
 
           {mode === 'expense' && selected && inThisMonth && (
             <div className="mt-3">

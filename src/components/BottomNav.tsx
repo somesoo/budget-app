@@ -1,5 +1,14 @@
-import { ChartLineUp, ChartPieSlice, GearSix, ListBullets, Plus, type Icon } from '@phosphor-icons/react'
+import {
+  ChartLineUp,
+  ChartPieSlice,
+  GearSix,
+  ListBullets,
+  Plus,
+  type Icon,
+} from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
+import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
+import { AlertCount } from './alerts/AlertList'
 
 export const TABS: { to: string; label: string; icon: Icon }[] = [
   { to: '/', label: 'Add', icon: Plus },
@@ -11,6 +20,7 @@ export const TABS: { to: string; label: string; icon: Icon }[] = [
 
 /** Phone navigation. On a laptop the SideNav takes over. */
 export function BottomNav() {
+  const { alerts } = useBudgetAlerts()
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
       <ul className="mx-auto flex max-w-md">
@@ -27,7 +37,18 @@ export function BottomNav() {
             >
               {({ isActive }) => (
                 <>
-                  <tab.icon aria-hidden className="text-[22px]" weight={isActive ? 'fill' : 'regular'} />
+                  <span className="relative">
+                    <tab.icon
+                      aria-hidden
+                      className="text-[22px]"
+                      weight={isActive ? 'fill' : 'regular'}
+                    />
+                    {tab.to === '/budget' && (
+                      <span className="absolute -right-2.5 -top-1.5">
+                        <AlertCount count={alerts.length} />
+                      </span>
+                    )}
+                  </span>
                   {tab.label}
                 </>
               )}

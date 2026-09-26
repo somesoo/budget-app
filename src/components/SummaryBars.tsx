@@ -2,17 +2,21 @@ import { CaretRight } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import { CURRENCY_SUFFIX } from '../config'
 import { formatAmount, isOverLimit, limitRatio } from '../lib/calculations'
+import type { BudgetAlert } from '../lib/alerts'
 import type { Category } from '../types'
+import { AlertIcon } from './alerts/AlertList'
 
 interface Props {
   categories: Category[]
   spentByCategory: Record<string, number>
   /** Makes each row a link, e.g. to the category's own page. */
   linkTo?: (category: Category) => string
+  /** Warnings by category id; over a limit or heading over it gets an icon by the name. */
+  alerts?: Record<string, BudgetAlert>
 }
 
 /** Per-category progress: spent / limit / percent. */
-export function SummaryBars({ categories, spentByCategory, linkTo }: Props) {
+export function SummaryBars({ categories, spentByCategory, linkTo, alerts = {} }: Props) {
   return (
     <ul className="space-y-1">
       {categories.map((category) => {
@@ -26,6 +30,12 @@ export function SummaryBars({ categories, spentByCategory, linkTo }: Props) {
             <div className="mb-1.5 flex items-baseline justify-between gap-2">
               <span className="flex min-w-0 items-center gap-1 truncate text-sm font-medium text-white">
                 <span className="truncate">{category.name}</span>
+                {alerts[category.id] && alerts[category.id].kind !== 'near' && (
+                  <span title={alerts[category.id].title} className="flex shrink-0">
+                    <AlertIcon alert={alerts[category.id]} />
+                    <span className="sr-only">{alerts[category.id].title}</span>
+                  </span>
+                )}
                 {linkTo && (
                   <CaretRight
                     aria-hidden

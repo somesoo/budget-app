@@ -7,7 +7,9 @@ import { SpendDonut } from '../components/charts/SpendDonut'
 import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
+import { AlertStrip } from '../components/alerts/AlertList'
 import { useMonthCategories } from '../hooks/useBudgets'
+import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { useAddExpense, useExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
@@ -17,10 +19,12 @@ import {
   formatDayLong,
   formatMoney,
   formatMoneyCompact,
+  monthKeyOfDate,
   sumByCategory,
   sumExpenses,
   todayKey,
 } from '../lib/calculations'
+import { crossingNote, limitImpact } from '../lib/alerts'
 import { categorySlices } from '../lib/insights'
 import type { Category, Person } from '../types'
 
@@ -43,7 +47,7 @@ export function Home() {
 
   useEffect(() => {
     if (!toast) return
-    const id = setTimeout(() => setToast(null), 1800)
+    const id = setTimeout(() => setToast(null), 2600)
     return () => clearTimeout(id)
   }, [toast])
 
@@ -56,6 +60,7 @@ export function Home() {
   const leftOut = allCategories.filter((c) => !c.show_in_chart && (spentByCategory[c.id] ?? 0) > 0)
 
   const laptop = useMediaQuery(LAPTOP)
+  const { alerts } = useBudgetAlerts()
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -108,7 +113,21 @@ export function Home() {
           )
           setSelected(null)
           // a backdated expense may not move the tiles on screen, so say where it went
-          setToast(date === todayKey() ? 'Saved' : `Saved · ${formatDayLong(date)}`)
+          // a backdated expense lands in another month, whose limits aren't on screen
+          const crossed =
+            monthKeyOfDate(date) === month
+              ? crossingNote(
+                  selected,
+                  limitImpact(spentByCategory[selected.id] ?? 0, amount, selected.monthly_limit),
+                )
+              : null
+          setToast(
+            crossed
+              ? `Saved. ${crossed}`
+              : date === todayKey()
+                ? 'Saved'
+                : `Saved · ${formatDayLong(date)}`,
+          )
         }}
       />
     )
@@ -142,6 +161,12 @@ export function Home() {
           + Income
         </button>
       </div>
+
+      {alerts.length > 0 && (
+        <div className="mb-3 shrink-0">
+          <AlertStrip alerts={alerts} />
+        </div>
+      )}
 
       {error && (
         <p className="mb-3 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">

@@ -6,7 +6,9 @@ import { GoalProgress } from '../components/GoalProgress'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { SummaryBars } from '../components/SummaryBars'
+import { AlertList } from '../components/alerts/AlertList'
 import { useBudget, useMonthCategories } from '../hooks/useBudgets'
+import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { useExpenses } from '../hooks/useExpenses'
 import { useAddToGoal, useGoal } from '../hooks/useGoal'
 import { useIncomesBetween } from '../hooks/useIncomes'
@@ -150,6 +152,10 @@ function MonthStatus({
   const limit = roundMoney(shown.reduce((a, c) => a + c.monthly_limit, 0))
   const left = roundMoney(limit - spent)
   const isCurrent = month === currentMonthKey()
+  const { alerts, all: allAlerts, dismiss } = useBudgetAlerts()
+  const alertsByCategory = isCurrent
+    ? Object.fromEntries(allAlerts.filter((a) => a.category).map((a) => [a.category!.id, a]))
+    : {}
   const daysLeft = isCurrent ? daysInMonth(month) - elapsedDays(month) + 1 : 0
   const saved = roundMoney(income - spent)
   const ratio = limit > 0 ? Math.min(spent / limit, 1) : 0
@@ -158,60 +164,76 @@ function MonthStatus({
     <TwoColumns
       side={
         <>
-      <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="text-sm text-muted">Spent</p>
-          <PlanBadge plan={plan} onPlan={onPlan} />
-        </div>
-        <p className="text-4xl font-bold tabular-nums text-white">{formatMoney(spent)}</p>
-        {limit > 0 && (
-          <>
-            <p className="mt-1 text-sm text-muted">
-              of {formatMoneyCompact(limit)} {plan ? 'planned' : 'in default limits'} ·{' '}
-              {Math.round((spent / limit) * 100)}%
-            </p>
-            <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
-              <div
-                className={`h-full rounded-full transition-[width] duration-500 ${left < 0 ? 'bg-red-500' : 'bg-slate-50'}`}
-                style={{ width: `${ratio * 100}%` }}
+          <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-sm text-muted">Spent</p>
+              <PlanBadge plan={plan} onPlan={onPlan} />
+            </div>
+            <p className="text-4xl font-bold tabular-nums text-white">{formatMoney(spent)}</p>
+            {limit > 0 && (
+              <>
+                <p className="mt-1 text-sm text-muted">
+                  of {formatMoneyCompact(limit)} {plan ? 'planned' : 'in default limits'} ·{' '}
+                  {Math.round((spent / limit) * 100)}%
+                </p>
+                <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className={`h-full rounded-full transition-[width] duration-500 ${left < 0 ? 'bg-red-500' : 'bg-slate-50'}`}
+                    style={{ width: `${ratio * 100}%` }}
+                  />
+                </div>
+                <p
+                  className={`mt-2 text-sm font-medium ${left < 0 ? 'text-red-300' : 'text-white'}`}
+                >
+                  {left < 0
+                    ? `${formatMoneyCompact(-left)} over the plan`
+                    : isCurrent && daysLeft > 0
+                      ? `${formatMoneyCompact(left)} left · about ${formatAmount(Math.floor(left / daysLeft))} ${CURRENCY_SUFFIX} a day for ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`
+                      : `${formatMoneyCompact(left)} under the plan`}
+                </p>
+              </>
+            )}
+
+            <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-3">
+              <Figure
+                label="Income"
+                value={formatMoneyCompact(income)}
+                tone="positive"
+                sub={
+                  plan && plan.income > 0 ? `planned ${formatMoneyCompact(plan.income)}` : undefined
+                }
+              />
+              <Figure
+                label={isCurrent ? 'Left over so far' : 'Left over'}
+                value={`${saved < 0 ? '−' : ''}${formatMoneyCompact(Math.abs(saved))}`}
+                tone={saved < 0 ? 'negative' : undefined}
+                sub={
+                  plan && plan.savings > 0
+                    ? `to save ${formatMoneyCompact(plan.savings)}`
+                    : undefined
+                }
               />
             </div>
-            <p className={`mt-2 text-sm font-medium ${left < 0 ? 'text-red-300' : 'text-white'}`}>
-              {left < 0
-                ? `${formatMoneyCompact(-left)} over the plan`
-                : isCurrent && daysLeft > 0
-                  ? `${formatMoneyCompact(left)} left · about ${formatAmount(Math.floor(left / daysLeft))} ${CURRENCY_SUFFIX} a day for ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`
-                  : `${formatMoneyCompact(left)} under the plan`}
-            </p>
-          </>
-        )}
 
-        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-3">
-          <Figure
-            label="Income"
-            value={formatMoneyCompact(income)}
-            tone="positive"
-            sub={plan && plan.income > 0 ? `planned ${formatMoneyCompact(plan.income)}` : undefined}
-          />
-          <Figure
-            label={isCurrent ? 'Left over so far' : 'Left over'}
-            value={`${saved < 0 ? '−' : ''}${formatMoneyCompact(Math.abs(saved))}`}
-            tone={saved < 0 ? 'negative' : undefined}
-            sub={
-              plan && plan.savings > 0 ? `to save ${formatMoneyCompact(plan.savings)}` : undefined
-            }
-          />
-        </div>
+            {plan?.note && (
+              <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
+                <NotePencil
+                  aria-hidden
+                  className="mr-1.5 inline-block align-[-0.15em] text-muted"
+                />
+                {plan.note}
+              </p>
+            )}
+          </section>
 
-        {plan?.note && (
-          <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
-            <NotePencil aria-hidden className="mr-1.5 inline-block align-[-0.15em] text-muted" />
-            {plan.note}
-          </p>
-        )}
-      </section>
+          {isCurrent && alerts.length > 0 && (
+            <section className="mb-6" aria-label="Warnings">
+              <SectionTitle>Heads-up</SectionTitle>
+              <AlertList alerts={alerts} onDismiss={dismiss} />
+            </section>
+          )}
 
-      {children}
+          {children}
         </>
       }
       main={
@@ -221,6 +243,7 @@ function MonthStatus({
             categories={shown}
             spentByCategory={byCategory}
             linkTo={(c) => `/category/${c.id}?month=${month}`}
+            alerts={alertsByCategory}
           />
         </section>
       }
@@ -233,7 +256,15 @@ function MonthStatus({
  * Phone: one column. Laptop: the month's numbers (and whatever goes with them)
  * on the left, the categories on the right.
  */
-function TwoColumns({ side, main, aside }: { side: ReactNode; main: ReactNode; aside?: ReactNode }) {
+function TwoColumns({
+  side,
+  main,
+  aside,
+}: {
+  side: ReactNode
+  main: ReactNode
+  aside?: ReactNode
+}) {
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-8">
       <div className="lg:sticky lg:top-8">
@@ -268,23 +299,23 @@ function FuturePlan({
   if (!plan) {
     return (
       <div className="lg:max-w-xl">
-      <section className="mb-6 rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10">
-        <p className="text-lg font-semibold text-white">
-          {formatMonthName(month)} isn’t planned yet
-        </p>
-        <p className="mt-1 text-sm text-muted">
-          Until it is, it’ll use the default limits from Settings. Planning takes a minute: start
-          from last month or your typical spending, tell it what’s different, adjust.
-        </p>
-        <button
-          type="button"
-          onClick={onPlan}
-          className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
-        >
-          Plan {formatMonthName(month)}
-        </button>
-      </section>
-      {aside}
+        <section className="mb-6 rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10">
+          <p className="text-lg font-semibold text-white">
+            {formatMonthName(month)} isn’t planned yet
+          </p>
+          <p className="mt-1 text-sm text-muted">
+            Until it is, it’ll use the default limits from Settings. Planning takes a minute: start
+            from last month or your typical spending, tell it what’s different, adjust.
+          </p>
+          <button
+            type="button"
+            onClick={onPlan}
+            className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
+          >
+            Plan {formatMonthName(month)}
+          </button>
+        </section>
+        {aside}
       </div>
     )
   }
@@ -297,59 +328,59 @@ function FuturePlan({
     <TwoColumns
       aside={aside}
       side={
-      <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-        <div className="grid grid-cols-3 gap-2">
-          <Figure label="Income" value={formatMoneyCompact(plan.income)} tone="positive" />
-          <Figure label="Spending" value={formatMoneyCompact(spending)} />
-          <Figure label="Savings" value={formatMoneyCompact(plan.savings)} />
-        </div>
-        {plan.income > 0 && Math.abs(unassigned) >= 1 && (
-          <p className={`mt-3 text-sm ${unassigned < 0 ? 'text-red-300' : 'text-amber-200'}`}>
-            {unassigned < 0
-              ? `Plans ${formatMoneyCompact(-unassigned)} more than the expected income.`
-              : `${formatMoneyCompact(unassigned)} of income has no job yet.`}
-          </p>
-        )}
-        {plan.note && (
-          <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
-            <NotePencil aria-hidden className="mr-1.5 inline-block align-[-0.15em] text-muted" />
-            {plan.note}
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={onPlan}
-          className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
-        >
-          Edit plan
-        </button>
-      </section>
+        <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+          <div className="grid grid-cols-3 gap-2">
+            <Figure label="Income" value={formatMoneyCompact(plan.income)} tone="positive" />
+            <Figure label="Spending" value={formatMoneyCompact(spending)} />
+            <Figure label="Savings" value={formatMoneyCompact(plan.savings)} />
+          </div>
+          {plan.income > 0 && Math.abs(unassigned) >= 1 && (
+            <p className={`mt-3 text-sm ${unassigned < 0 ? 'text-red-300' : 'text-amber-200'}`}>
+              {unassigned < 0
+                ? `Plans ${formatMoneyCompact(-unassigned)} more than the expected income.`
+                : `${formatMoneyCompact(unassigned)} of income has no job yet.`}
+            </p>
+          )}
+          {plan.note && (
+            <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
+              <NotePencil aria-hidden className="mr-1.5 inline-block align-[-0.15em] text-muted" />
+              {plan.note}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={onPlan}
+            className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
+          >
+            Edit plan
+          </button>
+        </section>
       }
       main={
-      <section className="mb-6">
-        <SectionTitle>Limits</SectionTitle>
-        <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
-          {active.map((c) => (
-            <li key={c.id}>
-              <Link
-                to={`/category/${c.id}?month=${month}`}
-                className="flex items-center gap-3 px-3 py-2.5 transition hover:bg-white/5 active:bg-white/10"
-              >
-                <span
-                  aria-hidden
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: c.color }}
-                />
-                <span className="flex-1 text-[15px] text-white">{c.name}</span>
-                <span className="text-[15px] font-semibold tabular-nums text-white">
-                  {formatMoneyCompact(c.monthly_limit)}
-                </span>
-                <CaretRight aria-hidden className="shrink-0 text-muted" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+        <section className="mb-6">
+          <SectionTitle>Limits</SectionTitle>
+          <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
+            {active.map((c) => (
+              <li key={c.id}>
+                <Link
+                  to={`/category/${c.id}?month=${month}`}
+                  className="flex items-center gap-3 px-3 py-2.5 transition hover:bg-white/5 active:bg-white/10"
+                >
+                  <span
+                    aria-hidden
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: c.color }}
+                  />
+                  <span className="flex-1 text-[15px] text-white">{c.name}</span>
+                  <span className="text-[15px] font-semibold tabular-nums text-white">
+                    {formatMoneyCompact(c.monthly_limit)}
+                  </span>
+                  <CaretRight aria-hidden className="shrink-0 text-muted" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       }
     />
   )
@@ -394,7 +425,5 @@ function Figure({
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2 className="mb-3 text-base font-semibold text-white">{children}</h2>
-  )
+  return <h2 className="mb-3 text-base font-semibold text-white">{children}</h2>
 }

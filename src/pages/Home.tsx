@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { DesktopAdd } from '../components/add/DesktopAdd'
 import { CategoryPager } from '../components/CategoryPager'
 import { AmountPad } from '../components/AmountPad'
 import { ChartCard } from '../components/charts/ChartCard'
@@ -10,6 +11,7 @@ import { useMonthCategories } from '../hooks/useBudgets'
 import { useAddExpense, useExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
+import { LAPTOP, useMediaQuery } from '../hooks/useMediaQuery'
 import {
   currentMonthKey,
   formatDayLong,
@@ -53,10 +55,15 @@ export function Home() {
   // switched out of the donut in Settings (rent and the like), but spent on this month
   const leftOut = allCategories.filter((c) => !c.show_in_chart && (spentByCategory[c.id] ?? 0) > 0)
 
+  const laptop = useMediaQuery(LAPTOP)
+
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
     setSelected(category)
   }
+
+  // a different screen on a laptop, not a stretched phone one
+  if (laptop) return <DesktopAdd />
 
   if (incomeOpen) {
     return (
@@ -81,6 +88,7 @@ export function Home() {
     return (
       <AmountPad
         category={selected}
+        spent={spentByCategory[selected.id] ?? 0}
         person={entryPerson}
         onPersonChange={setEntryPerson}
         onCancel={() => setSelected(null)}

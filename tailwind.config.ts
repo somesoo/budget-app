@@ -21,6 +21,8 @@ export default {
       screens: {
         /** A laptop screen that's short on height, like 1366×768 once the browser's bars are drawn. */
         short: { raw: '(max-height: 820px)' },
+        /** Room for the Add tab's third column (between xl and 2xl, so 1366 laptops get it). */
+        wide: '1360px',
       },
       fontSize: {
         huge: ['3.25rem', { lineHeight: '1' }],

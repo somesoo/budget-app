@@ -1,26 +1,20 @@
 import { CalendarDots, MagnifyingGlass, X } from '@phosphor-icons/react'
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { CalendarHeatmap } from '../components/CalendarHeatmap'
-import { EntryEditor } from '../components/history/EntryEditor'
+import { EntryDialogs } from '../components/history/EntryDialogs'
 import { EntryRow } from '../components/history/EntryRow'
-import { UndoToast } from '../components/history/UndoToast'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { useCategories } from '../hooks/useCategories'
+import { useEntryActions } from '../hooks/useEntryActions'
 import {
   SEARCH_LIMIT,
-  useDeleteExpense,
   useExpenses,
-  useRestoreExpense,
   useSearchExpenses,
-  useUpdateExpense,
 } from '../hooks/useExpenses'
 import {
-  useDeleteIncome,
   useIncomesBetween,
-  useRestoreIncome,
   useSearchIncomes,
-  useUpdateIncome,
 } from '../hooks/useIncomes'
 import { PERSON_LABELS } from '../config'
 import {
@@ -41,7 +35,6 @@ import {
   sanitizeSearch,
   toEntries,
   totals,
-  type Entry,
 } from '../lib/history'
 import { PERSONS, type Person } from '../types'
 
@@ -58,8 +51,6 @@ export function History() {
   const [kind, setKind] = useState<Kind>('all')
   const [person, setPerson] = useState<Person | null>(null)
   const [categoryId, setCategoryId] = useState<string | null>(null)
-  const [editing, setEditing] = useState<Entry | null>(null)
-  const [deleted, setDeleted] = useState<Entry | null>(null)
   const [showCalendar, setShowCalendar] = useState(false)
   const [day, setDay] = useState<string | null>(null)
 
@@ -91,12 +82,7 @@ export function History() {
     ? foundExpenses.isLoading || foundIncomes.isLoading
     : monthExpenses.isLoading || monthIncomes.isLoading
 
-  const updateExpense = useUpdateExpense()
-  const deleteExpense = useDeleteExpense()
-  const restoreExpense = useRestoreExpense()
-  const updateIncome = useUpdateIncome()
-  const deleteIncome = useDeleteIncome()
-  const restoreIncome = useRestoreIncome()
+  const actions = useEntryActions()
 
   // a category only exists on expenses, so picking one narrows to those
   const effectiveKind: Kind = categoryId ? 'expense' : kind
@@ -125,20 +111,6 @@ export function History() {
     setCategoryId(null)
   }
 
-  const remove = (entry: Entry) => {
-    if (entry.kind === 'expense') deleteExpense.mutate(entry.id)
-    else deleteIncome.mutate(entry.id)
-    setDeleted(entry)
-  }
-
-  const undo = () => {
-    if (!deleted) return
-    if (deleted.kind === 'expense') restoreExpense.mutate(deleted.item)
-    else restoreIncome.mutate(deleted.item)
-    setDeleted(null)
-  }
-
-  const dismissUndo = useCallback(() => setDeleted(null), [])
 
   return (
     <Screen
@@ -352,7 +324,7 @@ export function History() {
                         entry={entry}
                         categories={categoryMap}
                         onOpen={
-                          entry.id.startsWith('optimistic-') ? undefined : () => setEditing(entry)
+                          entry.id.startsWith('optimistic-') ? undefined : () => actions.edit(entry)
                         }
                       />
                     </li>
@@ -364,25 +336,7 @@ export function History() {
         </div>
       )}
 
-      {editing && (
-        <EntryEditor
-          entry={editing}
-          categories={categories}
-          onClose={() => setEditing(null)}
-          onSaveExpense={(id, patch) => updateExpense.mutate({ id, ...patch })}
-          onSaveIncome={(id, patch) => updateIncome.mutate({ id, ...patch })}
-          onDelete={remove}
-        />
-      )}
-
-      {deleted && (
-        <UndoToast
-          key={`${deleted.kind}-${deleted.id}`}
-          message={`${deleted.kind === 'expense' ? 'Expense' : 'Income'} deleted · ${formatMoney(deleted.item.amount)}`}
-          onUndo={undo}
-          onDismiss={dismissUndo}
-        />
-      )}
+      <EntryDialogs actions={actions} categories={categories} />
     </Screen>
   )
 }

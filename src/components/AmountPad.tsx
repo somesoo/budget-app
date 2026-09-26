@@ -1,14 +1,18 @@
 import { ArrowLeft } from '@phosphor-icons/react'
-import { useRef, useState } from 'react'
+import { AmountField } from './entry/AmountField'
+import { LimitPreview } from './entry/LimitPreview'
+import { useAmountEntry } from './entry/useAmountEntry'
 import { QuickAmountButtons } from './QuickAmountButtons'
 import { FineTuneButtons } from './FineTuneButtons'
 import { DateChip, PersonToggle } from './HeaderControls'
-import { CURRENCY_SUFFIX } from '../config'
-import { readableTextColor, roundMoney, todayKey } from '../lib/calculations'
+import { useState } from 'react'
+import { currentMonthKey, monthKeyOfDate, readableTextColor, todayKey } from '../lib/calculations'
 import type { Category, Person } from '../types'
 
 interface Props {
   category: Category
+  /** Already spent in the category this month, for the preview against its limit. */
+  spent: number
   person: Person
   onPersonChange: (person: Person) => void
   onCancel: () => void
@@ -21,16 +25,6 @@ interface Props {
   saving: boolean
 }
 
-function parseAmount(text: string): number {
-  const normalized = text.replace(',', '.').replace(/[^\d.]/g, '')
-  const value = Number.parseFloat(normalized)
-  return Number.isFinite(value) ? roundMoney(value) : 0
-}
-
-function formatInput(value: number): string {
-  return Number.isInteger(value) ? String(value) : String(roundMoney(value))
-}
-
 /**
  * Amount screen: quick amounts → fine-tuning → save.
  * The date defaults to today and the person comes from this phone's cache, so
@@ -39,38 +33,18 @@ function formatInput(value: number): string {
  */
 export function AmountPad({
   category,
+  spent,
   person,
   onPersonChange,
   onCancel,
   onSave,
   saving,
 }: Props) {
-  const [amountText, setAmountText] = useState('')
+  const entry = useAmountEntry()
   const [note, setNote] = useState('')
-  const [quickPick, setQuickPick] = useState<number | null>(null)
   const [date, setDate] = useState(todayKey())
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const amount = parseAmount(amountText)
+  const { amount } = entry
   const canSave = amount > 0 && !saving
-
-  const pickQuick = (value: number) => {
-    setQuickPick(value)
-    setAmountText(formatInput(value))
-  }
-
-  const adjust = (delta: number) => {
-    const next = Math.max(roundMoney(amount + delta), 0)
-    setQuickPick(null)
-    setAmountText(next === 0 ? '' : formatInput(next))
-  }
-
-  const handleManual = (value: string) => {
-    setQuickPick(null)
-    // digits plus a single decimal separator
-    const cleaned = value.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1')
-    setAmountText(cleaned)
-  }
 
   return (
     // full-screen overlay — covers the bottom navigation too
@@ -107,27 +81,16 @@ export function AmountPad({
           className="w-full rounded-2xl bg-white/5 px-4 py-3.5 text-base text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
         />
 
-        {/* tap the number to type an exact amount */}
-        <div
-          onClick={() => inputRef.current?.focus()}
-          className="flex w-full items-baseline justify-center gap-2 rounded-3xl bg-white/5 py-6 ring-1 ring-white/10"
-        >
-          <input
-            ref={inputRef}
-            value={amountText}
-            onChange={(e) => handleManual(e.target.value)}
-            onFocus={(e) => e.currentTarget.select()}
-            inputMode="decimal"
-            placeholder="0"
-            aria-label="Amount"
-            className="w-full max-w-[65%] bg-transparent text-right text-huge font-bold tabular-nums text-white outline-none placeholder:text-white/25"
-          />
-          <span className="text-3xl font-semibold text-muted">{CURRENCY_SUFFIX}</span>
-        </div>
+        <AmountField value={entry.text} onChange={entry.type} label="Amount" />
 
-        <QuickAmountButtons onPick={pickQuick} selected={quickPick} accent={category.color} />
+        <QuickAmountButtons onPick={entry.pickQuick} selected={entry.quickPick} accent={category.color} />
 
-        {amount > 0 && <FineTuneButtons onAdjust={adjust} />}
+        {amount > 0 && <FineTuneButtons onAdjust={entry.adjust} />}
+
+        {/* only this month's spending is on screen to compare with */}
+        {monthKeyOfDate(date) === currentMonthKey() && (
+          <LimitPreview category={category} spent={spent} amount={amount} />
+        )}
       </div>
 
       <div className="sticky bottom-0 border-t border-white/10 bg-ink/95 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 backdrop-blur">

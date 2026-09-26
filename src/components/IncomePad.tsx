@@ -1,10 +1,12 @@
 import { ArrowLeft } from '@phosphor-icons/react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import { AmountField } from './entry/AmountField'
+import { parseAmount } from './entry/useAmountEntry'
 import { DatePicker } from './DatePicker'
 import { UserSwitcher } from './UserSwitcher'
 import { CURRENCY_SUFFIX } from '../config'
 import { useLastIncomes } from '../hooks/useIncomes'
-import { formatAmount, roundMoney, todayKey } from '../lib/calculations'
+import { formatAmount, todayKey } from '../lib/calculations'
 import type { Person } from '../types'
 
 interface Props {
@@ -15,7 +17,8 @@ interface Props {
   saving: boolean
 }
 
-const INCOME_COLOR = '#34d399' // emerald — income reads apart from any expense category
+/** Income reads apart from any expense category: the app's "positive" color. */
+const INCOME_COLOR = '#34d399'
 
 /**
  * Logging a paycheck. Salaries repeat, so the last amount for the selected
@@ -25,10 +28,9 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
   const [amountText, setAmountText] = useState('')
   const [note, setNote] = useState('')
   const [date, setDate] = useState(todayKey())
-  const inputRef = useRef<HTMLInputElement>(null)
   const { data: recent = [] } = useLastIncomes()
 
-  const amount = roundMoney(Number.parseFloat(amountText.replace(',', '.')) || 0)
+  const amount = parseAmount(amountText)
   const last = recent.find((i) => i.person === person)
 
   return (
@@ -51,25 +53,12 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
       </header>
 
       <div className="flex-1 space-y-5 px-4 pb-6">
-        <div
-          onClick={() => inputRef.current?.focus()}
-          className="flex w-full items-baseline justify-center gap-2 rounded-3xl bg-white/5 py-6 ring-1 ring-white/10"
-        >
-          <input
-            ref={inputRef}
-            value={amountText}
-            onChange={(e) =>
-              setAmountText(e.target.value.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1'))
-            }
-            onFocus={(e) => e.currentTarget.select()}
-            inputMode="decimal"
-            placeholder="0"
-            aria-label="Amount received"
-            autoFocus
-            className="w-full max-w-[70%] bg-transparent text-right text-huge font-bold tabular-nums text-white outline-none placeholder:text-white/25"
-          />
-          <span className="text-3xl font-semibold text-muted">{CURRENCY_SUFFIX}</span>
-        </div>
+        <AmountField
+          value={amountText}
+          onChange={(v) => setAmountText(v.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1'))}
+          label="Amount received"
+          autoFocus
+        />
 
         {last && (
           <button

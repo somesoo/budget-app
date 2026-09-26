@@ -1,4 +1,7 @@
 import { PERSON_LABELS } from '../config'
+import type { BudgetAlert } from './alerts'
+import type { ProjectSummary } from './projects'
+import type { AccountSummary, GoalSummary } from './savings'
 import type { Category, Expense, Goal, Income, Person } from '../types'
 import { PERSONS } from '../types'
 import { daysInMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
@@ -89,7 +92,7 @@ export function monthForecast(args: {
       .filter((e) => monthKeyOfDate(e.expense_date) === month)
       .reduce((a, e) => a + e.amount, 0),
   )
-  const projectedSpend = isCurrent ? projectMonthEnd(spentSoFar, month) ?? spentSoFar : spentSoFar
+  const projectedSpend = isCurrent ? (projectMonthEnd(spentSoFar, month) ?? spentSoFar) : spentSoFar
   const projectedSavings = roundMoney(income - projectedSpend)
 
   const daysLeft = isCurrent ? daysInMonth(month) - elapsedDays(month) : 0
@@ -120,8 +123,8 @@ export function monthForecast(args: {
 /* ---------- what the server (and Gemini) receives ---------- */
 
 /**
- * Aggregates only: totals per category and person, income, the goal. No notes,
- * no individual transactions, no account details.
+ * Totals per category and person, income, the app's warnings, the month's
+ * biggest expenses (with notes), savings accounts, goals and projects.
  */
 export interface AdviceRequest {
   month: MonthKey
@@ -133,11 +136,47 @@ export interface AdviceRequest {
     byPerson: { name: string; logged: number; typicalMonthly: number | null; counted: number }[]
   }
   spending: { soFar: number; projectedMonthEnd: number; limitsTotal: number }
-  categories: { name: string; monthlyLimit: number; spentSoFar: number; typicalMonthly: number | null }[]
+  categories: {
+    name: string
+    monthlyLimit: number
+    spentSoFar: number
+    typicalMonthly: number | null
+  }[]
   people: { name: string; spentSoFar: number }[]
   goal: { name: string; target: number; saved: number } | null
   forecast: { projectedSavings: number; savingsRate: number | null; monthsToGoal: number | null }
+  /** The app's own warnings this month (over a limit, heading over). */
+  warnings: string[]
+  /** This month's biggest single expenses, with their notes. */
+  biggestExpenses: {
+    date: string
+    amount: number
+    category: string
+    note: string | null
+    who: string
+  }[]
+  /** Accounts and goals; null before savings accounts exist (migration 0007). */
+  savings: {
+    savedThisMonth: number
+    plannedThisMonth: number | null
+    totalSaved: number
+    unassigned: number
+    accounts: { name: string; balance: number; interestPercent: number | null }[]
+    goals: {
+      name: string
+      target: number | null
+      by: string | null
+      saved: number
+      neededPerMonth: number | null
+      onTrack: boolean | null
+    }[]
+  } | null
+  /** Trips and projects, outside the monthly numbers. */
+  projects: { name: string; budget: number | null; spent: number; phase: string }[]
 }
+
+/** How many of the month's biggest expenses go along. */
+const BIGGEST = 12
 
 export function buildAdviceRequest(args: {
   month: MonthKey
@@ -145,8 +184,20 @@ export function buildAdviceRequest(args: {
   categories: Category[]
   goal: Goal | null | undefined
   forecast: MonthForecast
+  alerts?: BudgetAlert[]
+  savings?: {
+    available: boolean
+    savedThisMonth: number
+    plannedThisMonth: number | null
+    total: number
+    unassigned: number
+    accounts: AccountSummary[]
+    goals: GoalSummary[]
+  }
+  projects?: ProjectSummary[]
 }): AdviceRequest {
-  const { month, expenses, categories, goal, forecast } = args
+  const { month, expenses, categories, goal, forecast, alerts = [], savings, projects = [] } = args
+  const nameOf = new Map(categories.map((c) => [c.id, c.name]))
   const inMonth = expenses.filter((e) => monthKeyOfDate(e.expense_date) === month)
   const earlier = expenses.filter((e) => monthKeyOfDate(e.expense_date) < month)
   const earlierMonths = new Set(earlier.map((e) => monthKeyOfDate(e.expense_date))).size
@@ -182,15 +233,72 @@ export function buildAdviceRequest(args: {
     }),
     people: PERSONS.map((p) => ({
       name: PERSON_LABELS[p],
-      spentSoFar: roundMoney(inMonth.filter((e) => e.person === p).reduce((a, e) => a + e.amount, 0)),
+      spentSoFar: roundMoney(
+        inMonth.filter((e) => e.person === p).reduce((a, e) => a + e.amount, 0),
+      ),
     })),
-    goal: goal
-      ? { name: goal.name, target: goal.target_amount, saved: goal.current_amount }
-      : null,
+    goal: goal ? { name: goal.name, target: goal.target_amount, saved: goal.current_amount } : null,
     forecast: {
       projectedSavings: Math.round(forecast.projectedSavings),
-      savingsRate: forecast.savingsRate !== null ? Math.round(forecast.savingsRate * 100) / 100 : null,
+      savingsRate:
+        forecast.savingsRate !== null ? Math.round(forecast.savingsRate * 100) / 100 : null,
       monthsToGoal: forecast.monthsToGoal,
     },
+    warnings: alerts.map((a) => `${a.title}. ${a.detail}`.slice(0, 300)).slice(0, 12),
+    biggestExpenses: [...inMonth]
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, BIGGEST)
+      .map((e) => ({
+        date: e.expense_date,
+        amount: e.amount,
+        category: (nameOf.get(e.category_id) ?? 'other').slice(0, 60),
+        note: e.note ? e.note.slice(0, 80) : null,
+        who: PERSON_LABELS[e.person],
+      })),
+    savings:
+      savings && savings.available
+        ? {
+            savedThisMonth: savings.savedThisMonth,
+            plannedThisMonth: savings.plannedThisMonth,
+            totalSaved: savings.total,
+            unassigned: savings.unassigned,
+            accounts: savings.accounts
+              .filter((a) => !a.account.archived)
+              .slice(0, 20)
+              .map((a) => ({
+                name: a.account.name.slice(0, 60),
+                balance: a.balance,
+                interestPercent: a.account.interest_rate,
+              })),
+            goals: savings.goals
+              .filter((g) => !g.goal.archived)
+              .slice(0, 20)
+              .map((g) => ({
+                name: g.goal.name.slice(0, 60),
+                target: g.goal.target_amount || null,
+                by: g.goal.target_date,
+                saved: g.saved,
+                neededPerMonth:
+                  g.status.kind === 'on-track' || g.status.kind === 'behind'
+                    ? g.status.neededPerMonth
+                    : null,
+                onTrack:
+                  g.status.kind === 'on-track' || g.status.kind === 'reached'
+                    ? true
+                    : g.status.kind === 'behind' || g.status.kind === 'overdue'
+                      ? false
+                      : null,
+              })),
+          }
+        : null,
+    projects: projects
+      .filter((p) => !p.project.archived)
+      .slice(0, 10)
+      .map((p) => ({
+        name: p.project.name.slice(0, 60),
+        budget: p.budget,
+        spent: p.spent,
+        phase: p.phase,
+      })),
   }
 }

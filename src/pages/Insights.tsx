@@ -2,6 +2,10 @@ import { CaretDown, CaretUp, Check, Warning } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { AdviceCard } from '../components/AdviceCard'
 import { AskLink } from '../components/AskLink'
+import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
+import { useProjectSummaries } from '../hooks/useProjectSummaries'
+import type { BudgetAlert } from '../lib/alerts'
+import type { ProjectSummary } from '../lib/projects'
 import { ForecastCard } from '../components/ForecastCard'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
@@ -21,7 +25,7 @@ import {
 } from '../config'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
-import { usePrimaryGoal } from '../hooks/useSavings'
+import { usePrimaryGoal, useSavingsOverview, type SavingsOverview } from '../hooks/useSavings'
 import { useIncomesBetween } from '../hooks/useIncomes'
 import { buildAdviceRequest, monthForecast } from '../lib/forecast'
 import {
@@ -66,6 +70,9 @@ export function Insights() {
   } = useMonthlyExpensesBetween(from, to)
   const { data: incomes = [] } = useIncomesBetween(from, to)
   const { data: goal } = usePrimaryGoal()
+  const savings = useSavingsOverview()
+  const { open: projects } = useProjectSummaries()
+  const { all: alerts } = useBudgetAlerts()
 
   return (
     <Screen
@@ -99,6 +106,7 @@ export function Insights() {
             categories={categories}
             incomes={incomes}
             goal={goal}
+            adviceExtras={{ alerts, savings, projects }}
           />
         </div>
       )}
@@ -114,6 +122,12 @@ interface BodyProps {
   categories: Parameters<typeof categoryDeltas>[1]
   incomes: Income[]
   goal: Goal | null | undefined
+  /** Savings, trips and warnings for the recommendations. */
+  adviceExtras: {
+    alerts: BudgetAlert[]
+    savings: SavingsOverview
+    projects: ProjectSummary[]
+  }
 }
 
 function InsightsBody({
@@ -124,6 +138,7 @@ function InsightsBody({
   categories,
   incomes,
   goal,
+  adviceExtras,
 }: BodyProps) {
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
@@ -151,79 +166,96 @@ function InsightsBody({
   const points = pacePoints(expenses, month, totalLimit)
   const forecast = monthForecast({ month, isCurrent, expenses, incomes, goal })
 
-  // phone: one column, top to bottom. Laptop: this month on the left, comparisons on the right.
+  // Recommendations first, across the page. Then phone: one column, top to
+  // bottom; laptop: this month on the left, comparisons on the right.
   return (
-    <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
-      <div className="space-y-4">
-        <KpiRow
-          spent={spent}
-          projected={projected}
-          isCurrent={isCurrent}
-          totalLimit={totalLimit}
-          change={change}
-          prevName={prevName}
-          sameSpan={isCurrent}
-        />
+    <div className="space-y-4">
+      <AdviceCard
+        month={month}
+        isCurrent={isCurrent}
+        buildRequest={() =>
+          buildAdviceRequest({
+            month,
+            expenses,
+            categories,
+            goal,
+            forecast,
+            alerts: adviceExtras.alerts,
+            savings: adviceExtras.savings,
+            projects: adviceExtras.projects,
+          })
+        }
+      />
+      <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
+        <div className="space-y-4">
+          <KpiRow
+            spent={spent}
+            projected={projected}
+            isCurrent={isCurrent}
+            totalLimit={totalLimit}
+            change={change}
+            prevName={prevName}
+            sameSpan={isCurrent}
+          />
 
-        <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
+          <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
 
-        <AdviceCard
-          month={month}
-          isCurrent={isCurrent}
-          buildRequest={() => buildAdviceRequest({ month, expenses, categories, goal, forecast })}
-        />
+          <ChartCard
+            title={isCurrent ? 'Pace this month' : `Pace through ${monthName}`}
+            headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
+            legend={
+              totalLimit > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  <LegendItem
+                    color={CHART.accent}
+                    label={isCurrent ? 'Spent so far' : 'Spent'}
+                    shape="line"
+                  />
+                  <LegendItem
+                    color={CHART.textMuted}
+                    label="Even spread of limits"
+                    shape="dashed"
+                  />
+                </div>
+              )
+            }
+            table={{
+              head: ['Day', 'Spent to date', 'Pace'],
+              rows: points
+                .filter((p) => p.cumulative !== null)
+                .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
+            }}
+          >
+            <PaceChart month={month} points={points} showPace={totalLimit > 0} />
+          </ChartCard>
 
-        <ChartCard
-          title={isCurrent ? 'Pace this month' : `Pace through ${monthName}`}
-          headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
-          legend={
-            totalLimit > 0 && (
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <LegendItem
-                  color={CHART.accent}
-                  label={isCurrent ? 'Spent so far' : 'Spent'}
-                  shape="line"
-                />
-                <LegendItem color={CHART.textMuted} label="Even spread of limits" shape="dashed" />
-              </div>
-            )
-          }
-          table={{
-            head: ['Day', 'Spent to date', 'Pace'],
-            rows: points
-              .filter((p) => p.cumulative !== null)
-              .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
-          }}
-        >
-          <PaceChart month={month} points={points} showPace={totalLimit > 0} />
-        </ChartCard>
+          <MonthlyCard
+            month={month}
+            expenses={expenses}
+            activeMonths={activeMonths}
+            totalLimit={totalLimit}
+            projected={isCurrent ? projected : null}
+          />
+        </div>
 
-        <MonthlyCard
-          month={month}
-          expenses={expenses}
-          activeMonths={activeMonths}
-          totalLimit={totalLimit}
-          projected={isCurrent ? projected : null}
-        />
-      </div>
+        <div className="space-y-4">
+          <CategoryCard
+            month={month}
+            expenses={expenses}
+            categories={categories}
+            hasPrevMonth={inMonth(prev).length > 0}
+            dayCutoff={isCurrent ? elapsed : undefined}
+          />
 
-      <div className="space-y-4">
-        <CategoryCard
-          month={month}
-          expenses={expenses}
-          categories={categories}
-          hasPrevMonth={inMonth(prev).length > 0}
-          dayCutoff={isCurrent ? elapsed : undefined}
-        />
+          <PeopleCard
+            month={month}
+            expenses={expenses}
+            activeMonths={activeMonths}
+            partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
+          />
 
-        <PeopleCard
-          month={month}
-          expenses={expenses}
-          activeMonths={activeMonths}
-          partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
-        />
-
-        <WeekdayCard expenses={expenses} months={months} />
+          <WeekdayCard expenses={expenses} months={months} />
+        </div>
       </div>
     </div>
   )

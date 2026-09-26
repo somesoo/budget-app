@@ -116,7 +116,11 @@ export interface Recommendation {
   detail: string
   /** Rough monthly effect in złoty, if the model could ground one in the data. */
   monthlyImpact: number | null
+  /** What it's about; absent in advice stored before it was asked for. */
+  area?: AdviceArea
 }
+
+export type AdviceArea = 'spending' | 'savings' | 'goals' | 'income' | 'other'
 
 export interface Advice {
   id: string

@@ -147,3 +147,21 @@ export interface PlanSuggestion {
   tips: string[]
   model: string
 }
+
+/** A conversation in the Ask tab, shared by both phones. */
+export interface ChatThread {
+  id: string
+  title: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ChatMessage {
+  id: string
+  thread_id: string
+  role: 'user' | 'assistant'
+  content: string
+  /** Who asked; null for the assistant. */
+  person: Person | null
+  created_at: string
+}

@@ -7,6 +7,7 @@ import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
+import { AskLink } from '../components/AskLink'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
 import { SavingsSummaryCard } from '../components/savings/SavingsSummaryCard'
 import { useSavingsOverview } from '../hooks/useSavings'
@@ -75,11 +76,14 @@ export function Budget() {
       title="Budget"
       wide
       action={
-        <MonthSwitcher
-          month={month}
-          onChange={setMonth}
-          max={shiftMonth(current, PLAN_AHEAD_MONTHS)}
-        />
+        <div className="flex items-center gap-2">
+          <AskLink question="How are we doing against this month's plan, and what should we watch?" />
+          <MonthSwitcher
+            month={month}
+            onChange={setMonth}
+            max={shiftMonth(current, PLAN_AHEAD_MONTHS)}
+          />
+        </div>
       }
     >
       {isFuture ? (

@@ -1,6 +1,7 @@
 import { CaretDown, CaretUp, Check, Warning } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { AdviceCard } from '../components/AdviceCard'
+import { AskLink } from '../components/AskLink'
 import { ForecastCard } from '../components/ForecastCard'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
@@ -62,7 +63,16 @@ export function Insights() {
   const { data: goal } = useGoal()
 
   return (
-    <Screen title="Insights" wide action={<MonthSwitcher month={month} onChange={setMonth} />}>
+    <Screen
+      title="Insights"
+      wide
+      action={
+        <div className="flex items-center gap-2">
+          <AskLink question={`What stands out in ${formatMonthName(month)}'s spending?`} />
+          <MonthSwitcher month={month} onChange={setMonth} />
+        </div>
+      }
+    >
       {error ? (
         <Notice>Could not load expenses: {(error as Error).message}</Notice>
       ) : isLoading || !expenses ? (
@@ -78,7 +88,9 @@ export function Insights() {
             month={month}
             months={months}
             expenses={expenses}
-            totalLimit={categories.filter((c) => !c.archived).reduce((acc, c) => acc + c.monthly_limit, 0)}
+            totalLimit={categories
+              .filter((c) => !c.archived)
+              .reduce((acc, c) => acc + c.monthly_limit, 0)}
             categories={categories}
             incomes={incomes}
             goal={goal}
@@ -138,76 +150,75 @@ function InsightsBody({
   return (
     <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
       <div className="space-y-4">
-      <KpiRow
-        spent={spent}
-        projected={projected}
-        isCurrent={isCurrent}
-        totalLimit={totalLimit}
-        change={change}
-        prevName={prevName}
-        sameSpan={isCurrent}
-      />
+        <KpiRow
+          spent={spent}
+          projected={projected}
+          isCurrent={isCurrent}
+          totalLimit={totalLimit}
+          change={change}
+          prevName={prevName}
+          sameSpan={isCurrent}
+        />
 
-      <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
+        <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
 
-      <AdviceCard
-        month={month}
-        isCurrent={isCurrent}
-        buildRequest={() => buildAdviceRequest({ month, expenses, categories, goal, forecast })}
-      />
+        <AdviceCard
+          month={month}
+          isCurrent={isCurrent}
+          buildRequest={() => buildAdviceRequest({ month, expenses, categories, goal, forecast })}
+        />
 
-      <ChartCard
-        title={isCurrent ? 'Pace this month' : `Pace through ${monthName}`}
-        headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
-        legend={
-          totalLimit > 0 && (
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <LegendItem
-                color={CHART.accent}
-                label={isCurrent ? 'Spent so far' : 'Spent'}
-                shape="line"
-              />
-              <LegendItem color={CHART.textMuted} label="Even spread of limits" shape="dashed" />
-            </div>
-          )
-        }
-        table={{
-          head: ['Day', 'Spent to date', 'Pace'],
-          rows: points
-            .filter((p) => p.cumulative !== null)
-            .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
-        }}
-      >
-        <PaceChart month={month} points={points} showPace={totalLimit > 0} />
-      </ChartCard>
+        <ChartCard
+          title={isCurrent ? 'Pace this month' : `Pace through ${monthName}`}
+          headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
+          legend={
+            totalLimit > 0 && (
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                <LegendItem
+                  color={CHART.accent}
+                  label={isCurrent ? 'Spent so far' : 'Spent'}
+                  shape="line"
+                />
+                <LegendItem color={CHART.textMuted} label="Even spread of limits" shape="dashed" />
+              </div>
+            )
+          }
+          table={{
+            head: ['Day', 'Spent to date', 'Pace'],
+            rows: points
+              .filter((p) => p.cumulative !== null)
+              .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
+          }}
+        >
+          <PaceChart month={month} points={points} showPace={totalLimit > 0} />
+        </ChartCard>
 
-      <MonthlyCard
-        month={month}
-        expenses={expenses}
-        activeMonths={activeMonths}
-        totalLimit={totalLimit}
-        projected={isCurrent ? projected : null}
-      />
-
+        <MonthlyCard
+          month={month}
+          expenses={expenses}
+          activeMonths={activeMonths}
+          totalLimit={totalLimit}
+          projected={isCurrent ? projected : null}
+        />
       </div>
 
       <div className="space-y-4">
-      <CategoryCard
-        month={month}
-        expenses={expenses}
-        categories={categories}
-        hasPrevMonth={inMonth(prev).length > 0}
-        dayCutoff={isCurrent ? elapsed : undefined}
-      />
+        <CategoryCard
+          month={month}
+          expenses={expenses}
+          categories={categories}
+          hasPrevMonth={inMonth(prev).length > 0}
+          dayCutoff={isCurrent ? elapsed : undefined}
+        />
 
-      <PeopleCard
-        month={month}
-        expenses={expenses}
-        activeMonths={activeMonths}
-        partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
-      />
+        <PeopleCard
+          month={month}
+          expenses={expenses}
+          activeMonths={activeMonths}
+          partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
+        />
 
-      <WeekdayCard expenses={expenses} months={months} />
+        <WeekdayCard expenses={expenses} months={months} />
       </div>
     </div>
   )
@@ -237,7 +248,10 @@ function KpiRow({
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div className="rounded-2xl p-3 ring-1 ring-white/10" style={{ backgroundColor: CHART.surface }}>
+      <div
+        className="rounded-2xl p-3 ring-1 ring-white/10"
+        style={{ backgroundColor: CHART.surface }}
+      >
         <p className="text-xs text-muted">{isCurrent ? 'Projected month end' : 'Spent'}</p>
         <p className="mt-0.5 text-xl font-bold text-white">
           {headlineValue === null
@@ -251,22 +265,25 @@ function KpiRow({
             className="mt-0.5 text-xs font-medium"
             style={{ color: over ? CHART.warning : CHART.textMuted }}
           >
-            {over
-              ? (
-                <>
-                  <Warning weight="fill" aria-hidden className="inline-block align-[-0.125em]" />{' '}
-                  {formatAmount(Math.round(headlineValue - totalLimit))} over limits
-                </>
-              ) : (
-                <>
-                  <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" /> within {formatAmount(totalLimit)} limits
-                </>
-              )}
+            {over ? (
+              <>
+                <Warning weight="fill" aria-hidden className="inline-block align-[-0.125em]" />{' '}
+                {formatAmount(Math.round(headlineValue - totalLimit))} over limits
+              </>
+            ) : (
+              <>
+                <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" /> within{' '}
+                {formatAmount(totalLimit)} limits
+              </>
+            )}
           </p>
         )}
       </div>
 
-      <div className="rounded-2xl p-3 ring-1 ring-white/10" style={{ backgroundColor: CHART.surface }}>
+      <div
+        className="rounded-2xl p-3 ring-1 ring-white/10"
+        style={{ backgroundColor: CHART.surface }}
+      >
         <p className="text-xs text-muted">
           vs {prevName}
           {sameSpan ? ', same days' : ''}
@@ -278,7 +295,9 @@ function KpiRow({
             <p
               className="mt-0.5 text-xl font-bold"
               // spending up is bad → warm; down is good → green. Arrow + sign carry it too.
-              style={{ color: change > 0 ? CHART.more : change < 0 ? CHART.good : CHART.textPrimary }}
+              style={{
+                color: change > 0 ? CHART.more : change < 0 ? CHART.good : CHART.textPrimary,
+              }}
             >
               {change > 0 ? (
                 <CaretUp weight="fill" aria-hidden className="inline-block align-[-0.125em]" />
@@ -306,12 +325,21 @@ function paceHeadline(
   monthName: string,
 ): ReactNode {
   if (!isCurrent) {
-    if (totalLimit <= 0) return <>You spent {formatMoney(spent)} in {monthName}.</>
+    if (totalLimit <= 0)
+      return (
+        <>
+          You spent {formatMoney(spent)} in {monthName}.
+        </>
+      )
     const diff = spent - totalLimit
     return diff > 0 ? (
-      <>{monthName} ended {formatMoney(diff)} over your limits.</>
+      <>
+        {monthName} ended {formatMoney(diff)} over your limits.
+      </>
     ) : (
-      <>{monthName} ended {formatMoney(-diff)} under your limits.</>
+      <>
+        {monthName} ended {formatMoney(-diff)} under your limits.
+      </>
     )
   }
   if (projected === null || totalLimit <= 0) return <>Spent {formatMoney(spent)} so far.</>

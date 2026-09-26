@@ -14,6 +14,7 @@ import { CategoryPage } from './pages/CategoryPage'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
 import { Savings } from './pages/Savings'
+import { Ask } from './pages/Ask'
 import { SavingsAccountPage, SavingsGoalPage } from './pages/SavingsDetail'
 import { Insights } from './pages/Insights'
 
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/budget" element={<Budget />} />
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/savings" element={<Savings />} />
+          <Route path="/ask" element={<Ask />} />
           <Route path="/savings/account/:id" element={<SavingsAccountPage />} />
           <Route path="/savings/goal/:id" element={<SavingsGoalPage />} />
           {/* old tabs, kept so a bookmarked or installed link still lands somewhere */}

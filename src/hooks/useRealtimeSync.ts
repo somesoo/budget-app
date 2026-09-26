@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient'
 import { categoriesKey } from './useCategories'
 import { goalsKey } from './useGoal'
+import { chatKey } from './useChat'
 import { savingsKey } from './useSavings'
 
 export type SyncStatus = 'connecting' | 'live' | 'offline'
@@ -68,8 +69,8 @@ export function useRealtimeSync(): SyncStatus {
         }
       })
 
-    // Savings (migration 0007) on a channel of its own: before the migration
-    // has been run these tables don't exist, and the rejection mustn't take
+    // Savings and Ask (migrations 0007, 0008) on a channel of their own: until
+    // those migrations have been run these tables don't exist, and the rejection mustn't take
     // the expense sync above down with it.
     const savings = supabase
       .channel('budget-app-savings')
@@ -81,6 +82,13 @@ export function useRealtimeSync(): SyncStatus {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'goal_allocations' }, () => {
         void qc.invalidateQueries({ queryKey: savingsKey })
+      })
+      // the Ask tab's conversations (migration 0008)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_threads' }, () => {
+        void qc.invalidateQueries({ queryKey: chatKey })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_messages' }, () => {
+        void qc.invalidateQueries({ queryKey: chatKey })
       })
       .subscribe()
 

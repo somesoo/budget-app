@@ -1,4 +1,5 @@
 import {
+  ChatCircleDots,
   ChartLineUp,
   ChartPieSlice,
   GearSix,
@@ -17,11 +18,15 @@ export const TABS: { to: string; label: string; icon: Icon }[] = [
   { to: '/budget', label: 'Budget', icon: ChartPieSlice },
   { to: '/savings', label: 'Savings', icon: PiggyBank },
   { to: '/insights', label: 'Insights', icon: ChartLineUp },
+  { to: '/ask', label: 'Ask', icon: ChatCircleDots },
   { to: '/settings', label: 'Settings', icon: GearSix },
 ]
 
-/** Settings lives behind a gear on the phone, to leave the bar five tabs. */
-const PHONE_TABS = TABS.filter((t) => t.to !== '/settings')
+/**
+ * Five tabs fit the phone's bar: Settings lives behind a gear there, and Ask
+ * behind "Ask AI" buttons on the screens it helps with.
+ */
+const PHONE_TABS = TABS.filter((t) => t.to !== '/settings' && t.to !== '/ask')
 
 /** Phone navigation. On a laptop the SideNav takes over. */
 export function BottomNav() {

@@ -7,15 +7,8 @@ import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { useCategories } from '../hooks/useCategories'
 import { useEntryActions } from '../hooks/useEntryActions'
-import {
-  SEARCH_LIMIT,
-  useExpenses,
-  useSearchExpenses,
-} from '../hooks/useExpenses'
-import {
-  useIncomesBetween,
-  useSearchIncomes,
-} from '../hooks/useIncomes'
+import { SEARCH_LIMIT, useExpenses, useSearchExpenses } from '../hooks/useExpenses'
+import { useIncomesBetween, useSearchIncomes } from '../hooks/useIncomes'
 import { PERSON_LABELS } from '../config'
 import {
   categoryById,
@@ -110,7 +103,6 @@ export function History() {
     setPerson(null)
     setCategoryId(null)
   }
-
 
   return (
     <Screen

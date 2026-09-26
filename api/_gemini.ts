@@ -68,30 +68,22 @@ export async function authorize(req: VercelRequest, res: VercelResponse): Promis
 export type GeminiResult =
   { ok: true; parsed: Record<string, unknown>; model: string } | { ok: false; error: string }
 
+type GeminiContent = { role: 'user' | 'model'; parts: { text: string }[] }
+
+type RawResult = { ok: true; text: string; model: string } | { ok: false; error: string }
+
 /**
- * One schema-constrained JSON call. Overload (503) is common and usually
- * brief: the main model is retried once, then a different model is tried.
- * Details of failures go to the Vercel log, not to the browser.
+ * One generateContent call with the retries every feature shares. Overload
+ * (503) is common and usually brief: the main model is retried once, then a
+ * different model is tried. Details of failures go to the Vercel log, not to
+ * the browser.
  */
-export async function askGemini(args: {
-  systemPrompt: string
-  input: unknown
-  schema: unknown
-  temperature?: number
-}): Promise<GeminiResult> {
+async function generate(body: Record<string, unknown>): Promise<RawResult> {
   const apiKey = process.env.GEMINI_API_KEY!
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL
   const fallback = process.env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL
+  const request = JSON.stringify(body)
 
-  const request = JSON.stringify({
-    systemInstruction: { parts: [{ text: args.systemPrompt }] },
-    contents: [{ role: 'user', parts: [{ text: JSON.stringify(args.input) }] }],
-    generationConfig: {
-      temperature: args.temperature ?? 0.4,
-      responseMimeType: 'application/json',
-      responseSchema: args.schema,
-    },
-  })
   const ask = (m: string) =>
     fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`,
@@ -132,13 +124,68 @@ export async function askGemini(args: {
   const data = (await gemini.json()) as {
     candidates?: { content?: { parts?: { text?: string }[] } }[]
   }
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+  const text = (data.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? '').join('')
+  return { ok: true, text, model: usedModel }
+}
+
+/** One schema-constrained JSON call. */
+export async function askGemini(args: {
+  systemPrompt: string
+  input: unknown
+  schema: unknown
+  temperature?: number
+}): Promise<GeminiResult> {
+  const result = await generate({
+    systemInstruction: { parts: [{ text: args.systemPrompt }] },
+    contents: [{ role: 'user', parts: [{ text: JSON.stringify(args.input) }] }],
+    generationConfig: {
+      temperature: args.temperature ?? 0.4,
+      responseMimeType: 'application/json',
+      responseSchema: args.schema,
+    },
+  })
+  if (!result.ok) return result
   try {
-    const parsed = JSON.parse(text ?? '')
+    const parsed = JSON.parse(result.text)
     if (!parsed || typeof parsed !== 'object') throw new Error('not an object')
-    return { ok: true, parsed, model: usedModel }
+    return { ok: true, parsed, model: result.model }
   } catch {
-    console.error('Gemini returned non-JSON', text)
+    console.error('Gemini returned non-JSON', result.text)
     return { ok: false, error: 'Gemini returned an unreadable answer. Try again.' }
   }
+}
+
+/**
+ * A conversation turn: the household's data goes first as context, then the
+ * thread so far, and the answer comes back as plain text.
+ */
+export async function chatGemini(args: {
+  systemPrompt: string
+  context: unknown
+  history: { role: 'user' | 'assistant'; content: string }[]
+}): Promise<RawResult> {
+  const contents: GeminiContent[] = [
+    {
+      role: 'user',
+      parts: [
+        {
+          text: `Our data, as JSON. Use it to answer what follows.\n${JSON.stringify(args.context)}`,
+        },
+      ],
+    },
+    { role: 'model', parts: [{ text: 'Got it. What would you like to know?' }] },
+    ...args.history.map((m): GeminiContent => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    })),
+  ]
+  const result = await generate({
+    systemInstruction: { parts: [{ text: args.systemPrompt }] },
+    contents,
+    generationConfig: { temperature: 0.6 },
+  })
+  if (result.ok && !result.text.trim()) {
+    return { ok: false, error: 'Gemini returned an empty answer. Try again.' }
+  }
+  return result
 }

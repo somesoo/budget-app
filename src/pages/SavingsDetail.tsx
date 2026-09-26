@@ -1,6 +1,7 @@
 import { ArrowLeft, PencilSimple, Plus } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { AskLink } from '../components/AskLink'
 import { TooltipRow } from '../components/charts/ChartCard'
 import { ColumnChart } from '../components/charts/ColumnChart'
 import { CHART } from '../components/charts/theme'
@@ -247,10 +248,13 @@ export function SavingsGoalPage() {
       }
       onEdit={() => setSheet({ kind: 'edit' })}
       actions={
-        <Actions
-          onPick={(mode) => setSheet({ kind: 'money', mode, goalId: id })}
-          modes={['deposit', 'withdraw', 'allocate', 'transfer']}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <Actions
+            onPick={(mode) => setSheet({ kind: 'money', mode, goalId: id })}
+            modes={['deposit', 'withdraw', 'allocate', 'transfer']}
+          />
+          <AskLink question={`How do we get to ${goal.name} in time, and what would it take?`} />
+        </div>
       }
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">

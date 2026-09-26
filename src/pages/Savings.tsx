@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { AskLink } from '../components/AskLink'
 import { SettingsLink } from '../components/SettingsLink'
 import { Screen } from '../components/Screen'
 import { AccountSheet } from '../components/savings/AccountSheet'
@@ -89,7 +90,16 @@ export function Savings() {
   ]
 
   return (
-    <Screen title="Savings" wide action={<SettingsLink />}>
+    <Screen
+      title="Savings"
+      wide
+      action={
+        <div className="flex items-center gap-1">
+          <AskLink question="Are we on track with our savings goals, and what should we change?" />
+          <SettingsLink />
+        </div>
+      }
+    >
       {/* ---------- the totals ---------- */}
       <section className="mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5">
         <Figure label="Saved in all" value={formatMoneyWhole(s.total)} big />

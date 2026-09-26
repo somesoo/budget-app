@@ -44,8 +44,16 @@ through Supabase Realtime.
 9. Paste and run `supabase/migrations/0006_chart_exclusion.sql` — lets a
    category be left out of the "Where it goes" donut. Also optional for the
    app to run.
-10. Check **Database → Replication** that `expenses`, `categories` and `goals`
-   (and, after steps 7–8, `incomes`, `advice` and `budgets`) are in the
+10. Paste and run `supabase/migrations/0007_savings.sql`: savings accounts,
+   goals funded from them, and trips/projects (categories with their own
+   budget, outside the monthly limits). Your existing goal and what's saved
+   toward it move onto an account called "Savings". Until it's run, the
+   Savings tab explains what to do and everything else works as before.
+11. Paste and run `supabase/migrations/0008_ai_chat.sql`: the saved
+   conversations of the Ask tab.
+12. Check **Database → Replication** that `expenses`, `categories` and `goals`
+   (and, after steps 7–11, `incomes`, `advice`, `budgets`, `savings_accounts`,
+   `savings_movements`, `goal_allocations`, `ai_threads` and `ai_messages`) are in the
    `supabase_realtime` publication — the migrations add them.
 
 ### 2. Local development

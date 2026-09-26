@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { DesktopAdd } from '../components/add/DesktopAdd'
+import { ProjectStrip } from '../components/add/ProjectStrip'
+import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import { CategoryPager } from '../components/CategoryPager'
 import { AmountPad } from '../components/AmountPad'
 import { ChartCard } from '../components/charts/ChartCard'
@@ -11,7 +13,7 @@ import { SettingsLink } from '../components/SettingsLink'
 import { AlertStrip } from '../components/alerts/AlertList'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
-import { useAddExpense, useExpenses } from '../hooks/useExpenses'
+import { useAddExpense, useMonthlyExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
 import { LAPTOP, useMediaQuery } from '../hooks/useMediaQuery'
@@ -35,7 +37,7 @@ export function Home() {
   // limits come from this month's plan where it has one
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
   const categories = allCategories.filter((c) => !c.archived)
-  const { data: expenses = [] } = useExpenses(month)
+  const { data: expenses = [] } = useMonthlyExpenses(month)
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
   const [incomeOpen, setIncomeOpen] = useState(false)
@@ -62,6 +64,14 @@ export function Home() {
 
   const laptop = useMediaQuery(LAPTOP)
   const { alerts } = useBudgetAlerts()
+
+  const projects = useProjectSummaries()
+  // a project is measured by all it has cost against its whole budget, not by the month
+  const spentOf = (c: Category) =>
+    c.kind === 'project'
+      ? (projects.all.find((p) => p.project.id === c.id)?.spent ?? 0)
+      : (spentByCategory[c.id] ?? 0)
+  const limitOf = (c: Category) => (c.kind === 'project' ? (c.budget_total ?? 0) : c.monthly_limit)
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -94,7 +104,7 @@ export function Home() {
     return (
       <AmountPad
         category={selected}
-        spent={spentByCategory[selected.id] ?? 0}
+        spent={spentOf(selected)}
         person={entryPerson}
         onPersonChange={setEntryPerson}
         onCancel={() => setSelected(null)}
@@ -113,14 +123,10 @@ export function Home() {
             },
           )
           setSelected(null)
-          // a backdated expense may not move the tiles on screen, so say where it went
           // a backdated expense lands in another month, whose limits aren't on screen
           const crossed =
-            monthKeyOfDate(date) === month
-              ? crossingNote(
-                  selected,
-                  limitImpact(spentByCategory[selected.id] ?? 0, amount, selected.monthly_limit),
-                )
+            selected.kind === 'project' || monthKeyOfDate(date) === month
+              ? crossingNote(selected, limitImpact(spentOf(selected), amount, limitOf(selected)))
               : null
           setToast(
             crossed
@@ -197,6 +203,8 @@ export function Home() {
           </ChartCard>
         </div>
       )}
+
+      <ProjectStrip projects={projects.open} onSelect={openCategory} />
 
       {isLoading ? (
         <div className="grid grid-cols-3 gap-2">

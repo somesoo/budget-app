@@ -12,7 +12,7 @@ import {
   PlanUnavailableError,
 } from '../../hooks/useBudgets'
 import { useCategories } from '../../hooks/useCategories'
-import { useExpensesBetween } from '../../hooks/useExpenses'
+import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import { useGoal } from '../../hooks/useGoal'
 import { useSavingsOverview } from '../../hooks/useSavings'
 import { useIncomesBetween } from '../../hooks/useIncomes'
@@ -59,10 +59,14 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const to = monthRange(months[months.length - 1]).to
 
   const { data: allCategories = [] } = useCategories()
-  const categories = useMemo(() => allCategories.filter((c) => !c.archived), [allCategories])
+  // trips and other projects have their own budget, not a monthly limit
+  const categories = useMemo(
+    () => allCategories.filter((c) => !c.archived && c.kind !== 'project'),
+    [allCategories],
+  )
   const existing = useBudget(month)
   const previous = useBudget(prevMonth)
-  const expenses = useExpensesBetween(from, to)
+  const expenses = useMonthlyExpensesBetween(from, to)
   const incomes = useIncomesBetween(from, to)
   const { data: goal } = useGoal()
   const savingsOverview = useSavingsOverview()

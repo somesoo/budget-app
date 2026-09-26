@@ -7,6 +7,7 @@ import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
 import { useSavings } from '../hooks/useSavings'
+import { ProjectSheet } from '../components/projects/ProjectSheet'
 import { Link } from 'react-router-dom'
 import { CURRENCY_SUFFIX } from '../config'
 import { supabase } from '../lib/supabaseClient'
@@ -19,12 +20,16 @@ export function Settings() {
   const updateCategory = useUpdateCategory()
   const addCategory = useAddCategory()
   const [showHidden, setShowHidden] = useState(false)
-  const active = categories.filter((c) => !c.archived)
-  const hidden = categories.filter((c) => c.archived)
+  // projects have their own section below
+  const monthly = categories.filter((c) => c.kind !== 'project')
+  const active = monthly.filter((c) => !c.archived)
+  const hidden = monthly.filter((c) => c.archived)
   const { data: goal, isLoading: goalLoading } = useGoal()
   const upsertGoal = useUpsertGoal()
   const status = useRealtimeStatus()
   const savingsReady = useSavings().data?.available ?? false
+  const projects = categories.filter((c) => c.kind === 'project')
+  const [projectSheet, setProjectSheet] = useState<Category | 'new' | null>(null)
 
   return (
     <Screen title="Settings">
@@ -118,6 +123,63 @@ export function Settings() {
           </div>
         )}
       </section>
+
+      {savingsReady && (
+        <section className="mb-6">
+          <div className="mb-1 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold text-white">Trips and projects</h2>
+            <button
+              type="button"
+              onClick={() => setProjectSheet('new')}
+              className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
+            >
+              New
+            </button>
+          </div>
+          <p className="mb-3 text-xs text-muted">
+            A category that doesn’t start over each month: its own budget for the whole trip,
+            outside the monthly limits.
+          </p>
+          {projects.length === 0 ? (
+            <p className="text-sm text-muted">None yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {projects.map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => setProjectSheet(p)}
+                    className={`flex w-full items-center gap-3 rounded-2xl bg-white/5 px-4 py-3 text-left ring-1 ring-white/10 hover:bg-white/10 ${
+                      p.archived ? 'opacity-60' : ''
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: p.color }}
+                    />
+                    <span className="min-w-0 flex-1 truncate text-[15px] text-white">{p.name}</span>
+                    <span className="shrink-0 text-sm tabular-nums text-muted">
+                      {p.archived
+                        ? 'Finished'
+                        : p.budget_total
+                          ? formatMoney(p.budget_total)
+                          : 'No budget'}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {projectSheet && (
+        <ProjectSheet
+          project={projectSheet === 'new' ? undefined : projectSheet}
+          onClose={() => setProjectSheet(null)}
+        />
+      )}
 
       {savingsReady ? (
         <section className="mb-6">

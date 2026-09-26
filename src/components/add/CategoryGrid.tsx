@@ -5,6 +5,8 @@ import { CategoryTile } from '../CategoryTile'
 
 interface Props {
   categories: Category[]
+  /** Trips and other projects, each with its whole budget as the tile's limit. */
+  projects?: Category[]
   spentByCategory: Record<string, number>
   selectedId: string | null
   onSelect: (category: Category) => void
@@ -22,6 +24,7 @@ const TILE_HEIGHT = 104
  */
 export function CategoryGrid({
   categories,
+  projects = [],
   spentByCategory,
   selectedId,
   onSelect,
@@ -51,33 +54,69 @@ export function CategoryGrid({
         </kbd>
       </label>
 
-      {categories.length === 0 ? (
+      {categories.length === 0 && projects.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted">No category matches “{query}”.</p>
       ) : (
         <div className="-m-1 min-h-0 flex-1 overflow-y-auto p-1">
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-3">
-            {categories.map((category, i) => (
-              <div
-                key={category.id}
-                className={`rounded-2xl transition ${
-                  category.id === selectedId
-                    ? 'ring-2 ring-accent ring-offset-2 ring-offset-ink'
-                    : query && i === 0
-                      ? 'ring-1 ring-white/40 ring-offset-2 ring-offset-ink'
-                      : ''
-                }`}
-              >
-                <CategoryTile
-                  category={category}
-                  spent={spentByCategory[category.id] ?? 0}
-                  height={TILE_HEIGHT}
-                  onClick={() => onSelect(category)}
-                />
-              </div>
-            ))}
-          </div>
+          <Tiles
+            list={categories}
+            spentByCategory={spentByCategory}
+            selectedId={selectedId}
+            highlightFirst={!!query}
+            onSelect={onSelect}
+          />
+          {projects.length > 0 && (
+            <>
+              <h3 className="mb-2 mt-5 text-sm font-semibold text-white">Trips and projects</h3>
+              <Tiles
+                list={projects}
+                spentByCategory={spentByCategory}
+                selectedId={selectedId}
+                highlightFirst={!!query && categories.length === 0}
+                onSelect={onSelect}
+              />
+            </>
+          )}
         </div>
       )}
+    </div>
+  )
+}
+
+function Tiles({
+  list,
+  spentByCategory,
+  selectedId,
+  highlightFirst,
+  onSelect,
+}: {
+  list: Category[]
+  spentByCategory: Record<string, number>
+  selectedId: string | null
+  highlightFirst: boolean
+  onSelect: (category: Category) => void
+}) {
+  return (
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-3">
+      {list.map((category, i) => (
+        <div
+          key={category.id}
+          className={`rounded-2xl transition ${
+            category.id === selectedId
+              ? 'ring-2 ring-accent ring-offset-2 ring-offset-ink'
+              : highlightFirst && i === 0
+                ? 'ring-1 ring-white/40 ring-offset-2 ring-offset-ink'
+                : ''
+          }`}
+        >
+          <CategoryTile
+            category={category}
+            spent={spentByCategory[category.id] ?? 0}
+            height={TILE_HEIGHT}
+            onClick={() => onSelect(category)}
+          />
+        </div>
+      ))}
     </div>
   )
 }

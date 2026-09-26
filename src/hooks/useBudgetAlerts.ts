@@ -2,7 +2,7 @@ import { useMemo, useSyncExternalStore } from 'react'
 import { ALERT_RANK, alertSubject, budgetAlerts, type BudgetAlert } from '../lib/alerts'
 import { currentMonthKey } from '../lib/calculations'
 import { useMonthCategories } from './useBudgets'
-import { useExpenses } from './useExpenses'
+import { useMonthlyExpenses } from './useExpenses'
 
 /*
  * Dismissed warnings live in this browser only: a per-device convenience,
@@ -62,7 +62,7 @@ function isDismissed(alert: BudgetAlert, ids: string[]): boolean {
 export function useBudgetAlerts() {
   const month = currentMonthKey()
   const { data: categories } = useMonthCategories(month)
-  const { data: expenses } = useExpenses(month)
+  const { data: expenses } = useMonthlyExpenses(month)
   const ids = useSyncExternalStore(
     subscribe,
     () => dismissed,

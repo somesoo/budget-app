@@ -130,7 +130,6 @@ export function Ask() {
       }
     >
       <div className="min-h-0 flex-1 overflow-y-auto px-4 lg:px-0">
-
         {shown.length === 0 ? (
           <div className="flex min-h-full flex-col justify-end pb-4 lg:justify-center">
             <Sparkle weight="fill" aria-hidden className="text-2xl text-accent-soft" />

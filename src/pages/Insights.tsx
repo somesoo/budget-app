@@ -20,7 +20,7 @@ import {
   WEEKDAY_NAMES,
 } from '../config'
 import { useMonthCategories } from '../hooks/useBudgets'
-import { useExpensesBetween } from '../hooks/useExpenses'
+import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
 import { useGoal } from '../hooks/useGoal'
 import { useIncomesBetween } from '../hooks/useIncomes'
 import { buildAdviceRequest, monthForecast } from '../lib/forecast'
@@ -58,7 +58,12 @@ export function Insights() {
 
   // the selected month's limits: its own plan where it has one
   const { data: categories = [] } = useMonthCategories(month)
-  const { data: expenses, isLoading, isPlaceholderData, error } = useExpensesBetween(from, to)
+  const {
+    data: expenses,
+    isLoading,
+    isPlaceholderData,
+    error,
+  } = useMonthlyExpensesBetween(from, to)
   const { data: incomes = [] } = useIncomesBetween(from, to)
   const { data: goal } = useGoal()
 

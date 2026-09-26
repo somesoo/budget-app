@@ -1,7 +1,7 @@
 import { CaretRight, WarningCircle } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import { useMonthCategories } from '../../hooks/useBudgets'
-import { useExpenses } from '../../hooks/useExpenses'
+import { useMonthlyExpenses } from '../../hooks/useExpenses'
 import { useIncomesBetween } from '../../hooks/useIncomes'
 import {
   formatMoneyWhole,
@@ -31,7 +31,7 @@ export function MonthReviewCard({
   onOpen: () => void
 }) {
   const { data: categories, plan } = useMonthCategories(month)
-  const { data: expenses } = useExpenses(month)
+  const { data: expenses } = useMonthlyExpenses(month)
   const { from, to } = monthRange(month)
   const { data: incomes } = useIncomesBetween(from, to)
   if (!categories || !expenses || !incomes || expenses.length === 0) return null

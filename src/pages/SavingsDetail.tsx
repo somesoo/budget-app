@@ -11,6 +11,7 @@ import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
 import { useGoals } from '../hooks/useGoal'
+import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import { useSavingsOverview } from '../hooks/useSavings'
 import {
   currentMonthKey,
@@ -220,6 +221,7 @@ export function SavingsAccountPage() {
 export function SavingsGoalPage() {
   const { id = '' } = useParams()
   const s = useSavingsOverview()
+  const projects = useProjectSummaries()
   const [sheet, setSheet] = useState<Sheet>(null)
   const summary = s.goals.find((g) => g.goal.id === id)
 
@@ -233,6 +235,7 @@ export function SavingsGoalPage() {
 
   const { goal, saved, progress, funding, status, pace, remaining } = summary
   const mine = s.movements.filter((m) => m.goal_id === id)
+  const paidFor = projects.all.filter((p) => p.project.goal_id === id)
 
   return (
     <Frame
@@ -293,35 +296,60 @@ export function SavingsGoalPage() {
           </section>
         </div>
 
-        <section>
-          <h2 className="mb-2 text-base font-semibold text-white">Where the money is</h2>
-          {funding.length === 0 ? (
-            <p className="text-sm text-muted">Nothing set aside for it on any account yet.</p>
-          ) : (
-            <ul className="grid gap-1.5">
-              {funding.map((f) => (
-                <li key={f.account.id}>
-                  <Link
-                    to={`/savings/account/${f.account.id}`}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-white/10 hover:bg-white/5"
-                  >
-                    <span
-                      aria-hidden
-                      className="h-6 w-1.5 rounded-full"
-                      style={{ backgroundColor: f.account.color }}
-                    />
-                    <span className="min-w-0 flex-1 truncate text-sm text-white">
-                      {f.account.name}
-                    </span>
-                    <span className="text-sm font-semibold tabular-nums text-white">
-                      {formatMoneyWhole(f.amount)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        <div className="space-y-6">
+          <section>
+            <h2 className="mb-2 text-base font-semibold text-white">Where the money is</h2>
+            {funding.length === 0 ? (
+              <p className="text-sm text-muted">Nothing set aside for it on any account yet.</p>
+            ) : (
+              <ul className="grid gap-1.5">
+                {funding.map((f) => (
+                  <li key={f.account.id}>
+                    <Link
+                      to={`/savings/account/${f.account.id}`}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-white/10 hover:bg-white/5"
+                    >
+                      <span
+                        aria-hidden
+                        className="h-6 w-1.5 rounded-full"
+                        style={{ backgroundColor: f.account.color }}
+                      />
+                      <span className="min-w-0 flex-1 truncate text-sm text-white">
+                        {f.account.name}
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-white">
+                        {formatMoneyWhole(f.amount)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+          {paidFor.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-base font-semibold text-white">Spent from it</h2>
+              <ul className="grid gap-1.5">
+                {paidFor.map((p) => (
+                  <li key={p.project.id}>
+                    <Link
+                      to={`/project/${p.project.id}`}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-white/10 hover:bg-white/5"
+                    >
+                      <span className="min-w-0 flex-1 truncate text-sm text-white">
+                        {p.project.name}
+                      </span>
+                      <span className="text-sm tabular-nums text-slate-300">
+                        {formatMoneyWhole(p.spent)}
+                        {p.budget ? ` of ${formatMoneyWhole(p.budget)}` : ''}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-        </section>
+        </div>
       </div>
 
       {sheet?.kind === 'money' && (

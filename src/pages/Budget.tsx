@@ -9,11 +9,13 @@ import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
 import { AskLink } from '../components/AskLink'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
+import { ProjectsCard } from '../components/projects/ProjectsCard'
+import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import { SavingsSummaryCard } from '../components/savings/SavingsSummaryCard'
 import { useSavingsOverview } from '../hooks/useSavings'
 import { useBudget, useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
-import { useExpenses } from '../hooks/useExpenses'
+import { useMonthlyExpenses } from '../hooks/useExpenses'
 import { useAddToGoal, useGoal } from '../hooks/useGoal'
 import { useIncomesBetween } from '../hooks/useIncomes'
 import { CURRENCY_SUFFIX, PLAN_AHEAD_MONTHS } from '../config'
@@ -56,7 +58,7 @@ export function Budget() {
 
   const savings = useSavingsOverview()
   // once savings accounts exist (migration 0007), goals live there
-  const goalSection = savings.available ? (
+  const savingsSection = savings.available ? (
     <SavingsSummaryCard overview={savings} />
   ) : (
     goal && (
@@ -69,6 +71,13 @@ export function Budget() {
         />
       </section>
     )
+  )
+  const projects = useProjectSummaries()
+  const goalSection = (
+    <>
+      {savingsSection}
+      <ProjectsCard projects={projects.open} />
+    </>
   )
 
   return (
@@ -160,7 +169,7 @@ function MonthStatus({
   children?: ReactNode
 }) {
   const { from, to } = monthRange(month)
-  const { data: expenses = [] } = useExpenses(month)
+  const { data: expenses = [] } = useMonthlyExpenses(month)
   const { data: incomes = [] } = useIncomesBetween(from, to)
 
   const spent = sumExpenses(expenses)

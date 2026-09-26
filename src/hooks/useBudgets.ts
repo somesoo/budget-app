@@ -84,15 +84,17 @@ export function useDeleteBudget() {
  * month's plan where it sets one. Everything that reads limits — tiles, bars,
  * the pace line — takes these, so a planned month is measured against its plan.
  * Hidden categories are included (their past spending still counts); filter
- * on `archived` where only the active ones belong.
+ * on `archived` where only the active ones belong. Projects (trips) aren't:
+ * they run across months, see useProjects.
  */
 export function useMonthCategories(month: MonthKey) {
   const categories = useCategories()
   const budget = useBudget(month)
   const plan = budget.data ?? null
-  const data: Category[] | undefined = categories.data?.map((c) =>
-    plan && c.id in plan.limits ? { ...c, monthly_limit: plan.limits[c.id] } : c,
-  )
+  // trips and other projects aren't part of any month (see lib/projects)
+  const data: Category[] | undefined = categories.data
+    ?.filter((c) => c.kind !== 'project')
+    .map((c) => (plan && c.id in plan.limits ? { ...c, monthly_limit: plan.limits[c.id] } : c))
   return { ...categories, data, plan, planLoading: budget.isLoading }
 }
 

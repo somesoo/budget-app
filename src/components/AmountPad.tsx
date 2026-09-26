@@ -11,17 +11,12 @@ import type { Category, Person } from '../types'
 
 interface Props {
   category: Category
-  /** Already spent in the category this month, for the preview against its limit. */
+  /** Already spent in the category this month (for a project: in all), for the preview. */
   spent: number
   person: Person
   onPersonChange: (person: Person) => void
   onCancel: () => void
-  onSave: (input: {
-    amount: number
-    person: Person
-    note: string | null
-    date: string
-  }) => void
+  onSave: (input: { amount: number; person: Person; note: string | null; date: string }) => void
   saving: boolean
 }
 
@@ -83,13 +78,21 @@ export function AmountPad({
 
         <AmountField value={entry.text} onChange={entry.type} label="Amount" />
 
-        <QuickAmountButtons onPick={entry.pickQuick} selected={entry.quickPick} accent={category.color} />
+        <QuickAmountButtons
+          onPick={entry.pickQuick}
+          selected={entry.quickPick}
+          accent={category.color}
+        />
 
         {amount > 0 && <FineTuneButtons onAdjust={entry.adjust} />}
 
         {/* only this month's spending is on screen to compare with */}
-        {monthKeyOfDate(date) === currentMonthKey() && (
-          <LimitPreview category={category} spent={spent} amount={amount} />
+        {category.kind === 'project' ? (
+          <LimitPreview category={category} spent={spent} amount={amount} project />
+        ) : (
+          monthKeyOfDate(date) === currentMonthKey() && (
+            <LimitPreview category={category} spent={spent} amount={amount} />
+          )
         )}
       </div>
 
@@ -97,9 +100,7 @@ export function AmountPad({
         <button
           type="button"
           disabled={!canSave}
-          onClick={() =>
-            onSave({ amount, person, note: note.trim() ? note.trim() : null, date })
-          }
+          onClick={() => onSave({ amount, person, note: note.trim() ? note.trim() : null, date })}
           className="h-16 w-full rounded-3xl text-xl font-bold transition active:scale-[0.99] disabled:opacity-40"
           style={{ backgroundColor: category.color, color: readableTextColor(category.color) }}
         >

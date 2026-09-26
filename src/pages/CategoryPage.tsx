@@ -21,7 +21,7 @@ export function CategoryPage() {
 
   const { data: categories = [] } = useCategories()
   const category = categories.find((c) => c.id === id)
-  const active = categories.filter((c) => !c.archived)
+  const active = categories.filter((c) => !c.archived && c.kind !== 'project')
   const index = active.findIndex((c) => c.id === id)
   const neighbour = (step: number) =>
     index === -1 ? null : active[(index + step + active.length) % active.length]

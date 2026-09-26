@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { ChatMessage, ChatThread, Person } from '../types'
 import { useBudgetAlerts } from './useBudgetAlerts'
 import { useBudget, useMonthCategories } from './useBudgets'
+import { useProjects } from './useCategories'
 import { useExpensesBetween } from './useExpenses'
 import { useIncomesBetween } from './useIncomes'
 import { useSavingsOverview } from './useSavings'
@@ -70,6 +71,7 @@ export function useChatContext() {
   const { from, to } = windowRange(monthsEndingAt(month, 12))
   const incomeRange = windowRange(monthsEndingAt(month, 3))
   const categories = useMonthCategories(month)
+  const { data: projects = [] } = useProjects()
   const expenses = useExpensesBetween(from, to)
   const incomes = useIncomesBetween(incomeRange.from, incomeRange.to)
   const next = useBudget(shiftMonth(month, 1))
@@ -82,7 +84,8 @@ export function useChatContext() {
       buildChatContext({
         month,
         today: todayKey(),
-        categories: categories.data ?? [],
+        // the month's categories, plus the projects it keeps apart
+        categories: [...(categories.data ?? []), ...projects],
         expenses: expenses.data ?? [],
         incomes: incomes.data ?? [],
         planThisMonth: categories.plan,

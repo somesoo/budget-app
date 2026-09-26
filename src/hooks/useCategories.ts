@@ -37,6 +37,12 @@ export function useCategories() {
   })
 }
 
+/** Trips and other projects: categories that don't start over each month. */
+export function useProjects() {
+  const categories = useCategories()
+  return { ...categories, data: categories.data?.filter((c) => c.kind === 'project') }
+}
+
 export function useUpdateCategory() {
   const qc = useQueryClient()
   return useMutation({
@@ -64,7 +70,10 @@ export function useUpdateCategory() {
 export function useAddCategory() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (category: Pick<Category, 'name' | 'color' | 'monthly_limit'>) => {
+    mutationFn: async (
+      category: Pick<Category, 'name' | 'color' | 'monthly_limit'> &
+        Partial<Pick<Category, 'kind' | 'budget_total' | 'starts_on' | 'ends_on' | 'goal_id'>>,
+    ) => {
       const existing = qc.getQueryData<Category[]>(categoriesKey) ?? []
       const sort_order = existing.reduce((max, c) => Math.max(max, c.sort_order), 0) + 1
       const { error } = await supabase.from('categories').insert({ ...category, sort_order })

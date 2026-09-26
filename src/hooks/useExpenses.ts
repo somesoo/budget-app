@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { monthlyOnly } from '../lib/projects'
+import { useCategories } from './useCategories'
 import { supabase } from '../lib/supabaseClient'
 import { monthKeyOfDate, monthRange, type MonthKey } from '../lib/calculations'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
@@ -215,7 +218,10 @@ export function useDeleteExpense() {
       await qc.cancelQueries({ queryKey: ['expenses'] })
       const snapshots = qc.getQueriesData<Expense[]>({ queryKey: ['expenses'] })
       for (const [key, list] of snapshots) {
-        qc.setQueryData<Expense[]>(key, (list ?? []).filter((e) => e.id !== id))
+        qc.setQueryData<Expense[]>(
+          key,
+          (list ?? []).filter((e) => e.id !== id),
+        )
       }
       return { snapshots }
     },
@@ -224,6 +230,81 @@ export function useDeleteExpense() {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['expenses'] })
+    },
+  })
+}
+
+/**
+ * The month's expenses without trips and other projects: what every monthly
+ * number (limits, warnings, forecasts) is made of. Same query as useExpenses.
+ */
+export function useMonthlyExpenses(month: MonthKey) {
+  const query = useExpenses(month)
+  const { data: categories } = useCategories()
+  const data = useMemo(
+    () => (query.data && categories ? monthlyOnly(query.data, categories) : query.data),
+    [query.data, categories],
+  )
+  return { ...query, data }
+}
+
+/** useExpensesBetween without trips and other projects; see useMonthlyExpenses. */
+export function useMonthlyExpensesBetween(from: string, to: string) {
+  const query = useExpensesBetween(from, to)
+  const { data: categories } = useCategories()
+  const data = useMemo(
+    () => (query.data && categories ? monthlyOnly(query.data, categories) : query.data),
+    [query.data, categories],
+  )
+  return { ...query, data }
+}
+
+/** Every expense in one category, all time: a project's whole history. */
+export function useCategoryExpenses(categoryId: string) {
+  return useQuery({
+    queryKey: ['expenses', 'category', categoryId],
+    enabled: !!categoryId,
+    queryFn: async (): Promise<Expense[]> => {
+      const rows: Expense[] = []
+      for (let offset = 0; ; offset += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from('expenses')
+          .select(COLUMNS)
+          .eq('category_id', categoryId)
+          .order('expense_date', { ascending: false })
+          .order('created_at', { ascending: false })
+          .range(offset, offset + PAGE_SIZE - 1)
+        if (error) throw error
+        rows.push(...(data ?? []).map(normalize))
+        if (!data || data.length < PAGE_SIZE) return rows
+      }
+    },
+  })
+}
+
+/** All-time expenses of several categories at once (the projects), by category id. */
+export function useProjectExpenses(ids: string[]) {
+  const key = [...ids].sort()
+  return useQuery({
+    queryKey: ['expenses', 'projects', key],
+    enabled: key.length > 0,
+    queryFn: async (): Promise<Record<string, Expense[]>> => {
+      const rows: Expense[] = []
+      for (let offset = 0; ; offset += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from('expenses')
+          .select(COLUMNS)
+          .in('category_id', key)
+          .order('expense_date', { ascending: false })
+          .order('created_at', { ascending: false })
+          .range(offset, offset + PAGE_SIZE - 1)
+        if (error) throw error
+        rows.push(...(data ?? []).map(normalize))
+        if (!data || data.length < PAGE_SIZE) break
+      }
+      const out: Record<string, Expense[]> = Object.fromEntries(key.map((id) => [id, []]))
+      for (const e of rows) out[e.category_id]?.push(e)
+      return out
     },
   })
 }

@@ -3,9 +3,10 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CURRENCY_SUFFIX, QUICK_AMOUNTS } from '../../config'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
+import { useProjectSummaries } from '../../hooks/useProjectSummaries'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { useEntryActions } from '../../hooks/useEntryActions'
-import { useAddExpense, useExpenses } from '../../hooks/useExpenses'
+import { useAddExpense, useExpenses, useMonthlyExpenses } from '../../hooks/useExpenses'
 import { useAddIncome, useIncomesBetween, useLastIncomes } from '../../hooks/useIncomes'
 import {
   categoryById,
@@ -55,7 +56,9 @@ export function DesktopAdd() {
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
   const categories = allCategories.filter((c) => !c.archived)
-  const { data: expenses = [] } = useExpenses(month)
+  const { data: expenses = [] } = useMonthlyExpenses(month)
+  // recent entries include trips: they were just logged here too
+  const { data: allExpenses = [] } = useExpenses(month)
   const { from, to } = monthRange(month)
   const { data: incomes = [] } = useIncomesBetween(from, to)
   const { data: lastIncomes = [] } = useLastIncomes()
@@ -63,6 +66,7 @@ export function DesktopAdd() {
   const addIncome = useAddIncome()
   const actions = useEntryActions()
   const { alerts } = useBudgetAlerts()
+  const projectSummaries = useProjectSummaries()
 
   const [mode, setMode] = useState<Mode>('expense')
   const [query, setQuery] = useState('')
@@ -94,15 +98,26 @@ export function DesktopAdd() {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  const spentByCategory = sumByCategory(expenses)
+  // projects show their whole budget on the tile, and all they've cost so far
+  const projectTiles = projectSummaries.open.map((p) => ({
+    ...p.project,
+    monthly_limit: p.budget ?? 0,
+  }))
+  const spentByCategory = {
+    ...sumByCategory(expenses),
+    ...Object.fromEntries(projectSummaries.open.map((p) => [p.project.id, p.spent])),
+  }
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
   const left = monthLimit - monthTotal
   const daysLeft = daysInMonth(month) - elapsedDays(month) + 1
   const q = query.trim().toLowerCase()
-  const shown = q ? categories.filter((c) => c.name.toLowerCase().includes(q)) : categories
-  const selected = categories.find((c) => c.id === selectedId) ?? null
-  const recent = toEntries(expenses, incomes).slice(0, RECENT)
+  const matches = (c: Category) => !q || c.name.toLowerCase().includes(q)
+  const shown = categories.filter(matches)
+  const shownProjects = projectTiles.filter(matches)
+  const selected = [...categories, ...projectTiles].find((c) => c.id === selectedId) ?? null
+  const isProjectPick = selected?.kind === 'project'
+  const recent = toEntries(allExpenses, incomes).slice(0, RECENT)
   const lastIncome = lastIncomes.find((i) => i.person === person)
   const inThisMonth = monthKeyOfDate(date) === month
 
@@ -135,12 +150,13 @@ export function DesktopAdd() {
         },
         { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
       )
-      const crossed = inThisMonth
-        ? crossingNote(
-            selected,
-            limitImpact(spentByCategory[selected.id] ?? 0, entry.amount, selected.monthly_limit),
-          )
-        : null
+      const crossed =
+        inThisMonth || isProjectPick
+          ? crossingNote(
+              selected,
+              limitImpact(spentByCategory[selected.id] ?? 0, entry.amount, selected.monthly_limit),
+            )
+          : null
       setToast(
         crossed
           ? `Saved. ${crossed}`
@@ -160,9 +176,10 @@ export function DesktopAdd() {
   }
 
   const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && shown[0]) {
+    const first = shown[0] ?? shownProjects[0]
+    if (e.key === 'Enter' && first) {
       e.preventDefault()
-      pick(shown[0])
+      pick(first)
     } else if (e.key === 'Escape') {
       setQuery('')
     }
@@ -240,6 +257,7 @@ export function DesktopAdd() {
           ) : (
             <CategoryGrid
               categories={shown}
+              projects={shownProjects}
               spentByCategory={spentByCategory}
               selectedId={mode === 'expense' ? selectedId : null}
               onSelect={pick}
@@ -365,12 +383,15 @@ export function DesktopAdd() {
             </div>
           )}
 
-          {mode === 'expense' && selected && inThisMonth && (
+          {mode === 'expense' && selected && (inThisMonth || isProjectPick) && (
             <div className="mt-3">
               <LimitPreview
-                category={selected}
+                category={
+                  isProjectPick ? { ...selected, budget_total: selected.monthly_limit } : selected
+                }
                 spent={spentByCategory[selected.id] ?? 0}
                 amount={entry.amount}
+                project={isProjectPick}
               />
             </div>
           )}

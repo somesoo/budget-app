@@ -9,14 +9,16 @@ interface Props {
   /** Already spent in the category this month. */
   spent: number
   amount: number
+  /** A trip or project: measured against its whole budget, not a month. */
+  project?: boolean
 }
 
 /**
  * The category's month before and after this expense, against its limit, so
  * going over is something you see before saving rather than after.
  */
-export function LimitPreview({ category, spent, amount }: Props) {
-  const limit = category.monthly_limit
+export function LimitPreview({ category, spent, amount, project = false }: Props) {
+  const limit = project ? (category.budget_total ?? 0) : category.monthly_limit
   if (limit <= 0) return null
   const impact = limitImpact(spent, amount, limit)
   const scale = Math.max(impact.after, limit)
@@ -28,7 +30,7 @@ export function LimitPreview({ category, spent, amount }: Props) {
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="min-w-0 truncate text-slate-300">
           {category.name}
-          {amount > 0 ? ' after this' : ' this month'}
+          {amount > 0 ? ' after this' : project ? ' so far' : ' this month'}
         </span>
         <span className="shrink-0 tabular-nums text-white">
           {formatMoneyWhole(amount > 0 ? impact.after : impact.before)}{' '}
@@ -60,9 +62,9 @@ export function LimitPreview({ category, spent, amount }: Props) {
       >
         {warn && <Warning weight="fill" aria-hidden className="shrink-0" />}
         {impact.levelAfter === 'over'
-          ? `${formatMoneyWhole(impact.overBy)} over the limit`
+          ? `${formatMoneyWhole(impact.overBy)} over the ${project ? 'budget' : 'limit'}`
           : impact.levelAfter === 'near'
-            ? `${Math.round((impact.after / limit) * 100)}% of the limit, ${formatMoneyWhole(impact.left)} left`
+            ? `${Math.round((impact.after / limit) * 100)}% of the ${project ? 'budget' : 'limit'}, ${formatMoneyWhole(impact.left)} left`
             : `${formatMoneyWhole(impact.left)} left in ${category.name}`}
       </p>
     </div>

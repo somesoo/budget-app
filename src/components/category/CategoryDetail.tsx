@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { CURRENCY_SUFFIX } from '../../config'
 import { useMonthCategories } from '../../hooks/useBudgets'
-import { useExpensesBetween } from '../../hooks/useExpenses'
+import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import {
   categoryById,
   currentMonthKey,
@@ -61,7 +61,7 @@ export function CategoryDetail({
 }: Props) {
   const { from, to } = windowRange(detailWindow(month))
   const { data: monthCategories, isLoading: categoriesLoading } = useMonthCategories(month)
-  const { data: expenses, error } = useExpensesBetween(from, to)
+  const { data: expenses, error } = useMonthlyExpensesBetween(from, to)
 
   if (error) return <Notice>Could not load expenses: {(error as Error).message}</Notice>
   if (categoriesLoading || !monthCategories || !expenses) return <Skeleton />

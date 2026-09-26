@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import type { Allocation, SavingsAccount, SavingsMovement } from '../types'
-import { goalsKey } from './useGoal'
+import { currentMonthKey, roundMoney } from '../lib/calculations'
+import { accountSummaries, goalSummaries, savedInMonth, totalNeededPerMonth } from '../lib/savings'
+import { useBudget } from './useBudgets'
+import { goalsKey, useGoals } from './useGoal'
 
 export const savingsKey = ['savings'] as const
 
@@ -223,3 +226,46 @@ export function useSaveAccount() {
     },
   })
 }
+
+/**
+ * Everything the savings screens show, added up: accounts with their balance
+ * and unassigned money, goals with progress and status, this month's saving
+ * against the plan. `available` is false until migration 0007 has been run.
+ */
+export function useSavingsOverview() {
+  const savings = useSavings()
+  const goals = useGoals()
+  const month = currentMonthKey()
+  const { data: plan } = useBudget(month)
+
+  const data = savings.data
+  const allGoals = goals.data ?? []
+  const accounts = data ? accountSummaries(data.accounts, data.movements, data.allocations) : []
+  const goalList = data
+    ? goalSummaries({
+        goals: allGoals,
+        accounts: data.accounts,
+        movements: data.movements,
+        allocations: data.allocations,
+        now: month,
+      })
+    : []
+  const open = accounts.filter((a) => !a.account.archived)
+
+  return {
+    isLoading: savings.isLoading || goals.isLoading,
+    error: savings.error ?? goals.error,
+    available: data?.available ?? false,
+    movements: data?.movements ?? [],
+    accounts,
+    goals: goalList,
+    total: roundMoney(open.reduce((s, a) => s + a.balance, 0)),
+    unassigned: roundMoney(open.reduce((s, a) => s + Math.max(a.unassigned, 0), 0)),
+    savedThisMonth: data ? savedInMonth(data.movements, month) : 0,
+    /** What this month's plan means to put aside; null without a plan. */
+    plannedThisMonth: plan ? plan.savings : null,
+    neededPerMonth: totalNeededPerMonth(goalList.filter((g) => !g.goal.archived)),
+  }
+}
+
+export type SavingsOverview = ReturnType<typeof useSavingsOverview>

@@ -1,4 +1,4 @@
-import { ChartDonut, EyeSlash } from '@phosphor-icons/react'
+import { CaretRight, ChartDonut, EyeSlash } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { UserSwitcher } from '../components/UserSwitcher'
@@ -6,6 +6,8 @@ import { useAddCategory, useCategories, useUpdateCategory } from '../hooks/useCa
 import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
+import { useSavings } from '../hooks/useSavings'
+import { Link } from 'react-router-dom'
 import { CURRENCY_SUFFIX } from '../config'
 import { supabase } from '../lib/supabaseClient'
 import { formatMoney, roundMoney } from '../lib/calculations'
@@ -22,6 +24,7 @@ export function Settings() {
   const { data: goal, isLoading: goalLoading } = useGoal()
   const upsertGoal = useUpsertGoal()
   const status = useRealtimeStatus()
+  const savingsReady = useSavings().data?.available ?? false
 
   return (
     <Screen title="Settings">
@@ -39,9 +42,7 @@ export function Settings() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-1 text-base font-semibold text-white">
-          Categories and default limits
-        </h2>
+        <h2 className="mb-1 text-base font-semibold text-white">Categories and default limits</h2>
         <p className="mb-3 text-xs text-muted">
           A month you plan in the Budget tab uses its own limits; these apply to months without a
           plan.
@@ -118,22 +119,33 @@ export function Settings() {
         )}
       </section>
 
-      <section className="mb-6">
-        <h2 className="mb-3 text-base font-semibold text-white">
-          Shared savings goal
-        </h2>
-        {/* keyed so the fields fill in once the goal has loaded — otherwise they'd
+      {savingsReady ? (
+        <section className="mb-6">
+          <h2 className="mb-2 text-base font-semibold text-white">Savings goals</h2>
+          <Link
+            to="/savings"
+            className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3 text-sm text-slate-200 ring-1 ring-white/10 hover:bg-white/10"
+          >
+            Goals and accounts are in the Savings tab
+            <CaretRight aria-hidden className="text-muted" />
+          </Link>
+        </section>
+      ) : (
+        <section className="mb-6">
+          <h2 className="mb-3 text-base font-semibold text-white">Shared savings goal</h2>
+          {/* keyed so the fields fill in once the goal has loaded — otherwise they'd
             keep the empty defaults and "Save goal" would write zeros over it */}
-        {goalLoading ? (
-          <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
-        ) : (
-          <GoalEditor
-            key={goal?.id ?? 'new'}
-            goal={goal ?? null}
-            onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
-          />
-        )}
-      </section>
+          {goalLoading ? (
+            <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
+          ) : (
+            <GoalEditor
+              key={goal?.id ?? 'new'}
+              goal={goal ?? null}
+              onSave={(next) => upsertGoal.mutate({ id: goal?.id, ...next })}
+            />
+          )}
+        </section>
+      )}
 
       <button
         type="button"

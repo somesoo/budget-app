@@ -14,6 +14,7 @@ import {
 import { useCategories } from '../../hooks/useCategories'
 import { useExpensesBetween } from '../../hooks/useExpenses'
 import { useGoal } from '../../hooks/useGoal'
+import { useSavingsOverview } from '../../hooks/useSavings'
 import { useIncomesBetween } from '../../hooks/useIncomes'
 import {
   formatAmount,
@@ -64,6 +65,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const expenses = useExpensesBetween(from, to)
   const incomes = useIncomesBetween(from, to)
   const { data: goal } = useGoal()
+  const savingsOverview = useSavingsOverview()
   const save = useSaveBudget()
   const remove = useDeleteBudget()
   const suggest = useSuggestPlan()
@@ -280,7 +282,16 @@ export function BudgetPlanner({ month, onClose }: Props) {
               <Row
                 label="Savings"
                 hint={
-                  goal ? (
+                  savingsOverview.available && savingsOverview.neededPerMonth > 0 ? (
+                    <Hint
+                      active={draft.savings === roundUpPlan(savingsOverview.neededPerMonth)}
+                      onClick={() =>
+                        setDraft({ ...draft, savings: roundUpPlan(savingsOverview.neededPerMonth) })
+                      }
+                    >
+                      goals need {formatAmount(Math.round(savingsOverview.neededPerMonth))}
+                    </Hint>
+                  ) : goal && !savingsOverview.available ? (
                     <span className="text-xs text-muted">
                       {monthsToGoal
                         ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`

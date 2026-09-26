@@ -8,6 +8,8 @@ import { Screen } from '../components/Screen'
 import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
+import { SavingsSummaryCard } from '../components/savings/SavingsSummaryCard'
+import { useSavingsOverview } from '../hooks/useSavings'
 import { useBudget, useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { useExpenses } from '../hooks/useExpenses'
@@ -51,15 +53,21 @@ export function Budget() {
 
   const isFuture = month > current
 
-  const goalSection = goal && (
-    <section>
-      <SectionTitle>Goal: {goal.name}</SectionTitle>
-      <GoalProgress
-        goal={goal}
-        pending={addToGoal.isPending}
-        onAdd={(delta) => addToGoal.mutate({ goalId: goal.id, delta })}
-      />
-    </section>
+  const savings = useSavingsOverview()
+  // once savings accounts exist (migration 0007), goals live there
+  const goalSection = savings.available ? (
+    <SavingsSummaryCard overview={savings} />
+  ) : (
+    goal && (
+      <section>
+        <SectionTitle>Goal: {goal.name}</SectionTitle>
+        <GoalProgress
+          goal={goal}
+          pending={addToGoal.isPending}
+          onAdd={(delta) => addToGoal.mutate({ goalId: goal.id, delta })}
+        />
+      </section>
+    )
   )
 
   return (

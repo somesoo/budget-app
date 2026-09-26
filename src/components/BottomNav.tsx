@@ -3,6 +3,7 @@ import {
   ChartPieSlice,
   GearSix,
   ListBullets,
+  PiggyBank,
   Plus,
   type Icon,
 } from '@phosphor-icons/react'
@@ -14,9 +15,13 @@ export const TABS: { to: string; label: string; icon: Icon }[] = [
   { to: '/', label: 'Add', icon: Plus },
   { to: '/history', label: 'History', icon: ListBullets },
   { to: '/budget', label: 'Budget', icon: ChartPieSlice },
+  { to: '/savings', label: 'Savings', icon: PiggyBank },
   { to: '/insights', label: 'Insights', icon: ChartLineUp },
   { to: '/settings', label: 'Settings', icon: GearSix },
 ]
+
+/** Settings lives behind a gear on the phone, to leave the bar five tabs. */
+const PHONE_TABS = TABS.filter((t) => t.to !== '/settings')
 
 /** Phone navigation. On a laptop the SideNav takes over. */
 export function BottomNav() {
@@ -24,7 +29,7 @@ export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/10 bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
       <ul className="mx-auto flex max-w-md">
-        {TABS.map((tab) => (
+        {PHONE_TABS.map((tab) => (
           <li key={tab.to} className="flex-1">
             <NavLink
               to={tab.to}

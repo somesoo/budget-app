@@ -7,6 +7,7 @@ import { SpendDonut } from '../components/charts/SpendDonut'
 import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
+import { SettingsLink } from '../components/SettingsLink'
 import { AlertStrip } from '../components/alerts/AlertList'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
@@ -136,7 +137,12 @@ export function Home() {
   return (
     <Screen
       title="What for?"
-      action={devicePerson && <UserSwitcher value={devicePerson} onChange={setDevicePerson} />}
+      action={
+        <div className="flex items-center gap-1">
+          {devicePerson && <UserSwitcher value={devicePerson} onChange={setDevicePerson} />}
+          <SettingsLink />
+        </div>
+      }
       fill
     >
       <div className="mb-3 flex shrink-0 items-center justify-between gap-3">

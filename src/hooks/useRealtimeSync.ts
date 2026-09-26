@@ -2,7 +2,8 @@ import { useEffect, useSyncExternalStore } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient'
 import { categoriesKey } from './useCategories'
-import { goalKey } from './useGoal'
+import { goalsKey } from './useGoal'
+import { savingsKey } from './useSavings'
 
 export type SyncStatus = 'connecting' | 'live' | 'offline'
 
@@ -49,7 +50,7 @@ export function useRealtimeSync(): SyncStatus {
         void qc.invalidateQueries({ queryKey: categoriesKey })
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, () => {
-        void qc.invalidateQueries({ queryKey: goalKey })
+        void qc.invalidateQueries({ queryKey: goalsKey })
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'incomes' }, () => {
         void qc.invalidateQueries({ queryKey: ['incomes'] })
@@ -67,6 +68,22 @@ export function useRealtimeSync(): SyncStatus {
         }
       })
 
+    // Savings (migration 0007) on a channel of its own: before the migration
+    // has been run these tables don't exist, and the rejection mustn't take
+    // the expense sync above down with it.
+    const savings = supabase
+      .channel('budget-app-savings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'savings_accounts' }, () => {
+        void qc.invalidateQueries({ queryKey: savingsKey })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'savings_movements' }, () => {
+        void qc.invalidateQueries({ queryKey: savingsKey })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'goal_allocations' }, () => {
+        void qc.invalidateQueries({ queryKey: savingsKey })
+      })
+      .subscribe()
+
     // coming back after the phone was asleep — pull in anything we missed
     const onVisible = () => {
       if (document.visibilityState === 'visible') void qc.invalidateQueries()
@@ -76,6 +93,7 @@ export function useRealtimeSync(): SyncStatus {
     return () => {
       document.removeEventListener('visibilitychange', onVisible)
       void supabase.removeChannel(channel)
+      void supabase.removeChannel(savings)
     }
   }, [qc])
 

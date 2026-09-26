@@ -14,6 +14,19 @@ export interface Category {
   archived: boolean
   /** In the Home donut. Off for fixed costs like rent, which would swamp it. */
   show_in_chart: boolean
+  /**
+   * 'monthly' starts over every month and counts toward the month's budget.
+   * 'project' (a trip) runs across months against budget_total and stays out
+   * of the monthly numbers; it's paid for from savings.
+   */
+  kind: 'monthly' | 'project'
+  /** A project's budget for the whole of it; null when it has none. */
+  budget_total: number | null
+  /** A project's dates, ISO YYYY-MM-DD; either may be open. */
+  starts_on: string | null
+  ends_on: string | null
+  /** The savings goal a project is paid from. */
+  goal_id: string | null
 }
 
 export interface Expense {
@@ -30,8 +43,57 @@ export interface Expense {
 export interface Goal {
   id: string
   name: string
+  /** 0 means open-ended, like an emergency fund that just grows. */
   target_amount: number
+  /** Before savings accounts (migration 0007): what was saved. After: unused, see allocations. */
   current_amount: number
+  target_date: string | null
+  color: string
+  sort_order: number
+  archived: boolean
+  note: string | null
+}
+
+export type AccountKind = 'savings' | 'deposit' | 'investment' | 'retirement' | 'cash' | 'other'
+
+/** Where savings are: a bank account, a deposit, cash. Its balance is the sum of its movements. */
+export interface SavingsAccount {
+  id: string
+  name: string
+  kind: AccountKind
+  owner: Person | 'joint'
+  /** Yearly, in percent; null when it earns nothing. */
+  interest_rate: number | null
+  color: string
+  sort_order: number
+  archived: boolean
+  note: string | null
+  created_at: string
+}
+
+export type MovementKind = 'deposit' | 'withdrawal' | 'interest' | 'adjustment' | 'transfer'
+
+export interface SavingsMovement {
+  id: string
+  account_id: string
+  kind: MovementKind
+  /** Signed: money in is positive, money out negative. */
+  amount: number
+  /** ISO YYYY-MM-DD, local time. */
+  movement_date: string
+  person: Person | null
+  note: string | null
+  goal_id: string | null
+  /** Shared by the two halves of a transfer between accounts. */
+  transfer_id: string | null
+  created_at: string
+}
+
+/** The part of an account's balance set aside for a goal. */
+export interface Allocation {
+  account_id: string
+  goal_id: string
+  amount: number
 }
 
 export type NewExpense = Omit<Expense, 'id' | 'created_at'>

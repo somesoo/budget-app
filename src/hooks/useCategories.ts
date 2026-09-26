@@ -23,8 +23,14 @@ export function useCategories() {
         monthly_limit: Number(c.monthly_limit),
         sort_order: Number(c.sort_order),
         archived: Boolean(c.archived),
-        // absent until migration 0006 — and absent means shown
+        // absent until migration 0006, and absent means shown
         show_in_chart: c.show_in_chart !== false,
+        // absent until migration 0007: every category is a monthly one
+        kind: c.kind === 'project' ? 'project' : 'monthly',
+        budget_total: c.budget_total == null ? null : Number(c.budget_total),
+        starts_on: c.starts_on ?? null,
+        ends_on: c.ends_on ?? null,
+        goal_id: c.goal_id ?? null,
       }))
     },
     staleTime: 60_000,

@@ -10,6 +10,11 @@ const cat = (id: string, limit: number, extra: Partial<Category> = {}): Category
   sort_order: 0,
   archived: false,
   show_in_chart: true,
+  kind: 'monthly',
+  budget_total: null,
+  starts_on: null,
+  ends_on: null,
+  goal_id: null,
   ...extra,
 })
 

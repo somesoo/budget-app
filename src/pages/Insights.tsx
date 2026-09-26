@@ -21,7 +21,7 @@ import {
 } from '../config'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
-import { useGoal } from '../hooks/useGoal'
+import { usePrimaryGoal } from '../hooks/useSavings'
 import { useIncomesBetween } from '../hooks/useIncomes'
 import { buildAdviceRequest, monthForecast } from '../lib/forecast'
 import {
@@ -65,7 +65,7 @@ export function Insights() {
     error,
   } = useMonthlyExpensesBetween(from, to)
   const { data: incomes = [] } = useIncomesBetween(from, to)
-  const { data: goal } = useGoal()
+  const { data: goal } = usePrimaryGoal()
 
   return (
     <Screen

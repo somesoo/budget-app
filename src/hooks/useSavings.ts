@@ -269,3 +269,17 @@ export function useSavingsOverview() {
 }
 
 export type SavingsOverview = ReturnType<typeof useSavingsOverview>
+
+/**
+ * "The goal" for the places that speak of one (the forecast, the planner):
+ * the first open goal, with what's saved toward it. Once savings accounts
+ * exist that comes from its allocations; before, from the old current_amount.
+ */
+export function usePrimaryGoal() {
+  const overview = useSavingsOverview()
+  const goals = useGoals()
+  const first = goals.data?.find((g) => !g.archived) ?? null
+  if (!first || !overview.available) return { data: first }
+  const saved = overview.goals.find((g) => g.goal.id === first.id)?.saved ?? 0
+  return { data: { ...first, current_amount: saved } }
+}

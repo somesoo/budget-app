@@ -13,8 +13,7 @@ import {
 } from '../../hooks/useBudgets'
 import { useCategories } from '../../hooks/useCategories'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
-import { useGoal } from '../../hooks/useGoal'
-import { useSavingsOverview } from '../../hooks/useSavings'
+import { usePrimaryGoal, useSavingsOverview } from '../../hooks/useSavings'
 import { useIncomesBetween } from '../../hooks/useIncomes'
 import {
   formatAmount,
@@ -68,7 +67,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const previous = useBudget(prevMonth)
   const expenses = useMonthlyExpensesBetween(from, to)
   const incomes = useIncomesBetween(from, to)
-  const { data: goal } = useGoal()
+  const { data: goal } = usePrimaryGoal()
   const savingsOverview = useSavingsOverview()
   const save = useSaveBudget()
   const remove = useDeleteBudget()

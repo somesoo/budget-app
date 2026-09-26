@@ -44,6 +44,9 @@ export const WEEKDAY_NAMES = [
   'Sunday',
 ]
 
+/** How far ahead a month can be planned. */
+export const PLAN_AHEAD_MONTHS = 3
+
 /** How many months the Insights tab looks back over. */
 export const INSIGHTS_MONTHS = 6
 

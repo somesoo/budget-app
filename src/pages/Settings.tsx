@@ -1,3 +1,4 @@
+import { ChartDonut, EyeSlash } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { UserSwitcher } from '../components/UserSwitcher'
@@ -31,14 +32,14 @@ export function Settings() {
         {person && <UserSwitcher value={person} onChange={setPerson} size="lg" />}
         <p className="mt-3 text-xs text-muted">
           Sync:{' '}
-          <span className={status === 'live' ? 'text-emerald-400' : 'text-amber-400'}>
+          <span className={status === 'live' ? 'text-positive' : 'text-amber-400'}>
             {status === 'live' ? 'live' : status === 'connecting' ? 'connecting…' : 'offline'}
           </span>
         </p>
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="mb-1 text-base font-semibold text-white">
           Categories and default limits
         </h2>
         <p className="mb-3 text-xs text-muted">
@@ -64,8 +65,9 @@ export function Settings() {
           month
         </p>
         <p className="mt-1 flex flex-wrap items-center gap-x-1 text-xs text-muted">
-          <ChartIcon on /> in the “Where it goes” chart, <ChartIcon on={false} /> left out — tap to
-          leave out fixed costs like rent, which still count everywhere else. ⊘ hides the category.
+          <ChartIcon on /> in the “Where it goes” chart, <ChartIcon on={false} /> left out. Tap to
+          leave out fixed costs like rent, which still count everywhere else.{' '}
+          <EyeSlash aria-hidden className="text-sm" /> hides the category.
         </p>
 
         <NewCategory
@@ -117,7 +119,7 @@ export function Settings() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="mb-3 text-base font-semibold text-white">
           Shared savings goal
         </h2>
         {/* keyed so the fields fill in once the goal has loaded — otherwise they'd
@@ -228,7 +230,7 @@ function CategoryRow({ category, onSave, onHide, onToggleChart }: RowProps) {
         title="Hide"
         className="-mr-1 flex h-9 w-8 shrink-0 items-center justify-center rounded-xl text-muted active:bg-white/10"
       >
-        ⊘
+        <EyeSlash aria-hidden className="text-lg" />
       </button>
     </div>
   )
@@ -341,7 +343,7 @@ function NewCategory({
           type="button"
           onClick={submit}
           disabled={!name.trim() || pending}
-          className="flex-1 rounded-xl bg-white py-2.5 text-sm font-semibold text-ink disabled:opacity-40"
+          className="flex-1 rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-ink disabled:opacity-40"
         >
           Add category
         </button>
@@ -395,7 +397,7 @@ function GoalEditor({ goal, onSave }: GoalProps) {
 
       <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-emerald-400 transition-[width] duration-500"
+          className="h-full rounded-full bg-accent transition-[width] duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -412,7 +414,7 @@ function GoalEditor({ goal, onSave }: GoalProps) {
             current_amount: num(current),
           })
         }
-        className="w-full rounded-xl bg-white py-2.5 text-sm font-semibold text-ink"
+        className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-ink"
       >
         {goal ? 'Save goal' : 'Create goal'}
       </button>
@@ -420,22 +422,13 @@ function GoalEditor({ goal, onSave }: GoalProps) {
   )
 }
 
-/**
- * A little donut with a slice in it; an empty, dimmed ring when the category
- * is left out of the chart. (Deliberately not struck through — that would read
- * like the ⊘ hide button next to it.)
- */
+/** A filled donut when the category is in the chart; an outline, dimmed, when it's left out. */
 function ChartIcon({ on }: { on: boolean }) {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
+    <ChartDonut
       aria-hidden
-      className={on ? 'text-white' : 'text-white/25'}
-    >
-      <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
-      {on && <path d="M9 3 A6 6 0 0 1 15 9" fill="none" stroke="#34d399" strokeWidth="3" />}
-    </svg>
+      weight={on ? 'fill' : 'regular'}
+      className={`text-lg ${on ? 'text-accent-soft' : 'text-white/30'}`}
+    />
   )
 }

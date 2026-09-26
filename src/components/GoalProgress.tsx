@@ -40,13 +40,13 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
 
       <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-emerald-400 transition-[width] duration-500"
+          className="h-full rounded-full bg-accent transition-[width] duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
 
       <p className="mt-2 text-xs text-muted">
-        {remaining > 0 ? `${formatMoney(remaining)} to go` : 'Goal reached 🎉'}
+        {remaining > 0 ? `${formatMoney(remaining)} to go` : 'Goal reached'}
       </p>
 
       {open ? (
@@ -58,7 +58,7 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
                 type="button"
                 onClick={() => setAmountText(String(amount))}
                 className={`h-12 rounded-xl text-sm font-semibold tabular-nums ring-1 ring-white/10 transition active:scale-95 ${
-                  delta === amount ? 'bg-emerald-400 text-ink' : 'bg-white/5 text-slate-100'
+                  delta === amount ? 'bg-accent text-ink' : 'bg-white/5 text-slate-100'
                 }`}
               >
                 {amount}
@@ -95,7 +95,7 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
               type="button"
               onClick={commit}
               disabled={delta === 0 || pending}
-              className="flex-1 rounded-xl bg-emerald-400 py-2.5 text-sm font-bold text-ink disabled:opacity-40"
+              className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-bold text-ink disabled:opacity-40"
             >
               {delta < 0 ? `Take out ${Math.abs(delta)}` : `Add ${delta || ''}`}
             </button>
@@ -105,7 +105,7 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 w-full rounded-xl bg-emerald-400/15 py-2.5 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-400/30 active:bg-emerald-400/25"
+          className="mt-3 w-full rounded-xl bg-accent/15 py-2.5 text-sm font-semibold text-accent-soft ring-1 ring-accent/30 active:bg-accent/25"
         >
           Add money
         </button>

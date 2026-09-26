@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/BottomNav'
+import { SideNav } from './components/SideNav'
 import { Login } from './components/Login'
 import { PersonOnboarding } from './components/PersonOnboarding'
 import { SetupNotice } from './components/SetupNotice'
@@ -9,6 +10,7 @@ import { useSession } from './hooks/useSession'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { Home } from './pages/Home'
 import { Budget } from './pages/Budget'
+import { CategoryPage } from './pages/CategoryPage'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
 import { Insights } from './pages/Insights'
@@ -26,10 +28,13 @@ export default function App() {
 
   return (
     <>
+      <SideNav />
+      <main className="lg:pl-60">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/history" element={<History />} />
         <Route path="/budget" element={<Budget />} />
+        <Route path="/category/:id" element={<CategoryPage />} />
         {/* old tabs, kept so a bookmarked or installed link still lands somewhere */}
         <Route path="/calendar" element={<Navigate to="/history" replace />} />
         <Route path="/summary" element={<Navigate to="/budget" replace />} />
@@ -37,6 +42,7 @@ export default function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </main>
       <BottomNav />
     </>
   )

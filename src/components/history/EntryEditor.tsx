@@ -70,7 +70,7 @@ export function EntryEditor({
             onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ''))}
             inputMode="decimal"
             className={`w-full min-w-0 bg-transparent text-right text-4xl font-bold tabular-nums outline-none ${
-              isExpense ? 'text-white' : 'text-emerald-300'
+              isExpense ? 'text-white' : 'text-positive'
             }`}
           />
           <span className="shrink-0 text-xl font-semibold text-muted">{CURRENCY_SUFFIX}</span>
@@ -154,7 +154,7 @@ export function EntryEditor({
           <button
             type="submit"
             disabled={!valid || !changed}
-            className="flex-1 rounded-xl bg-white py-3 text-sm font-bold text-ink disabled:opacity-40"
+            className="flex-1 rounded-xl bg-slate-50 py-3 text-sm font-bold text-ink disabled:opacity-40"
           >
             {changed ? 'Save changes' : 'No changes'}
           </button>
@@ -167,7 +167,7 @@ export function EntryEditor({
 function Field({ label, grow, children }: { label: string; grow?: boolean; children: ReactNode }) {
   return (
     <div className={grow ? 'min-w-0 flex-1' : ''}>
-      <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
+      <p className="mb-1.5 text-sm text-muted">{label}</p>
       {children}
     </div>
   )

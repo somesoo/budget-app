@@ -20,16 +20,16 @@ export function UndoToast({ message, onUndo, onDismiss, timeoutMs = 6000 }: Prop
   }, [message, onDismiss, timeoutMs])
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] z-30 flex justify-center px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] z-30 flex justify-center px-4 lg:bottom-8 lg:left-60">
       <div
         role="status"
-        className="motion-safe:animate-sheet-up pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl bg-white py-2 pl-4 pr-2 text-ink shadow-lg"
+        className="motion-safe:animate-sheet-up pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl bg-slate-50 py-2 pl-4 pr-2 text-ink shadow-lg"
       >
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{message}</span>
         <button
           type="button"
           onClick={onUndo}
-          className="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-blue-600 active:bg-blue-600/10"
+          className="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-accent-strong active:bg-accent/10"
         >
           Undo
         </button>

@@ -1,3 +1,4 @@
+import { X } from '@phosphor-icons/react'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 
 interface Props {
@@ -29,7 +30,7 @@ export function BottomSheet({ title, onClose, children }: Props) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center">
+    <div className="fixed inset-0 z-40 flex items-end justify-center lg:items-center lg:p-8">
       <div aria-hidden className="motion-safe:animate-fade-in absolute inset-0 bg-black/60" onClick={onClose} />
       <div
         ref={panel}
@@ -37,9 +38,9 @@ export function BottomSheet({ title, onClose, children }: Props) {
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="motion-safe:animate-sheet-up relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-card px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-2 outline-none ring-1 ring-white/10"
+        className="motion-safe:animate-sheet-up lg:motion-safe:animate-fade-in relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-card px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-2 lg:max-h-[85dvh] lg:rounded-3xl lg:px-6 lg:pb-6 lg:pt-5 outline-none ring-1 ring-white/10"
       >
-        <div aria-hidden className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
+        <div aria-hidden className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20 lg:hidden" />
         <div className="mb-4 flex items-center justify-between">
           <h2 id={titleId} className="text-lg font-bold text-white">
             {title}
@@ -50,7 +51,7 @@ export function BottomSheet({ title, onClose, children }: Props) {
             aria-label="Close"
             className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl text-muted active:bg-white/10"
           >
-            ×
+            <X />
           </button>
         </div>
         {children}

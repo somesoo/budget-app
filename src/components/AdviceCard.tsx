@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ChartCard } from './charts/ChartCard'
 import { CURRENCY_SUFFIX } from '../config'
 import { AdviceUnavailableError, useGenerateAdvice, useLatestAdvice } from '../hooks/useAdvice'
-import { formatAmount } from '../lib/calculations'
+import { formatAmount, plainDashes } from '../lib/calculations'
 import type { AdviceRequest } from '../lib/forecast'
 
 interface Props {
@@ -44,7 +44,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
       type="button"
       onClick={() => generate.mutate(buildRequest())}
       disabled={generate.isPending}
-      className="w-full rounded-2xl bg-white py-3 text-sm font-bold text-ink transition active:scale-[0.99] disabled:opacity-50"
+      className="w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink transition active:scale-[0.99] disabled:opacity-50"
     >
       {generate.isPending ? 'Thinking…' : advice ? 'Refresh recommendations' : 'Get recommendations'}
     </button>
@@ -57,20 +57,20 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
       ) : advice ? (
         <div className="space-y-3">
           {advice.content.summary && (
-            <p className="text-[15px] leading-snug text-white">{advice.content.summary}</p>
+            <p className="text-[15px] leading-snug text-white">{plainDashes(advice.content.summary)}</p>
           )}
           <ol className="space-y-2">
             {advice.content.recommendations.map((r, i) => (
               <li key={i} className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/5">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">{r.title}</p>
+                  <p className="text-sm font-semibold text-white">{plainDashes(r.title)}</p>
                   {r.monthlyImpact !== null && r.monthlyImpact > 0 && (
-                    <span className="shrink-0 rounded-full bg-emerald-400/15 px-2 py-0.5 text-xs font-semibold text-emerald-300">
+                    <span className="shrink-0 rounded-full bg-positive/15 px-2 py-0.5 text-xs font-semibold text-positive">
                       ~{formatAmount(r.monthlyImpact)} {CURRENCY_SUFFIX}/mo
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-sm leading-snug text-slate-300">{r.detail}</p>
+                <p className="mt-1 text-sm leading-snug text-slate-300">{plainDashes(r.detail)}</p>
               </li>
             ))}
           </ol>

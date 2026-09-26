@@ -1,3 +1,4 @@
+import { ArrowLeft } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import { DatePicker } from './DatePicker'
 import { UserSwitcher } from './UserSwitcher'
@@ -39,7 +40,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
           aria-label="Back"
           className="-ml-2 rounded-full px-3 py-2 text-2xl leading-none text-muted active:bg-white/10"
         >
-          ←
+          <ArrowLeft />
         </button>
         <span
           className="rounded-full px-3 py-1.5 text-sm font-semibold text-ink"

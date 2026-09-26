@@ -113,7 +113,7 @@ export function useSuggestPlan() {
       })
       if (res.status === 404) {
         throw new PlanUnavailableError(
-          'The AI server isn’t running here — it works on Vercel, or locally with `vercel dev`.',
+          'The AI server isn’t running here. It works on Vercel, or locally with `vercel dev`.',
         )
       }
       const body = await res.json().catch(() => ({}))

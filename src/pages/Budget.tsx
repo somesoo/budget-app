@@ -1,4 +1,6 @@
+import { CalendarPlus, CaretRight, NotePencil } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { BudgetPlanner } from '../components/budget/BudgetPlanner'
 import { GoalProgress } from '../components/GoalProgress'
 import { MonthSwitcher } from '../components/MonthSwitcher'
@@ -8,7 +10,7 @@ import { useBudget, useMonthCategories } from '../hooks/useBudgets'
 import { useExpenses } from '../hooks/useExpenses'
 import { useAddToGoal, useGoal } from '../hooks/useGoal'
 import { useIncomesBetween } from '../hooks/useIncomes'
-import { CURRENCY_SUFFIX } from '../config'
+import { CURRENCY_SUFFIX, PLAN_AHEAD_MONTHS } from '../config'
 import {
   currentMonthKey,
   daysInMonth,
@@ -25,9 +27,6 @@ import {
 } from '../lib/calculations'
 import { elapsedDays } from '../lib/insights'
 import type { BudgetPlan, Category } from '../types'
-
-/** How far ahead a month can be planned. */
-const PLAN_AHEAD_MONTHS = 3
 
 /**
  * The month against its plan — or, for a month still to come, the plan
@@ -49,9 +48,21 @@ export function Budget() {
 
   const isFuture = month > current
 
+  const goalSection = goal && (
+    <section>
+      <SectionTitle>Goal: {goal.name}</SectionTitle>
+      <GoalProgress
+        goal={goal}
+        pending={addToGoal.isPending}
+        onAdd={(delta) => addToGoal.mutate({ goalId: goal.id, delta })}
+      />
+    </section>
+  )
+
   return (
     <Screen
       title="Budget"
+      wide
       action={
         <MonthSwitcher
           month={month}
@@ -67,6 +78,7 @@ export function Budget() {
           categories={categories}
           loading={planLoading}
           onPlan={() => setPlanning(month)}
+          aside={goalSection}
         />
       ) : (
         <MonthStatus
@@ -74,16 +86,15 @@ export function Budget() {
           plan={plan}
           categories={categories}
           onPlan={() => setPlanning(month)}
+          aside={goalSection}
         >
           {month === current && (
             <button
               type="button"
               onClick={() => setPlanning(next)}
-              className="mb-6 flex w-full items-center gap-3 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-emerald-400/10 p-4 text-left ring-1 ring-white/10 active:scale-[0.99]"
+              className="mb-6 flex w-full items-center gap-3 rounded-3xl bg-accent/10 p-4 text-left ring-1 ring-accent/25 transition hover:ring-accent/45 active:scale-[0.99]"
             >
-              <span aria-hidden className="text-2xl">
-                🗓
-              </span>
+              <CalendarPlus aria-hidden className="shrink-0 text-2xl text-accent-soft" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-white">
                   {nextPlan
@@ -93,26 +104,13 @@ export function Budget() {
                 <span className="block text-sm text-slate-300">
                   {nextPlan
                     ? `${formatMoneyCompact(sumLimits(nextPlan))} of spending · ${formatMoneyCompact(nextPlan.savings)} to savings`
-                    : 'Set limits for next month — from your history, with an AI draft if you like.'}
+                    : 'Set next month’s limits from your history, with an AI draft if you like.'}
                 </span>
               </span>
-              <span aria-hidden className="text-xl text-muted">
-                ›
-              </span>
+              <CaretRight aria-hidden className="shrink-0 text-xl text-muted" />
             </button>
           )}
         </MonthStatus>
-      )}
-
-      {goal && (
-        <section>
-          <SectionTitle>Goal: {goal.name}</SectionTitle>
-          <GoalProgress
-            goal={goal}
-            pending={addToGoal.isPending}
-            onAdd={(delta) => addToGoal.mutate({ goalId: goal.id, delta })}
-          />
-        </section>
       )}
     </Screen>
   )
@@ -128,12 +126,15 @@ function MonthStatus({
   plan,
   categories,
   onPlan,
+  aside,
   children,
 }: {
   month: MonthKey
   plan: BudgetPlan | null
   categories: Category[]
   onPlan: () => void
+  /** Under everything on a phone, under the month's numbers on a laptop. */
+  aside?: ReactNode
   /** Goes between the month's numbers and its categories. */
   children?: ReactNode
 }) {
@@ -154,7 +155,9 @@ function MonthStatus({
   const ratio = limit > 0 ? Math.min(spent / limit, 1) : 0
 
   return (
-    <>
+    <TwoColumns
+      side={
+        <>
       <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-sm text-muted">Spent</p>
@@ -169,7 +172,7 @@ function MonthStatus({
             </p>
             <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
               <div
-                className={`h-full rounded-full transition-[width] duration-500 ${left < 0 ? 'bg-red-500' : 'bg-white'}`}
+                className={`h-full rounded-full transition-[width] duration-500 ${left < 0 ? 'bg-red-500' : 'bg-slate-50'}`}
                 style={{ width: `${ratio * 100}%` }}
               />
             </div>
@@ -202,18 +205,44 @@ function MonthStatus({
 
         {plan?.note && (
           <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
-            📝 {plan.note}
+            <NotePencil aria-hidden className="mr-1.5 inline-block align-[-0.15em] text-muted" />
+            {plan.note}
           </p>
         )}
       </section>
 
       {children}
+        </>
+      }
+      main={
+        <section className="mb-6">
+          <SectionTitle>Categories</SectionTitle>
+          <SummaryBars
+            categories={shown}
+            spentByCategory={byCategory}
+            linkTo={(c) => `/category/${c.id}?month=${month}`}
+          />
+        </section>
+      }
+      aside={aside}
+    />
+  )
+}
 
-      <section className="mb-6">
-        <SectionTitle>Categories</SectionTitle>
-        <SummaryBars categories={shown} spentByCategory={byCategory} />
-      </section>
-    </>
+/**
+ * Phone: one column. Laptop: the month's numbers (and whatever goes with them)
+ * on the left, the categories on the right.
+ */
+function TwoColumns({ side, main, aside }: { side: ReactNode; main: ReactNode; aside?: ReactNode }) {
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-8">
+      <div className="lg:sticky lg:top-8">
+        {side}
+        <div className="hidden lg:block">{aside}</div>
+      </div>
+      <div>{main}</div>
+      <div className="lg:hidden">{aside}</div>
+    </div>
   )
 }
 
@@ -225,17 +254,20 @@ function FuturePlan({
   categories,
   loading,
   onPlan,
+  aside,
 }: {
   month: MonthKey
   plan: BudgetPlan | null
   categories: Category[]
   loading: boolean
   onPlan: () => void
+  aside?: ReactNode
 }) {
   if (loading) return <div className="mb-6 h-40 animate-pulse rounded-3xl bg-white/5" />
 
   if (!plan) {
     return (
+      <div className="lg:max-w-xl">
       <section className="mb-6 rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10">
         <p className="text-lg font-semibold text-white">
           {formatMonthName(month)} isn’t planned yet
@@ -247,11 +279,13 @@ function FuturePlan({
         <button
           type="button"
           onClick={onPlan}
-          className="mt-4 w-full rounded-2xl bg-white py-3 text-sm font-bold text-ink active:scale-[0.99]"
+          className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
         >
           Plan {formatMonthName(month)}
         </button>
       </section>
+      {aside}
+      </div>
     )
   }
 
@@ -260,7 +294,9 @@ function FuturePlan({
   const active = categories.filter((c) => !c.archived)
 
   return (
-    <>
+    <TwoColumns
+      aside={aside}
+      side={
       <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
         <div className="grid grid-cols-3 gap-2">
           <Figure label="Income" value={formatMoneyCompact(plan.income)} tone="positive" />
@@ -276,37 +312,46 @@ function FuturePlan({
         )}
         {plan.note && (
           <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300">
-            📝 {plan.note}
+            <NotePencil aria-hidden className="mr-1.5 inline-block align-[-0.15em] text-muted" />
+            {plan.note}
           </p>
         )}
         <button
           type="button"
           onClick={onPlan}
-          className="mt-4 w-full rounded-2xl bg-white py-3 text-sm font-bold text-ink active:scale-[0.99]"
+          className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
         >
           Edit plan
         </button>
       </section>
-
+      }
+      main={
       <section className="mb-6">
         <SectionTitle>Limits</SectionTitle>
         <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
           {active.map((c) => (
-            <li key={c.id} className="flex items-center gap-3 px-3 py-2.5">
-              <span
-                aria-hidden
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: c.color }}
-              />
-              <span className="flex-1 text-[15px] text-white">{c.name}</span>
-              <span className="text-[15px] font-semibold tabular-nums text-white">
-                {formatMoneyCompact(c.monthly_limit)}
-              </span>
+            <li key={c.id}>
+              <Link
+                to={`/category/${c.id}?month=${month}`}
+                className="flex items-center gap-3 px-3 py-2.5 transition hover:bg-white/5 active:bg-white/10"
+              >
+                <span
+                  aria-hidden
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: c.color }}
+                />
+                <span className="flex-1 text-[15px] text-white">{c.name}</span>
+                <span className="text-[15px] font-semibold tabular-nums text-white">
+                  {formatMoneyCompact(c.monthly_limit)}
+                </span>
+                <CaretRight aria-hidden className="shrink-0 text-muted" />
+              </Link>
             </li>
           ))}
         </ul>
       </section>
-    </>
+      }
+    />
   )
 }
 
@@ -318,7 +363,7 @@ function PlanBadge({ plan, onPlan }: { plan: BudgetPlan | null; onPlan: () => vo
       type="button"
       onClick={onPlan}
       className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 active:opacity-70 ${
-        plan ? 'text-emerald-300 ring-emerald-400/30' : 'text-amber-200 ring-amber-300/30'
+        plan ? 'text-accent-soft ring-accent/35' : 'text-amber-200 ring-amber-300/30'
       }`}
     >
       {plan ? 'Planned · edit' : 'No plan · set one'}
@@ -338,10 +383,10 @@ function Figure({
   tone?: 'positive' | 'negative'
 }) {
   const color =
-    tone === 'positive' ? 'text-emerald-300' : tone === 'negative' ? 'text-red-300' : 'text-white'
+    tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-red-300' : 'text-white'
   return (
     <div className="min-w-0">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
       <p className={`truncate text-lg font-bold tabular-nums ${color}`}>{value}</p>
       {sub && <p className="truncate text-xs text-muted">{sub}</p>}
     </div>
@@ -350,6 +395,6 @@ function Figure({
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">{children}</h2>
+    <h2 className="mb-3 text-base font-semibold text-white">{children}</h2>
   )
 }

@@ -24,7 +24,7 @@ export const CHART = {
   less: '#3987e5',
   /** Status — always paired with an icon and words, never color alone. */
   warning: '#fab219',
-  good: '#0ca30c',
+  good: '#34d399',
 } as const
 
 export const AXIS_FONT = 11

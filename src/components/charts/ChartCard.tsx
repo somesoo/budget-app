@@ -27,8 +27,8 @@ export function ChartCard({ title, headline, legend, table, children }: Props) {
       className="rounded-3xl p-4 ring-1 ring-white/10"
       style={{ backgroundColor: CHART.surface }}
     >
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{title}</h2>
-      {headline && <p className="mt-1 text-[15px] leading-snug text-white">{headline}</p>}
+      <h2 className="text-base font-semibold text-white">{title}</h2>
+      {headline && <p className="mt-1 text-[15px] leading-snug text-slate-200">{headline}</p>}
       {legend && <div className="mt-3">{legend}</div>}
 
       <div className="mt-3">{children}</div>

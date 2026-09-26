@@ -1,3 +1,4 @@
+import { CalendarDots, MagnifyingGlass, X } from '@phosphor-icons/react'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { CalendarHeatmap } from '../components/CalendarHeatmap'
 import { EntryEditor } from '../components/history/EntryEditor'
@@ -155,7 +156,7 @@ export function History() {
             aria-hidden
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           >
-            ⌕
+            <MagnifyingGlass />
           </span>
           <input
             type="search"
@@ -173,7 +174,7 @@ export function History() {
               aria-label="Clear search"
               className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-lg text-muted active:bg-white/10"
             >
-              ×
+              <X />
             </button>
           )}
         </div>
@@ -189,17 +190,17 @@ export function History() {
             title="Calendar view"
             className={`flex w-11 shrink-0 items-center justify-center rounded-xl text-lg ring-1 transition ${
               showCalendar
-                ? 'bg-white text-ink ring-white'
+                ? 'bg-slate-50 text-ink ring-white'
                 : 'bg-white/5 text-muted ring-white/10 active:bg-white/10'
             }`}
           >
-            ▦
+            <CalendarDots />
           </button>
         )}
       </div>
 
       {/* ---------- filters ---------- */}
-      <div className="no-scrollbar -mx-4 mb-2 flex gap-2 overflow-x-auto px-4">
+      <div className="no-scrollbar -mx-4 mb-2 flex gap-2 overflow-x-auto px-4 lg:-mx-8 lg:px-8">
         <div className="inline-flex shrink-0 rounded-full bg-white/5 p-0.5 ring-1 ring-white/10">
           {(
             [
@@ -217,7 +218,7 @@ export function History() {
               }}
               aria-pressed={effectiveKind === value}
               className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                effectiveKind === value ? 'bg-white text-ink' : 'text-muted active:bg-white/10'
+                effectiveKind === value ? 'bg-slate-50 text-ink' : 'text-muted active:bg-white/10'
               }`}
             >
               {label}
@@ -232,7 +233,7 @@ export function History() {
       </div>
 
       {effectiveKind !== 'income' && categories.length > 0 && (
-        <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
+        <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
           {categories
             .filter((c) => !c.archived || c.id === categoryId)
             .map((c) => (
@@ -329,7 +330,7 @@ export function History() {
             const heading = dayHeading(group.date)
             return (
               <section key={group.date} aria-label={heading.subtitle ?? heading.title}>
-                <header className="sticky top-[env(safe-area-inset-top)] z-10 -mx-4 flex items-baseline justify-between bg-ink/95 px-5 pb-1.5 pt-2 backdrop-blur">
+                <header className="sticky top-[env(safe-area-inset-top)] z-10 -mx-4 flex items-baseline justify-between bg-ink/95 px-5 pb-1.5 pt-2 backdrop-blur lg:-mx-8 lg:px-9">
                   <h2 className="text-sm font-semibold text-white">
                     {heading.title}
                     {heading.subtitle && (
@@ -340,7 +341,7 @@ export function History() {
                     {group.spent > 0 && formatMoney(group.spent)}
                     {group.spent > 0 && group.earned > 0 && ' · '}
                     {group.earned > 0 && (
-                      <span className="text-emerald-300">+{formatMoney(group.earned)}</span>
+                      <span className="text-positive">+{formatMoney(group.earned)}</span>
                     )}
                   </span>
                 </header>
@@ -431,10 +432,10 @@ function Stat({
   tone?: 'positive' | 'negative'
 }) {
   const color =
-    tone === 'positive' ? 'text-emerald-300' : tone === 'negative' ? 'text-red-300' : 'text-white'
+    tone === 'positive' ? 'text-positive' : tone === 'negative' ? 'text-red-300' : 'text-white'
   return (
     <div className="min-w-0 rounded-2xl bg-white/5 px-3 py-2.5">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
       <p className={`truncate text-sm font-bold tabular-nums ${color}`}>{value}</p>
     </div>
   )

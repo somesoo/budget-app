@@ -1,3 +1,4 @@
+import { CaretDown, CaretUp, Check, Warning } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { AdviceCard } from '../components/AdviceCard'
 import { ForecastCard } from '../components/ForecastCard'
@@ -61,7 +62,7 @@ export function Insights() {
   const { data: goal } = useGoal()
 
   return (
-    <Screen title="Insights" action={<MonthSwitcher month={month} onChange={setMonth} />}>
+    <Screen title="Insights" wide action={<MonthSwitcher month={month} onChange={setMonth} />}>
       {error ? (
         <Notice>Could not load expenses: {(error as Error).message}</Notice>
       ) : isLoading || !expenses ? (
@@ -72,7 +73,7 @@ export function Insights() {
         </div>
       ) : (
         // refetching another month keeps the previous render, dimmed — no flash
-        <div className={`space-y-4 transition-opacity ${isPlaceholderData ? 'opacity-50' : ''}`}>
+        <div className={`transition-opacity ${isPlaceholderData ? 'opacity-50' : ''}`}>
           <InsightsBody
             month={month}
             months={months}
@@ -109,7 +110,7 @@ function InsightsBody({
 }: BodyProps) {
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
-    return <Notice>Nothing to chart yet — add a few expenses and come back.</Notice>
+    return <Notice>Nothing to chart yet. Add a few expenses and come back.</Notice>
   }
 
   const isCurrent = month === currentMonthKey()
@@ -133,8 +134,10 @@ function InsightsBody({
   const points = pacePoints(expenses, month, totalLimit)
   const forecast = monthForecast({ month, isCurrent, expenses, incomes, goal })
 
+  // phone: one column, top to bottom. Laptop: this month on the left, comparisons on the right.
   return (
-    <>
+    <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
+      <div className="space-y-4">
       <KpiRow
         spent={spent}
         projected={projected}
@@ -186,6 +189,9 @@ function InsightsBody({
         projected={isCurrent ? projected : null}
       />
 
+      </div>
+
+      <div className="space-y-4">
       <CategoryCard
         month={month}
         expenses={expenses}
@@ -202,7 +208,8 @@ function InsightsBody({
       />
 
       <WeekdayCard expenses={expenses} months={months} />
-    </>
+      </div>
+    </div>
   )
 }
 
@@ -234,7 +241,7 @@ function KpiRow({
         <p className="text-xs text-muted">{isCurrent ? 'Projected month end' : 'Spent'}</p>
         <p className="mt-0.5 text-xl font-bold text-white">
           {headlineValue === null
-            ? '—'
+            ? 'No data'
             : isCurrent
               ? formatMoneyWhole(headlineValue)
               : formatMoney(headlineValue)}
@@ -245,8 +252,16 @@ function KpiRow({
             style={{ color: over ? CHART.warning : CHART.textMuted }}
           >
             {over
-              ? `⚠ ${formatAmount(Math.round(headlineValue - totalLimit))} over limits`
-              : `✓ within ${formatAmount(totalLimit)} limits`}
+              ? (
+                <>
+                  <Warning weight="fill" aria-hidden className="inline-block align-[-0.125em]" />{' '}
+                  {formatAmount(Math.round(headlineValue - totalLimit))} over limits
+                </>
+              ) : (
+                <>
+                  <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" /> within {formatAmount(totalLimit)} limits
+                </>
+              )}
           </p>
         )}
       </div>
@@ -265,7 +280,12 @@ function KpiRow({
               // spending up is bad → warm; down is good → green. Arrow + sign carry it too.
               style={{ color: change > 0 ? CHART.more : change < 0 ? CHART.good : CHART.textPrimary }}
             >
-              {change > 0 ? '▲' : change < 0 ? '▼' : ''} {change > 0 ? '+' : change < 0 ? '−' : ''}
+              {change > 0 ? (
+                <CaretUp weight="fill" aria-hidden className="inline-block align-[-0.125em]" />
+              ) : change < 0 ? (
+                <CaretDown weight="fill" aria-hidden className="inline-block align-[-0.125em]" />
+              ) : null}{' '}
+              {change > 0 ? '+' : change < 0 ? '−' : ''}
               {Math.abs(Math.round(change * 100))}%
             </p>
             <p className="mt-0.5 text-xs text-muted">
@@ -329,7 +349,7 @@ function MonthlyCard({
     return (
       <ChartCard title="Month by month">
         <p className="text-sm text-muted">
-          Shows up once you have two months of expenses — a single month is just the number above.
+          Shows up once you have two months of expenses. A single month is just the number above.
         </p>
       </ChartCard>
     )
@@ -411,14 +431,14 @@ function CategoryCard({
   const prevName = formatMonthName(shiftMonth(month, -1))
   const prevShort = formatMonthShort(shiftMonth(month, -1))
   const curShort = formatMonthShort(month)
-  const span = dayCutoff !== undefined ? ` 1–${dayCutoff}` : ''
+  const span = dayCutoff !== undefined ? ` 1-${dayCutoff}` : ''
   const deltas = categoryDeltas(expenses, categories, month, dayCutoff)
 
   if (!hasPrevMonth) {
     return (
       <ChartCard title="Change by category">
         <p className="text-sm text-muted">
-          Compares each category with the month before — nothing logged in {prevName} yet.
+          Compares each category with the month before. Nothing logged in {prevName} yet.
         </p>
       </ChartCard>
     )
@@ -439,7 +459,7 @@ function CategoryCard({
           </>
         ) : biggestDown ? (
           <>
-            Every category is down — most of all <strong>{biggestDown.category.name}</strong>.
+            Every category is down, most of all <strong>{biggestDown.category.name}</strong>.
           </>
         ) : undefined
       }
@@ -557,7 +577,7 @@ function WeekdayCard({ expenses, months }: { expenses: Expense[]; months: MonthK
       headline={
         top.average > 0 ? (
           <>
-            Your priciest day is <strong>{WEEKDAY_NAMES[top.weekday]}</strong> — about{' '}
+            Your priciest day is <strong>{WEEKDAY_NAMES[top.weekday]}</strong>, about{' '}
             {formatMoneyWhole(top.average)} on average.
           </>
         ) : undefined

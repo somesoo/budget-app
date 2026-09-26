@@ -1,5 +1,7 @@
+import { ArrowLeft, CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MoneyInput } from './MoneyInput'
+import { CategoryDetail } from '../category/CategoryDetail'
 import { CURRENCY_SUFFIX, LOCALE } from '../../config'
 import {
   useBudget,
@@ -18,6 +20,7 @@ import {
   formatMonth,
   formatMonthName,
   monthRange,
+  plainDashes,
   shiftMonth,
   type MonthKey,
 } from '../../lib/calculations'
@@ -83,6 +86,8 @@ export function BudgetPlanner({ month, onClose }: Props) {
 
   const [draft, setDraft] = useState<PlanDraft | null>(null)
   const [ai, setAi] = useState<PlanSuggestion | null>(null)
+  /** The category opened up in the three-pane view, or null for the list. */
+  const [focused, setFocused] = useState<string | null>(null)
 
   // first draft: the month's own plan, else last month's, else typical spending
   useEffect(() => {
@@ -170,27 +175,49 @@ export function BudgetPlanner({ month, onClose }: Props) {
   return (
     <Shell
       month={month}
-      onClose={onClose}
+      onClose={focused ? () => setFocused(null) : onClose}
       status={existing.data ? 'Editing the saved plan' : 'Not saved yet'}
+      fit={focused !== null}
       footer={
         <>
           {save.error && (
-            <p className="mb-2 text-sm text-red-300">
+            <p className="mb-2 text-sm text-red-300 lg:mb-0 lg:mr-auto">
               Not saved: {(save.error as Error).message}. Has migration 0005 been run?
             </p>
           )}
+          <p className="hidden text-sm text-muted lg:mr-auto lg:block">
+            {balanceNote(draft.income, unassigned)}
+          </p>
           <button
             type="button"
             onClick={onSave}
             disabled={save.isPending}
-            className="h-14 w-full rounded-2xl bg-white text-lg font-bold text-ink transition active:scale-[0.99] disabled:opacity-50"
+            className="h-14 w-full rounded-2xl bg-slate-100 text-lg font-bold text-ink transition short:lg:h-10 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-50 lg:h-12 lg:w-auto lg:px-10 lg:text-base"
           >
             {save.isPending ? 'Saving…' : `Save ${formatMonthName(month)} plan`}
           </button>
         </>
       }
     >
-      <div className="space-y-5 px-4 pb-6">
+      {focused ? (
+        <FocusedCategory
+          month={month}
+          categoryId={focused}
+          categories={categories}
+          draftLimits={draft.limits}
+          onSelect={setFocused}
+          onBack={() => setFocused(null)}
+          editor={(id, name) => (
+            <MoneyInput
+              label={`${name} limit`}
+              value={draft.limits[id] ?? 0}
+              onChange={(v) => setLimit(id, v)}
+            />
+          )}
+        />
+      ) : (
+      <div className="space-y-5 px-4 pb-6 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-8 lg:space-y-0 lg:px-0">
+        <div className="space-y-5 lg:sticky lg:top-0">
         {/* ---------- the whole month on one card ---------- */}
         <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
           <Row
@@ -246,7 +273,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
         <section>
           <label
             htmlFor="plan-note"
-            className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted"
+            className="mb-1.5 block text-base font-semibold text-white"
           >
             What’s different about {formatMonthName(month)}?
           </label>
@@ -265,14 +292,17 @@ export function BudgetPlanner({ month, onClose }: Props) {
         </section>
 
         {/* ---------- AI draft ---------- */}
-        <section className="rounded-3xl bg-gradient-to-br from-indigo-500/15 to-emerald-400/10 p-4 ring-1 ring-white/10">
+        <section className="rounded-3xl bg-accent/10 p-4 ring-1 ring-accent/25">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-white">✦ AI draft</h2>
+            <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
+              <Sparkle weight="fill" aria-hidden />
+              AI draft
+            </h2>
             {ai && (
               <button
                 type="button"
                 onClick={applyAi}
-                className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
+                className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
               >
                 Use all
               </button>
@@ -280,11 +310,11 @@ export function BudgetPlanner({ month, onClose }: Props) {
           </div>
           {ai ? (
             <div className="mt-2 space-y-2">
-              <p className="text-[15px] leading-snug text-white">{ai.summary}</p>
+              <p className="text-[15px] leading-snug text-white">{plainDashes(ai.summary)}</p>
               {ai.savings !== null && (
                 <p className="text-sm text-slate-300">
                   Suggested savings:{' '}
-                  <span className="font-semibold text-emerald-300">
+                  <span className="font-semibold text-white">
                     {formatAmount(ai.savings)} {CURRENCY_SUFFIX}
                   </span>
                 </p>
@@ -292,13 +322,13 @@ export function BudgetPlanner({ month, onClose }: Props) {
               {ai.tips.length > 0 && (
                 <ul className="list-disc space-y-1 pl-5 text-sm leading-snug text-slate-300">
                   {ai.tips.map((t, i) => (
-                    <li key={i}>{t}</li>
+                    <li key={i}>{plainDashes(t)}</li>
                   ))}
                 </ul>
               )}
               <p className="text-xs text-muted">
-                Per-category suggestions are shown under each category below. Written by {ai.model}{' '}
-                — a suggestion, not financial advice.
+                Per-category suggestions are shown under each category. Written by {ai.model}. A
+                suggestion, not financial advice.
               </p>
             </div>
           ) : (
@@ -331,10 +361,13 @@ export function BudgetPlanner({ month, onClose }: Props) {
           </p>
         </section>
 
+        </div>
+
         {/* ---------- per category ---------- */}
+        <div className="space-y-5">
         <section>
           <div className="mb-2 flex items-center justify-between gap-2">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">Limits</h2>
+            <h2 className="text-base font-semibold text-white">Limits</h2>
             <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
               {previous.data && (
                 <FillChip onClick={() => fill('previous')}>
@@ -359,9 +392,20 @@ export function BudgetPlanner({ month, onClose }: Props) {
                       className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ backgroundColor: category.color }}
                     />
-                    <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-white">
-                      {category.name}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFocused(category.id)}
+                      title="History, forecast and share"
+                      className="group flex min-w-0 flex-1 items-center gap-1 text-left"
+                    >
+                      <span className="truncate text-[15px] font-medium text-white decoration-white/30 underline-offset-4 group-hover:underline">
+                        {category.name}
+                      </span>
+                      <CaretRight
+                        aria-hidden
+                        className="shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-white"
+                      />
+                    </button>
                     <div className="w-32 shrink-0">
                       <MoneyInput
                         label={`${category.name} limit`}
@@ -402,15 +446,15 @@ export function BudgetPlanner({ month, onClose }: Props) {
                       onClick={() => setLimit(category.id, suggestion.amount)}
                       className={`mt-2 ml-5 block rounded-xl px-2.5 py-1.5 text-left text-xs leading-snug ring-1 transition ${
                         value === suggestion.amount
-                          ? 'bg-emerald-400/10 text-emerald-200 ring-emerald-400/30'
-                          : 'bg-indigo-400/10 text-indigo-100 ring-indigo-300/25 active:bg-indigo-400/20'
+                          ? 'bg-accent/15 text-accent-soft ring-accent/40'
+                          : 'bg-white/5 text-slate-100 ring-white/10 hover:bg-white/10 active:bg-white/10'
                       }`}
                     >
                       <span className="font-semibold">
-                        ✦ {formatAmount(suggestion.amount)} {CURRENCY_SUFFIX}
+                        <Sparkle weight="fill" aria-hidden className="inline-block align-[-0.125em]" /> {formatAmount(suggestion.amount)} {CURRENCY_SUFFIX}
                         {value === suggestion.amount ? ' · used' : ' · tap to use'}
                       </span>
-                      <span className="block text-slate-300">{suggestion.reason}</span>
+                      <span className="block text-slate-300">{plainDashes(suggestion.reason)}</span>
                     </button>
                   )}
                 </li>
@@ -434,7 +478,9 @@ export function BudgetPlanner({ month, onClose }: Props) {
             Remove {formatMonthName(month)}’s plan (back to default limits)
           </button>
         )}
+        </div>
       </div>
+      )}
     </Shell>
   )
 }
@@ -443,36 +489,55 @@ function Shell({
   month,
   onClose,
   status,
+  fit = false,
   footer,
   children,
 }: {
   month: MonthKey
   onClose: () => void
   status?: string
+  /** On a laptop, fit the content to the screen instead of scrolling it (the three-pane view). */
+  fit?: boolean
   footer?: ReactNode
   children: ReactNode
 }) {
   return (
-    // full-screen overlay — covers the bottom navigation too
-    <div className="fixed inset-0 z-30 mx-auto flex max-w-md flex-col overflow-y-auto bg-ink">
-      <header className="flex items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+    // full-screen overlay: covers the bottom navigation (and the side one on a laptop) too
+    <div className="fixed inset-0 z-30 mx-auto flex max-w-md flex-col overflow-y-auto bg-ink lg:max-w-none">
+      <header
+        className={`mx-auto flex w-full items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] lg:max-w-7xl lg:px-8 lg:pb-5 lg:pt-6 ${
+          // a short laptop screen needs every row for the three panes; the
+          // category bar below says which plan this is instead
+          fit ? 'short:lg:hidden' : ''
+        }`}
+      >
         <button
           type="button"
           onClick={onClose}
           aria-label="Back"
           className="-ml-2 shrink-0 rounded-full px-2 py-2 text-2xl leading-none text-muted active:bg-white/10"
         >
-          ←
+          <ArrowLeft />
         </button>
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold text-white">Plan {formatMonth(month)}</h1>
+          <h1 className="truncate text-xl font-bold text-white lg:text-2xl lg:tracking-tight">
+            Plan {formatMonth(month)}
+          </h1>
           {status && <p className="text-xs text-muted">{status}</p>}
         </div>
       </header>
-      <div className="flex-1">{children}</div>
+      <div className={`mx-auto w-full flex-1 lg:max-w-7xl lg:px-8 ${fit ? 'lg:min-h-0' : ''}`}>
+        {children}
+      </div>
       {footer && (
-        <div className="sticky bottom-0 border-t border-white/10 bg-ink/95 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 backdrop-blur">
-          {footer}
+        <div
+          className={`sticky bottom-0 border-t border-white/10 bg-ink/95 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 backdrop-blur lg:px-0 lg:py-4 ${
+            fit ? 'short:lg:py-2.5' : ''
+          }`}
+        >
+          <div className="mx-auto lg:flex lg:max-w-7xl lg:items-center lg:justify-end lg:gap-4 lg:px-8">
+            {footer}
+          </div>
         </div>
       )}
     </div>
@@ -542,13 +607,21 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
   return (
     <div
       className={`mt-3 flex items-baseline justify-between rounded-xl px-3 py-2.5 ${
-        balanced ? 'bg-emerald-400/15' : over ? 'bg-red-500/15' : 'bg-amber-400/10'
+        balanced ? 'bg-positive/15' : over ? 'bg-red-500/15' : 'bg-amber-400/10'
       }`}
     >
       <span
-        className={`text-sm font-semibold ${balanced ? 'text-emerald-300' : over ? 'text-red-300' : 'text-amber-200'}`}
+        className={`text-sm font-semibold ${balanced ? 'text-positive' : over ? 'text-red-300' : 'text-amber-200'}`}
       >
-        {balanced ? 'Every złoty has a job ✓' : over ? 'Over income by' : 'Not assigned yet'}
+        {balanced ? (
+          <>
+            Every złoty has a job <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" />
+          </>
+        ) : over ? (
+          'Over income by'
+        ) : (
+          'Not assigned yet'
+        )}
       </span>
       {!balanced && (
         <span
@@ -557,6 +630,96 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
           {formatMoneyCompact(Math.abs(unassigned))}
         </span>
       )}
+    </div>
+  )
+}
+
+/** The footer's reminder, on a laptop, of where the zero-based plan stands. */
+function balanceNote(planned: number, unassigned: number): string {
+  if (planned <= 0) return 'No income planned yet.'
+  if (Math.abs(unassigned) < 1) return 'Every złoty has a job.'
+  return unassigned < 0
+    ? `${formatMoneyCompact(-unassigned)} more than the income.`
+    : `${formatMoneyCompact(unassigned)} not assigned yet.`
+}
+
+/**
+ * One category of the plan, opened up: its history, forecast and share, with
+ * the limit editable in place. The draft stays in the planner, so nothing is
+ * lost going back to the list.
+ */
+function FocusedCategory({
+  month,
+  categoryId,
+  categories,
+  draftLimits,
+  onSelect,
+  onBack,
+  editor,
+}: {
+  month: MonthKey
+  categoryId: string
+  categories: { id: string; name: string; color: string }[]
+  draftLimits: Record<string, number>
+  onSelect: (id: string) => void
+  onBack: () => void
+  editor: (id: string, name: string) => ReactNode
+}) {
+  const index = categories.findIndex((c) => c.id === categoryId)
+  const category = categories[index]
+  const step = (d: number) => categories[(index + d + categories.length) % categories.length]
+
+  return (
+    <div className="px-4 pb-6 lg:flex lg:h-full lg:flex-col lg:px-0 lg:pb-5 short:lg:pb-3 short:lg:pt-3">
+      <div className="mb-4 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 short:lg:mb-3">
+        <button
+          type="button"
+          onClick={onBack}
+          className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-300 ring-1 ring-white/10 hover:bg-white/5 active:bg-white/10"
+        >
+          All categories
+        </button>
+        <h2 className="flex min-w-0 flex-1 items-center gap-2.5 text-xl font-bold text-white">
+          {category && (
+            <span aria-hidden className="h-3 w-3 shrink-0 rounded" style={{ backgroundColor: category.color }} />
+          )}
+          <span className="truncate">{category?.name}</span>
+          <span className="hidden truncate text-base font-medium text-muted short:lg:inline">
+            in the {formatMonth(month)} plan
+          </span>
+        </h2>
+        {categories.length > 1 && index !== -1 && (
+          <nav aria-label="Other categories" className="flex items-center gap-1 text-sm">
+            <button
+              type="button"
+              onClick={() => onSelect(step(-1).id)}
+              aria-label={`Previous category: ${step(-1).name}`}
+              className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
+            >
+              <CaretLeft aria-hidden className="inline-block align-[-0.125em]" />
+              <span className="ml-1.5 hidden lg:inline">{step(-1).name}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelect(step(1).id)}
+              aria-label={`Next category: ${step(1).name}`}
+              className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
+            >
+              <span className="mr-1.5 hidden lg:inline">{step(1).name}</span>
+              <CaretRight aria-hidden className="inline-block align-[-0.125em]" />
+            </button>
+          </nav>
+        )}
+      </div>
+      <div className="lg:min-h-0 lg:flex-1">
+        <CategoryDetail
+          categoryId={categoryId}
+          month={month}
+          draftLimits={draftLimits}
+          limitEditor={category && editor(category.id, category.name)}
+          onSelectCategory={onSelect}
+        />
+      </div>
     </div>
   )
 }

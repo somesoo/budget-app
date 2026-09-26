@@ -118,13 +118,13 @@ export async function askGemini(args: {
     if (gemini && !RETRYABLE.has(status)) console.error('Gemini error', status, await gemini.text())
     const hint =
       status === 404
-        ? ` — model "${usedModel}" not found; set GEMINI_MODEL`
+        ? `: model "${usedModel}" not found, set GEMINI_MODEL`
         : status === 429
-          ? ' — rate limit or quota reached, try again later'
+          ? ': rate limit or quota reached, try again later'
           : status === 400 || status === 403
-            ? ' — check GEMINI_API_KEY'
+            ? ': check GEMINI_API_KEY'
             : RETRYABLE.has(status)
-              ? ' — Gemini is overloaded right now, try again in a minute'
+              ? ': Gemini is overloaded right now, try again in a minute'
               : ''
     return { ok: false, error: `Gemini request failed (${status})${hint}` }
   }
@@ -139,6 +139,6 @@ export async function askGemini(args: {
     return { ok: true, parsed, model: usedModel }
   } catch {
     console.error('Gemini returned non-JSON', text)
-    return { ok: false, error: 'Gemini returned an unreadable answer — try again' }
+    return { ok: false, error: 'Gemini returned an unreadable answer. Try again.' }
   }
 }

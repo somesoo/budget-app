@@ -48,7 +48,7 @@ export function EntryRow({ entry, categories, onOpen }: Props) {
       </span>
       <span
         className={`shrink-0 text-[15px] font-semibold tabular-nums ${
-          isIncome ? 'text-emerald-300' : 'text-white'
+          isIncome ? 'text-positive' : 'text-white'
         }`}
       >
         {isIncome && '+'}
@@ -64,7 +64,7 @@ export function EntryRow({ entry, categories, onOpen }: Props) {
     <button
       type="button"
       onClick={onOpen}
-      aria-label={`${note ? `${title}, ` : ''}${categoryName}, ${formatMoney(entry.item.amount)} — edit`}
+      aria-label={`${note ? `${title}, ` : ''}${categoryName}, ${formatMoney(entry.item.amount)}. Edit`}
       className={`${base} transition active:bg-white/5`}
     >
       {content}

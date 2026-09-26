@@ -1,3 +1,4 @@
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { currentMonthKey, formatMonth, shiftMonth, type MonthKey } from '../lib/calculations'
 
 interface Props {
@@ -18,7 +19,7 @@ export function MonthSwitcher({ month, onChange, max = currentMonthKey() }: Prop
         aria-label="Previous month"
         className="rounded-full px-3 py-1.5 text-lg text-muted active:bg-white/10"
       >
-        ‹
+        <CaretLeft className="inline-block align-[-0.125em]" />
       </button>
       <span className="whitespace-nowrap text-sm font-semibold text-white">
         {formatMonth(month)}
@@ -30,7 +31,7 @@ export function MonthSwitcher({ month, onChange, max = currentMonthKey() }: Prop
         aria-label="Next month"
         className="rounded-full px-3 py-1.5 text-lg text-muted active:bg-white/10 disabled:opacity-25"
       >
-        ›
+        <CaretRight className="inline-block align-[-0.125em]" />
       </button>
     </div>
   )

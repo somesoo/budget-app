@@ -56,7 +56,7 @@ export function ForecastCard({ forecast: f, isCurrent, goal }: Props) {
           saving ? (
             <>
               On course to save <strong>{formatMoneyWhole(f.projectedSavings)}</strong> this month
-              {f.savingsRate !== null && <> — {Math.round(f.savingsRate * 100)}% of income</>}.
+              {f.savingsRate !== null && <>, {Math.round(f.savingsRate * 100)}% of income</>}.
             </>
           ) : (
             <>
@@ -67,7 +67,7 @@ export function ForecastCard({ forecast: f, isCurrent, goal }: Props) {
         ) : saving ? (
           <>
             Saved <strong>{formatMoney(f.projectedSavings)}</strong>
-            {f.savingsRate !== null && <> — {Math.round(f.savingsRate * 100)}% of income</>}.
+            {f.savingsRate !== null && <>, {Math.round(f.savingsRate * 100)}% of income</>}.
           </>
         ) : (
           <>
@@ -117,7 +117,7 @@ export function ForecastCard({ forecast: f, isCurrent, goal }: Props) {
         {incomeMarker !== null && (
           <span
             aria-hidden
-            className="absolute -top-1 h-6 w-0.5 bg-white"
+            className="absolute -top-1 h-6 w-0.5 bg-slate-50"
             style={{ left: `${incomeMarker}%` }}
             title="Income"
           />

@@ -243,3 +243,16 @@ export function readableTextColor(hex: string): string {
 export function categoryById(categories: Category[]): Record<string, Category> {
   return Object.fromEntries(categories.map((c) => [c.id, c]))
 }
+
+/* ---------- text ---------- */
+
+/**
+ * AI-written text without em or en dashes, which the app's copy doesn't use.
+ * The prompts ask for none, but older answers are stored and models slip:
+ * a dash between words becomes a comma, between numbers a hyphen.
+ */
+export function plainDashes(text: string): string {
+  return text
+    .replace(/(\d)\s*[–—]\s*(\d)/g, '$1-$2')
+    .replace(/\s*[–—]\s*/g, ', ')
+}

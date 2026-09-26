@@ -227,7 +227,7 @@ export function PaceChart({ month, points, showPace }: Props) {
           <TooltipRow
             color={CHART.accent}
             label="Spent"
-            value={activePoint.cumulative !== null ? formatMoney(activePoint.cumulative) : '—'}
+            value={activePoint.cumulative !== null ? formatMoney(activePoint.cumulative) : 'Not yet'}
           />
           {showPace && (
             <TooltipRow

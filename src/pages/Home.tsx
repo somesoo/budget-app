@@ -129,7 +129,7 @@ export function Home() {
             setEntryPerson(devicePerson ?? 'bubs')
             setIncomeOpen(true)
           }}
-          className="shrink-0 rounded-full bg-emerald-400/15 px-3 py-1.5 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-400/30 active:bg-emerald-400/25"
+          className="shrink-0 rounded-full bg-accent/15 px-3 py-1.5 text-sm font-semibold text-accent-soft ring-1 ring-accent/30 hover:bg-accent/20 active:bg-accent/25"
         >
           + Income
         </button>
@@ -174,8 +174,8 @@ export function Home() {
       )}
 
       {toast && (
-        <div className="fixed inset-x-0 bottom-24 z-30 flex justify-center px-4">
-          <div className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-ink shadow-lg">
+        <div className="fixed inset-x-0 bottom-24 z-30 flex justify-center px-4 lg:bottom-8 lg:left-60">
+          <div className="rounded-full bg-slate-50 px-5 py-2.5 text-sm font-semibold text-ink shadow-lg">
             {toast}
           </div>
         </div>

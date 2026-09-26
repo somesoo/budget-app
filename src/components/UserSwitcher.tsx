@@ -25,7 +25,7 @@ export function UserSwitcher({ value, onChange, size = 'sm', label }: Props) {
               onClick={() => onChange(person)}
               aria-pressed={active}
               className={`${pad} rounded-full font-semibold transition ${
-                active ? 'bg-white text-ink shadow' : 'text-muted active:bg-white/10'
+                active ? 'bg-slate-50 text-ink shadow' : 'text-muted active:bg-white/10'
               }`}
             >
               {PERSON_LABELS[person]}

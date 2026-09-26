@@ -1,3 +1,4 @@
+import { Warning } from '@phosphor-icons/react'
 import { CURRENCY_SUFFIX } from '../config'
 import {
   fillPercent,
@@ -73,7 +74,7 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
         </span>
         {over && (
           <span aria-label="over limit" className="text-xs leading-none">
-            ⚠️
+            <Warning weight="fill" aria-hidden />
           </span>
         )}
       </div>

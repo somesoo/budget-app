@@ -1,3 +1,4 @@
+import { CalendarBlank } from '@phosphor-icons/react'
 import { formatDayShort, todayKey, yesterdayKey } from '../lib/calculations'
 
 interface Props {
@@ -17,7 +18,7 @@ export function DatePicker({ value, onChange }: Props) {
 
   const chip = (active: boolean) =>
     `rounded-full px-3 py-2 text-sm font-semibold transition ${
-      active ? 'bg-white text-ink shadow' : 'text-muted active:bg-white/10'
+      active ? 'bg-slate-50 text-ink shadow' : 'text-muted active:bg-white/10'
     }`
 
   return (
@@ -35,7 +36,9 @@ export function DatePicker({ value, onChange }: Props) {
 
       <label className={`relative cursor-pointer ${chip(isOther)}`}>
         <span className="sr-only">Pick a date</span>
-        <span aria-hidden>{isOther ? formatDayShort(value) : '📅'}</span>
+        <span aria-hidden className="flex items-center">
+          {isOther ? formatDayShort(value) : <CalendarBlank className="text-[1.1em]" />}
+        </span>
         <input
           type="date"
           value={value}

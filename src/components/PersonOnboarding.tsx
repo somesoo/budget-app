@@ -24,7 +24,7 @@ export function PersonOnboarding({ onPick }: Props) {
             key={person}
             type="button"
             onClick={() => onPick(person)}
-            className="h-20 rounded-3xl bg-white text-2xl font-bold text-ink transition active:scale-[0.98]"
+            className="h-20 rounded-3xl bg-slate-50 text-2xl font-bold text-ink transition active:scale-[0.98]"
           >
             {PERSON_LABELS[person]}
           </button>

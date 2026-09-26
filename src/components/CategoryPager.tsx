@@ -89,7 +89,7 @@ export function CategoryPager({ categories, spentByCategory, onSelect }: Props) 
             >
               <span
                 className={`block h-1.5 rounded-full transition-all ${
-                  index === page ? 'w-4 bg-white' : 'w-1.5 bg-white/30'
+                  index === page ? 'w-4 bg-slate-50' : 'w-1.5 bg-white/30'
                 }`}
               />
             </button>

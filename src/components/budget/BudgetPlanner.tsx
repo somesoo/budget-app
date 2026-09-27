@@ -78,8 +78,8 @@ export function BudgetPlanner({ month, onClose }: Props) {
     categoriesLoaded: !categoriesLoading,
     existingLoaded: !existing.isLoading,
     previousLoaded: !previous.isLoading,
-    expensesLoaded: !!expenses.data,
-    incomesLoaded: !!incomes.data,
+    expensesLoaded: !expenses.isLoading,
+    incomesLoaded: !incomes.isLoading,
   })
 
   const baseline = useMemo(

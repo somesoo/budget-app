@@ -31,6 +31,7 @@ import {
   draftTotals,
   historyMonths,
   planBaseline,
+  plannerReady,
   roundUpPlan,
   type FillSource,
   type PlanDraft,
@@ -57,7 +58,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const from = monthRange(months[0]).from
   const to = monthRange(months[months.length - 1]).to
 
-  const { data: allCategories = [] } = useCategories()
+  const { data: allCategories = [], isLoading: categoriesLoading } = useCategories()
   // trips and other projects have their own budget, not a monthly limit
   const categories = useMemo(
     () => allCategories.filter((c) => !c.archived && c.kind !== 'project'),
@@ -73,12 +74,13 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const remove = useDeleteBudget()
   const suggest = useSuggestPlan()
 
-  const ready =
-    allCategories.length > 0 &&
-    !existing.isLoading &&
-    !previous.isLoading &&
-    !!expenses.data &&
-    !!incomes.data
+  const ready = plannerReady({
+    categoriesLoaded: !categoriesLoading,
+    existingLoaded: !existing.isLoading,
+    previousLoaded: !previous.isLoading,
+    expensesLoaded: !!expenses.data,
+    incomesLoaded: !!incomes.data,
+  })
 
   const baseline = useMemo(
     () =>

@@ -177,6 +177,22 @@ export function draftTotals(draft: PlanDraft, activeIds: string[]) {
   return { spending, unassigned }
 }
 
+export function plannerReady(args: {
+  categoriesLoaded: boolean
+  existingLoaded: boolean
+  previousLoaded: boolean
+  expensesLoaded: boolean
+  incomesLoaded: boolean
+}) {
+  return (
+    args.categoriesLoaded &&
+    args.existingLoaded &&
+    args.previousLoaded &&
+    args.expensesLoaded &&
+    args.incomesLoaded
+  )
+}
+
 /* ---------- what the server (and Gemini) receives ---------- */
 
 /**

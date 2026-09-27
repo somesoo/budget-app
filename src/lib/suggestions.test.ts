@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Category, Expense } from '../types'
-import { planBaseline, type PlanDraft } from './planning'
+import { planBaseline, plannerReady, type PlanDraft } from './planning'
 import {
   annualBills,
   monthReview,
@@ -183,5 +183,28 @@ describe('monthReview', () => {
     expect(r.over.map((x) => x.category.id)).toEqual(['a'])
     expect(r.under.map((x) => x.category.id)).toEqual(['b'])
     expect(r.saved).toBe(4200)
+  })
+})
+
+describe('plannerReady', () => {
+  it('treats an empty categories list as ready once the queries complete', () => {
+    expect(
+      plannerReady({
+        categoriesLoaded: true,
+        existingLoaded: true,
+        previousLoaded: true,
+        expensesLoaded: true,
+        incomesLoaded: true,
+      }),
+    ).toBe(true)
+    expect(
+      plannerReady({
+        categoriesLoaded: false,
+        existingLoaded: true,
+        previousLoaded: true,
+        expensesLoaded: true,
+        incomesLoaded: true,
+      }),
+    ).toBe(false)
   })
 })

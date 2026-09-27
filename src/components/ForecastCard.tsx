@@ -11,6 +11,8 @@ interface Props {
   forecast: MonthForecast
   isCurrent: boolean
   goal: Goal | null | undefined
+  /** Without its frame, inside another card. */
+  bare?: boolean
 }
 
 /**
@@ -18,10 +20,10 @@ interface Props {
  * month's income split into spent so far, still to be spent (projected), and
  * what's left over.
  */
-export function ForecastCard({ forecast: f, isCurrent, goal }: Props) {
+export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
   if (f.income <= 0) {
     return (
-      <ChartCard title="Forecast">
+      <ChartCard title="Forecast" bare={bare}>
         <p className="text-sm text-muted">
           {isCurrent
             ? 'Log your paychecks with “+ Income” on the Add tab and this turns into a forecast of what you’ll have left at the end of the month.'
@@ -51,6 +53,7 @@ export function ForecastCard({ forecast: f, isCurrent, goal }: Props) {
   return (
     <ChartCard
       title="Forecast"
+      bare={bare}
       headline={
         isCurrent ? (
           saving ? (

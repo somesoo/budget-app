@@ -15,12 +15,15 @@ export interface Prefs {
   nearRatio: number
   /** Warn when the pace would take a category over by the month's end. */
   paceWarnings: boolean
+  /** Widgets switched off above the Add tiles (ids from ADD_WIDGETS). */
+  hiddenWidgets: string[]
 }
 
 export const DEFAULT_PREFS: Prefs = {
   quickAmounts: QUICK_AMOUNTS,
   nearRatio: NEAR_RATIO,
   paceWarnings: true,
+  hiddenWidgets: [],
 }
 
 const STORAGE_KEY = 'budget-app.prefs'
@@ -44,6 +47,10 @@ function read(): Prefs {
           : DEFAULT_PREFS.nearRatio,
       paceWarnings:
         typeof p.paceWarnings === 'boolean' ? p.paceWarnings : DEFAULT_PREFS.paceWarnings,
+      hiddenWidgets:
+        Array.isArray(p.hiddenWidgets) && p.hiddenWidgets.every((w) => typeof w === 'string')
+          ? p.hiddenWidgets
+          : DEFAULT_PREFS.hiddenWidgets,
     }
   } catch {
     return DEFAULT_PREFS

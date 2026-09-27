@@ -12,6 +12,8 @@ interface Props {
   headline?: ReactNode
   legend?: ReactNode
   table?: ChartTable
+  /** Without its own frame and title, inside another card (the Add widgets). */
+  bare?: boolean
   children: ReactNode
 }
 
@@ -19,8 +21,18 @@ interface Props {
  * Frame for every chart: title, takeaway, optional legend, the chart itself,
  * and a "Show numbers" table twin so no value is only reachable by hovering.
  */
-export function ChartCard({ title, headline, legend, table, children }: Props) {
+export function ChartCard({ title, headline, legend, table, bare = false, children }: Props) {
   const [showTable, setShowTable] = useState(false)
+
+  if (bare) {
+    return (
+      <div>
+        {headline && <p className="text-sm leading-snug text-slate-200">{headline}</p>}
+        {legend && <div className="mt-2">{legend}</div>}
+        <div className="mt-2">{children}</div>
+      </div>
+    )
+  }
 
   return (
     <section

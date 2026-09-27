@@ -9,6 +9,7 @@ import {
 } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ADD_WIDGETS } from '../components/add/widgets'
 import { MoneyInput } from '../components/budget/MoneyInput'
 import { Screen } from '../components/Screen'
 import { Segments, Switch } from '../components/savings/fields'
@@ -75,6 +76,7 @@ export function Settings() {
         </div>
         <div className="space-y-4">
           <AddScreenCard />
+          <WidgetsCard />
           <WarningsCard />
           <SavingsSettings
             available={savings.available}
@@ -263,6 +265,34 @@ function AddScreenCard() {
             value={n}
             onChange={(v) => set(i, v)}
             label={`Quick amount ${i + 1}`}
+          />
+        ))}
+      </div>
+    </SettingsCard>
+  )
+}
+
+function WidgetsCard() {
+  const prefs = usePrefs()
+  const toggle = (id: string, on: boolean) =>
+    setPrefs({
+      hiddenWidgets: on
+        ? prefs.hiddenWidgets.filter((w) => w !== id)
+        : [...prefs.hiddenWidgets, id],
+    })
+  return (
+    <SettingsCard
+      title="Widgets on Add"
+      help="The cards above the category tiles, swiped left and right. This device only."
+    >
+      <div className="space-y-3">
+        {ADD_WIDGETS.map((w) => (
+          <Switch
+            key={w.id}
+            label={w.label}
+            help={w.help}
+            checked={!prefs.hiddenWidgets.includes(w.id)}
+            onChange={(on) => toggle(w.id, on)}
           />
         ))}
       </div>

@@ -25,12 +25,22 @@ function remembered(): string | null {
  */
 export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
   const track = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(() =>
+  const tabs = useRef<HTMLDivElement>(null)
+  const [picked, setActive] = useState(() =>
     Math.max(
       widgets.findIndex((w) => w.id === remembered()),
       0,
     ),
   )
+
+  // one switched off in Settings can leave the index past the end
+  const active = Math.min(picked, widgets.length - 1)
+
+  // the labels scroll too: keep the current one in view
+  useEffect(() => {
+    const tab = tabs.current?.children[active] as HTMLElement | undefined
+    tab?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+  }, [active])
 
   // start on the remembered card without animating there
   useEffect(() => {
@@ -59,7 +69,7 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
       className="rounded-3xl pb-3 pt-3 ring-1 ring-white/10"
       style={{ backgroundColor: CHART.surface }}
     >
-      <div role="tablist" className="no-scrollbar flex gap-1 overflow-x-auto px-3">
+      <div ref={tabs} role="tablist" className="no-scrollbar flex gap-1 overflow-x-auto px-3">
         {widgets.map((w, i) => (
           <button
             key={w.id}

@@ -18,6 +18,8 @@ interface Props {
   /** Optional threshold (e.g. the monthly limit), drawn dashed. */
   reference?: { value: number; label: string }
   ariaLabel: string
+  /** Height of the plot itself, in px; smaller where it shares the screen. */
+  plotHeight?: number
 }
 
 const PLOT_H = 140
@@ -48,7 +50,14 @@ function columnPath(x: number, top: number, w: number, bottom: number): string {
  * Emphasis columns: one highlighted column carries the story and its value;
  * the others are context in gray. Tap (or focus) any column for its tooltip.
  */
-export function ColumnChart({ columns, emphasize, reference, ariaLabel }: Props) {
+export function ColumnChart({
+  columns,
+  emphasize,
+  reference,
+  ariaLabel,
+  plotHeight = PLOT_H,
+}: Props) {
+  const plotH = plotHeight
   const { ref, width } = useElementWidth<HTMLDivElement>()
   const [active, setActive] = useState<string | null>(null)
 
@@ -57,9 +66,9 @@ export function ColumnChart({ columns, emphasize, reference, ariaLabel }: Props)
   const plotW = Math.max(width - LEFT - RIGHT, 10)
   const band = plotW / columns.length
   const barW = Math.min(MAX_BAR, band * 0.6)
-  const height = TOP + PLOT_H + AXIS_BAND
+  const height = TOP + plotH + AXIS_BAND
 
-  const y = (v: number) => TOP + PLOT_H - (v / max) * PLOT_H
+  const y = (v: number) => TOP + plotH - (v / max) * plotH
   const bandX = (i: number) => LEFT + i * band
 
   const ticks: number[] = []
@@ -140,7 +149,7 @@ export function ColumnChart({ columns, emphasize, reference, ariaLabel }: Props)
                 onBlur={() => setActive(null)}
               >
                 {/* hit target: the whole band, not just the painted bar */}
-                <rect x={bandX(i)} y={TOP} width={band} height={PLOT_H} fill="transparent" />
+                <rect x={bandX(i)} y={TOP} width={band} height={plotH} fill="transparent" />
                 <path
                   d={columnPath(x, y(c.value), barW, y(0))}
                   fill={fill}
@@ -148,7 +157,7 @@ export function ColumnChart({ columns, emphasize, reference, ariaLabel }: Props)
                 />
                 <text
                   x={bandX(i) + band / 2}
-                  y={TOP + PLOT_H + 16}
+                  y={TOP + plotH + 16}
                   textAnchor="middle"
                   fontSize={AXIS_FONT}
                   fontWeight={emphasized ? 600 : 400}

@@ -3,8 +3,9 @@ import { CHART } from '../charts/theme'
 
 export interface Widget {
   id: string
+  /** Not shown, only read out: the cards speak for themselves. */
   label: string
-  /** A count next to the label, like the number of warnings. */
+  /** Something needs a look (warnings): its dot is coloured. */
   badge?: number
   content: ReactNode
 }
@@ -21,11 +22,10 @@ function remembered(): string | null {
 
 /**
  * Small cards above the category tiles, one at a time: swipe left and right
- * (native scroll-snap), or tap a label. Remembers the last one on this phone.
+ * (native scroll-snap), dots underneath. Remembers the last one on this phone.
  */
 export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
   const track = useRef<HTMLDivElement>(null)
-  const tabs = useRef<HTMLDivElement>(null)
   const [picked, setActive] = useState(() =>
     Math.max(
       widgets.findIndex((w) => w.id === remembered()),
@@ -35,12 +35,6 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
 
   // one switched off in Settings can leave the index past the end
   const active = Math.min(picked, widgets.length - 1)
-
-  // the labels scroll too: keep the current one in view
-  useEffect(() => {
-    const tab = tabs.current?.children[active] as HTMLElement | undefined
-    tab?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
-  }, [active])
 
   // start on the remembered card without animating there
   useEffect(() => {
@@ -66,33 +60,9 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
 
   return (
     <section
-      className="rounded-3xl pb-3 pt-3 ring-1 ring-white/10"
+      className="rounded-3xl pb-1 pt-3 ring-1 ring-white/10"
       style={{ backgroundColor: CHART.surface }}
     >
-      <div ref={tabs} role="tablist" className="no-scrollbar flex gap-1 overflow-x-auto px-3">
-        {widgets.map((w, i) => (
-          <button
-            key={w.id}
-            type="button"
-            role="tab"
-            aria-selected={i === active}
-            onClick={() => goTo(i)}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold transition ${
-              i === active ? 'bg-white/10 text-white' : 'text-muted hover:text-white'
-            }`}
-          >
-            {w.label}
-            {!!w.badge && (
-              <span
-                className="min-w-[1.125rem] rounded-full px-1 text-center text-[11px] font-bold leading-[1.125rem] text-ink"
-                style={{ backgroundColor: CHART.warning }}
-              >
-                {w.badge}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
       <div
         ref={track}
         onScroll={(e) => {
@@ -101,13 +71,14 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
           const index = Math.round(el.scrollLeft / el.clientWidth)
           if (index !== active) settle(index)
         }}
-        className="no-scrollbar mt-3 grid snap-x snap-mandatory auto-cols-[100%] grid-flow-col overflow-x-auto overscroll-x-contain"
+        className="no-scrollbar grid snap-x snap-mandatory auto-cols-[100%] grid-flow-col overflow-x-auto overscroll-x-contain"
       >
         {widgets.map((w, i) => (
           <div
             key={w.id}
-            role="tabpanel"
-            aria-label={w.label}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${w.label}, ${i + 1} of ${widgets.length}`}
             aria-hidden={i !== active}
             className="min-w-0 snap-start snap-always px-4"
           >
@@ -115,6 +86,33 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
           </div>
         ))}
       </div>
+      {widgets.length > 1 && (
+        <div className="flex justify-center">
+          {widgets.map((w, i) => (
+            <button
+              key={w.id}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={w.label}
+              aria-current={i === active}
+              className="flex h-6 w-5 items-center justify-center"
+            >
+              <span
+                className={`block h-1.5 rounded-full transition-all ${
+                  i === active ? 'w-4' : 'w-1.5'
+                }`}
+                style={{
+                  backgroundColor: w.badge
+                    ? CHART.warning
+                    : i === active
+                      ? '#f8fafc'
+                      : 'rgba(255,255,255,0.3)',
+                }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   )
 }

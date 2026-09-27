@@ -1,7 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#0f172a"/>
-  <rect x="96" y="96" width="140" height="140" rx="32" fill="#22c55e"/>
-  <rect x="276" y="96" width="140" height="140" rx="32" fill="#f97316"/>
-  <rect x="96" y="276" width="140" height="140" rx="32" fill="#38bdf8"/>
-  <rect x="276" y="276" width="140" height="140" rx="32" fill="#a855f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Zaokrąglone tło (squircle) -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+
+  <!-- Pierścień alokacji budżetu / wykres -->
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#334155" stroke-width="36" />
+  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#accentGrad)" stroke-width="36"
+          stroke-dasharray="1068" stroke-dashoffset="320" stroke-linecap="round"
+          transform="rotate(-90 256 256)" />
+
+  <!-- Portfel / Tarcza budżetowa -->
+  <rect x="176" y="186" width="160" height="140" rx="24" fill="#0f172a" stroke="#f8fafc" stroke-width="20" stroke-linejoin="round" />
+  
+  <!-- Klapka portfela z monetą / symbolem waluty -->
+  <path d="M 276 226 L 336 226 A 30 30 0 0 1 336 286 L 276 286 Z" fill="#1e293b" stroke="#f8fafc" stroke-width="20" stroke-linejoin="round" />
+  <circle cx="306" cy="256" r="12" fill="#10b981" />
+
+  <!-- Strzałka wzrostu / optymalizacji (prawy górny róg) -->
+  <path d="M 330 140 L 380 140 L 380 190" fill="none" stroke="#10b981" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 280 240 L 370 150" fill="none" stroke="#10b981" stroke-width="24" stroke-linecap="round" />
 </svg>

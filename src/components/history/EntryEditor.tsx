@@ -30,6 +30,9 @@ export function EntryEditor({
   const [amount, setAmount] = useState(String(entry.item.amount))
   const [note, setNote] = useState(entry.item.note ?? '')
   const [categoryId, setCategoryId] = useState(initialCategory)
+  const goals = categories.filter(
+    (c) => c.kind === 'project' && (!c.archived || c.id === initialCategory),
+  )
   const [person, setPerson] = useState<Person>(entry.item.person)
   const [date, setDate] = useState(entry.date)
 
@@ -88,38 +91,18 @@ export function EntryEditor({
 
         {isExpense && (
           <Field label="Category">
-            <div className="flex flex-wrap gap-2">
-              {categories
-                .filter((c) => !c.archived || c.id === initialCategory)
-                .map((c) => {
-                  const active = c.id === categoryId
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => setCategoryId(c.id)}
-                      aria-pressed={active}
-                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ring-white/10 transition"
-                      style={
-                        active
-                          ? {
-                              backgroundColor: withAlpha(c.color, 0.28),
-                              color: '#fff',
-                              boxShadow: `inset 0 0 0 2px ${c.color}`,
-                            }
-                          : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#cbd5e1' }
-                      }
-                    >
-                      <span
-                        aria-hidden
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: c.color }}
-                      />
-                      {c.name}
-                    </button>
-                  )
-                })}
-            </div>
+            <Chips
+              list={categories.filter(
+                (c) => c.kind !== 'project' && (!c.archived || c.id === initialCategory),
+              )}
+              value={categoryId}
+              onChange={setCategoryId}
+            />
+          </Field>
+        )}
+        {isExpense && goals.length > 0 && (
+          <Field label="Or spent from a goal">
+            <Chips list={goals} value={categoryId} onChange={setCategoryId} />
           </Field>
         )}
 
@@ -169,6 +152,45 @@ function Field({ label, grow, children }: { label: string; grow?: boolean; child
     <div className={grow ? 'min-w-0 flex-1' : ''}>
       <p className="mb-1.5 text-sm text-muted">{label}</p>
       {children}
+    </div>
+  )
+}
+
+function Chips({
+  list,
+  value,
+  onChange,
+}: {
+  list: Category[]
+  value: string
+  onChange: (id: string) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {list.map((c) => {
+        const active = c.id === value
+        return (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => onChange(c.id)}
+            aria-pressed={active}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ring-white/10 transition"
+            style={
+              active
+                ? {
+                    backgroundColor: withAlpha(c.color, 0.28),
+                    color: '#fff',
+                    boxShadow: `inset 0 0 0 2px ${c.color}`,
+                  }
+                : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#cbd5e1' }
+            }
+          >
+            <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
+            {c.name}
+          </button>
+        )
+      })}
     </div>
   )
 }

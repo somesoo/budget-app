@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CURRENCY_SUFFIX } from '../../config'
 import { usePrefs } from '../../hooks/usePrefs'
 import { useMonthCategories } from '../../hooks/useBudgets'
+import { useCategories } from '../../hooks/useCategories'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useGoalTrips } from '../../hooks/useGoalTrips'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
@@ -57,6 +58,8 @@ export function DesktopAdd() {
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
   const categories = allCategories.filter((c) => !c.archived)
+  // goals included: what was just logged may have been spent from one
+  const { data: everyCategory = [] } = useCategories()
   const { data: expenses = [] } = useMonthlyExpenses(month)
   // recent entries include spending from goals: it was just logged here too
   const { data: allExpenses = [] } = useExpenses(month)
@@ -453,7 +456,7 @@ export function DesktopAdd() {
             <h2 className="mb-2 px-1 text-base font-semibold text-white">Recent</h2>
             <RecentEntries
               entries={recent}
-              categories={categoryById(allCategories)}
+              categories={categoryById(everyCategory)}
               onOpen={actions.edit}
             />
           </div>
@@ -467,7 +470,7 @@ export function DesktopAdd() {
         </aside>
       </div>
 
-      <EntryDialogs actions={actions} categories={allCategories} />
+      <EntryDialogs actions={actions} categories={everyCategory} />
       {goalsOpen && (
         <GoalPicker
           goals={goals.open}

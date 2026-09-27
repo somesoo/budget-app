@@ -1,17 +1,24 @@
-import { ArrowDown, ArrowUp } from '@phosphor-icons/react'
+import { ArrowDown, ArrowUp, Trash } from '@phosphor-icons/react'
 import { useState, type FormEvent } from 'react'
-import { useAddCategory, useUpdateCategory } from '../../hooks/useCategories'
+import {
+  useAddCategory,
+  useCategories,
+  useCategoryExpenseCount,
+  useDeleteCategory,
+  useUpdateCategory,
+} from '../../hooks/useCategories'
 import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import { roundUpPlan } from '../../lib/planning'
 import type { Category } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
-import { Field, SubmitRow, Switch, inputClass } from '../savings/fields'
+import { Field, Select, SubmitRow, Switch, inputClass } from '../savings/fields'
 
 /**
  * A monthly category: its name, color, default limit (months without a plan
- * use it), whether it's in the Home chart, its place in the list, hiding it.
+ * use it), whether it's in the Home chart, its place in the list, hiding or
+ * deleting it.
  */
 export function CategorySheet({
   category,
@@ -157,7 +164,89 @@ export function CategorySheet({
             Hiding takes it off the Add screen and out of planning; old expenses keep it.
           </p>
         )}
+        {category && <DeleteCategory category={category} onDone={onClose} />}
       </form>
     </BottomSheet>
+  )
+}
+
+/**
+ * Deleting for good. A category with expenses hands them to another one
+ * first, so nothing ends up without a category.
+ */
+function DeleteCategory({ category, onDone }: { category: Category; onDone: () => void }) {
+  const [open, setOpen] = useState(false)
+  const { data: categories = [] } = useCategories()
+  const { data: count, isLoading } = useCategoryExpenseCount(open ? category.id : undefined)
+  const remove = useDeleteCategory()
+  const others = categories.filter((c) => c.id !== category.id && c.kind === 'monthly')
+  const [moveTo, setMoveTo] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const target = moveTo || others.find((c) => !c.archived)?.id || ''
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-sm font-semibold text-red-300 ring-1 ring-red-400/30 hover:bg-red-500/10"
+      >
+        <Trash aria-hidden /> Delete category
+      </button>
+    )
+  }
+
+  const hasExpenses = (count ?? 0) > 0
+  const confirm = async () => {
+    setError(null)
+    try {
+      await remove.mutateAsync({ id: category.id, moveTo: hasExpenses ? target : undefined })
+      onDone()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
+  return (
+    <div className="grid gap-3 rounded-2xl bg-red-500/10 p-3.5 ring-1 ring-red-400/30">
+      {isLoading ? (
+        <p className="text-sm text-slate-300">Checking its expenses…</p>
+      ) : hasExpenses ? (
+        <Field
+          label={`${count} ${count === 1 ? 'expense is' : 'expenses are'} in ${category.name}. Move ${count === 1 ? 'it' : 'them'} to`}
+        >
+          <Select value={target} onChange={setMoveTo}>
+            {others.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+                {c.archived ? ' (hidden)' : ''}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      ) : (
+        <p className="text-sm text-slate-200">
+          No expenses in {category.name}. Delete it for good?
+        </p>
+      )}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+        >
+          Keep it
+        </button>
+        <button
+          type="button"
+          onClick={confirm}
+          disabled={isLoading || remove.isPending || (hasExpenses && !target)}
+          className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white hover:bg-red-400 disabled:opacity-40"
+        >
+          {remove.isPending ? 'Deleting…' : hasExpenses ? 'Move and delete' : 'Delete'}
+        </button>
+      </div>
+      {error && <p className="text-sm text-red-300">Not deleted: {error}</p>}
+    </div>
   )
 }

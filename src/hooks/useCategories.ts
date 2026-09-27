@@ -84,3 +84,44 @@ export function useAddCategory() {
     },
   })
 }
+
+/** How many expenses a category has, all time: deleting it needs them moved first. */
+export function useCategoryExpenseCount(id: string | undefined) {
+  return useQuery({
+    queryKey: ['expenses', 'count', id],
+    enabled: !!id,
+    queryFn: async (): Promise<number> => {
+      const { count, error } = await supabase
+        .from('expenses')
+        .select('id', { count: 'exact', head: true })
+        .eq('category_id', id!)
+      if (error) throw error
+      return count ?? 0
+    },
+  })
+}
+
+/**
+ * Deletes a category for good. Its expenses (the database won't let them lose
+ * their category) move to `moveTo` first; without one it must have none.
+ */
+export function useDeleteCategory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, moveTo }: { id: string; moveTo?: string }) => {
+      if (moveTo) {
+        const { error } = await supabase
+          .from('expenses')
+          .update({ category_id: moveTo })
+          .eq('category_id', id)
+        if (error) throw error
+      }
+      const { error } = await supabase.from('categories').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: categoriesKey })
+      void qc.invalidateQueries({ queryKey: ['expenses'] })
+    },
+  })
+}

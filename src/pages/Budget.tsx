@@ -51,9 +51,6 @@ export function Budget() {
   const { data: nextPlan } = useBudget(next)
   const { data: goal } = useGoal()
   const addToGoal = useAddToGoal()
-
-  if (planning) return <BudgetPlanner month={planning} onClose={() => setPlanning(null)} />
-
   const isFuture = month > current
 
   const savings = useSavingsOverview()
@@ -79,6 +76,10 @@ export function Budget() {
       <ProjectsCard projects={projects.open} />
     </>
   )
+
+  if (planning) {
+    return <BudgetPlanner month={planning} onClose={() => setPlanning(null)} />
+  }
 
   return (
     <Screen

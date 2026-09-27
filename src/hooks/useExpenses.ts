@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { monthlyOnly } from '../lib/projects'
 import { useCategories } from './useCategories'
 import { supabase } from '../lib/supabaseClient'
@@ -132,7 +132,7 @@ export function useUpdateExpense() {
       await qc.cancelQueries({ queryKey: ['expenses'] })
       const snapshots = qc.getQueriesData<Expense[]>({ queryKey: ['expenses'] })
       for (const [key, list] of snapshots) {
-        if (!list) continue
+        if (!Array.isArray(list)) continue
         qc.setQueryData<Expense[]>(
           key,
           list.flatMap((e) => {
@@ -218,9 +218,10 @@ export function useDeleteExpense() {
       await qc.cancelQueries({ queryKey: ['expenses'] })
       const snapshots = qc.getQueriesData<Expense[]>({ queryKey: ['expenses'] })
       for (const [key, list] of snapshots) {
+        if (!Array.isArray(list)) continue
         qc.setQueryData<Expense[]>(
           key,
-          (list ?? []).filter((e) => e.id !== id),
+          list.filter((e) => e.id !== id),
         )
       }
       return { snapshots }
@@ -282,13 +283,29 @@ export function useCategoryExpenses(categoryId: string) {
   })
 }
 
-/** All-time expenses of several categories at once (the projects), by category id. */
+/**
+ * All-time expenses of several categories at once (the goals spent from), by
+ * category id. The cache holds a plain list like every other ['expenses', …]
+ * query, so the optimistic edits and deletes above can go through it; the
+ * grouping happens on the way out.
+ */
 export function useProjectExpenses(ids: string[]) {
   const key = [...ids].sort()
+  const joined = key.join(',')
+  const group = useCallback(
+    (rows: Expense[]): Record<string, Expense[]> => {
+      const out: Record<string, Expense[]> = Object.fromEntries(
+        joined.split(',').map((id) => [id, []]),
+      )
+      for (const e of rows) out[e.category_id]?.push(e)
+      return out
+    },
+    [joined],
+  )
   return useQuery({
     queryKey: ['expenses', 'projects', key],
     enabled: key.length > 0,
-    queryFn: async (): Promise<Record<string, Expense[]>> => {
+    queryFn: async (): Promise<Expense[]> => {
       const rows: Expense[] = []
       for (let offset = 0; ; offset += PAGE_SIZE) {
         const { data, error } = await supabase
@@ -300,11 +317,9 @@ export function useProjectExpenses(ids: string[]) {
           .range(offset, offset + PAGE_SIZE - 1)
         if (error) throw error
         rows.push(...(data ?? []).map(normalize))
-        if (!data || data.length < PAGE_SIZE) break
+        if (!data || data.length < PAGE_SIZE) return rows
       }
-      const out: Record<string, Expense[]> = Object.fromEntries(key.map((id) => [id, []]))
-      for (const e of rows) out[e.category_id]?.push(e)
-      return out
     },
+    select: group,
   })
 }

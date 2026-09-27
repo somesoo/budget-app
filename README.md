@@ -51,8 +51,11 @@ through Supabase Realtime.
    Savings tab explains what to do and everything else works as before.
 11. Paste and run `supabase/migrations/0008_ai_chat.sql`: the saved
    conversations of the Ask tab.
-12. Check **Database → Replication** that `expenses`, `categories` and `goals`
-   (and, after steps 7–11, `incomes`, `advice`, `budgets`, `savings_accounts`,
+12. Paste and run `supabase/migrations/0009_goals_are_trips.sql`: goals and
+   trips become one thing. Every goal can be spent from (the Goals tile on the
+   Add tab), outside the monthly budget; a trip without a goal gets one.
+13. Check **Database → Replication** that `expenses`, `categories` and `goals`
+   (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads` and `ai_messages`) are in the
    `supabase_realtime` publication — the migrations add them.
 

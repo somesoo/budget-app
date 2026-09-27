@@ -1,20 +1,27 @@
 import { ArrowLeft, PencilSimple, Plus } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { RecentEntries } from '../components/add/RecentEntries'
 import { AskLink } from '../components/AskLink'
 import { TooltipRow } from '../components/charts/ChartCard'
 import { ColumnChart } from '../components/charts/ColumnChart'
 import { CHART } from '../components/charts/theme'
+import { EntryDialogs } from '../components/history/EntryDialogs'
+import { TripSpendingCard, WhereItWent } from '../components/projects/TripSpending'
 import { AccountSheet, ACCOUNT_KINDS, ownerLabel } from '../components/savings/AccountSheet'
 import { StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
 import { useGoals } from '../hooks/useGoal'
-import { useProjectSummaries } from '../hooks/useProjectSummaries'
+import { useCategories } from '../hooks/useCategories'
+import { useEntryActions } from '../hooks/useEntryActions'
+import { useGoalTrips } from '../hooks/useGoalTrips'
 import { useSavingsOverview } from '../hooks/useSavings'
 import {
+  categoryById,
   currentMonthKey,
+  formatDayLong,
   formatMoney,
   formatMoneyWhole,
   formatMonth,
@@ -23,6 +30,7 @@ import {
   roundMoney,
   shiftMonth,
 } from '../lib/calculations'
+import { toEntries } from '../lib/history'
 import { monthsEndingAt } from '../lib/insights'
 import { balanceHistory, projectBalance } from '../lib/savings'
 
@@ -217,11 +225,16 @@ export function SavingsAccountPage() {
   )
 }
 
-/** `/savings/goal/:id`: how far a goal is, where its money is, what went in and out for it. */
+/**
+ * `/savings/goal/:id`: how far a goal is, where its money is, what went in and
+ * out for it, and, since a goal is also a trip, what's been spent from it.
+ */
 export function SavingsGoalPage() {
   const { id = '' } = useParams()
   const s = useSavingsOverview()
-  const projects = useProjectSummaries()
+  const trips = useGoalTrips()
+  const { data: categories = [] } = useCategories()
+  const actions = useEntryActions()
   const [sheet, setSheet] = useState<Sheet>(null)
   const summary = s.goals.find((g) => g.goal.id === id)
 
@@ -235,7 +248,9 @@ export function SavingsGoalPage() {
 
   const { goal, saved, progress, funding, status, pace, remaining } = summary
   const mine = s.movements.filter((m) => m.goal_id === id)
-  const paidFor = projects.all.filter((p) => p.project.goal_id === id)
+  const trip = trips.tripOf(id)
+  const spending = trip ? trips.expensesOf(trip.project.id) : []
+  const tripDates = trip ? datesOf(trip.project.starts_on, trip.project.ends_on) : null
 
   return (
     <Frame
@@ -243,11 +258,16 @@ export function SavingsGoalPage() {
       title={goal.name}
       color={goal.color}
       subtitle={
-        goal.target_amount > 0
-          ? `Target ${formatMoneyWhole(goal.target_amount)}${
-              goal.target_date ? ` by ${formatMonth(goal.target_date.slice(0, 7))}` : ''
-            }`
-          : 'No finish line'
+        [
+          goal.target_amount > 0
+            ? `Target ${formatMoneyWhole(goal.target_amount)}${
+                goal.target_date ? ` by ${formatMonth(goal.target_date.slice(0, 7))}` : ''
+              }`
+            : 'No finish line',
+          tripDates,
+        ]
+          .filter(Boolean)
+          .join(' · ')
       }
       onEdit={() => setSheet({ kind: 'edit' })}
       actions={
@@ -284,6 +304,27 @@ export function SavingsGoalPage() {
             </div>
             {goal.note && <p className="mt-3 text-sm text-slate-300">{goal.note}</p>}
           </section>
+
+          {trip && (
+            <section>
+              <h2 className="mb-2 text-base font-semibold text-white">Spent from it</h2>
+              {spending.length > 0 && <TripSpendingCard summary={trip} />}
+              {spending.length === 0 ? (
+                <p className="text-sm text-muted">
+                  Nothing yet. Add what it costs from the Goals tile on the Add tab: it stays out
+                  of the monthly budget.
+                </p>
+              ) : (
+                <div className="mt-3">
+                  <RecentEntries
+                    entries={toEntries(spending, [])}
+                    categories={categoryById(categories)}
+                    onOpen={actions.edit}
+                  />
+                </div>
+              )}
+            </section>
+          )}
 
           <section>
             <h2 className="mb-2 text-base font-semibold text-white">Put in and taken out</h2>
@@ -326,29 +367,7 @@ export function SavingsGoalPage() {
               </ul>
             )}
           </section>
-          {paidFor.length > 0 && (
-            <section>
-              <h2 className="mb-2 text-base font-semibold text-white">Spent from it</h2>
-              <ul className="grid gap-1.5">
-                {paidFor.map((p) => (
-                  <li key={p.project.id}>
-                    <Link
-                      to={`/project/${p.project.id}`}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-white/10 hover:bg-white/5"
-                    >
-                      <span className="min-w-0 flex-1 truncate text-sm text-white">
-                        {p.project.name}
-                      </span>
-                      <span className="text-sm tabular-nums text-slate-300">
-                        {formatMoneyWhole(p.spent)}
-                        {p.budget ? ` of ${formatMoneyWhole(p.budget)}` : ''}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <WhereItWent expenses={spending} />
         </div>
       </div>
 
@@ -362,11 +381,19 @@ export function SavingsGoalPage() {
         />
       )}
       {sheet?.kind === 'edit' && <GoalSheet goal={goal} onClose={() => setSheet(null)} />}
+      <EntryDialogs actions={actions} categories={categories} />
     </Frame>
   )
 }
 
 /* ---------- bits ---------- */
+
+function datesOf(from: string | null, to: string | null): string | null {
+  if (from && to) return `${formatDayLong(from)} to ${formatDayLong(to)}`
+  if (from) return `From ${formatDayLong(from)}`
+  if (to) return `Until ${formatDayLong(to)}`
+  return null
+}
 
 function Frame({
   back,

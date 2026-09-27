@@ -73,7 +73,8 @@ export function Budget() {
   const goalSection = (
     <>
       {savingsSection}
-      <ProjectsCard projects={projects.open} />
+      {/* goals spent from, like a trip: outside the month's numbers */}
+      <ProjectsCard projects={projects.open.filter((p) => p.spent > 0)} />
     </>
   )
 

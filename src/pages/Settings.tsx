@@ -1,5 +1,4 @@
 import {
-  AirplaneTilt,
   CaretRight,
   ChartDonut,
   DownloadSimple,
@@ -11,7 +10,6 @@ import {
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MoneyInput } from '../components/budget/MoneyInput'
-import { ProjectSheet } from '../components/projects/ProjectSheet'
 import { Screen } from '../components/Screen'
 import { Segments, Switch } from '../components/savings/fields'
 import { CategorySheet } from '../components/settings/CategorySheet'
@@ -30,7 +28,6 @@ import {
   currentMonthKey,
   formatAmount,
   formatMoney,
-  formatMoneyWhole,
   roundMoney,
   shiftMonth,
   sumByCategory,
@@ -46,14 +43,13 @@ const TYPICAL_MONTHS = 3
 type CategoryEdit = { category?: Category } | null
 
 /**
- * Settings in compact cards. Shared settings (categories, trips) change both
+ * Settings in compact cards. Shared settings (categories) change both
  * phones; the ones marked "this device" stay on this one.
  */
 export function Settings() {
   const { data: categories = [] } = useCategories()
   const savings = useSavingsOverview()
   const [editing, setEditing] = useState<CategoryEdit>(null)
-  const [projectSheet, setProjectSheet] = useState<Category | 'new' | null>(null)
 
   // what each category has actually cost lately, next to its limit
   const months = monthsEndingAt(shiftMonth(currentMonthKey(), -1), TYPICAL_MONTHS)
@@ -64,7 +60,6 @@ export function Settings() {
 
   const monthly = categories.filter((c) => c.kind !== 'project')
   const active = monthly.filter((c) => !c.archived)
-  const projects = categories.filter((c) => c.kind === 'project')
 
   return (
     <Screen title="Settings" wide>
@@ -77,13 +72,6 @@ export function Settings() {
             onEdit={(category) => setEditing({ category })}
             onNew={() => setEditing({})}
           />
-          {savings.available && (
-            <ProjectsSettings
-              projects={projects}
-              onEdit={setProjectSheet}
-              onNew={() => setProjectSheet('new')}
-            />
-          )}
         </div>
         <div className="space-y-4">
           <AddScreenCard />
@@ -111,12 +99,6 @@ export function Settings() {
               : undefined
           }
           onClose={() => setEditing(null)}
-        />
-      )}
-      {projectSheet && (
-        <ProjectSheet
-          project={projectSheet === 'new' ? undefined : projectSheet}
-          onClose={() => setProjectSheet(null)}
         />
       )}
     </Screen>
@@ -247,59 +229,6 @@ function CategoriesCard({
           </button>
           {showHidden && <ul className="mt-1 divide-y divide-white/5">{hidden.map(row)}</ul>}
         </>
-      )}
-    </SettingsCard>
-  )
-}
-
-/* ---------- trips ---------- */
-
-function ProjectsSettings({
-  projects,
-  onEdit,
-  onNew,
-}: {
-  projects: Category[]
-  onEdit: (p: Category) => void
-  onNew: () => void
-}) {
-  return (
-    <SettingsCard
-      title="Trips and projects"
-      help="Their own budget for the whole of it, outside the monthly limits."
-      action={
-        <CardAction onClick={onNew}>
-          <Plus weight="bold" aria-hidden /> New
-        </CardAction>
-      }
-    >
-      {projects.length === 0 ? (
-        <p className="text-sm text-muted">None yet. A trip is a good first one.</p>
-      ) : (
-        <ul className="divide-y divide-white/5">
-          {projects.map((p) => (
-            <li key={p.id}>
-              <button
-                type="button"
-                onClick={() => onEdit(p)}
-                className={`flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-white/5 ${
-                  p.archived ? 'opacity-50' : ''
-                }`}
-              >
-                <AirplaneTilt weight="fill" aria-hidden style={{ color: p.color }} />
-                <span className="min-w-0 flex-1 truncate text-[15px] text-white">{p.name}</span>
-                <span className="shrink-0 text-sm tabular-nums text-muted">
-                  {p.archived
-                    ? 'Finished'
-                    : p.budget_total
-                      ? formatMoneyWhole(p.budget_total)
-                      : 'No budget'}
-                </span>
-                <CaretRight aria-hidden className="shrink-0 text-muted" />
-              </button>
-            </li>
-          ))}
-        </ul>
       )}
     </SettingsCard>
   )

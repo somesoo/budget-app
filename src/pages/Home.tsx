@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { DesktopAdd } from '../components/add/DesktopAdd'
-import { ProjectStrip } from '../components/add/ProjectStrip'
-import { useProjectSummaries } from '../hooks/useProjectSummaries'
+import { GoalPicker, GoalsTile } from '../components/add/GoalPicker'
+import { useGoalTrips } from '../hooks/useGoalTrips'
 import { CategoryPager } from '../components/CategoryPager'
 import { AmountPad } from '../components/AmountPad'
 import { ChartCard } from '../components/charts/ChartCard'
@@ -42,6 +42,7 @@ export function Home() {
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
   const [incomeOpen, setIncomeOpen] = useState(false)
+  const [goalsOpen, setGoalsOpen] = useState(false)
 
   const [selected, setSelected] = useState<Category | null>(null)
   // Person for this one expense — defaults to whoever owns the phone, but can be
@@ -67,11 +68,11 @@ export function Home() {
   const prefs = usePrefs()
   const { alerts } = useBudgetAlerts()
 
-  const projects = useProjectSummaries()
-  // a project is measured by all it has cost against its whole budget, not by the month
+  const goals = useGoalTrips()
+  // spending from a goal is measured by all it has cost against its target, not by the month
   const spentOf = (c: Category) =>
     c.kind === 'project'
-      ? (projects.all.find((p) => p.project.id === c.id)?.spent ?? 0)
+      ? (goals.all.find((g) => g.trip?.project.id === c.id)?.trip?.spent ?? 0)
       : (spentByCategory[c.id] ?? 0)
   const limitOf = (c: Category) => (c.kind === 'project' ? (c.budget_total ?? 0) : c.monthly_limit)
 
@@ -209,8 +210,6 @@ export function Home() {
         </div>
       )}
 
-      <ProjectStrip projects={projects.open} onSelect={openCategory} />
-
       {isLoading ? (
         <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -222,6 +221,25 @@ export function Home() {
           categories={categories}
           spentByCategory={spentByCategory}
           onSelect={openCategory}
+          trailing={
+            goals.open.length > 0
+              ? (height) => (
+                  <GoalsTile goals={goals.open} height={height} onClick={() => setGoalsOpen(true)} />
+                )
+              : undefined
+          }
+        />
+      )}
+
+      {goalsOpen && (
+        <GoalPicker
+          goals={goals.open}
+          onClose={() => setGoalsOpen(false)}
+          onPick={async ({ goal }) => {
+            const category = await goals.ensureTrip(goal)
+            setGoalsOpen(false)
+            openCategory(category)
+          }}
         />
       )}
 

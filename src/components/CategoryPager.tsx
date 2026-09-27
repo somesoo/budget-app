@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { CategoryTile } from './CategoryTile'
 import type { Category } from '../types'
 
@@ -6,6 +6,8 @@ interface Props {
   categories: Category[]
   spentByCategory: Record<string, number>
   onSelect: (category: Category) => void
+  /** One more tile after the categories (the Goals tile), given its height. */
+  trailing?: (height: number) => ReactNode
 }
 
 const GAP = 8
@@ -20,7 +22,7 @@ const DOTS = 22
  * never scrolls vertically. Tiles that don't fit go onto further pages,
  * swiped left and right (native scroll-snap, so it feels like the OS).
  */
-export function CategoryPager({ categories, spentByCategory, onSelect }: Props) {
+export function CategoryPager({ categories, spentByCategory, onSelect, trailing }: Props) {
   const viewport = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
   const [page, setPage] = useState(0)
@@ -35,10 +37,11 @@ export function CategoryPager({ categories, spentByCategory, onSelect }: Props) 
     return () => observer.disconnect()
   }, [])
 
-  const { cols, rows, tileHeight } = fit(size, categories.length)
+  const tiles: (Category | 'trailing')[] = trailing ? [...categories, 'trailing'] : categories
+  const { cols, rows, tileHeight } = fit(size, tiles.length)
   const perPage = cols * rows
-  const pages: Category[][] = []
-  for (let i = 0; i < categories.length; i += perPage) pages.push(categories.slice(i, i + perPage))
+  const pages: (Category | 'trailing')[][] = []
+  for (let i = 0; i < tiles.length; i += perPage) pages.push(tiles.slice(i, i + perPage))
 
   const goTo = (index: number) =>
     viewport.current?.scrollTo({ left: index * size.width, behavior: 'smooth' })
@@ -54,7 +57,7 @@ export function CategoryPager({ categories, spentByCategory, onSelect }: Props) 
         className="no-scrollbar flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
       >
         {size.height > 0 &&
-          pages.map((tiles, index) => (
+          pages.map((pageTiles, index) => (
             <div
               key={index}
               aria-label={
@@ -63,15 +66,19 @@ export function CategoryPager({ categories, spentByCategory, onSelect }: Props) 
               className="grid w-full shrink-0 snap-start snap-always content-start"
               style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: GAP }}
             >
-              {tiles.map((category) => (
-                <CategoryTile
-                  key={category.id}
-                  category={category}
-                  spent={spentByCategory[category.id] ?? 0}
-                  height={tileHeight}
-                  onClick={() => onSelect(category)}
-                />
-              ))}
+              {pageTiles.map((category) =>
+                category === 'trailing' ? (
+                  <div key="trailing">{trailing?.(tileHeight)}</div>
+                ) : (
+                  <CategoryTile
+                    key={category.id}
+                    category={category}
+                    spent={spentByCategory[category.id] ?? 0}
+                    height={tileHeight}
+                    onClick={() => onSelect(category)}
+                  />
+                ),
+              )}
             </div>
           ))}
       </div>

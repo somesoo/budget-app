@@ -4,7 +4,7 @@ import { CURRENCY_SUFFIX } from '../../config'
 import { usePrefs } from '../../hooks/usePrefs'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
-import { useProjectSummaries } from '../../hooks/useProjectSummaries'
+import { useGoalTrips } from '../../hooks/useGoalTrips'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { useEntryActions } from '../../hooks/useEntryActions'
 import { useAddExpense, useExpenses, useMonthlyExpenses } from '../../hooks/useExpenses'
@@ -28,7 +28,7 @@ import {
 import { crossingNote, limitImpact } from '../../lib/alerts'
 import { toEntries } from '../../lib/history'
 import { categorySlices, elapsedDays } from '../../lib/insights'
-import type { Category, Person } from '../../types'
+import type { Category, Goal, Person } from '../../types'
 import { CHART } from '../charts/theme'
 import { SpendDonut } from '../charts/SpendDonut'
 import { AlertStrip } from '../alerts/AlertList'
@@ -39,6 +39,7 @@ import { DateChip, PersonToggle } from '../HeaderControls'
 import { EntryDialogs } from '../history/EntryDialogs'
 import { UserSwitcher } from '../UserSwitcher'
 import { CategoryGrid } from './CategoryGrid'
+import { GoalPicker, GoalsTile } from './GoalPicker'
 import { RecentEntries } from './RecentEntries'
 
 type Mode = 'expense' | 'income'
@@ -57,7 +58,7 @@ export function DesktopAdd() {
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
   const categories = allCategories.filter((c) => !c.archived)
   const { data: expenses = [] } = useMonthlyExpenses(month)
-  // recent entries include trips: they were just logged here too
+  // recent entries include spending from goals: it was just logged here too
   const { data: allExpenses = [] } = useExpenses(month)
   const { from, to } = monthRange(month)
   const { data: incomes = [] } = useIncomesBetween(from, to)
@@ -67,9 +68,10 @@ export function DesktopAdd() {
   const actions = useEntryActions()
   const { alerts } = useBudgetAlerts()
   const prefs = usePrefs()
-  const projectSummaries = useProjectSummaries()
+  const goals = useGoalTrips()
 
   const [mode, setMode] = useState<Mode>('expense')
+  const [goalsOpen, setGoalsOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [person, setPerson] = useState<Person>(devicePerson ?? 'bubs')
@@ -99,14 +101,15 @@ export function DesktopAdd() {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  // projects show their whole budget on the tile, and all they've cost so far
-  const projectTiles = projectSummaries.open.map((p) => ({
-    ...p.project,
-    monthly_limit: p.budget ?? 0,
+  // goals show their whole target on the tile, and all that's been spent from them;
+  // one without its category yet gets a stand-in until it's picked
+  const goalTiles: Category[] = goals.open.map(({ goal, trip }) => ({
+    ...(trip?.project ?? standIn(goal)),
+    monthly_limit: trip?.budget ?? goal.target_amount,
   }))
   const spentByCategory = {
     ...sumByCategory(expenses),
-    ...Object.fromEntries(projectSummaries.open.map((p) => [p.project.id, p.spent])),
+    ...Object.fromEntries(goals.open.flatMap((g) => (g.trip ? [[g.trip.project.id, g.trip.spent]] : []))),
   }
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
@@ -115,8 +118,8 @@ export function DesktopAdd() {
   const q = query.trim().toLowerCase()
   const matches = (c: Category) => !q || c.name.toLowerCase().includes(q)
   const shown = categories.filter(matches)
-  const shownProjects = projectTiles.filter(matches)
-  const selected = [...categories, ...projectTiles].find((c) => c.id === selectedId) ?? null
+  const shownGoals = goalTiles.filter(matches)
+  const selected = [...categories, ...goalTiles].find((c) => c.id === selectedId) ?? null
   const isProjectPick = selected?.kind === 'project'
   const recent = toEntries(allExpenses, incomes).slice(0, RECENT)
   const lastIncome = lastIncomes.find((i) => i.person === person)
@@ -128,6 +131,18 @@ export function DesktopAdd() {
     setQuery('')
     // after the click has landed, so the tile doesn't keep the focus
     requestAnimationFrame(() => amountRef.current?.focus())
+  }
+
+  const pickGoal = async (goal: Goal) => {
+    const category = await goals.ensureTrip(goal)
+    setGoalsOpen(false)
+    pick(category)
+  }
+
+  const pickTile = (category: Category) => {
+    const goal = goals.open.find((g) => category.id === standIn(g.goal).id)?.goal
+    if (!goal) return pick(category)
+    pickGoal(goal).catch((err) => setToast(`Couldn’t open it: ${(err as Error).message}`))
   }
 
   const canSave =
@@ -182,10 +197,10 @@ export function DesktopAdd() {
   }
 
   const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    const first = shown[0] ?? shownProjects[0]
+    const first = shown[0] ?? shownGoals[0]
     if (e.key === 'Enter' && first) {
       e.preventDefault()
-      pick(first)
+      pickTile(first)
     } else if (e.key === 'Escape') {
       setQuery('')
     }
@@ -263,10 +278,21 @@ export function DesktopAdd() {
           ) : (
             <CategoryGrid
               categories={shown}
-              projects={shownProjects}
+              goals={shownGoals}
+              goalsTile={
+                goals.open.length > 0
+                  ? (height) => (
+                      <GoalsTile
+                        goals={goals.open}
+                        height={height}
+                        onClick={() => setGoalsOpen(true)}
+                      />
+                    )
+                  : undefined
+              }
               spentByCategory={spentByCategory}
               selectedId={mode === 'expense' ? selectedId : null}
-              onSelect={pick}
+              onSelect={pickTile}
               query={query}
               onQueryChange={setQuery}
               searchRef={searchRef}
@@ -442,6 +468,13 @@ export function DesktopAdd() {
       </div>
 
       <EntryDialogs actions={actions} categories={allCategories} />
+      {goalsOpen && (
+        <GoalPicker
+          goals={goals.open}
+          onClose={() => setGoalsOpen(false)}
+          onPick={({ goal }) => pickGoal(goal)}
+        />
+      )}
 
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-8 z-30 flex justify-center pl-60">
@@ -455,6 +488,24 @@ export function DesktopAdd() {
       )}
     </div>
   )
+}
+
+/** A goal whose category isn't there yet (before migration 0009), as a tile. */
+function standIn(goal: Goal): Category {
+  return {
+    id: `goal:${goal.id}`,
+    name: goal.name,
+    color: goal.color,
+    monthly_limit: goal.target_amount,
+    sort_order: goal.sort_order,
+    archived: false,
+    show_in_chart: true,
+    kind: 'project',
+    budget_total: goal.target_amount || null,
+    starts_on: null,
+    ends_on: null,
+    goal_id: goal.id,
+  }
 }
 
 function MonthCard({

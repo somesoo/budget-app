@@ -1,12 +1,14 @@
 import { MagnifyingGlass } from '@phosphor-icons/react'
-import type { KeyboardEvent, RefObject } from 'react'
+import type { KeyboardEvent, ReactNode, RefObject } from 'react'
 import type { Category } from '../../types'
 import { CategoryTile } from '../CategoryTile'
 
 interface Props {
   categories: Category[]
-  /** Trips and other projects, each with its whole budget as the tile's limit. */
-  projects?: Category[]
+  /** Savings goals matching the search, each with its whole target as the tile's limit. */
+  goals?: Category[]
+  /** The Goals tile, after the categories while nothing is being searched for. */
+  goalsTile?: (height: number) => ReactNode
   spentByCategory: Record<string, number>
   selectedId: string | null
   onSelect: (category: Category) => void
@@ -24,7 +26,8 @@ const TILE_HEIGHT = 104
  */
 export function CategoryGrid({
   categories,
-  projects = [],
+  goals = [],
+  goalsTile,
   spentByCategory,
   selectedId,
   onSelect,
@@ -54,7 +57,7 @@ export function CategoryGrid({
         </kbd>
       </label>
 
-      {categories.length === 0 && projects.length === 0 ? (
+      {categories.length === 0 && goals.length === 0 && !!query ? (
         <p className="py-10 text-center text-sm text-muted">No category matches “{query}”.</p>
       ) : (
         <div className="-m-1 min-h-0 flex-1 overflow-y-auto p-1">
@@ -64,12 +67,13 @@ export function CategoryGrid({
             selectedId={selectedId}
             highlightFirst={!!query}
             onSelect={onSelect}
+            trailing={query ? undefined : goalsTile?.(TILE_HEIGHT)}
           />
-          {projects.length > 0 && (
+          {query && goals.length > 0 && (
             <>
-              <h3 className="mb-2 mt-5 text-sm font-semibold text-white">Trips and projects</h3>
+              <h3 className="mb-2 mt-5 text-sm font-semibold text-white">Goals</h3>
               <Tiles
-                list={projects}
+                list={goals}
                 spentByCategory={spentByCategory}
                 selectedId={selectedId}
                 highlightFirst={!!query && categories.length === 0}
@@ -89,12 +93,14 @@ function Tiles({
   selectedId,
   highlightFirst,
   onSelect,
+  trailing,
 }: {
   list: Category[]
   spentByCategory: Record<string, number>
   selectedId: string | null
   highlightFirst: boolean
   onSelect: (category: Category) => void
+  trailing?: ReactNode
 }) {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-3">
@@ -117,6 +123,7 @@ function Tiles({
           />
         </div>
       ))}
+      {trailing}
     </div>
   )
 }

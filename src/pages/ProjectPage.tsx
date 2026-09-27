@@ -1,31 +1,27 @@
-import { AirplaneTilt, ArrowLeft, PencilSimple, Warning } from '@phosphor-icons/react'
+import { AirplaneTilt, ArrowLeft, PencilSimple } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { RecentEntries } from '../components/add/RecentEntries'
-import { CHART } from '../components/charts/theme'
 import { EntryDialogs } from '../components/history/EntryDialogs'
 import { ProjectSheet } from '../components/projects/ProjectSheet'
+import { TripSpendingCard, WhereItWent } from '../components/projects/TripSpending'
 import { useCategories } from '../hooks/useCategories'
 import { useEntryActions } from '../hooks/useEntryActions'
 import { useProjectSummaries } from '../hooks/useProjectSummaries'
-import { useSavingsOverview } from '../hooks/useSavings'
-import { categoryById, formatDayLong, formatMoneyWhole, roundMoney } from '../lib/calculations'
+import { categoryById, formatDayLong } from '../lib/calculations'
 import { toEntries } from '../lib/history'
 import type { ProjectSummary } from '../lib/projects'
 
-/** Items listed by what they were (their notes), biggest first. */
-const TOP_ITEMS = 5
-
 /**
- * `/project/:id`: a trip or project across all its months. What it has cost
- * against its budget, how much a day is left while it runs, what was saved
- * for it, and every expense.
+ * `/project/:id`: a trip or project across all its months. Since goals and
+ * trips are one thing (migration 0009), a trip tied to a goal lives on the
+ * goal's page; this one is left for a trip without a goal, on a database that
+ * hasn't run that migration yet.
  */
 export function ProjectPage() {
   const { id = '' } = useParams()
   const projects = useProjectSummaries()
   const { data: categories = [] } = useCategories()
-  const savings = useSavingsOverview()
   const actions = useEntryActions()
   const [editing, setEditing] = useState(false)
   const summary = projects.all.find((p) => p.project.id === id)
@@ -39,25 +35,9 @@ export function ProjectPage() {
   }
   if (!summary) return <Frame title="Project">Nothing here: it may have been removed.</Frame>
 
-  const { project, spent, budget, left } = summary
+  const { project } = summary
+  if (project.goal_id) return <Navigate to={`/savings/goal/${project.goal_id}`} replace />
   const expenses = projects.expensesOf(id)
-  const goal = project.goal_id
-    ? savings.goals.find((g) => g.goal.id === project.goal_id)
-    : undefined
-  const progress = budget ? Math.min(spent / budget, 1) : null
-  const over = left !== null && left < 0
-
-  // the biggest things it went on, by what they were called
-  const byNote = new Map<string, number>()
-  for (const e of expenses) {
-    const key = e.note?.trim() || 'Untitled'
-    byNote.set(key, (byNote.get(key) ?? 0) + e.amount)
-  }
-  const items = [...byNote.entries()]
-    .map(([note, amount]) => ({ note, amount: roundMoney(amount) }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, TOP_ITEMS)
-
   return (
     <Frame
       title={project.name}
@@ -67,44 +47,13 @@ export function ProjectPage() {
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
-          <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
-            <div className="grid grid-cols-3 gap-3">
-              <Stat label="Spent" value={formatMoneyWhole(spent)} />
-              <Stat label="Budget" value={budget ? formatMoneyWhole(budget) : 'None'} />
-              <Stat
-                label={over ? 'Over by' : 'Left'}
-                value={left === null ? 'No budget' : formatMoneyWhole(Math.abs(left))}
-                warn={over}
-              />
-            </div>
-            {progress !== null && (
-              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${progress * 100}%`,
-                    backgroundColor: over ? CHART.warning : project.color,
-                  }}
-                />
-              </div>
-            )}
-            <p className="mt-3 flex items-start gap-1.5 text-sm leading-snug text-slate-300">
-              {over && (
-                <Warning
-                  weight="fill"
-                  className="mt-0.5 shrink-0"
-                  style={{ color: CHART.warning }}
-                />
-              )}
-              {phaseLine(summary)}
-            </p>
-          </section>
+          <TripSpendingCard summary={summary} />
 
           <section>
             <h2 className="mb-2 text-base font-semibold text-white">Every expense</h2>
             {expenses.length === 0 ? (
               <p className="text-sm text-muted">
-                Nothing yet. Add expenses to it from the Add tab, where it has its own tile.
+                Nothing yet. Tie it to a savings goal in Edit, then add expenses from the Goals tile on the Add tab.
               </p>
             ) : (
               <RecentEntries
@@ -117,41 +66,7 @@ export function ProjectPage() {
         </div>
 
         <div className="space-y-6">
-          {goal && (
-            <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-              <h2 className="text-base font-semibold text-white">Paid from {goal.goal.name}</h2>
-              <p className="mt-1 text-sm leading-snug text-slate-300">
-                {formatMoneyWhole(goal.saved)} saved for it
-                {budget && left !== null && left > 0
-                  ? goal.saved >= left
-                    ? `, which covers the ${formatMoneyWhole(left)} still to spend.`
-                    : `; the ${formatMoneyWhole(left)} still to spend needs ${formatMoneyWhole(left - goal.saved)} more.`
-                  : '.'}
-              </p>
-              <Link
-                to={`/savings/goal/${goal.goal.id}`}
-                className="mt-2 inline-block text-sm font-semibold text-accent-soft hover:underline"
-              >
-                See the goal
-              </Link>
-            </section>
-          )}
-
-          {items.length > 0 && (
-            <section>
-              <h2 className="mb-2 text-base font-semibold text-white">Where it went</h2>
-              <ul className="grid gap-1.5">
-                {items.map((it) => (
-                  <li key={it.note} className="flex items-baseline gap-3 text-sm">
-                    <span className="min-w-0 flex-1 truncate text-slate-200">{it.note}</span>
-                    <span className="shrink-0 font-semibold tabular-nums text-white">
-                      {formatMoneyWhole(it.amount)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <WhereItWent expenses={expenses} />
         </div>
       </div>
 
@@ -168,28 +83,6 @@ function dates({ project }: ProjectSummary): string {
   if (from) return `From ${from}`
   if (to) return `Until ${to}`
   return 'Trip or project'
-}
-
-function phaseLine(s: ProjectSummary): string {
-  const days = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`
-  switch (s.phase) {
-    case 'upcoming':
-      return `Starts in ${days(s.days ?? 0)}.${
-        s.spent > 0 ? ` ${formatMoneyWhole(s.spent)} already paid ahead.` : ''
-      }`
-    case 'running':
-      return s.perDayLeft !== null
-        ? `${days(s.days ?? 0)} to go, today included: about ${formatMoneyWhole(Math.floor(s.perDayLeft))} a day keeps it within budget.`
-        : `${days(s.days ?? 0)} to go, today included.`
-    case 'finished':
-      return s.left !== null
-        ? s.left >= 0
-          ? `Finished ${formatMoneyWhole(s.left)} under budget.`
-          : `Finished ${formatMoneyWhole(-s.left)} over budget.`
-        : 'Finished.'
-    default:
-      return 'No dates: it runs until you finish it in its settings.'
-  }
 }
 
 function Frame({
@@ -240,20 +133,6 @@ function Frame({
         )}
       </header>
       {children}
-    </div>
-  )
-}
-
-function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
-  return (
-    <div className="min-w-0">
-      <p className="truncate text-xs text-muted">{label}</p>
-      <p
-        className="truncate text-lg font-bold tabular-nums text-white"
-        style={warn ? { color: CHART.warning } : undefined}
-      >
-        {value}
-      </p>
     </div>
   )
 }

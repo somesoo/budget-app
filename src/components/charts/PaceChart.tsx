@@ -9,6 +9,8 @@ interface Props {
   month: MonthKey
   points: PacePoint[]
   showPace: boolean
+  /** Height of the plot itself, in px; smaller where it shares the screen. */
+  plotHeight?: number
 }
 
 const PLOT_H = 150
@@ -22,8 +24,9 @@ const RIGHT = 14
  * accent) against an even spread of the monthly limit (dashed — it's a
  * threshold, not data). Scrub with a finger or the arrow keys.
  */
-export function PaceChart({ month, points, showPace }: Props) {
+export function PaceChart({ month, points, showPace, plotHeight = PLOT_H }: Props) {
   const { ref, width } = useElementWidth<HTMLDivElement>()
+  const plotH = plotHeight
   const [active, setActive] = useState<number | null>(null)
 
   const days = points.length
@@ -36,10 +39,10 @@ export function PaceChart({ month, points, showPace }: Props) {
   )
   const { max, step } = niceScale(peak)
   const plotW = Math.max(width - LEFT - RIGHT, 10)
-  const height = TOP + PLOT_H + AXIS_BAND
+  const height = TOP + plotH + AXIS_BAND
 
   const x = (day: number) => LEFT + ((day - 1) / Math.max(days - 1, 1)) * plotW
-  const y = (value: number) => TOP + PLOT_H - (value / max) * PLOT_H
+  const y = (value: number) => TOP + plotH - (value / max) * plotH
 
   const linePath = elapsed
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.day).toFixed(1)},${y(p.cumulative!).toFixed(1)}`)
@@ -113,7 +116,7 @@ export function PaceChart({ month, points, showPace }: Props) {
             <text
               key={d}
               x={x(d)}
-              y={TOP + PLOT_H + 16}
+              y={TOP + plotH + 16}
               textAnchor={d === 1 ? 'start' : d === days ? 'end' : 'middle'}
               fontSize={AXIS_FONT}
               fill={CHART.textMuted}
@@ -157,7 +160,7 @@ export function PaceChart({ month, points, showPace }: Props) {
                 x1={x(activePoint.day)}
                 x2={x(activePoint.day)}
                 y1={TOP}
-                y2={TOP + PLOT_H}
+                y2={TOP + plotH}
                 stroke={CHART.textSecondary}
                 strokeOpacity={0.5}
                 strokeWidth={1}
@@ -217,7 +220,7 @@ export function PaceChart({ month, points, showPace }: Props) {
           y={Math.min(
             activePoint.cumulative !== null ? y(activePoint.cumulative) : Infinity,
             showPace ? y(activePoint.pace) : Infinity,
-            TOP + PLOT_H,
+            TOP + plotH,
           )}
           width={width}
         >

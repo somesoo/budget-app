@@ -4,13 +4,14 @@ import { GoalPicker, GoalsTile } from '../components/add/GoalPicker'
 import { useGoalTrips } from '../hooks/useGoalTrips'
 import { CategoryPager } from '../components/CategoryPager'
 import { AmountPad } from '../components/AmountPad'
-import { ChartCard } from '../components/charts/ChartCard'
 import { SpendDonut } from '../components/charts/SpendDonut'
 import { IncomePad } from '../components/IncomePad'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { Screen } from '../components/Screen'
 import { SettingsLink } from '../components/SettingsLink'
-import { AlertStrip } from '../components/alerts/AlertList'
+import { AlertList } from '../components/alerts/AlertList'
+import { WidgetCarousel, type Widget } from '../components/add/WidgetCarousel'
+import { PaceChart } from '../components/charts/PaceChart'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { useAddExpense, useMonthlyExpenses } from '../hooks/useExpenses'
@@ -29,7 +30,7 @@ import {
   todayKey,
 } from '../lib/calculations'
 import { crossingNote, limitImpact } from '../lib/alerts'
-import { categorySlices } from '../lib/insights'
+import { categorySlices, pacePoints, projectMonthEnd } from '../lib/insights'
 import type { Category, Person } from '../types'
 
 export function Home() {
@@ -66,7 +67,7 @@ export function Home() {
 
   const laptop = useMediaQuery(LAPTOP)
   const prefs = usePrefs()
-  const { alerts } = useBudgetAlerts()
+  const { alerts, dismiss } = useBudgetAlerts()
 
   const goals = useGoalTrips()
   // spending from a goal is measured by all it has cost against its target, not by the month
@@ -75,6 +76,62 @@ export function Home() {
       ? (goals.all.find((g) => g.trip?.project.id === c.id)?.trip?.spent ?? 0)
       : (spentByCategory[c.id] ?? 0)
   const limitOf = (c: Category) => (c.kind === 'project' ? (c.budget_total ?? 0) : c.monthly_limit)
+
+  const projected = projectMonthEnd(monthTotal, month)
+  const widgets: Widget[] = [
+    {
+      id: 'donut',
+      label: 'Where it goes',
+      content:
+        slices.length > 0 ? (
+          <>
+            <SpendDonut slices={slices} />
+            {leftOut.length > 0 && (
+              <p className="mt-2 truncate text-xs text-muted">
+                Not in the chart:{' '}
+                {leftOut
+                  .map((c) => `${c.name} ${formatMoneyCompact(Math.round(spentByCategory[c.id]))}`)
+                  .join(' · ')}
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="py-6 text-center text-sm text-muted">Nothing spent yet this month.</p>
+        ),
+    },
+    {
+      id: 'pace',
+      label: 'Pace',
+      content: (
+        <>
+          <p className="text-sm leading-snug text-slate-200">
+            {paceLine(monthTotal, projected, monthLimit)}
+          </p>
+          <PaceChart
+            month={month}
+            points={pacePoints(expenses, month, monthLimit)}
+            showPace={monthLimit > 0}
+            plotHeight={96}
+          />
+        </>
+      ),
+    },
+    {
+      id: 'alerts',
+      label: 'Warnings',
+      badge: alerts.length,
+      content:
+        alerts.length > 0 ? (
+          <div className="max-h-48 overflow-y-auto">
+            <AlertList alerts={alerts} onDismiss={dismiss} />
+          </div>
+        ) : (
+          <p className="py-6 text-center text-sm text-muted">
+            All good: nothing close to a limit.
+          </p>
+        ),
+    },
+  ]
 
   const openCategory = (category: Category) => {
     setEntryPerson(devicePerson ?? 'bubs')
@@ -180,11 +237,6 @@ export function Home() {
         </button>
       </div>
 
-      {alerts.length > 0 && (
-        <div className="mb-3 shrink-0">
-          <AlertStrip alerts={alerts} />
-        </div>
-      )}
 
       {error && (
         <p className="mb-3 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
@@ -192,21 +244,10 @@ export function Home() {
         </p>
       )}
 
-      {/* Nothing spent yet means nothing to divide up — the donut only appears
-          once it has something to say. */}
-      {slices.length > 0 && (
+      {/* nothing spent and nothing to warn about: the tiles get the room */}
+      {(slices.length > 0 || alerts.length > 0) && (
         <div className="mb-3 shrink-0">
-          <ChartCard title="Where it goes">
-            <SpendDonut slices={slices} />
-            {leftOut.length > 0 && (
-              <p className="mt-2 truncate text-xs text-muted">
-                Not in the chart:{' '}
-                {leftOut
-                  .map((c) => `${c.name} ${formatMoneyCompact(Math.round(spentByCategory[c.id]))}`)
-                  .join(' · ')}
-              </p>
-            )}
-          </ChartCard>
+          <WidgetCarousel widgets={widgets} />
         </div>
       )}
 
@@ -252,4 +293,13 @@ export function Home() {
       )}
     </Screen>
   )
+}
+
+/** The month's pace in a sentence: where the total is heading against the limits. */
+function paceLine(spent: number, projected: number | null, limit: number): string {
+  if (projected === null || limit <= 0) return `Spent ${formatMoneyCompact(spent)} so far.`
+  const diff = projected - limit
+  return diff > 0
+    ? `At this rate about ${formatMoneyCompact(diff)} over the limits by the end of the month.`
+    : `On course for ${formatMoneyCompact(projected)}, ${formatMoneyCompact(-diff)} under the limits.`
 }

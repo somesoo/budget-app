@@ -10,16 +10,33 @@ interface Props {
   fill?: boolean
   /** On a laptop, use the width for columns instead of a phone-wide strip. */
   wide?: boolean
+  /** Keep the title for screen readers only; the header shows just the action. */
+  hideTitle?: boolean
   children: ReactNode
 }
 
 /** Shared tab layout: header plus scrollable content above the bottom nav (beside the side nav on a laptop). */
-export function Screen({ title, action, fill = false, wide = false, children }: Props) {
+export function Screen({
+  title,
+  action,
+  fill = false,
+  wide = false,
+  hideTitle = false,
+  children,
+}: Props) {
   const width = wide ? 'max-w-md lg:max-w-6xl lg:px-8' : 'max-w-md lg:max-w-2xl lg:px-8'
   const header = (
     <header className="mb-4 flex shrink-0 items-center justify-between gap-3 lg:mb-6">
-      <h1 className="truncate text-2xl font-bold text-white lg:text-3xl lg:tracking-tight">{title}</h1>
-      {action}
+      <h1
+        className={
+          hideTitle
+            ? 'sr-only'
+            : 'truncate text-2xl font-bold text-white lg:text-3xl lg:tracking-tight'
+        }
+      >
+        {title}
+      </h1>
+      {action && <div className="ml-auto">{action}</div>}
     </header>
   )
 

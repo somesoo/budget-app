@@ -162,6 +162,7 @@ export function Home() {
   return (
     <Screen
       title="What for?"
+      hideTitle
       action={
         <div className="flex items-center gap-1">
           {devicePerson && <UserSwitcher value={devicePerson} onChange={setDevicePerson} />}

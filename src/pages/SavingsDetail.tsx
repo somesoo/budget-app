@@ -107,7 +107,7 @@ export function SavingsAccountPage() {
         />
       }
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="grid grid-cols-3 gap-3 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
             <Stat label="Balance" value={formatMoneyWhole(balance)} />
@@ -304,7 +304,7 @@ export function SavingsGoalPage() {
         </div>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
             <p className="text-sm text-muted">Saved</p>

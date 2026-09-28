@@ -64,7 +64,7 @@ export function Settings() {
 
   return (
     <Screen title="Settings" wide>
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-4">
           <DeviceCard />
           <CategoriesCard

@@ -77,7 +77,7 @@ export function CategoryDetail({
   const history = categoryHistory(expenses, categoryId, month)
 
   return (
-    <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,7fr)_minmax(0,6fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,7fr)_minmax(0,6fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
       <HistoryPane
         key={category.id}
         category={category}
@@ -596,7 +596,7 @@ function Notice({ children }: { children: ReactNode }) {
 
 function Skeleton() {
   return (
-    <div className="grid gap-4 lg:h-full lg:grid-cols-[minmax(0,7fr)_minmax(0,6fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-4 lg:h-full lg:grid-cols-[minmax(0,7fr)_minmax(0,6fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
       <div className="h-96 animate-pulse rounded-3xl bg-white/5 lg:row-span-2 lg:h-auto" />
       <div className="h-80 animate-pulse rounded-3xl bg-white/5" />
       <div className="h-64 animate-pulse rounded-3xl bg-white/5 lg:h-auto" />

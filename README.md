@@ -54,7 +54,12 @@ through Supabase Realtime.
 12. Paste and run `supabase/migrations/0009_goals_are_trips.sql`: goals and
    trips become one thing. Every goal can be spent from (the Goals tile on the
    Add tab), outside the monthly budget; a trip without a goal gets one.
-13. Check **Database → Replication** that `expenses`, `categories` and `goals`
+13. Paste and run `supabase/migrations/0010_plan_allocations.sql`: a plan can
+   split its savings between goals and IKE/IKZE accounts and name the goal the
+   month before's unspent money goes to, and IKE/IKZE become account kinds of
+   their own (retirement accounts with IKE or IKZE in the name switch over).
+   Until it's run, plans save without the split.
+14. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads` and `ai_messages`) are in the
    `supabase_realtime` publication — the migrations add them.
@@ -188,6 +193,32 @@ month, and the same month a year ago — each one tap to adopt, rounded up to
 spending, or the defaults. "What's different about this month?" is a free-text
 note saved with the plan.
 
+**From the paycheck.** Once there are savings accounts, the planner's
+*Savings* splits into lines: one per open goal (with a chip for what it needs
+a month to be on time, and the account it goes onto) and one per IKE/IKZE
+account, plus *Other savings* for the rest. The plan's savings total is their
+sum. An IKE/IKZE line shows what's been paid in this calendar year against the
+yearly limit (`RETIREMENT_LIMITS` in `src/config.ts` — add each new year's
+figure when it's announced) and offers *max out*: the monthly payment that
+uses the rest of the limit by December. Planning past the limit shows a
+warning. Deposits and transfers in count toward the limit; interest doesn't,
+and withdrawals don't give it back.
+
+Planning a month also asks **where the month before's unspent money goes**:
+one of the goals, or nowhere (it stays on the account). Unspent is income −
+planned savings − spending. At the start of the planned month it shows up as a
+line in *From the paycheck*, booked as a deposit noted "Leftover from
+<month>" so it isn't mistaken for the goal's regular line.
+
+Logging a paycheck with "+ Income" opens *From the paycheck* straight away,
+so the savings leave before the money gets spent.
+
+On the Budget tab, *From the paycheck* lists the month's lines against what
+was actually paid in. In the running month each unfinished line has a *Pay in*
+button — tap, then confirm — that books the rest as a deposit onto the right
+account (and goal). A goal line counts deposits for that goal; an IKE line
+counts deposits and transfers onto the account.
+
 **AI draft** (`api/plan.ts`) sends Gemini monthly totals per category and of
 income for up to 12 months, the goal and your note — no individual expenses —
 and gets back a limit and a one-line reason per category, suggested savings and
@@ -316,10 +347,20 @@ scroll-snap), with dots underneath. Because tile height varies, the points at
 which a tile's text flips to dark as the fill rises are computed from the
 actual height (`CategoryTile`).
 
+### Safe to spend
+
+The line at the top of the Add tab is the month's money that's really free:
+income logged this month − the plan's savings (paid in yet or not: they're
+spoken for) − what's been spent, trips left out. Until a paycheck is logged
+the plan's expected income stands in, marked "expected". Below zero it turns
+red. Without a plan or income it falls back to spent against the limits.
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
-  (`fillPercent`). Past 100% the whole tile turns red.
+  (`fillPercent`). Its big number is what's left to spend this month, with
+  what's been spent underneath. Past 100% it goes below zero ("−246 zł over")
+  and the whole tile turns red.
 - A calendar day's intensity is relative to the month's daily average
   (`heatIntensity`): twice the average or more is full saturation.
 - Text color comes from `readableTextColor` (WCAG contrast), so any category

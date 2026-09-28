@@ -145,6 +145,8 @@ describe('planChecks', () => {
     income: 5000,
     savings: 500,
     limits: { food: 1500 },
+    allocations: [],
+    carryover: null,
     note: '',
     ...p,
   })

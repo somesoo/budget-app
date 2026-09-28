@@ -1,6 +1,14 @@
 import { LOCALE } from '../config'
 import type { Recurring, Suggestion } from './suggestions'
-import type { BudgetPlan, Category, Expense, Goal, Income } from '../types'
+import type {
+  BudgetPlan,
+  Category,
+  Expense,
+  Goal,
+  Income,
+  PlanAllocation,
+  PlanCarryover,
+} from '../types'
 import {
   currentMonthKey,
   formatMonth,
@@ -119,8 +127,13 @@ export function roundUpPlan(amount: number): number {
 
 export interface PlanDraft {
   income: number
+  /** The total put aside, allocations included. */
   savings: number
   limits: Record<string, number>
+  /** Where the savings go, see lib/allocations. */
+  allocations: PlanAllocation[]
+  /** The goal last month's unspent money goes to. */
+  carryover: PlanCarryover | null
   note: string
 }
 
@@ -133,8 +146,10 @@ export function draftFrom(args: {
   baseline: PlanBaseline
   previousPlan: BudgetPlan | null
   existing?: BudgetPlan | null
+  /** Which of last month's savings lines carry over (not those of closed goals and accounts). */
+  keepAllocation?: (a: PlanAllocation) => boolean
 }): PlanDraft {
-  const { source, categories, baseline, previousPlan, existing } = args
+  const { source, categories, baseline, previousPlan, existing, keepAllocation = () => true } = args
   if (existing) {
     return {
       income: existing.income,
@@ -142,9 +157,13 @@ export function draftFrom(args: {
       limits: Object.fromEntries(
         categories.map((c) => [c.id, existing.limits[c.id] ?? c.monthly_limit]),
       ),
+      allocations: existing.allocations,
+      carryover: existing.carryover,
       note: existing.note ?? '',
     }
   }
+  const allocations = (previousPlan?.allocations ?? []).filter(keepAllocation)
+  const lastCarryover = previousPlan?.carryover ?? null
 
   const typicalById = new Map(baseline.categories.map((b) => [b.category.id, b.typical]))
   const limits = Object.fromEntries(
@@ -164,8 +183,12 @@ export function draftFrom(args: {
       source === 'previous' && previousPlan
         ? previousPlan.income
         : roundMoney(baseline.typicalIncome ?? previousPlan?.income ?? 0),
+    // what went to a goal that has since closed goes back to "other savings"
     savings: previousPlan?.savings ?? 0,
     limits,
+    allocations,
+    carryover:
+      lastCarryover && keepAllocation({ ...lastCarryover, amount: 0 }) ? lastCarryover : null,
     note: '',
   }
 }

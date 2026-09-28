@@ -11,7 +11,9 @@ export const ACCOUNT_KINDS: Record<AccountKind, string> = {
   savings: 'Savings account',
   deposit: 'Term deposit',
   investment: 'Investments',
-  retirement: 'Retirement (IKE, IKZE)',
+  ike: 'IKE',
+  ikze: 'IKZE',
+  retirement: 'Other retirement',
   cash: 'Cash',
   other: 'Other',
 }
@@ -101,6 +103,13 @@ export function AccountSheet({
             </Select>
           </Field>
         </div>
+        {(kind === 'ike' || kind === 'ikze') && (
+          <p className="-mt-2 text-xs leading-snug text-muted">
+            {owner === 'joint'
+              ? `An ${kind.toUpperCase()} is always one person’s: pick whose it is.`
+              : `The planner keeps track of the yearly ${kind.toUpperCase()} limit and suggests a monthly payment that uses it up by December.`}
+          </p>
+        )}
         <Field
           label="Interest, % a year (optional)"
           help={

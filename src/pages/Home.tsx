@@ -16,6 +16,10 @@ import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
 import { LAPTOP, useMediaQuery } from '../hooks/useMediaQuery'
 import { usePrefs } from '../hooks/usePrefs'
+import { useMonthMoney } from '../hooks/useMonthMoney'
+import { useSavingsOverview } from '../hooks/useSavings'
+import { BottomSheet } from '../components/history/BottomSheet'
+import { PaycheckCard } from '../components/budget/PaycheckCard'
 import {
   currentMonthKey,
   formatDayLong,
@@ -57,6 +61,11 @@ export function Home() {
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
   const left = monthLimit - monthTotal
+  const money = useMonthMoney(month)
+  const safe = money.safe
+  const savings = useSavingsOverview()
+  /** Right after a paycheck is logged: where the plan sends it. */
+  const [payOutOpen, setPayOutOpen] = useState(false)
 
   const laptop = useMediaQuery(LAPTOP)
   const prefs = usePrefs()
@@ -92,6 +101,15 @@ export function Home() {
             { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
           )
           setIncomeOpen(false)
+          // pay the plan's savings out straight away, while the money is there
+          if (
+            money.plan &&
+            savings.available &&
+            (money.plan.allocations.length > 0 || money.plan.carryover) &&
+            monthKeyOfDate(date) === month
+          ) {
+            setPayOutOpen(true)
+          }
           setToast(date === todayKey() ? 'Income saved' : `Income saved · ${formatDayLong(date)}`)
         }}
       />
@@ -153,16 +171,34 @@ export function Home() {
       fill
     >
       <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
-          {monthLimit > 0 && (
-            <span className={left < 0 ? 'text-red-300' : ''}>
-              {' '}
-              ·{' '}
-              {left < 0 ? `${formatMoneyCompact(-left)} over` : `${formatMoneyCompact(left)} left`}
+        {safe ? (
+          // income − planned savings − spent: the money that's really free
+          <p className="min-w-0 text-sm text-muted">
+            Safe to spend:{' '}
+            <span className={`font-semibold ${safe.amount < 0 ? 'text-red-300' : 'text-white'}`}>
+              {safe.amount < 0 ? '−' : ''}
+              {formatMoney(Math.abs(safe.amount))}
             </span>
-          )}
-        </p>
+            <span className="block truncate text-xs">
+              {safe.expected ? 'expected ' : ''}income {formatMoneyCompact(safe.income)}
+              {money.plan && money.plan.savings > 0
+                ? ` − savings ${formatMoneyCompact(money.plan.savings)}`
+                : ''}{' '}
+              − spent {formatMoneyCompact(monthTotal)}
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted">
+            This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
+            {monthLimit > 0 && (
+              <span className={left < 0 ? 'text-red-300' : ''}>
+                {' '}
+                ·{' '}
+                {left < 0 ? `${formatMoneyCompact(-left)} over` : `${formatMoneyCompact(left)} left`}
+              </span>
+            )}
+          </p>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -208,6 +244,15 @@ export function Home() {
               : undefined
           }
         />
+      )}
+
+      {payOutOpen && money.plan && (
+        <BottomSheet title="From the paycheck" onClose={() => setPayOutOpen(false)}>
+          <p className="mb-2 text-sm text-slate-300">
+            Straight to the goals and IKE, before it gets spent.
+          </p>
+          <PaycheckCard month={month} plan={money.plan} overview={savings} bare />
+        </BottomSheet>
       )}
 
       {goalsOpen && (

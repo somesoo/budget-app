@@ -108,7 +108,7 @@ describe('loans', () => {
           { goal_id: 'trip', account_id: 'acc', amount: 1_000 },
           { goal_id: 'trip', account_id: 'acc', amount: 100, loan_id: 'paid' },
         ],
-        carryover: null,
+        carryover: [],
         note: null,
         updated_at: '',
       },

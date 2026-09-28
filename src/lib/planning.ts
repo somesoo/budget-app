@@ -132,8 +132,8 @@ export interface PlanDraft {
   limits: Record<string, number>
   /** Where the savings go, see lib/allocations. */
   allocations: PlanAllocation[]
-  /** The goal last month's unspent money goes to. */
-  carryover: PlanCarryover | null
+  /** The goals last month's unspent money is split between. */
+  carryover: PlanCarryover[]
   note: string
 }
 
@@ -170,7 +170,6 @@ export function draftFrom(args: {
     instalments = [],
   } = args
   if (existing) {
-    const carryover = existing.carryover
     return {
       income: existing.income,
       savings: existing.savings,
@@ -178,7 +177,7 @@ export function draftFrom(args: {
         categories.map((c) => [c.id, existing.limits[c.id] ?? c.monthly_limit]),
       ),
       allocations: existing.allocations.filter(keepExisting),
-      carryover: carryover && keepExisting({ ...carryover, amount: 0 }) ? carryover : null,
+      carryover: keptCarryover(existing.carryover, keepExisting),
       note: existing.note ?? '',
     }
   }
@@ -189,7 +188,6 @@ export function draftFrom(args: {
     ...previousLines.filter((a) => !a.loan_id && keepAllocation(a)),
     ...instalments,
   ]
-  const lastCarryover = previousPlan?.carryover ?? null
 
   const typicalById = new Map(baseline.categories.map((b) => [b.category.id, b.typical]))
   const limits = Object.fromEntries(
@@ -216,10 +214,46 @@ export function draftFrom(args: {
     ),
     limits,
     allocations,
-    carryover:
-      lastCarryover && keepAllocation({ ...lastCarryover, amount: 0 }) ? lastCarryover : null,
+    carryover: keptCarryover(previousPlan?.carryover ?? [], keepAllocation),
     note: '',
   }
+}
+
+/** The leftover goals still open, their shares scaled back up to 100%. */
+function keptCarryover(
+  carryover: PlanCarryover[],
+  keep: (a: PlanAllocation) => boolean,
+): PlanCarryover[] {
+  const kept = carryover.filter((c) => keep({ ...c, amount: 0 }))
+  const total = kept.reduce((s, c) => s + c.share, 0)
+  if (kept.length === carryover.length || total <= 0) return kept
+  return evenShares(kept.map((c) => ({ ...c, share: (c.share / total) * 100 })))
+}
+
+/**
+ * Whole-percent shares adding up to exactly 100: rounded down, the points
+ * left over going to the biggest first. With `even`, every goal the same.
+ */
+export function evenShares(carryover: PlanCarryover[], even = false): PlanCarryover[] {
+  if (carryover.length === 0) return []
+  const raw = carryover.map((c) => (even ? 100 / carryover.length : c.share))
+  const floors = raw.map(Math.floor)
+  let left = 100 - floors.reduce((s, x) => s + x, 0)
+  const order = raw.map((_, i) => i).sort((a, b) => raw[b] - floors[b] - (raw[a] - floors[a]))
+  for (const i of order) {
+    if (left <= 0) break
+    floors[i] += 1
+    left -= 1
+  }
+  return carryover.map((c, i) => ({ ...c, share: floors[i] }))
+}
+
+/** A leftover split by the shares, in whole złoty; what rounding leaves goes to the first goal. */
+export function splitLeftover(amount: number, carryover: PlanCarryover[]): number[] {
+  const whole = Math.floor(amount)
+  const parts = carryover.map((c) => Math.floor((whole * c.share) / 100))
+  if (parts.length > 0) parts[0] += whole - parts.reduce((s, x) => s + x, 0)
+  return parts
 }
 
 export function draftTotals(draft: PlanDraft, activeIds: string[]) {

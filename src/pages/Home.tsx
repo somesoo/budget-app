@@ -105,7 +105,7 @@ export function Home() {
           if (
             money.plan &&
             savings.available &&
-            (money.plan.allocations.length > 0 || money.plan.carryover) &&
+            (money.plan.allocations.length > 0 || money.plan.carryover.length > 0) &&
             monthKeyOfDate(date) === month
           ) {
             setPayOutOpen(true)

@@ -65,7 +65,10 @@ through Supabase Realtime.
 15. Paste and run `supabase/migrations/0012_carryover_keep.sql`: how much of
    the month before's leftover stays on the account before the goals get
    theirs. Until it's run, all of it goes to the goals.
-16. Check **Database → Replication** that `expenses`, `categories` and `goals`
+16. Paste and run `supabase/migrations/0013_money_health.sql`: pay that counts
+   for another month, the emergency fund mark on a goal, and allowances (a
+   category that's one person's). Until it's run, all three stay off.
+17. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages` and
    `savings_loans`) are in the
@@ -305,6 +308,31 @@ difference is booked as a balance correction and set aside for the goal, not
 as a deposit, so it's no part of the month's saving, spending or *Safe to
 spend*.
 
+### How healthy it is (the Budget tab)
+
+Three numbers against the usual rules of thumb, each saying what it's
+measured against: the **savings rate** (what the month puts aside, as a share
+of income; 20% or more), **fixed costs** (rent and bills as a share of income;
+under half), and the **emergency fund** in months of typical spending (the
+last three months averaged; three to six). A goal is marked as the emergency
+fund in its Edit sheet. While it's short, a new plan sends last month's
+leftover there, and borrowing from it warns when it would take a large part.
+
+### Allowances
+
+A category can be one person's allowance (Settings → the category → Whose):
+money nobody has to explain. Its tile shows only on that person's phone; the
+other sees its amounts in the plan and in History, but not the notes. One
+shared sign-in means this is tact, not security.
+
+### IKE, IKZE and investments: gains and losses
+
+Log what you pay in as deposits: they're what counts toward the yearly limit
+and as saving. The value moves by itself, so now and then (monthly, or each
+quarter) update the balance to what the provider shows. The difference is the
+gain or loss, shown on the account's page as *Put in / Worth now / Gained*,
+and it counts neither as saving nor against the limit.
+
 ### Deleting a savings account
 
 An account's *Edit* sheet can hide it or delete it. Deleting takes its
@@ -414,9 +442,18 @@ actual height (`CategoryTile`).
 ### Safe to spend
 
 The line at the top of the Add tab is the month's money that's really free:
-income logged this month − what the month puts aside (the plan's savings,
-paid in yet or not, or more if more went in; minus anything borrowed back out)
-− what's been spent, trips left out. Until a paycheck is logged
+income for this month − what the month puts aside (the plan's savings, paid in
+yet or not, or more if more went in; minus anything borrowed back out) − what's
+been spent, trips left out − the fixed costs not paid yet. Fixed costs are the
+categories kept out of the spending chart (rent, bills): until the rent is
+paid, its money isn't free, so each of them holds back its limit less what it
+has cost so far.
+
+**Pay for the month after.** Logging pay, *Pays for* says which month it's
+income for; from the 25th it suggests the month after, since pay on the 28th
+usually pays for that. Every monthly number (Safe to spend, the plan, the
+leftover, Insights) counts it there. History still lists it on the day it
+arrived. Until a paycheck is logged
 the plan's expected income stands in, marked "expected". Below zero it turns
 red. Without a plan or income it falls back to spent against the limits.
 

@@ -4,7 +4,7 @@ import type { ProjectSummary } from './projects'
 import type { AccountSummary, GoalSummary } from './savings'
 import type { Category, Expense, Goal, Income, Person } from '../types'
 import { PERSONS } from '../types'
-import { daysInMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
+import { daysInMonth, incomeMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
 import { elapsedDays, projectMonthEnd } from './insights'
 
 /*
@@ -37,12 +37,12 @@ export function expectedIncome(
   return PERSONS.map((person) => {
     const mine = incomes.filter((i) => i.person === person)
     const logged = roundMoney(
-      mine.filter((i) => monthKeyOfDate(i.income_date) === month).reduce((a, i) => a + i.amount, 0),
+      mine.filter((i) => incomeMonth(i) === month).reduce((a, i) => a + i.amount, 0),
     )
 
     const byMonth = new Map<MonthKey, number>()
     for (const i of mine) {
-      const m = monthKeyOfDate(i.income_date)
+      const m = incomeMonth(i)
       if (m < month) byMonth.set(m, (byMonth.get(m) ?? 0) + i.amount)
     }
     const typical = byMonth.size

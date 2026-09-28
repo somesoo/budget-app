@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Allocation, Goal, SavingsAccount, SavingsMovement } from '../types'
 import {
+  accountGain,
   accountSummaries,
   balanceHistory,
   goalStatus,
@@ -34,6 +35,7 @@ const goal = (id: string, target: number, target_date: string | null = null): Go
   sort_order: 0,
   archived: false,
   note: null,
+  is_emergency: false,
 })
 
 let n = 0
@@ -190,5 +192,21 @@ describe('projectBalance', () => {
     expect(first).toBe(1105)
     expect(second).toBeCloseTo(1210.53, 1)
     expect(projectBalance(1000, null, 100, 2)).toEqual([1100, 1200])
+  })
+})
+
+describe('accountGain', () => {
+  it('tells what went in from what the money earned or lost', () => {
+    const opening = { ...move('ike', 5_000, '2026-01-01', 'adjustment'), note: 'Opening balance' }
+    const valued = { ...move('ike', 420, '2026-06-30', 'adjustment'), note: 'Balance updated' }
+    const dip = { ...move('ike', -120, '2026-07-31', 'adjustment'), note: 'Balance updated' }
+    const movements = [
+      opening,
+      move('ike', 1_000, '2026-02-10'),
+      move('ike', 30, '2026-03-31', 'interest'),
+      valued,
+      dip,
+    ]
+    expect(accountGain(movements)).toEqual({ putIn: 6_000, gain: 330 })
   })
 })

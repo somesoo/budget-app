@@ -31,6 +31,8 @@ export function useCategories() {
         starts_on: c.starts_on ?? null,
         ends_on: c.ends_on ?? null,
         goal_id: c.goal_id ?? null,
+        // absent until migration 0013: shared
+        owner: c.owner === 'bubs' || c.owner === 'meow' ? c.owner : null,
       }))
     },
     staleTime: 60_000,
@@ -72,7 +74,9 @@ export function useAddCategory() {
   return useMutation({
     mutationFn: async (
       category: Pick<Category, 'name' | 'color' | 'monthly_limit'> &
-        Partial<Pick<Category, 'kind' | 'budget_total' | 'starts_on' | 'ends_on' | 'goal_id'>>,
+        Partial<
+          Pick<Category, 'kind' | 'budget_total' | 'starts_on' | 'ends_on' | 'goal_id' | 'owner'>
+        >,
     ) => {
       const existing = qc.getQueryData<Category[]>(categoriesKey) ?? []
       const sort_order = existing.reduce((max, c) => Math.max(max, c.sort_order), 0) + 1

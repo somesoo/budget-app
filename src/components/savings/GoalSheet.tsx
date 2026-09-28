@@ -6,7 +6,7 @@ import type { Goal } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from './ColorChoice'
-import { Field, Segments, SubmitRow, inputClass } from './fields'
+import { Field, Segments, SubmitRow, Switch, inputClass } from './fields'
 
 /**
  * New goal, or editing one. A goal can be open-ended (an emergency fund) or
@@ -41,6 +41,7 @@ export function GoalSheet({
   const [note, setNote] = useState(goal?.note ?? '')
   const [starts, setStarts] = useState(trip?.starts_on ?? '')
   const [ends, setEnds] = useState(trip?.ends_on ?? '')
+  const [emergency, setEmergency] = useState(goal?.is_emergency ?? false)
   const [error, setError] = useState<string | null>(null)
 
   const datesOk = !starts || !ends || starts <= ends
@@ -57,6 +58,8 @@ export function GoalSheet({
         target_date: shape === 'open' || !date ? null : date,
         color,
         note: note.trim() || null,
+        // only sent when it changes: the column arrives with migration 0013
+        ...(emergency !== (goal?.is_emergency ?? false) ? { is_emergency: emergency } : {}),
       })
       // migration 0009 carries name, colour and target over too; the dates are only here
       if (trip) {
@@ -153,6 +156,12 @@ export function GoalSheet({
             </Field>
           </div>
         )}
+        <Switch
+          label="This is our emergency fund"
+          help="The Budget tab says how many months of spending it covers, last month's leftover goes here first while it's short, and borrowing warns before emptying it."
+          checked={emergency}
+          onChange={setEmergency}
+        />
         <Field label="Note (optional)">
           <input
             value={note}

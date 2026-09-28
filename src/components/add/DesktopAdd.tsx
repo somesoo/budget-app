@@ -57,7 +57,10 @@ export function DesktopAdd() {
   const month = currentMonthKey()
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
-  const categories = allCategories.filter((c) => !c.archived)
+  // shared categories and this device's own allowance, not the other one's
+  const categories = allCategories.filter(
+    (c) => !c.archived && (!c.owner || c.owner === devicePerson),
+  )
   // goals included: what was just logged may have been spent from one
   const { data: everyCategory = [] } = useCategories()
   const { data: expenses = [] } = useMonthlyExpenses(month)
@@ -188,7 +191,7 @@ export function DesktopAdd() {
       )
     } else {
       addIncome.mutate(
-        { amount: entry.amount, person, note: trimmed, income_date: date },
+        { amount: entry.amount, person, note: trimmed, income_date: date, for_month: null },
         { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
       )
       setToast(`Income saved · ${formatMoney(entry.amount)}${where}`)
@@ -508,6 +511,7 @@ function standIn(goal: Goal): Category {
     starts_on: null,
     ends_on: null,
     goal_id: goal.id,
+    owner: null,
   }
 }
 

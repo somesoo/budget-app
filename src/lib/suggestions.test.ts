@@ -22,6 +22,7 @@ const cat = (id: string, limit: number, extra: Partial<Category> = {}): Category
   starts_on: null,
   ends_on: null,
   goal_id: null,
+  owner: null,
   ...extra,
 })
 

@@ -40,7 +40,7 @@ import {
   type PlanDraft,
 } from '../../lib/planning'
 import { planChecks, planSuggestions, recurringCosts, type Suggestion } from '../../lib/suggestions'
-import { carryAllocations, sumAllocations } from '../../lib/allocations'
+import { carryAllocations, defaultGoalAccount, sumAllocations } from '../../lib/allocations'
 import { loanLines } from '../../lib/loans'
 import type { PlanAllocation, PlanSuggestion } from '../../types'
 
@@ -126,18 +126,30 @@ export function BudgetPlanner({ month, onClose }: Props) {
   // first draft: the month's own plan, else last month's, else typical spending
   useEffect(() => {
     if (!ready || savingsLoading || draft) return
-    setDraft(
-      draftFrom({
-        source: previous.data ? 'previous' : baseline.months.length ? 'typical' : 'defaults',
-        categories,
-        baseline,
-        previousPlan: previous.data ?? null,
-        existing: existing.data,
-        keepAllocation,
-        keepExisting,
-        instalments: loanLines(savingsOverview.loans),
-      }),
+    const fresh = draftFrom({
+      source: previous.data ? 'previous' : baseline.months.length ? 'typical' : 'defaults',
+      categories,
+      baseline,
+      previousPlan: previous.data ?? null,
+      existing: existing.data,
+      keepAllocation,
+      keepExisting,
+      instalments: loanLines(savingsOverview.loans),
+    })
+    // nowhere chosen for the leftover yet: the emergency fund first, while it's short
+    const emergency = savingsOverview.goals.find(
+      (g) => g.goal.is_emergency && !g.goal.archived && g.status.kind !== 'reached',
     )
+    if (!existing.data && fresh.carryover.length === 0 && emergency) {
+      fresh.carryover = [
+        {
+          goal_id: emergency.goal.id,
+          account_id: defaultGoalAccount(emergency, savingsOverview.accounts.map((a) => a.account)),
+          share: 100,
+        },
+      ]
+    }
+    setDraft(fresh)
     // keepAllocation, keepExisting and the loans read the savings lists, loaded by now
   }, [ready, savingsLoading, draft, previous.data, existing.data, baseline, categories])
 

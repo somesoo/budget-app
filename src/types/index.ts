@@ -27,6 +27,11 @@ export interface Category {
   ends_on: string | null
   /** The savings goal a project is paid from. */
   goal_id: string | null
+  /**
+   * One person's allowance (migration 0013): its tile shows only on their
+   * phone, and the other sees its amounts but not its notes. Null: shared.
+   */
+  owner: Person | null
 }
 
 export interface Expense {
@@ -52,6 +57,8 @@ export interface Goal {
   sort_order: number
   archived: boolean
   note: string | null
+  /** The emergency fund (migration 0013): measured in months of spending, filled first. */
+  is_emergency: boolean
 }
 
 export type AccountKind =
@@ -133,6 +140,11 @@ export interface Income {
   note: string | null
   /** ISO date, YYYY-MM-DD, local time. */
   income_date: string
+  /**
+   * The month it pays for, when not the one it arrived in: a paycheck on the
+   * 28th for the month after (migration 0013). Null: income_date's month.
+   */
+  for_month: string | null
   created_at: string
 }
 

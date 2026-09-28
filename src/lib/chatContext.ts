@@ -1,7 +1,14 @@
 import { PERSON_LABELS } from '../config'
 import type { BudgetPlan, Category, Expense, Income, SavingsMovement } from '../types'
 import type { BudgetAlert } from './alerts'
-import { daysInMonth, monthKeyOfDate, roundMoney, shiftMonth, type MonthKey } from './calculations'
+import {
+  daysInMonth,
+  incomeMonth,
+  monthKeyOfDate,
+  roundMoney,
+  shiftMonth,
+  type MonthKey,
+} from './calculations'
 import { elapsedDays, monthsEndingAt, projectMonthEnd } from './insights'
 import type { AccountSummary, GoalSummary } from './savings'
 
@@ -93,7 +100,7 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
       plan: plan(planThisMonth),
       income: roundMoney(
         incomes
-          .filter((i) => monthKeyOfDate(i.income_date) === month)
+          .filter((i) => incomeMonth(i) === month)
           .reduce((a, i) => a + i.amount, 0),
       ),
       categories: monthly
@@ -129,7 +136,7 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
         who: who(e.person),
       })),
     income: incomes
-      .filter((i) => monthKeyOfDate(i.income_date) >= firstMonth)
+      .filter((i) => incomeMonth(i) >= firstMonth)
       .map((i) => ({ date: i.income_date, amount: i.amount, who: who(i.person), note: i.note })),
     projects: projects.map((c) => ({
       name: c.name,

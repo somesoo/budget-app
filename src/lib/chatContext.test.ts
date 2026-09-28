@@ -15,6 +15,7 @@ const cat = (id: string, extra: Partial<Category> = {}): Category => ({
   starts_on: null,
   ends_on: null,
   goal_id: null,
+  owner: null,
   ...extra,
 })
 

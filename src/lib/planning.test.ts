@@ -11,6 +11,7 @@ const plan = (p: Partial<BudgetPlan>): BudgetPlan => ({
   limits: {},
   allocations: [],
   carryover: [],
+  carryover_keep: 0,
   note: null,
   updated_at: '2026-09-28T00:00:00Z',
   ...p,
@@ -75,5 +76,21 @@ describe('splitting the leftover', () => {
     expect(splitLeftover(1_000.8, [c('a', 34), c('b', 33), c('c', 33)])).toEqual([340, 330, 330])
     expect(splitLeftover(101, [c('a', 50), c('b', 50)])).toEqual([51, 50])
     expect(splitLeftover(500, [])).toEqual([])
+  })
+
+  it('takes set amounts first, then splits the rest by percent', () => {
+    const fixed = (goal_id: string, amount: number) => ({ ...c(goal_id, 0), fixed: amount })
+    expect(splitLeftover(1_000, [fixed('a', 300), c('b', 50), c('c', 50)])).toEqual([300, 350, 350])
+    // set amounts only as far as the money goes
+    expect(splitLeftover(400, [fixed('a', 300), fixed('b', 300)])).toEqual([300, 100])
+    // with no percentages, the rest stays unassigned
+    expect(splitLeftover(1_000, [fixed('a', 300)])).toEqual([300])
+    // what's kept on the account comes off first
+    expect(splitLeftover(1_000, [fixed('a', 300), c('b', 100)], 200)).toEqual([300, 500])
+    expect(splitLeftover(150, [c('b', 100)], 200)).toEqual([0])
+    // even shares leave set amounts alone
+    expect(evenShares([fixed('a', 300), c('b', 0), c('c', 0)], true).map((x) => x.share)).toEqual([
+      0, 50, 50,
+    ])
   })
 })

@@ -147,6 +147,7 @@ describe('planChecks', () => {
     limits: { food: 1500 },
     allocations: [],
     carryover: [],
+    carryoverKeep: 0,
     note: '',
     ...p,
   })

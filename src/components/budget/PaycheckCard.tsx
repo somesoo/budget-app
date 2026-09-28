@@ -118,7 +118,7 @@ export function PaycheckCard({
   // last month's unspent money, split between the goals chosen while planning this one
   if (previous.leftover !== null && previous.leftover > 0) {
     const note = leftoverNote(formatMonthName(prevMonth))
-    const parts = splitLeftover(previous.leftover, plan.carryover)
+    const parts = splitLeftover(previous.leftover, plan.carryover, plan.carryover_keep)
     plan.carryover.forEach((carry, i) => {
       const carryGoal = goalById.get(carry.goal_id)
       if (!carryGoal || parts[i] <= 0) return

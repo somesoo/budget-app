@@ -62,7 +62,10 @@ through Supabase Realtime.
 14. Paste and run `supabase/migrations/0011_savings_loans.sql`: borrowing from
    savings and paying it back in instalments. Until it's run, *I need money*
    says to run it and everything else works.
-15. Check **Database → Replication** that `expenses`, `categories` and `goals`
+15. Paste and run `supabase/migrations/0012_carryover_keep.sql`: how much of
+   the month before's leftover stays on the account before the goals get
+   theirs. Until it's run, all of it goes to the goals.
+16. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages` and
    `savings_loans`) are in the
@@ -209,8 +212,15 @@ warning. Deposits and transfers in count toward the limit; interest doesn't,
 and withdrawals don't give it back.
 
 Planning a month also asks **where the month before's unspent money goes**:
-any number of goals, split evenly unless you change the percentages, or
-nowhere (it stays on the account). Unspent is income −
+any number of goals, or nowhere (it stays on the account). Each goal takes a
+percentage or a set amount in złoty: set amounts first, in order, as far as
+the money goes, then the rest by the percentages (split evenly until you
+change them). Each goal says what it has to go and, with a deadline, whether
+the plan's own monthly payment toward it is enough to make it, or how much a
+month it falls short; *use the … short* fills that in as its set amount. The
+plan is the commitment and the leftover the extra, so the leftover is for
+what the plan doesn't cover. *Keep on the account* leaves a cushion there
+first (migration `0012_carryover_keep.sql`); the goals share what's above it. Unspent is income −
 planned savings − spending. At the start of the planned month it shows up as a
 line in *From the paycheck*, booked as a deposit noted "Leftover from
 <month>" so it isn't mistaken for the goal's regular line.
@@ -279,6 +289,13 @@ has, books the change here and says which transfer to make in the bank:
 Saving more than the plan, or borrowing, moves *Safe to spend* too: the plan's
 savings count as spoken for until paid in, anything beyond them counts as
 well, and money taken back out of savings is money to spend.
+
+### Dropdowns
+
+Every dropdown (`Select` in `src/components/savings/fields.tsx`) is drawn by
+the app rather than the browser, whose own list ignores the dark theme on some
+systems (white text on white on Windows). It opens below the field, or above
+when there's no room, and works with the arrow keys, Enter and Escape.
 
 ### Money a goal has that the app doesn't know about
 

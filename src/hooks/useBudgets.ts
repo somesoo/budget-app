@@ -35,11 +35,13 @@ function normalizeCarryover(raw: unknown): PlanCarryover[] {
     const row = r as Record<string, unknown>
     if (typeof row.goal_id !== 'string') return []
     const share = Number(row.share)
+    const fixed = row.fixed == null ? null : Number(row.fixed)
     return [
       {
         goal_id: row.goal_id,
         account_id: typeof row.account_id === 'string' ? row.account_id : null,
-        share: Number.isFinite(share) && share > 0 ? share : 100,
+        share: Number.isFinite(share) && share >= 0 ? share : 100,
+        fixed: fixed !== null && Number.isFinite(fixed) && fixed >= 0 ? fixed : null,
       },
     ]
   })
@@ -59,6 +61,8 @@ function normalize(row: Record<string, unknown>): BudgetPlan {
     // absent until migration 0010 has been run
     allocations: normalizeAllocations(row.allocations),
     carryover: normalizeCarryover(row.carryover),
+    // absent until migration 0012 has been run
+    carryover_keep: Math.max(Number(row.carryover_keep ?? 0) || 0, 0),
     note: (row.note as string | null) ?? null,
     updated_at: String(row.updated_at),
   }
@@ -99,6 +103,19 @@ export function useSaveBudget() {
       const row = { ...plan, updated_at: new Date().toISOString() }
       const { error } = await supabase.from('budgets').upsert(row, { onConflict: 'month' })
       if (!error) return
+      // migration 0012 not run: the cushion can't be kept, everything else can
+      if (/carryover_keep/i.test(error.message ?? '')) {
+        if (plan.carryover_keep > 0) {
+          throw new Error(
+            'Keeping part of the leftover on the account needs migration 0012_carryover_keep.sql',
+          )
+        }
+        const withoutKeep: Partial<typeof row> = { ...row }
+        delete withoutKeep.carryover_keep
+        const again = await supabase.from('budgets').upsert(withoutKeep, { onConflict: 'month' })
+        if (!again.error) return
+        throw again.error
+      }
       if (!missingAllocations(error)) throw error
       // before migration 0010 a plan without a split still saves
       if (plan.allocations.length > 0 || plan.carryover.length > 0) {
@@ -109,6 +126,7 @@ export function useSaveBudget() {
       const rest: Partial<typeof row> = { ...row }
       delete rest.allocations
       delete rest.carryover
+      delete rest.carryover_keep
       const retry = await supabase.from('budgets').upsert(rest, { onConflict: 'month' })
       if (retry.error) throw retry.error
     },

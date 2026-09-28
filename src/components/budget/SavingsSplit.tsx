@@ -2,6 +2,7 @@ import { Warning } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { MoneyInput } from './MoneyInput'
 import { ownerLabel } from '../savings/AccountSheet'
+import { Select } from '../savings/fields'
 import type { SavingsOverview } from '../../hooks/useSavings'
 import {
   allocationKey,
@@ -102,17 +103,17 @@ export function SavingsSplit({
                 openAccounts.length > 1 && amount > 0 ? (
                   <label className="flex items-center gap-1.5 text-xs text-muted">
                     onto
-                    <select
+                    <Select
+                      size="sm"
                       value={account_id ?? ''}
-                      onChange={(e) => set(amount, e.target.value || null)}
-                      className="min-w-0 rounded-lg bg-white/5 px-1.5 py-0.5 text-xs text-slate-200 outline-none ring-1 ring-white/10"
+                      onChange={(v) => set(amount, v || null)}
                     >
                       {openAccounts.map((a) => (
                         <option key={a.id} value={a.id}>
                           {a.name}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                 ) : openAccounts.length === 0 && amount > 0 ? (
                   <p className="text-xs text-amber-200">

@@ -1,7 +1,7 @@
 import { CaretRight, Check, Plus, Warning, WarningCircle } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import { formatMoneyWhole, formatMonth, type MonthKey } from '../../lib/calculations'
-import type { AccountSummary, GoalStatus, GoalSummary } from '../../lib/savings'
+import { goalUse, type AccountSummary, type GoalStatus, type GoalSummary } from '../../lib/savings'
 import { CHART } from '../charts/theme'
 import { ACCOUNT_KINDS, ownerLabel } from './AccountSheet'
 
@@ -67,8 +67,17 @@ function Line({
   )
 }
 
-export function GoalCard({ summary, onSave }: { summary: GoalSummary; onSave: () => void }) {
-  const { goal, saved, progress, funding, status, pace } = summary
+export function GoalCard({
+  summary,
+  spent = 0,
+  onSave,
+}: {
+  summary: GoalSummary
+  /** What's been spent from it (its trip category). */
+  spent?: number
+  onSave: () => void
+}) {
+  const { goal, saved, progress, funding, status, pace, remaining } = summary
   return (
     <li className="group relative rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 transition hover:bg-white/[0.06]">
       <div className="flex items-start gap-3">
@@ -109,14 +118,17 @@ export function GoalCard({ summary, onSave }: { summary: GoalSummary; onSave: ()
         </button>
       </div>
 
-      {progress !== null && (
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10" aria-hidden>
-          <div
-            className="h-full rounded-full transition-[width] duration-500"
-            style={{ width: `${progress * 100}%`, backgroundColor: goal.color }}
+      <div className="mt-3 space-y-2">
+        {progress !== null && (
+          <GoalBar
+            label="Saved"
+            value={remaining > 0 ? `${formatMoneyWhole(remaining)} to go` : 'All there'}
+            share={progress}
+            color={goal.color}
           />
-        </div>
-      )}
+        )}
+        <LeftToUse saved={saved} spent={spent} color={goal.color} />
+      </div>
 
       <div className="mt-2.5 space-y-1">
         <StatusLine status={status} pace={pace} />
@@ -127,6 +139,82 @@ export function GoalCard({ summary, onSave }: { summary: GoalSummary; onSave: ()
         )}
       </div>
     </li>
+  )
+}
+
+/**
+ * The second bar of a goal: what can still be spent from it. Shown once
+ * something has been spent; spending never lowers what's saved.
+ */
+export function LeftToUse({
+  saved,
+  spent,
+  color,
+  size = 'sm',
+}: {
+  saved: number
+  spent: number
+  color: string
+  size?: 'sm' | 'lg'
+}) {
+  if (spent <= 0) return null
+  const { left, share } = goalUse(saved, spent)
+  return (
+    <GoalBar
+      label="Left to use"
+      value={
+        left >= 0
+          ? `${formatMoneyWhole(left)} of ${formatMoneyWhole(saved)}`
+          : `${formatMoneyWhole(-left)} more spent than saved`
+      }
+      share={share}
+      color={color}
+      faded
+      warn={left < 0}
+      size={size}
+    />
+  )
+}
+
+/** A labelled progress bar, the figure it stands for on the right. */
+export function GoalBar({
+  label,
+  value,
+  share,
+  color,
+  faded,
+  warn,
+  size = 'sm',
+}: {
+  label: string
+  value: string
+  share: number
+  color: string
+  /** Lighter, so it reads as different from the saved bar in the same colour. */
+  faded?: boolean
+  warn?: boolean
+  size?: 'sm' | 'lg'
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
+        <span className="text-muted">{label}</span>
+        <span className={`tabular-nums ${warn ? 'text-red-300' : 'text-slate-300'}`}>{value}</span>
+      </div>
+      <div
+        className={`${size === 'lg' ? 'h-2.5' : 'h-2'} overflow-hidden rounded-full bg-white/10`}
+        aria-hidden
+      >
+        <div
+          className="h-full rounded-full transition-[width] duration-500"
+          style={{
+            width: `${share * 100}%`,
+            backgroundColor: color,
+            opacity: faded ? 0.55 : 1,
+          }}
+        />
+      </div>
+    </div>
   )
 }
 

@@ -34,6 +34,7 @@ import { CHART } from '../charts/theme'
 import { SpendDonut } from '../charts/SpendDonut'
 import { AlertStrip } from '../alerts/AlertList'
 import { AmountField } from '../entry/AmountField'
+import { IncomeKind, ONE_OFF_HELP } from '../entry/IncomeKind'
 import { LimitPreview } from '../entry/LimitPreview'
 import { useAmountEntry } from '../entry/useAmountEntry'
 import { DateChip, PersonToggle } from '../HeaderControls'
@@ -83,6 +84,7 @@ export function DesktopAdd() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [person, setPerson] = useState<Person>(devicePerson ?? 'bubs')
   const [note, setNote] = useState('')
+  const [oneOff, setOneOff] = useState(false)
   const [date, setDate] = useState(todayKey())
   const [toast, setToast] = useState<string | null>(null)
   const entry = useAmountEntry()
@@ -133,7 +135,8 @@ export function DesktopAdd() {
     0,
     RECENT,
   )
-  const lastIncome = lastIncomes.find((i) => i.person === person)
+  // the last pay, not a one-off: that's the amount that comes again
+  const lastIncome = lastIncomes.find((i) => i.person === person && !i.one_off)
   const inThisMonth = monthKeyOfDate(date) === month
 
   const pick = (category: Category) => {
@@ -196,7 +199,14 @@ export function DesktopAdd() {
       )
     } else {
       addIncome.mutate(
-        { amount: entry.amount, person, note: trimmed, income_date: date, for_month: null },
+        {
+          amount: entry.amount,
+          person,
+          note: trimmed,
+          income_date: date,
+          for_month: null,
+          one_off: oneOff,
+        },
         { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
       )
       setToast(`Income saved · ${formatMoney(entry.amount)}${where}`)
@@ -204,6 +214,7 @@ export function DesktopAdd() {
     // the category stays picked: several receipts from one shop go in a row
     entry.reset()
     setNote('')
+    setOneOff(false)
     amountRef.current?.focus()
   }
 
@@ -232,6 +243,7 @@ export function DesktopAdd() {
     setMode(next)
     entry.reset()
     setNote('')
+    setOneOff(false)
     requestAnimationFrame(() =>
       next === 'expense' && !selected ? searchRef.current?.focus() : amountRef.current?.focus(),
     )
@@ -411,7 +423,13 @@ export function DesktopAdd() {
               </button>
             </div>
           )}
-          {mode === 'income' && lastIncome && (
+          {mode === 'income' && (
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <span className="text-sm text-muted">{oneOff ? ONE_OFF_HELP : 'Kind'}</span>
+              <IncomeKind oneOff={oneOff} onChange={setOneOff} />
+            </div>
+          )}
+          {mode === 'income' && lastIncome && !oneOff && (
             <button
               type="button"
               onClick={() => {

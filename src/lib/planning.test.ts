@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { BudgetPlan } from '../types'
-import { draftFrom, evenShares, splitLeftover, type PlanBaseline } from './planning'
+import type { BudgetPlan, Expense, Income } from '../types'
+import {
+  draftFrom,
+  evenShares,
+  planBaseline,
+  splitLeftover,
+  type PlanBaseline,
+} from './planning'
 
 const baseline: PlanBaseline = { months: [], categories: [], typicalIncome: null, incomeHistory: [] }
 
@@ -92,5 +98,42 @@ describe('splitting the leftover', () => {
     expect(evenShares([fixed('a', 300), c('b', 0), c('c', 0)], true).map((x) => x.share)).toEqual([
       0, 50, 50,
     ])
+  })
+})
+
+describe('planBaseline', () => {
+  const income = (amount: number, date: string, one_off = false): Income => ({
+    id: `${date}-${amount}`,
+    amount,
+    person: 'bubs',
+    note: null,
+    income_date: date,
+    for_month: null,
+    one_off,
+    created_at: `${date}T08:00:00Z`,
+  })
+  const expense: Expense = {
+    id: 'e1',
+    amount: 100,
+    category_id: 'food',
+    person: 'bubs',
+    note: null,
+    expense_date: '2026-06-02',
+    created_at: '2026-06-02T08:00:00Z',
+  }
+
+  it('leaves one-off money out of the typical income', () => {
+    const b = planBaseline({
+      target: '2026-08',
+      expenses: [expense],
+      incomes: [
+        income(13_000, '2026-06-01'),
+        income(13_000, '2026-07-01'),
+        income(1_300, '2026-07-17', true),
+      ],
+      categories: [],
+    })
+    expect(b.typicalIncome).toBe(13_000)
+    expect(b.incomeHistory).toEqual([13_000, 13_000])
   })
 })

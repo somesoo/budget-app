@@ -68,7 +68,11 @@ through Supabase Realtime.
 16. Paste and run `supabase/migrations/0013_money_health.sql`: pay that counts
    for another month, the emergency fund mark on a goal, and allowances (a
    category that's one person's). Until it's run, all three stay off.
-17. Check **Database → Replication** that `expenses`, `categories` and `goals`
+17. Paste and run `supabase/migrations/0014_one_off_income.sql`: income can be
+   marked one-off (a returned deposit, something sold), which counts for its
+   month but stays out of the typical pay the planner and forecast expect.
+   Until it's run, all income counts as pay.
+18. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages` and
    `savings_loans`) are in the

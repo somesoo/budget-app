@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { BottomSheet } from './BottomSheet'
 import { UserSwitcher } from '../UserSwitcher'
+import { IncomeKind, ONE_OFF_HELP } from '../entry/IncomeKind'
 import { CURRENCY_SUFFIX } from '../../config'
 import { roundMoney, todayKey, withAlpha } from '../../lib/calculations'
 import { formatLogged, type Entry } from '../../lib/history'
@@ -35,6 +36,8 @@ export function EntryEditor({
   )
   const [person, setPerson] = useState<Person>(entry.item.person)
   const [date, setDate] = useState(entry.date)
+  const initialOneOff = entry.kind === 'income' && entry.item.one_off
+  const [oneOff, setOneOff] = useState(initialOneOff)
 
   const parsed = roundMoney(Number.parseFloat(amount.replace(',', '.')) || 0)
   const trimmedNote = note.trim() || null
@@ -43,7 +46,8 @@ export function EntryEditor({
     trimmedNote !== entry.item.note ||
     categoryId !== initialCategory ||
     person !== entry.item.person ||
-    date !== entry.date
+    date !== entry.date ||
+    oneOff !== initialOneOff
   const valid = parsed > 0 && date !== ''
 
   const submit = (e: FormEvent) => {
@@ -58,7 +62,14 @@ export function EntryEditor({
         expense_date: date,
       })
     } else {
-      onSaveIncome(entry.id, { amount: parsed, note: trimmedNote, person, income_date: date })
+      onSaveIncome(entry.id, {
+        amount: parsed,
+        note: trimmedNote,
+        person,
+        income_date: date,
+        // sent only when changed: a database before migration 0014 has no such column
+        ...(oneOff !== initialOneOff && { one_off: oneOff }),
+      })
     }
     onClose()
   }
@@ -103,6 +114,13 @@ export function EntryEditor({
         {isExpense && goals.length > 0 && (
           <Field label="Or spent from a goal">
             <Chips list={goals} value={categoryId} onChange={setCategoryId} />
+          </Field>
+        )}
+
+        {!isExpense && (
+          <Field label="Kind">
+            <IncomeKind oneOff={oneOff} onChange={setOneOff} />
+            {oneOff && <p className="mt-1.5 text-xs leading-snug text-muted">{ONE_OFF_HELP}</p>}
           </Field>
         )}
 

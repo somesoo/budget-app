@@ -27,7 +27,9 @@ export interface IncomeExpectation {
  * Expected income per person for `month`. Once a paycheck is logged it wins,
  * even if it's below the usual — the forecast should err towards caution,
  * and an optimistic one is the kind that gets people into trouble. Until then,
- * the person's typical month stands in. A past month simply uses what was logged.
+ * the person's typical pay stands in, plus any one-off already in. One-offs
+ * never make the typical month: they don't come again. A past month simply
+ * uses what was logged.
  */
 export function expectedIncome(
   incomes: Income[],
@@ -36,28 +38,30 @@ export function expectedIncome(
 ): IncomeExpectation[] {
   return PERSONS.map((person) => {
     const mine = incomes.filter((i) => i.person === person)
-    const logged = roundMoney(
-      mine.filter((i) => incomeMonth(i) === month).reduce((a, i) => a + i.amount, 0),
+    const thisMonth = mine.filter((i) => incomeMonth(i) === month)
+    const logged = roundMoney(thisMonth.reduce((a, i) => a + i.amount, 0))
+    const loggedPay = roundMoney(
+      thisMonth.filter((i) => !i.one_off).reduce((a, i) => a + i.amount, 0),
     )
 
     const byMonth = new Map<MonthKey, number>()
     for (const i of mine) {
       const m = incomeMonth(i)
-      if (m < month) byMonth.set(m, (byMonth.get(m) ?? 0) + i.amount)
+      if (m < month && !i.one_off) byMonth.set(m, (byMonth.get(m) ?? 0) + i.amount)
     }
     const typical = byMonth.size
       ? roundMoney([...byMonth.values()].reduce((a, b) => a + b, 0) / byMonth.size)
       : null
 
-    if (logged > 0 || !isCurrent) {
+    if (loggedPay > 0 || !isCurrent || typical === null) {
       return { person, logged, typical, expected: logged, basis: logged > 0 ? 'logged' : 'none' }
     }
     return {
       person,
       logged,
       typical,
-      expected: typical ?? 0,
-      basis: typical !== null ? 'typical' : 'none',
+      expected: roundMoney(typical + logged),
+      basis: 'typical',
     }
   })
 }

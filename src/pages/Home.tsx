@@ -123,14 +123,16 @@ export function Home() {
         onPersonChange={setEntryPerson}
         onCancel={() => setIncomeOpen(false)}
         saving={addIncome.isPending}
-        onSave={({ amount, person, note, date, forMonth }) => {
+        onSave={({ amount, person, note, date, forMonth, oneOff }) => {
           addIncome.mutate(
-            { amount, person, note, income_date: date, for_month: forMonth },
+            { amount, person, note, income_date: date, for_month: forMonth, one_off: oneOff },
             { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
           )
           setIncomeOpen(false)
-          // pay the plan's savings out straight away, while the money is there
+          // pay the plan's savings out straight away, while the money is there;
+          // a one-off isn't the paycheck the plan was made around
           if (
+            !oneOff &&
             money.plan &&
             savings.available &&
             (money.plan.allocations.length > 0 || money.plan.carryover.length > 0) &&

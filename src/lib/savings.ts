@@ -140,6 +140,17 @@ export function goalSummaries(args: {
   })
 }
 
+/**
+ * What's left to spend from a goal. Spending from a goal doesn't take it off
+ * what's saved (that stays the measure of reaching the target), so what can
+ * still be used is saved minus spent. `left` goes negative when more has been
+ * spent than put aside; `share` is 0–1 of what's saved.
+ */
+export function goalUse(saved: number, spent: number): { left: number; share: number } {
+  const left = roundMoney(saved - spent)
+  return { left, share: saved > 0 ? Math.min(Math.max(left / saved, 0), 1) : 0 }
+}
+
 export function goalStatus(args: {
   target: number
   saved: number

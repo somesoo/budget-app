@@ -325,7 +325,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                         setDraft({ ...draft, income: Math.round(baseline.typicalIncome!) })
                       }
                     >
-                      typical {formatAmount(Math.round(baseline.typicalIncome))}
+                      typical pay {formatAmount(Math.round(baseline.typicalIncome))}
                     </Hint>
                   ) : null
                 }

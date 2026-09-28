@@ -9,7 +9,7 @@ import { CHART } from '../components/charts/theme'
 import { EntryDialogs } from '../components/history/EntryDialogs'
 import { TripSpendingCard, WhereItWent } from '../components/projects/TripSpending'
 import { AccountSheet, ACCOUNT_KINDS, ownerLabel } from '../components/savings/AccountSheet'
-import { StatusLine } from '../components/savings/cards'
+import { LeftToUse, StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
@@ -339,6 +339,11 @@ export function SavingsGoalPage() {
                   {remaining > 0 && `, ${formatMoneyWhole(remaining)} to go`}
                 </p>
               </>
+            )}
+            {trip && (
+              <div className="mt-3">
+                <LeftToUse saved={saved} spent={trip.spent} color={goal.color} size="lg" />
+              </div>
             )}
             <div className="mt-3">
               <StatusLine status={status} pace={pace} />

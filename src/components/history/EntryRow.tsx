@@ -26,7 +26,12 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
   const isIncome = entry.kind === 'income'
   const category = entry.kind === 'expense' ? categories[entry.item.category_id] : undefined
   const color = isIncome ? INCOME_COLOR : (category?.color ?? UNKNOWN_COLOR)
-  const categoryName = isIncome ? 'Income' : (category?.name ?? 'Unknown category')
+  const oneOff = entry.kind === 'income' && entry.item.one_off
+  const categoryName = isIncome
+    ? oneOff
+      ? 'One-off income'
+      : 'Income'
+    : (category?.name ?? 'Unknown category')
   // spent from a savings goal: say so, it isn't part of the month
   const where = category?.kind === 'project' ? `Goal: ${categoryName}` : categoryName
   const { person: me } = useDeviceUser()

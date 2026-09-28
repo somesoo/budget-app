@@ -18,6 +18,7 @@ import { AccountCard, GoalCard } from '../components/savings/cards'
 import { LoansCard, SavingsAssistant } from '../components/savings/SavingsAssistant'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
+import { useGoalTrips } from '../hooks/useGoalTrips'
 import { useTypicalSpending } from '../hooks/useTypicalSpending'
 import { useSavingsOverview } from '../hooks/useSavings'
 import { currentMonthKey, formatMoneyWhole, formatMonthName, shiftMonth } from '../lib/calculations'
@@ -38,6 +39,9 @@ export function Savings() {
   const s = useSavingsOverview()
   const [sheet, setSheet] = useState<Sheet>(null)
   const [showClosed, setShowClosed] = useState(false)
+  const [showHidden, setShowHidden] = useState(false)
+  const trips = useGoalTrips()
+  const spentFrom = (goalId: string) => trips.tripOf(goalId)?.spent ?? 0
   const emergency = useEmergencyHint()
 
   const month = currentMonthKey()
@@ -177,6 +181,7 @@ export function Savings() {
                 <GoalCard
                   key={g.goal.id}
                   summary={g}
+                  spent={spentFrom(g.goal.id)}
                   onSave={() => setSheet({ kind: 'money', mode: 'deposit', goalId: g.goal.id })}
                 />
               ))}
@@ -207,6 +212,7 @@ export function Savings() {
                 <GoalCard
                   key={g.goal.id}
                   summary={g}
+                  spent={spentFrom(g.goal.id)}
                   onSave={() => setSheet({ kind: 'money', mode: 'deposit', goalId: g.goal.id })}
                 />
               ))}
@@ -236,7 +242,15 @@ export function Savings() {
               ))}
             </ul>
           )}
-          {hiddenAccounts.length > 0 && showClosed && (
+          {hiddenAccounts.length > 0 && (
+            <Toggle
+              open={showHidden}
+              onClick={() => setShowHidden((v) => !v)}
+              count={hiddenAccounts.length}
+              what="hidden account"
+            />
+          )}
+          {hiddenAccounts.length > 0 && showHidden && (
             <ul className="mt-2 grid gap-2 opacity-70">
               {hiddenAccounts.map((a) => (
                 <AccountCard key={a.account.id} summary={a} history={historyOf(a.account.id)} />

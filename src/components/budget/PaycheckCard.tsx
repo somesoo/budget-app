@@ -18,6 +18,7 @@ import {
   shiftMonth,
   type MonthKey,
 } from '../../lib/calculations'
+import { splitLeftover } from '../../lib/planning'
 import type { BudgetPlan, SavingsAccount, SavingsLoan } from '../../types'
 
 interface Row {
@@ -114,27 +115,29 @@ export function PaycheckCard({
     },
   )
 
-  // last month's unspent money, to the goal chosen while planning this one
-  const carry = plan.carryover
-  const carryGoal = carry ? goalById.get(carry.goal_id) : undefined
-  if (carry && carryGoal && previous.leftover !== null && previous.leftover > 0) {
-    const account = carry.account_id ? accountById.get(carry.account_id) : undefined
+  // last month's unspent money, split between the goals chosen while planning this one
+  if (previous.leftover !== null && previous.leftover > 0) {
     const note = leftoverNote(formatMonthName(prevMonth))
-    const amount = Math.floor(previous.leftover)
-    const paid = leftoverPaid(overview.movements, carry.goal_id, note)
-    rows.push({
-      key: 'leftover',
-      name: carryGoal.name,
-      color: carryGoal.color,
-      sub: `unspent in ${formatMonthName(prevMonth)}${account ? ` · onto ${account.name}` : ''}`,
-      planned: amount,
-      paid,
-      remaining: roundMoney(Math.max(amount - paid, 0)),
-      account,
-      goalId: carry.goal_id,
-      payable: !!account && !account.archived && !carryGoal.archived,
-      note,
-      waiting: previous.final ? undefined : `at the end of ${formatMonthName(prevMonth)}`,
+    const parts = splitLeftover(previous.leftover, plan.carryover)
+    plan.carryover.forEach((carry, i) => {
+      const carryGoal = goalById.get(carry.goal_id)
+      if (!carryGoal || parts[i] <= 0) return
+      const account = carry.account_id ? accountById.get(carry.account_id) : undefined
+      const paid = leftoverPaid(overview.movements, carry.goal_id, note)
+      rows.push({
+        key: `leftover:${carry.goal_id}`,
+        name: carryGoal.name,
+        color: carryGoal.color,
+        sub: `${plan.carryover.length > 1 ? `${carry.share}% of ` : ''}unspent in ${formatMonthName(prevMonth)}${account ? ` · onto ${account.name}` : ''}`,
+        planned: parts[i],
+        paid,
+        remaining: roundMoney(Math.max(parts[i] - paid, 0)),
+        account,
+        goalId: carry.goal_id,
+        payable: !!account && !account.archived && !carryGoal.archived,
+        note,
+        waiting: previous.final ? undefined : `at the end of ${formatMonthName(prevMonth)}`,
+      })
     })
   }
 

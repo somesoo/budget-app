@@ -168,18 +168,20 @@ export interface BudgetPlan {
   limits: Record<string, number>
   /** Where the savings go: goals and IKE/IKZE. What they don't cover is "other savings". */
   allocations: PlanAllocation[]
-  /** The goal the previous month's unspent money goes to; null leaves it on the account. */
-  carryover: PlanCarryover | null
+  /** The goals the previous month's unspent money is split between; empty leaves it on the account. */
+  carryover: PlanCarryover[]
   /** What's unusual about the month, in your own words. */
   note: string | null
   updated_at: string
 }
 
-/** Where the month before's unspent money goes. */
+/** One goal that gets part of the month before's unspent money. */
 export interface PlanCarryover {
   goal_id: string
   /** Where the goal's money is kept; null when there's no account yet. */
   account_id: string | null
+  /** Its part of the unspent money, in percent; the parts add up to 100. */
+  share: number
 }
 
 /**

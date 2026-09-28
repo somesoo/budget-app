@@ -13,6 +13,7 @@ import { StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
+import { SetSavedSheet } from '../components/savings/SetSavedSheet'
 import { SharesSheet } from '../components/savings/SharesSheet'
 import { useGoals } from '../hooks/useGoal'
 import { useCategories } from '../hooks/useCategories'
@@ -39,6 +40,7 @@ type Sheet =
   | { kind: 'money'; mode: MoneyMode; goalId?: string }
   | { kind: 'edit' }
   | { kind: 'shares' }
+  | { kind: 'setSaved' }
   | null
 
 /** `/savings/account/:id`: one account's balance over time, what it holds for which goal, every movement. */
@@ -300,6 +302,13 @@ export function SavingsGoalPage() {
             onPick={(mode) => setSheet({ kind: 'money', mode, goalId: id })}
             modes={['deposit', 'withdraw', 'allocate', 'transfer']}
           />
+          <button
+            type="button"
+            onClick={() => setSheet({ kind: 'setSaved' })}
+            className="h-10 shrink-0 rounded-full px-4 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+          >
+            Set saved amount
+          </button>
           <AskLink question={`How do we get to ${goal.name} in time, and what would it take?`} />
         </div>
       }
@@ -405,6 +414,9 @@ export function SavingsGoalPage() {
         />
       )}
       {sheet?.kind === 'edit' && <GoalSheet goal={goal} onClose={() => setSheet(null)} />}
+      {sheet?.kind === 'setSaved' && (
+        <SetSavedSheet summary={summary} overview={s} onClose={() => setSheet(null)} />
+      )}
       <EntryDialogs actions={actions} categories={categories} />
     </Frame>
   )

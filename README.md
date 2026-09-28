@@ -209,7 +209,8 @@ warning. Deposits and transfers in count toward the limit; interest doesn't,
 and withdrawals don't give it back.
 
 Planning a month also asks **where the month before's unspent money goes**:
-one of the goals, or nowhere (it stays on the account). Unspent is income −
+any number of goals, split evenly unless you change the percentages, or
+nowhere (it stays on the account). Unspent is income −
 planned savings − spending. At the start of the planned month it shows up as a
 line in *From the paycheck*, booked as a deposit noted "Leftover from
 <month>" so it isn't mistaken for the goal's regular line.
@@ -278,6 +279,14 @@ has, books the change here and says which transfer to make in the bank:
 Saving more than the plan, or borrowing, moves *Safe to spend* too: the plan's
 savings count as spoken for until paid in, anything beyond them counts as
 well, and money taken back out of savings is money to spend.
+
+### Money a goal has that the app doesn't know about
+
+A goal's page has *Set saved amount*: say how much it has and where the money
+is, an existing account or a new one (e.g. your everyday account). The
+difference is booked as a balance correction and set aside for the goal, not
+as a deposit, so it's no part of the month's saving, spending or *Safe to
+spend*.
 
 ### Deleting a savings account
 

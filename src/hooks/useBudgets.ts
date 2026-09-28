@@ -27,14 +27,22 @@ function normalizeAllocations(raw: unknown): PlanAllocation[] {
   })
 }
 
-function normalizeCarryover(raw: unknown): PlanCarryover | null {
-  if (!raw || typeof raw !== 'object') return null
-  const row = raw as Record<string, unknown>
-  if (typeof row.goal_id !== 'string') return null
-  return {
-    goal_id: row.goal_id,
-    account_id: typeof row.account_id === 'string' ? row.account_id : null,
-  }
+/** A list of goals with shares; a plan saved before the split had one goal, taking it all. */
+function normalizeCarryover(raw: unknown): PlanCarryover[] {
+  const rows = Array.isArray(raw) ? raw : raw && typeof raw === 'object' ? [raw] : []
+  return rows.flatMap((r) => {
+    if (!r || typeof r !== 'object') return []
+    const row = r as Record<string, unknown>
+    if (typeof row.goal_id !== 'string') return []
+    const share = Number(row.share)
+    return [
+      {
+        goal_id: row.goal_id,
+        account_id: typeof row.account_id === 'string' ? row.account_id : null,
+        share: Number.isFinite(share) && share > 0 ? share : 100,
+      },
+    ]
+  })
 }
 
 function normalize(row: Record<string, unknown>): BudgetPlan {
@@ -93,7 +101,7 @@ export function useSaveBudget() {
       if (!error) return
       if (!missingAllocations(error)) throw error
       // before migration 0010 a plan without a split still saves
-      if (plan.allocations.length > 0 || plan.carryover) {
+      if (plan.allocations.length > 0 || plan.carryover.length > 0) {
         throw new Error(
           'Splitting savings between goals and IKE needs migration 0010_plan_allocations.sql',
         )

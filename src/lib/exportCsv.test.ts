@@ -25,6 +25,7 @@ describe('toCsv', () => {
           person: 'meow',
           note: 'Salary',
           income_date: '2026-09-10',
+          for_month: null,
           created_at: '2026-09-10T08:00:00Z',
         },
       ],
@@ -42,6 +43,7 @@ describe('toCsv', () => {
           starts_on: null,
           ends_on: null,
           goal_id: null,
+          owner: null,
         },
       ],
     )

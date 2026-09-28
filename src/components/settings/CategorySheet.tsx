@@ -9,7 +9,8 @@ import {
 } from '../../hooks/useCategories'
 import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import { roundUpPlan } from '../../lib/planning'
-import type { Category } from '../../types'
+import { PERSON_LABELS } from '../../config'
+import type { Category, Person } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
@@ -39,6 +40,10 @@ export function CategorySheet({
   const [color, setColor] = useState(category?.color ?? '#3987e5')
   const [limit, setLimit] = useState(category?.monthly_limit ?? 0)
   const [inChart, setInChart] = useState(category?.show_in_chart ?? true)
+  const [owner, setOwner] = useState<Person | ''>(category?.owner ?? '')
+  // only sent when it's someone's: the column arrives with migration 0013
+  const ownerField =
+    (owner || null) !== (category?.owner ?? null) ? { owner: (owner || null) as Person | null } : {}
   const [error, setError] = useState<string | null>(null)
 
   const submit = async (e: FormEvent) => {
@@ -52,9 +57,15 @@ export function CategorySheet({
           color,
           monthly_limit: roundMoney(limit),
           show_in_chart: inChart,
+          ...ownerField,
         })
       } else {
-        await add.mutateAsync({ name: name.trim(), color, monthly_limit: roundMoney(limit) })
+        await add.mutateAsync({
+          name: name.trim(),
+          color,
+          monthly_limit: roundMoney(limit),
+          ...ownerField,
+        })
       }
       onClose()
     } catch (err) {
@@ -119,6 +130,20 @@ export function CategorySheet({
           checked={inChart}
           onChange={setInChart}
         />
+        <Field
+          label="Whose"
+          help={
+            owner
+              ? `${PERSON_LABELS[owner]}'s allowance: money nobody has to explain. Its tile shows only on ${PERSON_LABELS[owner]}'s phone, and the other sees the amounts but not the notes. It still counts in the plan and every total.`
+              : 'Shared by both of you. Make it one person’s to use it as their allowance.'
+          }
+        >
+          <Select value={owner} onChange={(v) => setOwner(v as Person | '')}>
+            <option value="">Shared</option>
+            <option value="bubs">{PERSON_LABELS.bubs}'s allowance</option>
+            <option value="meow">{PERSON_LABELS.meow}'s allowance</option>
+          </Select>
+        </Field>
         <Field label="Color">
           <ColorChoice value={color} onChange={setColor} />
         </Field>

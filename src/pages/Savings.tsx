@@ -18,11 +18,10 @@ import { AccountCard, GoalCard } from '../components/savings/cards'
 import { LoansCard, SavingsAssistant } from '../components/savings/SavingsAssistant'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
-import { useCategories } from '../hooks/useCategories'
-import { useExpensesBetween } from '../hooks/useExpenses'
+import { useTypicalSpending } from '../hooks/useTypicalSpending'
 import { useSavingsOverview } from '../hooks/useSavings'
 import { currentMonthKey, formatMoneyWhole, formatMonthName, shiftMonth } from '../lib/calculations'
-import { monthsEndingAt, windowRange } from '../lib/insights'
+import { monthsEndingAt } from '../lib/insights'
 import { EMERGENCY_MONTHS, balanceHistory } from '../lib/savings'
 
 type Sheet =
@@ -264,16 +263,10 @@ export function Savings() {
   )
 }
 
-/** EMERGENCY_MONTHS of typical monthly spending (monthly categories, last 3 complete months). */
+/** EMERGENCY_MONTHS of typical monthly spending, rounded to 100 zł. */
 function useEmergencyHint(): number | null {
-  const months = monthsEndingAt(shiftMonth(currentMonthKey(), -1), 3)
-  const { from, to } = windowRange(months)
-  const { data: expenses } = useExpensesBetween(from, to)
-  const { data: categories } = useCategories()
-  if (!expenses || !categories) return null
-  const monthly = new Set(categories.filter((c) => c.kind === 'monthly').map((c) => c.id))
-  const total = expenses.filter((e) => monthly.has(e.category_id)).reduce((s, e) => s + e.amount, 0)
-  return total > 0 ? Math.round(((total / months.length) * EMERGENCY_MONTHS) / 100) * 100 : null
+  const typical = useTypicalSpending()
+  return typical === null ? null : Math.round((typical * EMERGENCY_MONTHS) / 100) * 100
 }
 
 function Figure({

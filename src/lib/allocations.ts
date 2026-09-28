@@ -171,12 +171,43 @@ export function safeToSpend(args: {
   deposited?: number
   /** Taken out of savings this month: money back in hand to spend. */
   withdrawn?: number
-}): { amount: number; income: number; expected: boolean; savedAside: number } | null {
+  /** Fixed costs not paid yet this month (see unpaidFixedCosts): already spoken for. */
+  reserved?: number
+}): {
+  amount: number
+  income: number
+  expected: boolean
+  savedAside: number
+  reserved: number
+} | null {
   const expected = args.income <= 0
   const income = expected ? args.plannedIncome : args.income
   if (income <= 0) return null
   const savedAside = savedAsideOf(args)
-  return { amount: roundMoney(income - savedAside - args.spent), income, expected, savedAside }
+  const reserved = roundMoney(args.reserved ?? 0)
+  return {
+    amount: roundMoney(income - savedAside - args.spent - reserved),
+    income,
+    expected,
+    savedAside,
+    reserved,
+  }
+}
+
+/**
+ * What the month's fixed costs (rent, bills: the categories kept out of the
+ * spending chart) still have to take: each one's limit less what it has cost
+ * so far. Until the rent is paid, its money isn't free to spend.
+ */
+export function unpaidFixedCosts(
+  categories: { id: string; monthly_limit: number; show_in_chart: boolean; archived: boolean }[],
+  spentByCategory: Record<string, number>,
+): number {
+  return roundMoney(
+    categories
+      .filter((c) => !c.show_in_chart && !c.archived)
+      .reduce((s, c) => s + Math.max(c.monthly_limit - (spentByCategory[c.id] ?? 0), 0), 0),
+  )
 }
 
 /**
@@ -278,4 +309,52 @@ export function allocationProgress(
     )
     return { line, paid, remaining: roundMoney(Math.max(line.amount - paid, 0)) }
   })
+}
+
+/* ---------- how healthy the month is ---------- */
+
+export type Health = 'good' | 'watch' | 'low'
+
+export interface MoneyHealth {
+  /** What the month puts aside, as a share of its income; null without income. */
+  savingsRate: { value: number; health: Health } | null
+  /** Rent, bills and other fixed costs, as a share of income; null without income. */
+  fixedShare: { value: number; health: Health } | null
+  /** Months of typical spending the emergency fund covers; null without one. */
+  emergencyMonths: { value: number; health: Health } | null
+}
+
+/**
+ * The three numbers that say most about a household's money, each against
+ * the usual rules of thumb: save 20% or more of income, keep fixed costs
+ * under half of it, and hold three to six months of spending in reserve.
+ */
+export function moneyHealth(args: {
+  income: number
+  savedAside: number
+  fixedCosts: number
+  emergencySaved: number | null
+  typicalSpending: number | null
+}): MoneyHealth {
+  const { income, savedAside, fixedCosts, emergencySaved, typicalSpending } = args
+  const rate = income > 0 ? savedAside / income : null
+  const fixed = income > 0 ? fixedCosts / income : null
+  const months =
+    emergencySaved !== null && typicalSpending !== null && typicalSpending > 0
+      ? emergencySaved / typicalSpending
+      : null
+  return {
+    savingsRate:
+      rate === null
+        ? null
+        : { value: rate, health: rate >= 0.2 ? 'good' : rate >= 0.1 ? 'watch' : 'low' },
+    fixedShare:
+      fixed === null
+        ? null
+        : { value: fixed, health: fixed <= 0.5 ? 'good' : fixed <= 0.6 ? 'watch' : 'low' },
+    emergencyMonths:
+      months === null
+        ? null
+        : { value: months, health: months >= 3 ? 'good' : months >= 1 ? 'watch' : 'low' },
+  }
 }

@@ -244,3 +244,25 @@ export function projectBalance(
 
 /** A starting point for an emergency fund: this many months of typical spending. */
 export const EMERGENCY_MONTHS = 3
+
+/**
+ * What an account's money did by itself: interest, and the corrections made
+ * when its balance was updated to what the bank or broker shows (an IKE's
+ * bonds or funds moving up or down). What you put in or took out, and the
+ * balance an account started with, aren't part of it.
+ */
+export function accountGain(movements: SavingsMovement[]): { putIn: number; gain: number } {
+  let putIn = 0
+  let gain = 0
+  for (const m of movements) {
+    const started = m.kind === 'adjustment' && isStartingPoint(m.note)
+    if (m.kind === 'interest' || (m.kind === 'adjustment' && !started)) gain += m.amount
+    else putIn += m.amount
+  }
+  return { putIn: roundMoney(putIn), gain: roundMoney(gain) }
+}
+
+/** An adjustment that says how much was there to begin with, not a change in value. */
+function isStartingPoint(note: string | null): boolean {
+  return !!note && /^opening balance$|saved amount corrected$/i.test(note.trim())
+}

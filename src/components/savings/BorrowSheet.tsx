@@ -142,6 +142,22 @@ export function BorrowSheet({
           </section>
         )}
 
+        {amount > 0 && chosen?.goal?.goal.is_emergency && chosen.goal.saved > 0 && (
+          <p
+            className={`rounded-xl px-3 py-2.5 text-sm leading-snug ring-1 ${
+              amount > chosen.goal.saved / 2
+                ? 'bg-red-500/10 text-red-200 ring-red-400/30'
+                : 'bg-amber-400/10 text-amber-100 ring-amber-300/25'
+            }`}
+          >
+            That’s {Math.round((amount / chosen.goal.saved) * 100)}% of {chosen.goal.goal.name}, your
+            emergency fund.{' '}
+            {amount > chosen.goal.saved / 2
+              ? 'More than half: only for something that really can’t wait, and pay it back first.'
+              : 'Fine for a real emergency; pay it back before the next one.'}
+          </p>
+        )}
+
         {amount > 0 && chosen && (
           <>
             <Field label="Pay it back over">

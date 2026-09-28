@@ -16,6 +16,8 @@ function normalizeGoal(row: Record<string, unknown>): Goal {
     sort_order: Number(row.sort_order ?? 0),
     archived: Boolean(row.archived),
     note: (row.note as string | null) ?? null,
+    // absent until migration 0013
+    is_emergency: row.is_emergency === true,
   }
 }
 
@@ -74,11 +76,25 @@ export type GoalInput = Pick<Goal, 'name' | 'target_amount'> &
 export function useUpsertGoal() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...fields }: GoalInput) => {
-      const { error } = id
-        ? await supabase.from('goals').update(fields).eq('id', id)
-        : await supabase.from('goals').insert(fields)
-      if (error) throw error
+    mutationFn: async ({ id, ...fields }: GoalInput): Promise<string> => {
+      if (id) {
+        const { error } = await supabase.from('goals').update(fields).eq('id', id)
+        if (error) throw error
+      } else {
+        const { data, error } = await supabase.from('goals').insert(fields).select('id').single()
+        if (error) throw error
+        id = String(data.id)
+      }
+      // there's one emergency fund: marking this one unmarks the rest
+      if (fields.is_emergency) {
+        const { error } = await supabase
+          .from('goals')
+          .update({ is_emergency: false })
+          .neq('id', id)
+          .eq('is_emergency', true)
+        if (error) throw error
+      }
+      return id
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: goalsKey })

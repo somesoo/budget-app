@@ -38,7 +38,10 @@ export function Home() {
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   // limits come from this month's plan where it has one
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
-  const categories = allCategories.filter((c) => !c.archived)
+  // shared categories and this phone's own allowance, not the other one's
+  const categories = allCategories.filter(
+    (c) => !c.archived && (!c.owner || c.owner === devicePerson),
+  )
   const { data: expenses = [] } = useMonthlyExpenses(month)
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
@@ -95,9 +98,9 @@ export function Home() {
         onPersonChange={setEntryPerson}
         onCancel={() => setIncomeOpen(false)}
         saving={addIncome.isPending}
-        onSave={({ amount, person, note, date }) => {
+        onSave={({ amount, person, note, date, forMonth }) => {
           addIncome.mutate(
-            { amount, person, note, income_date: date },
+            { amount, person, note, income_date: date, for_month: forMonth },
             { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
           )
           setIncomeOpen(false)
@@ -106,7 +109,7 @@ export function Home() {
             money.plan &&
             savings.available &&
             (money.plan.allocations.length > 0 || money.plan.carryover.length > 0) &&
-            monthKeyOfDate(date) === month
+            (forMonth ?? monthKeyOfDate(date)) === month
           ) {
             setPayOutOpen(true)
           }
@@ -186,6 +189,7 @@ export function Home() {
                 ? ` ${safe.savedAside < 0 ? '+ from savings' : '− savings'} ${formatMoneyCompact(Math.abs(safe.savedAside))}`
                 : ''}{' '}
               − spent {formatMoneyCompact(monthTotal)}
+              {safe.reserved > 0 ? ` − bills to pay ${formatMoneyCompact(safe.reserved)}` : ''}
             </span>
           </p>
         ) : (

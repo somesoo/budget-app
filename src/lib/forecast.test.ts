@@ -18,6 +18,7 @@ const cat = (id: string, extra: Partial<Category> = {}): Category => ({
   starts_on: null,
   ends_on: null,
   goal_id: null,
+  owner: null,
   ...extra,
 })
 const exp = (
@@ -44,6 +45,7 @@ const goal: Goal = {
   sort_order: 0,
   archived: false,
   note: null,
+  is_emergency: false,
 }
 
 beforeEach(() => {

@@ -6,14 +6,30 @@ import { DatePicker } from './DatePicker'
 import { UserSwitcher } from './UserSwitcher'
 import { CURRENCY_SUFFIX } from '../config'
 import { useLastIncomes } from '../hooks/useIncomes'
-import { formatAmount, todayKey } from '../lib/calculations'
+import {
+  formatAmount,
+  formatMonthName,
+  monthKeyOfDate,
+  shiftMonth,
+  todayKey,
+} from '../lib/calculations'
+
+/** From this day of the month on, pay usually covers the month after. */
+const PAYS_NEXT_FROM_DAY = 25
 import type { Person } from '../types'
 
 interface Props {
   person: Person
   onPersonChange: (person: Person) => void
   onCancel: () => void
-  onSave: (input: { amount: number; person: Person; note: string | null; date: string }) => void
+  onSave: (input: {
+    amount: number
+    person: Person
+    note: string | null
+    date: string
+    /** The month it pays for, when not the month of `date`. */
+    forMonth: string | null
+  }) => void
   saving: boolean
 }
 
@@ -28,6 +44,13 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
   const [amountText, setAmountText] = useState('')
   const [note, setNote] = useState('')
   const [date, setDate] = useState(todayKey())
+  // null: follow the date (late in the month, the month after); else what was picked
+  const [picked, setPicked] = useState<'same' | 'next' | null>(null)
+  const dateMonth = monthKeyOfDate(date)
+  const paysFor =
+    (picked ?? (Number(date.slice(8, 10)) >= PAYS_NEXT_FROM_DAY ? 'next' : 'same')) === 'next'
+      ? shiftMonth(dateMonth, 1)
+      : dateMonth
   const { data: recent = [] } = useLastIncomes()
 
   const amount = parseAmount(amountText)
@@ -87,6 +110,34 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
           <DatePicker value={date} onChange={setDate} />
         </div>
 
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-muted">Pays for</span>
+          <div className="flex rounded-full bg-white/5 p-1 ring-1 ring-white/10">
+            {(['same', 'next'] as const).map((which) => {
+              const month = which === 'same' ? dateMonth : shiftMonth(dateMonth, 1)
+              return (
+                <button
+                  key={which}
+                  type="button"
+                  aria-pressed={paysFor === month}
+                  onClick={() => setPicked(which)}
+                  className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                    paysFor === month ? 'bg-slate-50 text-ink' : 'text-muted'
+                  }`}
+                >
+                  {formatMonthName(month)}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        {paysFor !== dateMonth && (
+          <p className="-mt-3 text-xs leading-snug text-muted">
+            Counted as {formatMonthName(paysFor)}’s income: its plan, Safe to spend and what it
+            leaves over, not {formatMonthName(dateMonth)}’s.
+          </p>
+        )}
+
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -100,7 +151,15 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         <button
           type="button"
           disabled={amount <= 0 || saving}
-          onClick={() => onSave({ amount, person, note: note.trim() || null, date })}
+          onClick={() =>
+            onSave({
+              amount,
+              person,
+              note: note.trim() || null,
+              date,
+              forMonth: paysFor === dateMonth ? null : paysFor,
+            })
+          }
           className="h-16 w-full rounded-3xl text-xl font-bold text-ink transition active:scale-[0.99] disabled:opacity-40"
           style={{ backgroundColor: INCOME_COLOR }}
         >

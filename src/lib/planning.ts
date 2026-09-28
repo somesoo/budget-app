@@ -16,6 +16,7 @@ import {
   roundMoney,
   shiftMonth,
   type MonthKey,
+  incomeMonth,
 } from './calculations'
 
 /*
@@ -94,7 +95,7 @@ export function planBaseline(args: {
 
   const incomeHistory = months.map(() => 0)
   for (const inc of incomes) {
-    const i = index.get(monthKeyOfDate(inc.income_date))
+    const i = index.get(incomeMonth(inc))
     if (i !== undefined) incomeHistory[i] += inc.amount
   }
   const paidMonths = incomeHistory.filter((x) => x > 0).slice(-TYPICAL_OVER)

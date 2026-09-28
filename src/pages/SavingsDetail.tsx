@@ -34,7 +34,7 @@ import {
 } from '../lib/calculations'
 import { toEntries } from '../lib/history'
 import { monthsEndingAt } from '../lib/insights'
-import { balanceHistory, projectBalance } from '../lib/savings'
+import { accountGain, balanceHistory, projectBalance } from '../lib/savings'
 
 type Sheet =
   | { kind: 'money'; mode: MoneyMode; goalId?: string }
@@ -116,6 +116,14 @@ export function SavingsAccountPage() {
             <Stat label="Set aside" value={formatMoneyWhole(allocated)} />
             <Stat label="Unassigned" value={formatMoneyWhole(unassigned)} />
           </section>
+
+          {INVESTED.has(account.kind) && (
+            <InvestedCard
+              {...accountGain(mine)}
+              balance={balance}
+              onUpdate={() => setSheet({ kind: 'money', mode: 'balance' })}
+            />
+          )}
 
           {history.length > 1 && (
             <section
@@ -424,6 +432,63 @@ export function SavingsGoalPage() {
 
 /* ---------- bits ---------- */
 
+/** Accounts whose value moves with a market or a bond index, not just with interest. */
+const INVESTED = new Set(['ike', 'ikze', 'investment', 'retirement'])
+
+/**
+ * What went in against what it's worth now. Its value changes by itself, so
+ * it's kept up to date by updating the balance to what the provider shows,
+ * now and then; that's the gain or loss, and none of it counts as saving.
+ */
+function InvestedCard({
+  putIn,
+  gain,
+  balance,
+  onUpdate,
+}: {
+  putIn: number
+  gain: number
+  balance: number
+  onUpdate: () => void
+}) {
+  const pct = putIn > 0 ? (gain / putIn) * 100 : null
+  return (
+    <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+      <div className="grid grid-cols-3 gap-3">
+        <Stat label="Put in" value={formatMoneyWhole(putIn)} />
+        <Stat label="Worth now" value={formatMoneyWhole(balance)} />
+        <div className="min-w-0">
+          <p className="truncate text-xs text-muted">{gain >= 0 ? 'Gained' : 'Lost'}</p>
+          <p
+            className={`truncate text-base font-bold tabular-nums sm:text-lg ${gain >= 0 ? 'text-positive' : 'text-red-300'}`}
+          >
+            {gain >= 0 ? '+' : '−'}
+            {formatMoneyWhole(Math.abs(gain))}
+          </p>
+          {pct !== null && (
+            <p className="text-xs tabular-nums text-muted">
+              {gain >= 0 ? '+' : '−'}
+              {Math.abs(pct).toFixed(1)}%
+            </p>
+          )}
+        </div>
+      </div>
+      <p className="mt-3 text-xs leading-snug text-slate-300">
+        Its value goes up and down by itself. Once a month or a quarter,{' '}
+        <button
+          type="button"
+          onClick={onUpdate}
+          className="font-semibold text-accent-soft hover:underline"
+        >
+          update the balance
+        </button>{' '}
+        to what your provider shows: the difference is the gain or loss, and doesn’t count as
+        saving or against the yearly limit.
+      </p>
+    </section>
+  )
+}
+
 function datesOf(from: string | null, to: string | null): string | null {
   if (from && to) return `${formatDayLong(from)} to ${formatDayLong(to)}`
   if (from) return `From ${formatDayLong(from)}`
@@ -524,7 +589,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
       <p className="truncate text-xs text-muted">{label}</p>
-      <p className="truncate text-lg font-bold tabular-nums text-white">{value}</p>
+      <p className="truncate text-base font-bold tabular-nums sm:text-lg text-white">{value}</p>
     </div>
   )
 }

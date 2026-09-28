@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
+import { incomeMonth, monthRange, shiftMonth } from '../lib/calculations'
 import type { Income, NewIncome } from '../types'
 
 const COLUMNS = 'id, amount, person, note, income_date, created_at'
@@ -21,24 +22,45 @@ function normalize(row: Record<string, unknown>): Income {
     person: row.person as Income['person'],
     note: (row.note as string | null) ?? null,
     income_date: String(row.income_date),
+    // absent until migration 0013
+    for_month: typeof row.for_month === 'string' ? row.for_month : null,
     created_at: String(row.created_at),
   }
 }
 
-/** Income between two dates, inclusive — a handful of rows a month, so no paging. */
-export function useIncomesBetween(from: string, to: string) {
+/**
+ * Income for the months from `from` to `to` — a handful of rows a month, so
+ * no paging. By default it's the months a paycheck pays for (see
+ * incomeMonth), so pay that arrived on the 28th for the month after is
+ * counted there; `byDate` lists what arrived between the dates instead, as
+ * History does.
+ */
+export function useIncomesBetween(from: string, to: string, byDate = false) {
   return useQuery({
-    queryKey: ['incomes', from, to],
+    queryKey: ['incomes', from, to, byDate ? 'date' : 'month'],
     queryFn: async (): Promise<Income[]> => {
+      // a paycheck can pay for the month before or after the one it arrived in
+      const [lo, hi] = byDate
+        ? [from, to]
+        : [
+            monthRange(shiftMonth(from.slice(0, 7), -1)).from,
+            monthRange(shiftMonth(to.slice(0, 7), 1)).to,
+          ]
       const { data, error } = await supabase
         .from('incomes')
-        .select(COLUMNS)
-        .gte('income_date', from)
-        .lte('income_date', to)
+        // '*': for_month arrives with migration 0013
+        .select('*')
+        .gte('income_date', lo)
+        .lte('income_date', hi)
         .order('income_date', { ascending: false })
         .order('created_at', { ascending: false })
       if (error) throw error
-      return (data ?? []).map(normalize)
+      const rows = (data ?? []).map(normalize)
+      if (byDate) return rows
+      return rows.filter((i) => {
+        const m = incomeMonth(i)
+        return m >= from.slice(0, 7) && m <= to.slice(0, 7)
+      })
     },
     placeholderData: (previous) => previous,
   })
@@ -66,7 +88,19 @@ export function useAddIncome() {
   return useMutation({
     mutationFn: async (income: NewIncome) => {
       const { error } = await supabase.from('incomes').insert(income)
-      if (error) throw error
+      if (!error) return
+      // before migration 0013 there's no for_month: fine unless one was chosen
+      if (/for_month/i.test(error.message ?? '')) {
+        if (income.for_month) {
+          throw new Error('Counting pay for another month needs migration 0013_money_health.sql')
+        }
+        const rest: Partial<NewIncome> = { ...income }
+        delete rest.for_month
+        const retry = await supabase.from('incomes').insert(rest)
+        if (retry.error) throw retry.error
+        return
+      }
+      throw error
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['incomes'] })

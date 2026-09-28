@@ -62,6 +62,7 @@ export function useGoalTrips() {
       starts_on: null,
       ends_on: null,
       goal_id: goal.id,
+      owner: null,
     }
   }
 

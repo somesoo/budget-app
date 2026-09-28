@@ -35,6 +35,14 @@ export function monthKeyOfDate(dateKey: string): MonthKey {
   return dateKey.slice(0, 7)
 }
 
+/**
+ * The month a paycheck pays for: the one it was marked for (pay on the 28th
+ * for the month after), else the one it arrived in.
+ */
+export function incomeMonth(i: { income_date: string; for_month?: string | null }): MonthKey {
+  return i.for_month ?? monthKeyOfDate(i.income_date)
+}
+
 /** First and last day of the month as YYYY-MM-DD, both inclusive. */
 export function monthRange(month: MonthKey): { from: string; to: string } {
   const [y, m] = month.split('-').map(Number)

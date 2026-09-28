@@ -84,7 +84,10 @@ export function CarryoverPicker({
   overview: SavingsOverview
 }) {
   const chosen = new Map(value.map((c) => [c.goal_id, c]))
-  const goals = overview.goals.filter((g) => !g.goal.archived || chosen.has(g.goal.id))
+  // the emergency fund first: it's where a leftover does most good while it's short
+  const goals = overview.goals
+    .filter((g) => !g.goal.archived || chosen.has(g.goal.id))
+    .sort((a, b) => Number(b.goal.is_emergency) - Number(a.goal.is_emergency))
   if (!overview.available) return null
 
   const accounts = overview.accounts.map((a) => a.account)
@@ -186,7 +189,14 @@ export function CarryoverPicker({
                     style={{ backgroundColor: g.goal.color }}
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] text-white">{g.goal.name}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="truncate text-[15px] text-white">{g.goal.name}</span>
+                      {g.goal.is_emergency && (
+                        <span className="shrink-0 rounded-full bg-positive/15 px-1.5 py-0.5 text-[10px] font-semibold text-positive">
+                          emergency fund
+                        </span>
+                      )}
+                    </span>
                     <span className="block text-xs leading-snug text-muted">{needLine(g, planned[g.goal.id] ?? 0)}</span>
                   </span>
                 </button>

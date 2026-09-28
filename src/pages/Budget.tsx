@@ -9,6 +9,7 @@ import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
 import { AskLink } from '../components/AskLink'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
+import { HealthCard } from '../components/budget/HealthCard'
 import { PaycheckCard } from '../components/budget/PaycheckCard'
 import { ProjectsCard } from '../components/projects/ProjectsCard'
 import { useProjectSummaries } from '../hooks/useProjectSummaries'
@@ -271,6 +272,8 @@ function MonthStatus({
               onOpen={() => onOpenMonth(shiftMonth(month, -1))}
             />
           )}
+
+          <HealthCard month={month} categories={shown} />
 
           {isCurrent && alerts.length > 0 && (
             <section className="mb-6" aria-label="Warnings">

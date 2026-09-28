@@ -1,4 +1,5 @@
 import { PERSON_LABELS } from '../../config'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { formatDayShort, formatMoney, withAlpha } from '../../lib/calculations'
 import type { Entry } from '../../lib/history'
 import type { Category } from '../../types'
@@ -28,11 +29,15 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
   const categoryName = isIncome ? 'Income' : (category?.name ?? 'Unknown category')
   // spent from a savings goal: say so, it isn't part of the month
   const where = category?.kind === 'project' ? `Goal: ${categoryName}` : categoryName
-  const note = entry.item.note
+  const { person: me } = useDeviceUser()
+  // the other one's allowance: the amount, not what it went on
+  const privateNote = !!category?.owner && category.owner !== me
+  const note = privateNote ? null : entry.item.note
   const title = note ?? where
   const detail = [
     note ? where : null,
     PERSON_LABELS[entry.item.person],
+    privateNote && entry.item.note ? 'note kept private' : null,
     showDate ? formatDayShort(entry.date) : null,
   ]
     .filter(Boolean)

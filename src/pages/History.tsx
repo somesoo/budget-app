@@ -84,7 +84,8 @@ export function History() {
   }, [categories, query])
 
   const monthExpenses = useExpenses(month)
-  const monthIncomes = useIncomesBetween(from, to)
+  // History lists pay by the day it arrived
+  const monthIncomes = useIncomesBetween(from, to, true)
   const foundExpenses = useSearchExpenses(query, matchingCategoryIds)
   const foundIncomes = useSearchIncomes(query)
 

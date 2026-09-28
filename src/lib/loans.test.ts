@@ -42,6 +42,7 @@ const goal = (id: string, status: GoalSummary['status'], date: string | null, re
       sort_order: 0,
       archived: false,
       note: null,
+      is_emergency: false,
     } satisfies Goal,
     saved: 0,
     remaining,

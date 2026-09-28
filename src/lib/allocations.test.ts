@@ -13,6 +13,8 @@ import {
   retirementStatus,
   safeToSpend,
   setAllocation,
+  unpaidFixedCosts,
+  moneyHealth,
 } from './allocations'
 
 const ike: SavingsAccount & { kind: 'ike' } = {
@@ -52,7 +54,7 @@ const move = (
 describe('safe to spend', () => {
   it('takes the planned savings off the income, then the spending', () => {
     expect(safeToSpend({ income: 12_000, plannedIncome: 11_000, savings: 3_000, spent: 9_284 }))
-      .toEqual({ amount: -284, income: 12_000, expected: false, savedAside: 3_000 })
+      .toEqual({ amount: -284, income: 12_000, expected: false, savedAside: 3_000, reserved: 0 })
   })
 
   it('counts on the planned income until a paycheck is logged', () => {
@@ -61,6 +63,7 @@ describe('safe to spend', () => {
       income: 11_000,
       expected: true,
       savedAside: 3_000,
+      reserved: 0,
     })
     expect(safeToSpend({ income: 0, plannedIncome: 0, savings: 0, spent: 500 })).toBeNull()
   })
@@ -84,6 +87,23 @@ describe('safe to spend', () => {
       move('acc', 900, '2026-09-29'),
     ]
     expect(monthSavingsFlow(movements, '2026-10')).toEqual({ deposited: 1_000, withdrawn: 300 })
+  })
+
+  it('keeps unpaid rent and bills out of what\'s safe to spend', () => {
+    const categories = [
+      { id: 'rent', monthly_limit: 3_000, show_in_chart: false, archived: false },
+      { id: 'bills', monthly_limit: 800, show_in_chart: false, archived: false },
+      { id: 'food', monthly_limit: 1_500, show_in_chart: true, archived: false },
+    ]
+    // rent paid, 300 of the bills paid, food isn't a fixed cost
+    const reserved = unpaidFixedCosts(categories, { rent: 3_000, bills: 300, food: 900 })
+    expect(reserved).toBe(500)
+    expect(
+      safeToSpend({ income: 10_000, plannedIncome: 0, savings: 2_000, spent: 4_200, reserved })
+        ?.amount,
+    ).toBe(3_300)
+    // paying more than the limit reserves nothing more
+    expect(unpaidFixedCosts(categories, { rent: 3_200, bills: 900 })).toBe(0)
   })
 
   it('has no leftover without income', () => {
@@ -209,5 +229,31 @@ describe('allocationProgress', () => {
       '2026-09',
     )
     expect(line.remaining).toBe(750)
+  })
+})
+
+describe('moneyHealth', () => {
+  it('measures against the rules of thumb', () => {
+    const h = moneyHealth({
+      income: 10_000,
+      savedAside: 2_500,
+      fixedCosts: 5_500,
+      emergencySaved: 12_000,
+      typicalSpending: 6_000,
+    })
+    expect(h.savingsRate).toEqual({ value: 0.25, health: 'good' })
+    expect(h.fixedShare).toEqual({ value: 0.55, health: 'watch' })
+    expect(h.emergencyMonths).toEqual({ value: 2, health: 'watch' })
+  })
+
+  it('says nothing it has no numbers for', () => {
+    const h = moneyHealth({
+      income: 0,
+      savedAside: 0,
+      fixedCosts: 3_000,
+      emergencySaved: null,
+      typicalSpending: 5_000,
+    })
+    expect(h).toEqual({ savingsRate: null, fixedShare: null, emergencyMonths: null })
   })
 })

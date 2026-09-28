@@ -4,6 +4,7 @@ import { currentMonthKey } from '../lib/calculations'
 import { useMonthCategories } from './useBudgets'
 import { useMonthlyExpenses } from './useExpenses'
 import { usePrefs } from './usePrefs'
+import { useDeviceUser } from './useDeviceUser'
 
 /*
  * Dismissed warnings live in this browser only: a per-device convenience,
@@ -85,6 +86,7 @@ export function useBudgetAlerts() {
   const { data: categories } = useMonthCategories(month)
   const { data: expenses } = useMonthlyExpenses(month)
   const prefs = usePrefs()
+  const { person: me } = useDeviceUser()
   const ids = useSyncExternalStore(
     subscribe,
     () => dismissed,
@@ -100,9 +102,10 @@ export function useBudgetAlerts() {
             categories,
             nearRatio: prefs.nearRatio,
             pace: prefs.paceWarnings,
+            me,
           })
         : [],
-    [month, categories, expenses, prefs.nearRatio, prefs.paceWarnings],
+    [month, categories, expenses, prefs.nearRatio, prefs.paceWarnings, me],
   )
   const visible = useMemo(() => all.filter((a) => !isDismissed(a, ids)), [all, ids])
 

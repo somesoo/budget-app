@@ -33,16 +33,24 @@ export function AlertList({
           className="group relative flex gap-3 rounded-2xl bg-white/[0.04] py-3 pl-3 pr-11 ring-1 ring-white/10"
         >
           <AlertIcon alert={a} className="mt-0.5 shrink-0 text-lg" />
-          <Link to={alertHref(a)} className="min-w-0 flex-1">
-            <p className="flex items-center gap-1 text-sm font-semibold text-white">
-              {a.title}
-              <CaretRight
-                aria-hidden
-                className="shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-white"
-              />
-            </p>
-            <p className="mt-0.5 text-sm leading-snug text-slate-300">{a.detail}</p>
-          </Link>
+          {a.private ? (
+            // the other one's allowance: nothing behind it to open
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-white">{a.title}</p>
+              <p className="mt-0.5 text-sm leading-snug text-slate-300">{a.detail}</p>
+            </div>
+          ) : (
+            <Link to={alertHref(a)} className="min-w-0 flex-1">
+              <p className="flex items-center gap-1 text-sm font-semibold text-white">
+                {a.title}
+                <CaretRight
+                  aria-hidden
+                  className="shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-white"
+                />
+              </p>
+              <p className="mt-0.5 text-sm leading-snug text-slate-300">{a.detail}</p>
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => onDismiss(a)}

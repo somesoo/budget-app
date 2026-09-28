@@ -9,6 +9,7 @@ import { Screen } from '../components/Screen'
 import { Segments } from '../components/savings/fields'
 import { PERSON_LABELS } from '../config'
 import { useCategories } from '../hooks/useCategories'
+import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useEntryActions } from '../hooks/useEntryActions'
 import { SEARCH_LIMIT, useExpenses, useSearchExpenses } from '../hooks/useExpenses'
 import { useIncomesBetween, useSearchIncomes } from '../hooks/useIncomes'
@@ -33,6 +34,7 @@ import {
   totals,
   type Entry,
 } from '../lib/history'
+import { ownCategories, ownExpenses } from '../lib/allowance'
 import { PERSONS, type Category, type Person } from '../types'
 
 type Kind = 'all' | 'expense' | 'income'
@@ -58,6 +60,7 @@ const BREAKDOWN_ROWS = 8
  */
 export function History() {
   const laptop = useMediaQuery(LAPTOP)
+  const { person: devicePerson } = useDeviceUser()
   const [month, setMonth] = useState(currentMonthKey())
   const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
@@ -79,9 +82,11 @@ export function History() {
   const matchingCategoryIds = useMemo(() => {
     const q = query.trim().toLowerCase()
     return q.length >= 2
-      ? categories.filter((c) => c.name.toLowerCase().includes(q)).map((c) => c.id)
+      ? ownCategories(categories, devicePerson)
+          .filter((c) => c.name.toLowerCase().includes(q))
+          .map((c) => c.id)
       : []
-  }, [categories, query])
+  }, [categories, query, devicePerson])
 
   const monthExpenses = useExpenses(month)
   // History lists pay by the day it arrived
@@ -89,7 +94,12 @@ export function History() {
   const foundExpenses = useSearchExpenses(query, matchingCategoryIds)
   const foundIncomes = useSearchIncomes(query)
 
-  const expenses = (searching ? foundExpenses.data : monthExpenses.data) ?? []
+  // the other one's allowance is theirs: not listed, not searchable, not editable
+  const expenses = ownExpenses(
+    (searching ? foundExpenses.data : monthExpenses.data) ?? [],
+    categories,
+    devicePerson,
+  )
   const incomes = (searching ? foundIncomes.data : monthIncomes.data) ?? []
   const loading = searching
     ? foundExpenses.isLoading || foundIncomes.isLoading
@@ -137,7 +147,12 @@ export function History() {
       : `in ${formatMonthName(month)}`
 
   const controls = (
-    <FilterControls filters={filters} kind={kind} categories={categories} onChange={patch} />
+    <FilterControls
+      filters={filters}
+      kind={kind}
+      categories={ownCategories(categories, devicePerson)}
+      onChange={patch}
+    />
   )
 
   return (

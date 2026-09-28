@@ -25,8 +25,10 @@ import {
 } from '../config'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
+import { useDeviceUser } from '../hooks/useDeviceUser'
 import { usePrimaryGoal, useSavingsOverview, type SavingsOverview } from '../hooks/useSavings'
 import { useIncomesBetween } from '../hooks/useIncomes'
+import { ownCategories, ownExpenses } from '../lib/allowance'
 import { buildAdviceRequest, monthForecast } from '../lib/forecast'
 import {
   currentMonthKey,
@@ -140,6 +142,7 @@ function InsightsBody({
   goal,
   adviceExtras,
 }: BodyProps) {
+  const { person: me } = useDeviceUser()
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
     return <Notice>Nothing to chart yet. Add a few expenses and come back.</Notice>
@@ -176,8 +179,8 @@ function InsightsBody({
         buildRequest={() =>
           buildAdviceRequest({
             month,
-            expenses,
-            categories,
+            expenses: ownExpenses(expenses, categories, me),
+            categories: ownCategories(categories, me),
             goal,
             forecast,
             alerts: adviceExtras.alerts,
@@ -241,8 +244,8 @@ function InsightsBody({
         <div className="space-y-4">
           <CategoryCard
             month={month}
-            expenses={expenses}
-            categories={categories}
+            expenses={ownExpenses(expenses, categories, me)}
+            categories={ownCategories(categories, me)}
             hasPrevMonth={inMonth(prev).length > 0}
             dayCutoff={isCurrent ? elapsed : undefined}
           />

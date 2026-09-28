@@ -42,6 +42,7 @@ import { UserSwitcher } from '../UserSwitcher'
 import { CategoryGrid } from './CategoryGrid'
 import { GoalPicker, GoalsTile } from './GoalPicker'
 import { RecentEntries } from './RecentEntries'
+import { ownExpenses } from '../../lib/allowance'
 
 type Mode = 'expense' | 'income'
 
@@ -57,8 +58,10 @@ export function DesktopAdd() {
   const month = currentMonthKey()
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
-  // both allowances too: either of you can log or fix one (the notes stay private)
-  const categories = allCategories.filter((c) => !c.archived)
+  // shared categories and this device's own allowance, not the other one's
+  const categories = allCategories.filter(
+    (c) => !c.archived && (!c.owner || c.owner === devicePerson),
+  )
   // goals included: what was just logged may have been spent from one
   const { data: everyCategory = [] } = useCategories()
   const { data: expenses = [] } = useMonthlyExpenses(month)
@@ -125,7 +128,11 @@ export function DesktopAdd() {
   const shownGoals = goalTiles.filter(matches)
   const selected = [...categories, ...goalTiles].find((c) => c.id === selectedId) ?? null
   const isProjectPick = selected?.kind === 'project'
-  const recent = toEntries(allExpenses, incomes).slice(0, RECENT)
+  // the other one's allowance isn't listed here, as in History
+  const recent = toEntries(ownExpenses(allExpenses, everyCategory, devicePerson), incomes).slice(
+    0,
+    RECENT,
+  )
   const lastIncome = lastIncomes.find((i) => i.person === person)
   const inThisMonth = monthKeyOfDate(date) === month
 

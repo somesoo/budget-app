@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ownCategories, ownExpenses } from '../lib/allowance'
 import { buildChatContext, trimContext } from '../lib/chatContext'
 import { currentMonthKey, shiftMonth, todayKey } from '../lib/calculations'
 import { monthsEndingAt, windowRange } from '../lib/insights'
@@ -6,6 +7,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { ChatMessage, ChatThread, Person } from '../types'
 import { useBudgetAlerts } from './useBudgetAlerts'
 import { useBudget, useMonthCategories } from './useBudgets'
+import { useDeviceUser } from './useDeviceUser'
 import { useProjects } from './useCategories'
 import { useExpensesBetween } from './useExpenses'
 import { useIncomesBetween } from './useIncomes'
@@ -77,6 +79,7 @@ export function useChatContext() {
   const next = useBudget(shiftMonth(month, 1))
   const { all: alerts } = useBudgetAlerts()
   const savings = useSavingsOverview()
+  const { person: me } = useDeviceUser()
 
   const ready = !!categories.data && !!expenses.data && !!incomes.data && !savings.isLoading
   const build = () =>
@@ -85,8 +88,9 @@ export function useChatContext() {
         month,
         today: todayKey(),
         // the month's categories, plus the projects it keeps apart
-        categories: [...(categories.data ?? []), ...projects],
-        expenses: expenses.data ?? [],
+        // without the other one's allowance, which is theirs alone
+        categories: ownCategories([...(categories.data ?? []), ...projects], me),
+        expenses: ownExpenses(expenses.data ?? [], categories.data ?? [], me),
         incomes: incomes.data ?? [],
         planThisMonth: categories.plan,
         planNextMonth: next.data ?? null,

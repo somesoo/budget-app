@@ -129,3 +129,46 @@ describe('crossingNote', () => {
     expect(crossingNote(c, limitImpact(310, 20, 300))).toBeNull()
   })
 })
+
+describe('the other one’s allowance', () => {
+  const meow = cat('meow', 300, { owner: 'meow', name: 'Kieszonkowe Meow' })
+  // the month as a whole stays well within, so only the allowance could warn
+  const food = cat('food', 5000)
+
+  it('says nothing while it’s close or on a fast pace', () => {
+    at(20)
+    const alerts = budgetAlerts({
+      month: '2026-09',
+      expenses: spread('meow', 290, 6),
+      categories: [meow, food],
+      me: 'bubs',
+    })
+    expect(alerts).toEqual([])
+  })
+
+  it('only says it went over, with no numbers', () => {
+    at(20)
+    const [alert] = budgetAlerts({
+      month: '2026-09',
+      expenses: [exp('meow', 350, 3)],
+      categories: [meow, food],
+      me: 'bubs',
+    })
+    expect(alert.kind).toBe('over')
+    expect(alert.private).toBe(true)
+    expect(alert.title).toBe('Meow went over their allowance')
+    expect(`${alert.title} ${alert.detail}`).not.toMatch(/\d/)
+  })
+
+  it('warns its owner as usual', () => {
+    at(20)
+    const [alert] = budgetAlerts({
+      month: '2026-09',
+      expenses: [exp('meow', 350, 3)],
+      categories: [meow, food],
+      me: 'meow',
+    })
+    expect(alert.private).toBeUndefined()
+    expect(alert.detail).toMatch(/350/)
+  })
+})

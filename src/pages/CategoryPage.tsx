@@ -4,6 +4,8 @@ import { CategoryDetail } from '../components/category/CategoryDetail'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { PLAN_AHEAD_MONTHS } from '../config'
 import { useCategories } from '../hooks/useCategories'
+import { useDeviceUser } from '../hooks/useDeviceUser'
+import { ownCategories } from '../lib/allowance'
 import { currentMonthKey, shiftMonth } from '../lib/calculations'
 
 /**
@@ -20,8 +22,12 @@ export function CategoryPage() {
   const month = requested && /^\d{4}-\d{2}$/.test(requested) ? requested : current
 
   const { data: categories = [] } = useCategories()
+  const { person: me } = useDeviceUser()
   const category = categories.find((c) => c.id === id)
-  const active = categories.filter((c) => !c.archived && c.kind !== 'project')
+  const active = ownCategories(
+    categories.filter((c) => !c.archived && c.kind !== 'project'),
+    me,
+  )
   const index = active.findIndex((c) => c.id === id)
   const neighbour = (step: number) =>
     index === -1 ? null : active[(index + step + active.length) % active.length]

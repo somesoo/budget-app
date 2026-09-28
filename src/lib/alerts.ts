@@ -1,4 +1,6 @@
-import type { Category, Expense } from '../types'
+import { PERSON_LABELS } from '../config'
+import type { Category, Expense, Person } from '../types'
+import { isOthersAllowance } from './allowance'
 import {
   daysInMonth,
   formatMoneyWhole,
@@ -80,6 +82,8 @@ export interface BudgetAlert {
   daysLeft: number
   title: string
   detail: string
+  /** About the other one's allowance: say it's over, show no numbers. */
+  private?: boolean
 }
 
 /** What a warning is about, so dismissing it can also cover lesser ones: `2026-09:<id>`. */
@@ -102,6 +106,8 @@ export function budgetAlerts(args: {
   /** This device's preferences: where "close to the limit" starts, and whether pace warns. */
   nearRatio?: number
   pace?: boolean
+  /** Who this device belongs to: the other one's allowance only says when it's over. */
+  me?: Person | null
 }): BudgetAlert[] {
   const { month, categories, nearRatio = NEAR_RATIO, pace = true } = args
   const expenses = args.expenses.filter((e) => monthKeyOfDate(e.expense_date) === month)
@@ -124,6 +130,10 @@ export function budgetAlerts(args: {
     if (category.archived && spent === 0) continue
     if (limit <= 0) continue
     const level = limitLevel(spent, limit, nearRatio)
+    if (args.me !== undefined && isOthersAllowance(category, args.me)) {
+      if (level === 'over') alerts.push(privateOver({ month, category, spent, limit, daysLeft }))
+      continue
+    }
     const projected =
       paceOn &&
       category.show_in_chart !== false &&
@@ -207,6 +217,30 @@ function describe(args: {
     daysLeft,
     title,
     detail,
+  }
+}
+
+/** The other one's allowance went over: that it did, not by how much or on what. */
+function privateOver(args: {
+  month: MonthKey
+  category: Category
+  spent: number
+  limit: number
+  daysLeft: number
+}): BudgetAlert {
+  const { month, category, spent, limit, daysLeft } = args
+  const who = category.owner ? PERSON_LABELS[category.owner] : 'Someone'
+  return {
+    id: `${month}:${category.id}:over`,
+    kind: 'over',
+    category,
+    spent,
+    limit,
+    projected: null,
+    daysLeft,
+    title: `${who} went over their allowance`,
+    detail: `${category.name} has spent more than planned this month.`,
+    private: true,
   }
 }
 

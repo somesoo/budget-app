@@ -33,6 +33,7 @@ import {
   todayKey,
 } from '../lib/calculations'
 import { crossingNote, limitImpact } from '../lib/alerts'
+import { ownCategories } from '../lib/allowance'
 import { elapsedDays, paceStatus, type PaceStatus } from '../lib/insights'
 import type { Category, Person } from '../types'
 
@@ -52,8 +53,11 @@ export function Home() {
   const { person: devicePerson } = useDeviceUser()
   // limits come from this month's plan where it has one
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
-  // both allowances too: either of you can log or fix one (the notes stay private)
-  const categories = allCategories.filter((c) => !c.archived)
+  // shared categories and this phone's own allowance, not the other one's
+  const categories = ownCategories(
+    allCategories.filter((c) => !c.archived),
+    devicePerson,
+  )
   const { data: expenses = [] } = useMonthlyExpenses(month)
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()

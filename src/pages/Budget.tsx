@@ -36,6 +36,8 @@ import {
   type MonthKey,
 } from '../lib/calculations'
 import { elapsedDays } from '../lib/insights'
+import { ownCategories } from '../lib/allowance'
+import { useDeviceUser } from '../hooks/useDeviceUser'
 import type { BudgetPlan, Category } from '../types'
 
 /**
@@ -181,6 +183,7 @@ function MonthStatus({
   const { from, to } = monthRange(month)
   const { data: expenses = [] } = useMonthlyExpenses(month)
   const { data: incomes = [] } = useIncomesBetween(from, to)
+  const { person: me } = useDeviceUser()
 
   const spent = sumExpenses(expenses)
   const byCategory = sumByCategory(expenses)
@@ -289,7 +292,7 @@ function MonthStatus({
         <section className="mb-6">
           <SectionTitle>Categories</SectionTitle>
           <SummaryBars
-            categories={shown}
+            categories={ownCategories(shown, me)}
             spentByCategory={byCategory}
             linkTo={(c) => `/category/${c.id}?month=${month}`}
             alerts={alertsByCategory}

@@ -2,6 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { CURRENCY_SUFFIX } from '../../config'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
+import { isOthersAllowance, ownCategories, ownExpenses } from '../../lib/allowance'
 import {
   categoryById,
   currentMonthKey,
@@ -62,6 +64,7 @@ export function CategoryDetail({
   const { from, to } = windowRange(detailWindow(month))
   const { data: monthCategories, isLoading: categoriesLoading } = useMonthCategories(month)
   const { data: expenses, error } = useMonthlyExpensesBetween(from, to)
+  const { person: me } = useDeviceUser()
 
   if (error) return <Notice>Could not load expenses: {(error as Error).message}</Notice>
   if (categoriesLoading || !monthCategories || !expenses) return <Skeleton />
@@ -73,6 +76,8 @@ export function CategoryDetail({
     : monthCategories
   const category = categories.find((c) => c.id === categoryId)
   if (!category) return <Notice>This category doesn’t exist any more.</Notice>
+  if (isOthersAllowance(category, me))
+    return <Notice>{category.name} is someone else’s allowance: only they see what’s in it.</Notice>
 
   const history = categoryHistory(expenses, categoryId, month)
 
@@ -96,8 +101,8 @@ export function CategoryDetail({
       <SharePane
         category={category}
         month={month}
-        categories={categories}
-        expenses={expenses}
+        categories={ownCategories(categories, me)}
+        expenses={ownExpenses(expenses, categories, me)}
         history={history}
         onSelect={onSelectCategory}
       />

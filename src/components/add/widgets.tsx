@@ -5,6 +5,7 @@ import { PERSON_LABELS } from '../../config'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import { useIncomesBetween } from '../../hooks/useIncomes'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { usePrefs } from '../../hooks/usePrefs'
 import { usePrimaryGoal, useSavingsOverview } from '../../hooks/useSavings'
 import {
@@ -20,6 +21,7 @@ import {
   sumExpenses,
   todayKey,
 } from '../../lib/calculations'
+import { ownCategories, ownExpenses } from '../../lib/allowance'
 import { monthForecast } from '../../lib/forecast'
 import {
   categoryDeltas,
@@ -85,6 +87,9 @@ export function useAddWidgets({
   const month = currentMonthKey()
   const prev = shiftMonth(month, -1)
   const prefs = usePrefs()
+  const { person: me } = useDeviceUser()
+  // category by category, the other one's allowance isn't shown
+  const own = ownCategories(allCategories, me)
   const { alerts, dismiss } = useBudgetAlerts()
   const { data: twoMonths = [] } = useMonthlyExpensesBetween(
     monthRange(prev).from,
@@ -99,7 +104,9 @@ export function useAddWidgets({
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
 
   const all: Record<AddWidgetId, () => ReactNode> = {
-    donut: () => <DonutWidget expenses={expenses} categories={allCategories} />,
+    donut: () => (
+      <DonutWidget expenses={ownExpenses(expenses, allCategories, me)} categories={own} />
+    ),
     pace: () => (
       <>
         <p className="text-sm leading-snug text-slate-200">
@@ -121,7 +128,13 @@ export function useAddWidgets({
       ) : (
         <Empty>All good: nothing close to a limit.</Empty>
       ),
-    delta: () => <DeltaWidget expenses={twoMonths} categories={allCategories} month={month} />,
+    delta: () => (
+      <DeltaWidget
+        expenses={ownExpenses(twoMonths, allCategories, me)}
+        categories={own}
+        month={month}
+      />
+    ),
     forecast: () => (
       <ForecastCard
         forecast={monthForecast({ month, isCurrent: true, expenses, incomes, goal })}

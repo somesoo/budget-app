@@ -95,6 +95,25 @@ export interface SavingsMovement {
   goal_id: string | null
   /** Shared by the two halves of a transfer between accounts. */
   transfer_id: string | null
+  /** The loan a deposit pays back (migration 0011). */
+  loan_id: string | null
+  created_at: string
+}
+
+/**
+ * Money borrowed from savings for a need that couldn't wait: taken from a
+ * goal (or what's unassigned) on an account, paid back in monthly instalments.
+ */
+export interface SavingsLoan {
+  id: string
+  account_id: string
+  /** The goal it goes back to; null for money that was unassigned. */
+  goal_id: string | null
+  amount: number
+  /** The instalment each month's plan pays back. */
+  monthly: number
+  /** What it was for. */
+  note: string
   created_at: string
 }
 
@@ -173,6 +192,8 @@ export interface PlanAllocation {
   account_id: string | null
   goal_id: string | null
   amount: number
+  /** An instalment paying back a loan from savings, see SavingsLoan. */
+  loan_id?: string | null
 }
 
 /** A drafted plan as returned by /api/plan (Gemini, schema-constrained). */

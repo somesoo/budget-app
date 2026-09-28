@@ -153,6 +153,11 @@ export function draftFrom(args: {
    * account's line drops out, and its money counts as other savings.
    */
   keepExisting?: (a: PlanAllocation) => boolean
+  /**
+   * This month's instalments on loans from savings (lib/loans). A new plan
+   * pays them instead of whatever last month's plan paid back.
+   */
+  instalments?: PlanAllocation[]
 }): PlanDraft {
   const {
     source,
@@ -162,6 +167,7 @@ export function draftFrom(args: {
     existing,
     keepAllocation = () => true,
     keepExisting = () => true,
+    instalments = [],
   } = args
   if (existing) {
     const carryover = existing.carryover
@@ -176,7 +182,13 @@ export function draftFrom(args: {
       note: existing.note ?? '',
     }
   }
-  const allocations = (previousPlan?.allocations ?? []).filter(keepAllocation)
+  const previousLines = previousPlan?.allocations ?? []
+  const sum = (lines: PlanAllocation[]) => lines.reduce((s, a) => s + a.amount, 0)
+  const lastInstalments = previousLines.filter((a) => a.loan_id)
+  const allocations = [
+    ...previousLines.filter((a) => !a.loan_id && keepAllocation(a)),
+    ...instalments,
+  ]
   const lastCarryover = previousPlan?.carryover ?? null
 
   const typicalById = new Map(baseline.categories.map((b) => [b.category.id, b.typical]))
@@ -197,8 +209,11 @@ export function draftFrom(args: {
       source === 'previous' && previousPlan
         ? previousPlan.income
         : roundMoney(baseline.typicalIncome ?? previousPlan?.income ?? 0),
-    // what went to a goal that has since closed goes back to "other savings"
-    savings: previousPlan?.savings ?? 0,
+    // what went to a goal that has since closed goes back to "other savings";
+    // last month's instalments make way for this month's
+    savings: roundMoney(
+      Math.max((previousPlan?.savings ?? 0) - sum(lastInstalments), 0) + sum(instalments),
+    ),
     limits,
     allocations,
     carryover:

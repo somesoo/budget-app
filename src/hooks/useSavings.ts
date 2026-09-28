@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
-import type { Allocation, SavingsAccount, SavingsMovement } from '../types'
+import type { Allocation, SavingsAccount, SavingsLoan, SavingsMovement } from '../types'
 import { currentMonthKey, roundMoney } from '../lib/calculations'
+import { loanSummaries } from '../lib/loans'
 import { accountSummaries, goalSummaries, savedInMonth, totalNeededPerMonth } from '../lib/savings'
 import { useBudget } from './useBudgets'
 import { goalsKey, useGoals } from './useGoal'
@@ -14,6 +15,9 @@ export interface SavingsData {
   accounts: SavingsAccount[]
   movements: SavingsMovement[]
   allocations: Allocation[]
+  /** False until migration 0011 has been run: borrowing from savings stays hidden. */
+  loansAvailable: boolean
+  loans: SavingsLoan[]
 }
 
 const PAGE_SIZE = 1000
@@ -52,6 +56,20 @@ function normalizeMovement(r: Record<string, unknown>): SavingsMovement {
     note: (r.note as string | null) ?? null,
     goal_id: (r.goal_id as string | null) ?? null,
     transfer_id: (r.transfer_id as string | null) ?? null,
+    // absent until migration 0011 has been run
+    loan_id: (r.loan_id as string | null) ?? null,
+    created_at: String(r.created_at),
+  }
+}
+
+function normalizeLoan(r: Record<string, unknown>): SavingsLoan {
+  return {
+    id: String(r.id),
+    account_id: String(r.account_id),
+    goal_id: (r.goal_id as string | null) ?? null,
+    amount: Number(r.amount),
+    monthly: Number(r.monthly),
+    note: String(r.note),
     created_at: String(r.created_at),
   }
 }
@@ -67,7 +85,14 @@ export function useSavings() {
       const accounts = await supabase.from('savings_accounts').select('*').order('sort_order')
       if (accounts.error) {
         if (isMissingTable(accounts.error)) {
-          return { available: false, accounts: [], movements: [], allocations: [] }
+          return {
+            available: false,
+            accounts: [],
+            movements: [],
+            allocations: [],
+            loansAvailable: false,
+            loans: [],
+          }
         }
         throw accounts.error
       }
@@ -90,6 +115,9 @@ export function useSavings() {
         .select('account_id, goal_id, amount')
       if (allocations.error) throw allocations.error
 
+      const loans = await supabase.from('savings_loans').select('*').order('created_at')
+      if (loans.error && !isMissingTable(loans.error)) throw loans.error
+
       return {
         available: true,
         accounts: (accounts.data ?? []).map(normalizeAccount),
@@ -99,6 +127,8 @@ export function useSavings() {
           goal_id: String(a.goal_id),
           amount: Number(a.amount),
         })),
+        loansAvailable: !loans.error,
+        loans: (loans.data ?? []).map(normalizeLoan),
       }
     },
   })
@@ -112,10 +142,11 @@ interface Common {
   note?: string | null
 }
 
-async function rpc(name: string, args: Record<string, unknown>) {
-  const { error } = await supabase.rpc(name, args)
+async function rpc(name: string, args: Record<string, unknown>): Promise<unknown> {
+  const { data, error } = await supabase.rpc(name, args)
   // the functions explain themselves ("Only 512 is unassigned…"), so pass that on
   if (error) throw new Error(error.message)
+  return data
 }
 
 /**
@@ -190,6 +221,64 @@ export function useSavingsActions() {
     }),
     deleteMovement: useMutation({
       mutationFn: (id: string) => rpc('delete_movement', { p_id: id }),
+      ...settle,
+    }),
+    /**
+     * Borrow from savings (migration 0011): the loan is recorded first, then
+     * the money comes out; if taking it out fails, the loan goes again.
+     */
+    borrow: useMutation({
+      mutationFn: async (
+        v: Common & {
+          account: string
+          goal: string | null
+          amount: number
+          monthly: number
+          note: string
+        },
+      ) => {
+        const { data, error } = await supabase
+          .from('savings_loans')
+          .insert({
+            account_id: v.account,
+            goal_id: v.goal,
+            amount: v.amount,
+            monthly: v.monthly,
+            note: v.note,
+          })
+          .select('id')
+          .single()
+        if (error) throw error
+        try {
+          await rpc('take_from', {
+            p_account: v.account,
+            p_amount: v.amount,
+            p_goal: v.goal,
+            ...extra({ ...v, note: `Borrowed: ${v.note}` }),
+          })
+        } catch (err) {
+          await supabase.from('savings_loans').delete().eq('id', data.id)
+          throw err
+        }
+      },
+      ...settle,
+    }),
+    /** Pays back (part of) a loan: a deposit to where it came from, marked with the loan. */
+    repay: useMutation({
+      mutationFn: async (v: Common & { loan: SavingsLoan; amount: number }) => {
+        const id = await rpc('save_to', {
+          p_account: v.loan.account_id,
+          p_amount: v.amount,
+          p_goal: v.loan.goal_id,
+          p_kind: 'deposit',
+          ...extra({ ...v, note: v.note ?? `Paid back: ${v.loan.note}` }),
+        })
+        const { error } = await supabase
+          .from('savings_movements')
+          .update({ loan_id: v.loan.id })
+          .eq('id', String(id))
+        if (error) throw error
+      },
       ...settle,
     }),
   }
@@ -283,6 +372,10 @@ export function useSavingsOverview() {
     /** What this month's plan means to put aside; null without a plan. */
     plannedThisMonth: plan ? plan.savings : null,
     neededPerMonth: totalNeededPerMonth(goalList.filter((g) => !g.goal.archived)),
+    /** False until migration 0011: borrowing from savings stays hidden. */
+    loansAvailable: data?.loansAvailable ?? false,
+    /** Every loan from savings, with what's been paid back. */
+    loans: data ? loanSummaries(data.loans, data.movements) : [],
   }
 }
 

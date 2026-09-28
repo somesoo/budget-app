@@ -15,6 +15,7 @@ import { SettingsLink } from '../components/SettingsLink'
 import { Screen } from '../components/Screen'
 import { AccountSheet } from '../components/savings/AccountSheet'
 import { AccountCard, GoalCard } from '../components/savings/cards'
+import { LoansCard, SavingsAssistant } from '../components/savings/SavingsAssistant'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { useCategories } from '../hooks/useCategories'
@@ -131,6 +132,9 @@ export function Savings() {
           }
         />
       </section>
+
+      <SavingsAssistant overview={s} />
+      <LoansCard overview={s} />
 
       <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
         <button

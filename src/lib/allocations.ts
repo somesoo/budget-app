@@ -14,9 +14,9 @@ export const isRetirementWrapper = (a: SavingsAccount): a is SavingsAccount & {
   kind: 'ike' | 'ikze'
 } => a.kind === 'ike' || a.kind === 'ikze'
 
-/** Identifies a line: a goal, or an account paid into directly. */
-export const allocationKey = (a: Pick<PlanAllocation, 'goal_id' | 'account_id'>) =>
-  a.goal_id ? `goal:${a.goal_id}` : `account:${a.account_id}`
+/** Identifies a line: a loan instalment, a goal, or an account paid into directly. */
+export const allocationKey = (a: Pick<PlanAllocation, 'goal_id' | 'account_id' | 'loan_id'>) =>
+  a.loan_id ? `loan:${a.loan_id}` : a.goal_id ? `goal:${a.goal_id}` : `account:${a.account_id}`
 
 export const sumAllocations = (lines: PlanAllocation[]) =>
   roundMoney(lines.reduce((s, a) => s + a.amount, 0))
@@ -167,20 +167,58 @@ export function safeToSpend(args: {
   savings: number
   /** Monthly spending, trips left out. */
   spent: number
-}): { amount: number; income: number; expected: boolean } | null {
+  /** Paid into savings this month (see monthSavingsFlow); more than planned leaves less to spend. */
+  deposited?: number
+  /** Taken out of savings this month: money back in hand to spend. */
+  withdrawn?: number
+}): { amount: number; income: number; expected: boolean; savedAside: number } | null {
   const expected = args.income <= 0
   const income = expected ? args.plannedIncome : args.income
   if (income <= 0) return null
-  return { amount: roundMoney(income - args.savings - args.spent), income, expected }
+  const savedAside = savedAsideOf(args)
+  return { amount: roundMoney(income - savedAside - args.spent), income, expected, savedAside }
 }
 
 /**
- * What a month didn't spend: logged income, minus its planned savings, minus
- * its spending. Null when no income was logged, since there's nothing to go on.
+ * What the month puts aside, net: the plan's savings are spoken for until
+ * paid in, anything paid in beyond them counts too, and money taken back out
+ * is back in hand.
  */
-export function monthLeftover(args: { income: number; savings: number; spent: number }) {
+function savedAsideOf(args: { savings: number; deposited?: number; withdrawn?: number }) {
+  return roundMoney(Math.max(args.savings, args.deposited ?? 0) - (args.withdrawn ?? 0))
+}
+
+/**
+ * What a month didn't spend: logged income, minus what it put aside (as in
+ * safeToSpend), minus its spending. Null when no income was logged, since
+ * there's nothing to go on.
+ */
+export function monthLeftover(args: {
+  income: number
+  savings: number
+  spent: number
+  deposited?: number
+  withdrawn?: number
+}) {
   if (args.income <= 0) return null
-  return roundMoney(args.income - args.savings - args.spent)
+  return roundMoney(args.income - savedAsideOf(args) - args.spent)
+}
+
+/**
+ * Money that went into and came out of savings in a month, from the month's
+ * own income: deposits (not interest, not transfers between accounts, and not
+ * the month before's leftover, which came from that month's income) and
+ * withdrawals.
+ */
+export function monthSavingsFlow(movements: SavingsMovement[], month: MonthKey) {
+  let deposited = 0
+  let withdrawn = 0
+  for (const m of movements) {
+    if (monthKeyOfDate(m.movement_date) !== month) continue
+    if (m.kind === 'deposit' && !isLeftover(m)) deposited += m.amount
+    else if (m.kind === 'withdrawal') withdrawn -= m.amount
+  }
+  return { deposited: roundMoney(deposited), withdrawn: roundMoney(withdrawn) }
 }
 
 const LEFTOVER_PREFIX = 'Leftover from '
@@ -219,22 +257,24 @@ export function allocationProgress(
   movements: SavingsMovement[],
   month: MonthKey,
 ): AllocationProgress[] {
-  const planGoals = new Set(lines.flatMap((l) => (l.goal_id ? [l.goal_id] : [])))
-  // last month's leftover has its own line, see leftoverPaid
+  const planGoals = new Set(
+    lines.flatMap((l) => (l.goal_id && !l.loan_id ? [l.goal_id] : [])),
+  )
+  // last month's leftover has its own line (see leftoverPaid), and so does a loan's instalment
   const inMonth = movements.filter(
     (m) => isPaidIn(m) && monthKeyOfDate(m.movement_date) === month && !isLeftover(m),
   )
+  const countsFor = (line: PlanAllocation, m: SavingsMovement) => {
+    if (line.loan_id) return m.loan_id === line.loan_id
+    if (m.loan_id) return false
+    // a transfer moves a goal's money between accounts, it doesn't add any
+    if (line.goal_id) return m.goal_id === line.goal_id && m.kind === 'deposit'
+    // money moved onto an IKE from savings still counts toward paying into it
+    return m.account_id === line.account_id && !(m.goal_id && planGoals.has(m.goal_id))
+  }
   return lines.map((line) => {
     const paid = roundMoney(
-      inMonth
-        .filter((m) =>
-          line.goal_id
-            ? // a transfer moves a goal's money between accounts, it doesn't add any
-              m.goal_id === line.goal_id && m.kind === 'deposit'
-            : // money moved onto an IKE from savings still counts toward paying into it
-              m.account_id === line.account_id && !(m.goal_id && planGoals.has(m.goal_id)),
-        )
-        .reduce((s, m) => s + m.amount, 0),
+      inMonth.filter((m) => countsFor(line, m)).reduce((s, m) => s + m.amount, 0),
     )
     return { line, paid, remaining: roundMoney(Math.max(line.amount - paid, 0)) }
   })

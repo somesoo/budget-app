@@ -181,8 +181,8 @@ export function Home() {
             </span>
             <span className="block truncate text-xs">
               {safe.expected ? 'expected ' : ''}income {formatMoneyCompact(safe.income)}
-              {money.plan && money.plan.savings > 0
-                ? ` − savings ${formatMoneyCompact(money.plan.savings)}`
+              {safe.savedAside !== 0
+                ? ` ${safe.savedAside < 0 ? '+ from savings' : '− savings'} ${formatMoneyCompact(Math.abs(safe.savedAside))}`
                 : ''}{' '}
               − spent {formatMoneyCompact(monthTotal)}
             </span>

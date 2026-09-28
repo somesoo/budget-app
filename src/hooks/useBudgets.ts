@@ -21,8 +21,9 @@ function normalizeAllocations(raw: unknown): PlanAllocation[] {
     const amount = Number(row.amount)
     const account_id = typeof row.account_id === 'string' ? row.account_id : null
     const goal_id = typeof row.goal_id === 'string' ? row.goal_id : null
+    const loan_id = typeof row.loan_id === 'string' ? row.loan_id : null
     if (!Number.isFinite(amount) || amount <= 0 || (!account_id && !goal_id)) return []
-    return [{ account_id, goal_id, amount }]
+    return [loan_id ? { account_id, goal_id, amount, loan_id } : { account_id, goal_id, amount }]
   })
 }
 

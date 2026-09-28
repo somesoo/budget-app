@@ -41,6 +41,7 @@ import {
 } from '../../lib/planning'
 import { planChecks, planSuggestions, recurringCosts, type Suggestion } from '../../lib/suggestions'
 import { carryAllocations, sumAllocations } from '../../lib/allocations'
+import { loanLines } from '../../lib/loans'
 import type { PlanAllocation, PlanSuggestion } from '../../types'
 
 interface Props {
@@ -111,9 +112,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
       new Set(savingsOverview.goals.filter((g) => !g.goal.archived).map((g) => g.goal.id)),
       new Set(savingsOverview.accounts.filter((x) => !x.account.archived).map((x) => x.account.id)),
     ).length > 0
-  // the month's own lines stay unless their goal or account was deleted since
+  // the month's own lines stay unless their goal, account or loan was deleted since
   const keepExisting = (a: PlanAllocation) =>
     !savingsOverview.available ||
+    (a.loan_id ? savingsOverview.loans.some((l) => l.loan.id === a.loan_id) : true) &&
     carryAllocations(
       [a],
       new Set(savingsOverview.goals.map((g) => g.goal.id)),
@@ -133,9 +135,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
         existing: existing.data,
         keepAllocation,
         keepExisting,
+        instalments: loanLines(savingsOverview.loans),
       }),
     )
-    // keepAllocation and keepExisting read the savings lists, which are loaded by now
+    // keepAllocation, keepExisting and the loans read the savings lists, loaded by now
   }, [ready, savingsLoading, draft, previous.data, existing.data, baseline, categories])
 
   if (!draft) {

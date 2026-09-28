@@ -47,6 +47,11 @@ export function SavingsSplit({
   const wrappers = accounts
     .filter(isRetirementWrapper)
     .filter((a) => !a.archived || planned.has(`account:${a.id}`))
+  // loans from savings still owed, and any the plan already pays back
+  const loans = overview.loans.filter(
+    (l) => l.remaining > 0 || planned.has(`loan:${l.loan.id}`),
+  )
+  const goalName = new Map(overview.goals.map((g) => [g.goal.id, g.goal.name]))
   const other = otherSavings(value.savings, value.allocations)
   const year = month.slice(0, 4)
 
@@ -169,6 +174,37 @@ export function SavingsSplit({
           )
         })}
 
+        {loans.map((l) => {
+          const line = planned.get(`loan:${l.loan.id}`)
+          const amount = line?.amount ?? 0
+          const goal = l.loan.goal_id ? goalName.get(l.loan.goal_id) : null
+          const set = (v: number) =>
+            onChange(
+              setAllocation(
+                value,
+                { goal_id: l.loan.goal_id, account_id: l.loan.account_id, loan_id: l.loan.id },
+                Math.min(v, l.remaining),
+              ),
+            )
+          return (
+            <Line
+              key={l.loan.id}
+              color="#f59e0b"
+              name={`Pay back: ${l.loan.note}`}
+              kind={`to ${goal ?? 'savings'} · ${formatMoneyCompact(l.remaining)} still owed`}
+              amount={amount}
+              onAmount={set}
+              hints={
+                l.nextInstalment > 0 && (
+                  <Chip active={amount === l.nextInstalment} onClick={() => set(l.nextInstalment)}>
+                    instalment: {formatAmount(l.nextInstalment)}
+                  </Chip>
+                )
+              }
+            />
+          )
+        })}
+
         <li className="flex items-center gap-3">
           <div className="min-w-0 flex-1 pl-5">
             <p className="text-[15px] text-white">Other savings</p>
@@ -262,6 +298,7 @@ export function hasSplitTargets(overview: SavingsOverview): boolean {
   return (
     overview.available &&
     (overview.goals.some((g) => !g.goal.archived && g.status.kind !== 'reached') ||
-      overview.accounts.some((a) => !a.account.archived && isRetirementWrapper(a.account)))
+      overview.accounts.some((a) => !a.account.archived && isRetirementWrapper(a.account)) ||
+      overview.loans.some((l) => l.remaining > 0))
   )
 }

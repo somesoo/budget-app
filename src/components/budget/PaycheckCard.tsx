@@ -18,7 +18,7 @@ import {
   shiftMonth,
   type MonthKey,
 } from '../../lib/calculations'
-import type { BudgetPlan, SavingsAccount } from '../../types'
+import type { BudgetPlan, SavingsAccount, SavingsLoan } from '../../types'
 
 interface Row {
   key: string
@@ -30,6 +30,8 @@ interface Row {
   remaining: number
   account: SavingsAccount | undefined
   goalId: string | null
+  /** For an instalment: the loan it pays back. */
+  loan?: SavingsLoan
   /** Closed goal or account, or a month that isn't running: nothing to pay in from here. */
   payable: boolean
   note: string
@@ -55,7 +57,7 @@ export function PaycheckCard({
   /** Without its own card and title: inside a sheet that has them. */
   bare?: boolean
 }) {
-  const { saveTo } = useSavingsActions()
+  const { saveTo, repay } = useSavingsActions()
   const { person } = useDeviceUser()
   const [confirming, setConfirming] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -67,11 +69,29 @@ export function PaycheckCard({
   const isCurrent = month === currentMonthKey()
   const goalById = new Map(overview.goals.map((g) => [g.goal.id, g.goal]))
   const accountById = new Map(overview.accounts.map((a) => [a.account.id, a.account]))
+  const loanById = new Map(overview.loans.map((l) => [l.loan.id, l.loan]))
 
   const rows: Row[] = allocationProgress(plan.allocations, overview.movements, month).map(
     ({ line, paid, remaining }) => {
       const goal = line.goal_id ? goalById.get(line.goal_id) : undefined
       const account = line.account_id ? accountById.get(line.account_id) : undefined
+      const loan = line.loan_id ? loanById.get(line.loan_id) : undefined
+      if (line.loan_id) {
+        return {
+          key: allocationKey(line),
+          name: `Pay back: ${loan?.note ?? 'a loan'}`,
+          color: '#f59e0b',
+          sub: `to ${goal?.name ?? account?.name ?? 'savings'}`,
+          planned: line.amount,
+          paid,
+          remaining,
+          account,
+          goalId: line.goal_id,
+          loan,
+          payable: !!loan && !!account && !account.archived,
+          note: `Paid back: ${loan?.note ?? ''}`,
+        }
+      }
       return {
         key: allocationKey(line),
         name: goal?.name ?? account?.name ?? 'Closed',
@@ -125,13 +145,16 @@ export function PaycheckCard({
 
   const payIn = (row: Row) => {
     setError(null)
-    saveTo.mutate(
-      { account: row.account!.id, amount: row.remaining, goal: row.goalId, person, note: row.note },
-      {
-        onSuccess: () => setConfirming((c) => (c === row.key ? null : c)),
-        onError: (e) => setError((e as Error).message),
-      },
-    )
+    const done = {
+      onSuccess: () => setConfirming((c) => (c === row.key ? null : c)),
+      onError: (e: unknown) => setError((e as Error).message),
+    }
+    if (row.loan) repay.mutate({ loan: row.loan, amount: row.remaining, person }, done)
+    else
+      saveTo.mutate(
+        { account: row.account!.id, amount: row.remaining, goal: row.goalId, person, note: row.note },
+        done,
+      )
   }
 
   const list = (
@@ -159,7 +182,7 @@ export function PaycheckCard({
               ) : canPay ? (
                 <button
                   type="button"
-                  disabled={saveTo.isPending}
+                  disabled={saveTo.isPending || repay.isPending}
                   onClick={() => (confirming === row.key ? payIn(row) : setConfirming(row.key))}
                   className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums ring-1 transition active:scale-[0.97] disabled:opacity-50 ${
                     confirming === row.key

@@ -7,6 +7,7 @@ import {
   leftoverNote,
   leftoverPaid,
   monthLeftover,
+  monthSavingsFlow,
   otherSavings,
   retirementLimit,
   retirementStatus,
@@ -44,13 +45,14 @@ const move = (
   note: null,
   goal_id,
   transfer_id: kind === 'transfer' ? 't' : null,
+  loan_id: null,
   created_at: '2026-01-01T00:00:00Z',
 })
 
 describe('safe to spend', () => {
   it('takes the planned savings off the income, then the spending', () => {
     expect(safeToSpend({ income: 12_000, plannedIncome: 11_000, savings: 3_000, spent: 9_284 }))
-      .toEqual({ amount: -284, income: 12_000, expected: false })
+      .toEqual({ amount: -284, income: 12_000, expected: false, savedAside: 3_000 })
   })
 
   it('counts on the planned income until a paycheck is logged', () => {
@@ -58,8 +60,30 @@ describe('safe to spend', () => {
       amount: 7_500,
       income: 11_000,
       expected: true,
+      savedAside: 3_000,
     })
     expect(safeToSpend({ income: 0, plannedIncome: 0, savings: 0, spent: 500 })).toBeNull()
+  })
+
+  it('counts saving beyond the plan, and borrowing back out of it', () => {
+    const base = { income: 10_000, plannedIncome: 0, savings: 2_000, spent: 5_000 }
+    // the plan's 2,000 is spoken for before it's paid in
+    expect(safeToSpend({ ...base, deposited: 500 })?.amount).toBe(3_000)
+    // 500 more than planned went in
+    expect(safeToSpend({ ...base, deposited: 2_500 })?.amount).toBe(2_500)
+    // 800 borrowed back out is money to spend
+    expect(safeToSpend({ ...base, deposited: 2_000, withdrawn: 800 })?.amount).toBe(3_800)
+  })
+
+  it('leaves the month before\'s leftover and interest out of the flow', () => {
+    const movements = [
+      move('acc', 1_000, '2026-10-03'),
+      { ...move('acc', 700, '2026-10-02', 'deposit', 'trip'), note: leftoverNote('September') },
+      move('acc', 40, '2026-10-31', 'interest'),
+      move('acc', -300, '2026-10-12'),
+      move('acc', 900, '2026-09-29'),
+    ]
+    expect(monthSavingsFlow(movements, '2026-10')).toEqual({ deposited: 1_000, withdrawn: 300 })
   })
 
   it('has no leftover without income', () => {

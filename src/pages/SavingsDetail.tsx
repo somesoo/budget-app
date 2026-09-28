@@ -13,6 +13,7 @@ import { StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
+import { SharesSheet } from '../components/savings/SharesSheet'
 import { useGoals } from '../hooks/useGoal'
 import { useCategories } from '../hooks/useCategories'
 import { useEntryActions } from '../hooks/useEntryActions'
@@ -34,7 +35,11 @@ import { toEntries } from '../lib/history'
 import { monthsEndingAt } from '../lib/insights'
 import { balanceHistory, projectBalance } from '../lib/savings'
 
-type Sheet = { kind: 'money'; mode: MoneyMode; goalId?: string } | { kind: 'edit' } | null
+type Sheet =
+  | { kind: 'money'; mode: MoneyMode; goalId?: string }
+  | { kind: 'edit' }
+  | { kind: 'shares' }
+  | null
 
 /** `/savings/account/:id`: one account's balance over time, what it holds for which goal, every movement. */
 export function SavingsAccountPage() {
@@ -158,13 +163,22 @@ export function SavingsAccountPage() {
           <section>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-base font-semibold text-white">Set aside for</h2>
-              <button
-                type="button"
-                onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
-                className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
-              >
-                Assign
-              </button>
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
+                  className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
+                >
+                  Assign
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSheet({ kind: 'shares' })}
+                  className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
+                >
+                  Fix shares
+                </button>
+              </div>
             </div>
             {goalShares.length === 0 ? (
               <p className="text-sm text-muted">No goal has money on this account yet.</p>
@@ -220,6 +234,9 @@ export function SavingsAccountPage() {
           goalId={sheet.goalId}
           onClose={() => setSheet(null)}
         />
+      )}
+      {sheet?.kind === 'shares' && (
+        <SharesSheet summary={summary} goals={s.goals} onClose={() => setSheet(null)} />
       )}
       {sheet?.kind === 'edit' && (
         <AccountSheet

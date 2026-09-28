@@ -7,6 +7,7 @@ import {
   useSavingsOverview,
 } from '../../hooks/useSavings'
 import { formatMoneyCompact } from '../../lib/calculations'
+import { emptyAccountSteps } from '../../lib/loans'
 import type { AccountKind, SavingsAccount } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
@@ -32,17 +33,26 @@ export function AccountSheet({
   account,
   onClose,
   onDeleted,
+  startDeleting = false,
 }: {
   account?: SavingsAccount
   onClose: () => void
   /** After the account is deleted: its page has nothing left to show. */
   onDeleted?: () => void
+  /** Opened to close the account: the delete step is showing already. */
+  startDeleting?: boolean
 }) {
   const save = useSaveAccount()
   const remove = useDeleteAccount()
-  const { setBalance } = useSavingsActions()
+  const { setBalance, transfer } = useSavingsActions()
   const overview = useSavingsOverview()
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(startDeleting)
+  // where the money goes before the account is deleted
+  const others = overview.accounts.filter(
+    (a) => !a.account.archived && a.account.id !== account?.id,
+  )
+  const [moveTo, setMoveTo] = useState(others[0]?.account.id ?? '')
+  const [moving, setMoving] = useState(false)
   const [name, setName] = useState(account?.name ?? '')
   const [kind, setKind] = useState<AccountKind>(account?.kind ?? 'savings')
   const [owner, setOwner] = useState<SavingsAccount['owner']>(account?.owner ?? 'joint')
@@ -89,13 +99,45 @@ export function AccountSheet({
   const movementCount = account
     ? overview.movements.filter((m) => m.account_id === account.id).length
     : 0
+  const openLoanCount = account
+    ? overview.loans.filter((l) => l.loan.account_id === account.id && l.remaining > 0).length
+    : 0
   const deleteWarning = [
     summary && summary.balance !== 0 && `its balance of ${formatMoneyCompact(summary.balance)}`,
     summary &&
       summary.allocated > 0 &&
       `${formatMoneyCompact(summary.allocated)} set aside on it for goals, which they lose`,
     movementCount > 0 && `${movementCount} ${movementCount === 1 ? 'movement' : 'movements'}`,
+    openLoanCount > 0 &&
+      `${openLoanCount} ${openLoanCount === 1 ? 'loan' : 'loans'} still being paid back to it`,
   ].filter(Boolean)
+  const steps = summary ? emptyAccountSteps(summary) : []
+  const target = others.find((a) => a.account.id === moveTo)
+
+  // every goal's share moves across with its money, then the empty account goes
+  const moveThenDelete = async () => {
+    if (!account || !target) return
+    setError(null)
+    setMoving(true)
+    try {
+      for (const step of steps) {
+        await transfer.mutateAsync({
+          from: account.id,
+          to: target.account.id,
+          amount: step.amount,
+          goal: step.goalId,
+          note: `Closing ${account.name}`,
+        })
+      }
+      await remove.mutateAsync(account.id)
+      onClose()
+      onDeleted?.()
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setMoving(false)
+    }
+  }
 
   const deleteAccount = async () => {
     if (!account) return
@@ -193,6 +235,33 @@ export function AccountSheet({
         {account &&
           (confirmDelete ? (
             <div className="grid gap-2 rounded-2xl bg-red-500/10 p-3 ring-1 ring-red-400/30">
+              {steps.length > 0 && target && (
+                <div className="grid gap-2 rounded-xl bg-white/5 p-3">
+                  <p className="text-sm leading-snug text-slate-200">
+                    Keep the money: move the {formatMoneyCompact(summary!.balance)} to another
+                    account first, each goal keeping its share, then delete.
+                  </p>
+                  <Select value={moveTo} onChange={setMoveTo}>
+                    {others.map((a) => (
+                      <option key={a.account.id} value={a.account.id}>
+                        {a.account.name} · {formatMoneyCompact(a.balance)}
+                      </option>
+                    ))}
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={moveThenDelete}
+                    disabled={moving || remove.isPending}
+                    className="rounded-xl bg-slate-100 py-2.5 text-sm font-bold text-ink hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    {moving ? 'Moving…' : `Move it to ${target.account.name}, then delete`}
+                  </button>
+                  <p className="text-xs leading-snug text-muted">
+                    In the bank: transfer {formatMoneyCompact(summary!.balance)} from{' '}
+                    {account.name} to {target.account.name}, then close {account.name}.
+                  </p>
+                </div>
+              )}
               <p className="text-sm leading-snug text-red-200">
                 {deleteWarning.length > 0
                   ? `Deleting ${account.name} also deletes ${deleteWarning.join(', ')}. This can’t be undone.`

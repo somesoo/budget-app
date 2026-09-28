@@ -167,6 +167,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
           savings: d.savings,
           allocations: d.allocations,
           carryover: d.carryover,
+          carryoverKeep: d.carryoverKeep,
         },
     )
 
@@ -242,6 +243,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
         limits: Object.fromEntries(activeIds.map((id) => [id, draft.limits[id] ?? 0])),
         allocations: draft.allocations,
         carryover: draft.carryover,
+        carryover_keep: draft.carryover.length > 0 ? draft.carryoverKeep : 0,
         note: draft.note.trim() || null,
       },
       { onSuccess: onClose },
@@ -379,6 +381,9 @@ export function BudgetPlanner({ month, onClose }: Props) {
               final={prevMoney.final}
               value={draft.carryover}
               onChange={(carryover) => setDraft({ ...draft, carryover })}
+              keep={draft.carryoverKeep}
+              onKeepChange={(carryoverKeep) => setDraft({ ...draft, carryoverKeep })}
+              planned={plannedByGoal(draft.allocations)}
               overview={savingsOverview}
             />
 
@@ -743,6 +748,15 @@ function FillChip({ onClick, children }: { onClick: () => void; children: ReactN
       {children}
     </button>
   )
+}
+
+/** Goal id → what a plan's own savings lines put toward it (loan instalments aside). */
+function plannedByGoal(lines: PlanAllocation[]): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const l of lines) {
+    if (l.goal_id && !l.loan_id) out[l.goal_id] = (out[l.goal_id] ?? 0) + l.amount
+  }
+  return out
 }
 
 /** Where the zero-based plan stands: money without a job, exactly balanced, or over-committed. */

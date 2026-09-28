@@ -11,6 +11,7 @@ const plan = (p: Partial<BudgetPlan>): BudgetPlan => ({
   limits: {},
   allocations: [],
   carryover: [],
+  carryover_keep: 0,
   note: null,
   updated_at: '2026-09-28T00:00:00Z',
   ...p,
@@ -84,6 +85,9 @@ describe('splitting the leftover', () => {
     expect(splitLeftover(400, [fixed('a', 300), fixed('b', 300)])).toEqual([300, 100])
     // with no percentages, the rest stays unassigned
     expect(splitLeftover(1_000, [fixed('a', 300)])).toEqual([300])
+    // what's kept on the account comes off first
+    expect(splitLeftover(1_000, [fixed('a', 300), c('b', 100)], 200)).toEqual([300, 500])
+    expect(splitLeftover(150, [c('b', 100)], 200)).toEqual([0])
     // even shares leave set amounts alone
     expect(evenShares([fixed('a', 300), c('b', 0), c('c', 0)], true).map((x) => x.share)).toEqual([
       0, 50, 50,

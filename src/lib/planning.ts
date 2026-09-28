@@ -134,6 +134,8 @@ export interface PlanDraft {
   allocations: PlanAllocation[]
   /** The goals last month's unspent money is split between. */
   carryover: PlanCarryover[]
+  /** Of that money, what stays on the account first. */
+  carryoverKeep: number
   note: string
 }
 
@@ -178,6 +180,7 @@ export function draftFrom(args: {
       ),
       allocations: existing.allocations.filter(keepExisting),
       carryover: keptCarryover(existing.carryover, keepExisting),
+      carryoverKeep: existing.carryover_keep,
       note: existing.note ?? '',
     }
   }
@@ -215,6 +218,7 @@ export function draftFrom(args: {
     limits,
     allocations,
     carryover: keptCarryover(previousPlan?.carryover ?? [], keepAllocation),
+    carryoverKeep: previousPlan?.carryover_keep ?? 0,
     note: '',
   }
 }
@@ -256,13 +260,15 @@ export function evenShares(carryover: PlanCarryover[], even = false): PlanCarryo
 }
 
 /**
- * A leftover split between the goals, in whole złoty: set amounts first, in
+ * A leftover split between the goals, in whole złoty, after `keep` stays on
+ * the account: set amounts first, in
  * order, as far as the money goes; then what's left by the percentages, the
  * rounding going to the first of those. With no percentages, whatever the
  * set amounts don't take stays unassigned.
  */
-export function splitLeftover(amount: number, carryover: PlanCarryover[]): number[] {
-  let left = Math.max(Math.floor(amount), 0)
+export function splitLeftover(amount: number, carryover: PlanCarryover[], keep = 0): number[] {
+  // the cushion stays on the account before anything is split
+  let left = Math.max(Math.floor(amount - keep), 0)
   const parts = carryover.map((c) => {
     if (isShare(c)) return 0
     const part = Math.min(Math.floor(c.fixed ?? 0), left)

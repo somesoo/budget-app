@@ -170,6 +170,8 @@ export interface BudgetPlan {
   allocations: PlanAllocation[]
   /** The goals the previous month's unspent money is split between; empty leaves it on the account. */
   carryover: PlanCarryover[]
+  /** Of the unspent money, what stays on the account as a cushion before the goals get theirs. */
+  carryover_keep: number
   /** What's unusual about the month, in your own words. */
   note: string | null
   updated_at: string

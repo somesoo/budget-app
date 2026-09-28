@@ -35,11 +35,13 @@ function normalizeCarryover(raw: unknown): PlanCarryover[] {
     const row = r as Record<string, unknown>
     if (typeof row.goal_id !== 'string') return []
     const share = Number(row.share)
+    const fixed = row.fixed == null ? null : Number(row.fixed)
     return [
       {
         goal_id: row.goal_id,
         account_id: typeof row.account_id === 'string' ? row.account_id : null,
-        share: Number.isFinite(share) && share > 0 ? share : 100,
+        share: Number.isFinite(share) && share >= 0 ? share : 100,
+        fixed: fixed !== null && Number.isFinite(fixed) && fixed >= 0 ? fixed : null,
       },
     ]
   })

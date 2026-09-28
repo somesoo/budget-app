@@ -4,6 +4,8 @@
 
 @layer base {
   html {
+    /* the browser's own controls (date pickers, scrollbars) in dark too */
+    color-scheme: dark;
     background-color: theme('colors.ink');
     -webkit-tap-highlight-color: transparent;
   }

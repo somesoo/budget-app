@@ -76,4 +76,17 @@ describe('splitting the leftover', () => {
     expect(splitLeftover(101, [c('a', 50), c('b', 50)])).toEqual([51, 50])
     expect(splitLeftover(500, [])).toEqual([])
   })
+
+  it('takes set amounts first, then splits the rest by percent', () => {
+    const fixed = (goal_id: string, amount: number) => ({ ...c(goal_id, 0), fixed: amount })
+    expect(splitLeftover(1_000, [fixed('a', 300), c('b', 50), c('c', 50)])).toEqual([300, 350, 350])
+    // set amounts only as far as the money goes
+    expect(splitLeftover(400, [fixed('a', 300), fixed('b', 300)])).toEqual([300, 100])
+    // with no percentages, the rest stays unassigned
+    expect(splitLeftover(1_000, [fixed('a', 300)])).toEqual([300])
+    // even shares leave set amounts alone
+    expect(evenShares([fixed('a', 300), c('b', 0), c('c', 0)], true).map((x) => x.share)).toEqual([
+      0, 50, 50,
+    ])
+  })
 })

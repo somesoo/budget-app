@@ -219,24 +219,30 @@ export function draftFrom(args: {
   }
 }
 
-/** The leftover goals still open, their shares scaled back up to 100%. */
+/** The leftover goals still open, the percentages scaled back up to 100%. */
 function keptCarryover(
   carryover: PlanCarryover[],
   keep: (a: PlanAllocation) => boolean,
 ): PlanCarryover[] {
   const kept = carryover.filter((c) => keep({ ...c, amount: 0 }))
-  const total = kept.reduce((s, c) => s + c.share, 0)
-  if (kept.length === carryover.length || total <= 0) return kept
-  return evenShares(kept.map((c) => ({ ...c, share: (c.share / total) * 100 })))
+  if (kept.length === carryover.length) return kept
+  const total = kept.filter(isShare).reduce((s, c) => s + c.share, 0)
+  if (total <= 0) return kept
+  return evenShares(kept.map((c) => (isShare(c) ? { ...c, share: (c.share / total) * 100 } : c)))
 }
 
+/** Takes a percentage of what's left, rather than a set amount. */
+export const isShare = (c: PlanCarryover) => c.fixed === null || c.fixed === undefined
+
 /**
- * Whole-percent shares adding up to exactly 100: rounded down, the points
- * left over going to the biggest first. With `even`, every goal the same.
+ * Whole-percent shares adding up to exactly 100 among the goals taking a
+ * percentage (set amounts are left as they are): rounded down, the points
+ * left over going to the biggest first. With `even`, every one the same.
  */
 export function evenShares(carryover: PlanCarryover[], even = false): PlanCarryover[] {
-  if (carryover.length === 0) return []
-  const raw = carryover.map((c) => (even ? 100 / carryover.length : c.share))
+  const shared = carryover.filter(isShare)
+  if (shared.length === 0) return carryover
+  const raw = shared.map((c) => (even ? 100 / shared.length : c.share))
   const floors = raw.map(Math.floor)
   let left = 100 - floors.reduce((s, x) => s + x, 0)
   const order = raw.map((_, i) => i).sort((a, b) => raw[b] - floors[b] - (raw[a] - floors[a]))
@@ -245,14 +251,31 @@ export function evenShares(carryover: PlanCarryover[], even = false): PlanCarryo
     floors[i] += 1
     left -= 1
   }
-  return carryover.map((c, i) => ({ ...c, share: floors[i] }))
+  let k = 0
+  return carryover.map((c) => (isShare(c) ? { ...c, share: floors[k++] } : c))
 }
 
-/** A leftover split by the shares, in whole złoty; what rounding leaves goes to the first goal. */
+/**
+ * A leftover split between the goals, in whole złoty: set amounts first, in
+ * order, as far as the money goes; then what's left by the percentages, the
+ * rounding going to the first of those. With no percentages, whatever the
+ * set amounts don't take stays unassigned.
+ */
 export function splitLeftover(amount: number, carryover: PlanCarryover[]): number[] {
-  const whole = Math.floor(amount)
-  const parts = carryover.map((c) => Math.floor((whole * c.share) / 100))
-  if (parts.length > 0) parts[0] += whole - parts.reduce((s, x) => s + x, 0)
+  let left = Math.max(Math.floor(amount), 0)
+  const parts = carryover.map((c) => {
+    if (isShare(c)) return 0
+    const part = Math.min(Math.floor(c.fixed ?? 0), left)
+    left -= part
+    return part
+  })
+  const shared = carryover.map((c, i) => (isShare(c) ? i : -1)).filter((i) => i >= 0)
+  if (shared.length === 0) return parts
+  for (const i of shared) parts[i] = Math.floor((left * carryover[i].share) / 100)
+  const shares = shared.reduce((s, i) => s + carryover[i].share, 0)
+  if (shares >= 100) {
+    parts[shared[0]] += left - shared.reduce((s, i) => s + parts[i], 0)
+  }
   return parts
 }
 

@@ -180,8 +180,13 @@ export interface PlanCarryover {
   goal_id: string
   /** Where the goal's money is kept; null when there's no account yet. */
   account_id: string | null
-  /** Its part of the unspent money, in percent; the parts add up to 100. */
+  /**
+   * Its part of what's left after the fixed amounts, in percent; the parts
+   * add up to 100. Ignored when `fixed` is set.
+   */
   share: number
+  /** A set amount in złoty instead of a percentage; taken first, in order. */
+  fixed?: number | null
 }
 
 /**

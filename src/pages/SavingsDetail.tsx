@@ -1,6 +1,6 @@
 import { ArrowLeft, PencilSimple, Plus } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { RecentEntries } from '../components/add/RecentEntries'
 import { AskLink } from '../components/AskLink'
 import { TooltipRow } from '../components/charts/ChartCard'
@@ -42,6 +42,7 @@ export function SavingsAccountPage() {
   const s = useSavingsOverview()
   const { data: goals = [] } = useGoals()
   const [sheet, setSheet] = useState<Sheet>(null)
+  const navigate = useNavigate()
   const summary = s.accounts.find((a) => a.account.id === id)
 
   if (s.isLoading) return <Frame back="/savings" title="Account" loading />
@@ -220,7 +221,13 @@ export function SavingsAccountPage() {
           onClose={() => setSheet(null)}
         />
       )}
-      {sheet?.kind === 'edit' && <AccountSheet account={account} onClose={() => setSheet(null)} />}
+      {sheet?.kind === 'edit' && (
+        <AccountSheet
+          account={account}
+          onClose={() => setSheet(null)}
+          onDeleted={() => navigate('/savings')}
+        />
+      )}
     </Frame>
   )
 }

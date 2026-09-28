@@ -228,6 +228,24 @@ export function useSaveAccount() {
 }
 
 /**
+ * Deletes an account for good. The database takes its movements and its goal
+ * shares with it (on delete cascade), so the goals it funded lose that money.
+ */
+export function useDeleteAccount() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('savings_accounts').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: savingsKey })
+      void qc.invalidateQueries({ queryKey: goalsKey })
+    },
+  })
+}
+
+/**
  * Everything the savings screens show, added up: accounts with their balance
  * and unassigned money, goals with progress and status, this month's saving
  * against the plan. `available` is false until migration 0007 has been run.

@@ -148,17 +148,31 @@ export function draftFrom(args: {
   existing?: BudgetPlan | null
   /** Which of last month's savings lines carry over (not those of closed goals and accounts). */
   keepAllocation?: (a: PlanAllocation) => boolean
+  /**
+   * Which of the month's own saved lines still point somewhere: a deleted
+   * account's line drops out, and its money counts as other savings.
+   */
+  keepExisting?: (a: PlanAllocation) => boolean
 }): PlanDraft {
-  const { source, categories, baseline, previousPlan, existing, keepAllocation = () => true } = args
+  const {
+    source,
+    categories,
+    baseline,
+    previousPlan,
+    existing,
+    keepAllocation = () => true,
+    keepExisting = () => true,
+  } = args
   if (existing) {
+    const carryover = existing.carryover
     return {
       income: existing.income,
       savings: existing.savings,
       limits: Object.fromEntries(
         categories.map((c) => [c.id, existing.limits[c.id] ?? c.monthly_limit]),
       ),
-      allocations: existing.allocations,
-      carryover: existing.carryover,
+      allocations: existing.allocations.filter(keepExisting),
+      carryover: carryover && keepExisting({ ...carryover, amount: 0 }) ? carryover : null,
       note: existing.note ?? '',
     }
   }

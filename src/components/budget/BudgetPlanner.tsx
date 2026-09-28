@@ -111,6 +111,14 @@ export function BudgetPlanner({ month, onClose }: Props) {
       new Set(savingsOverview.goals.filter((g) => !g.goal.archived).map((g) => g.goal.id)),
       new Set(savingsOverview.accounts.filter((x) => !x.account.archived).map((x) => x.account.id)),
     ).length > 0
+  // the month's own lines stay unless their goal or account was deleted since
+  const keepExisting = (a: PlanAllocation) =>
+    !savingsOverview.available ||
+    carryAllocations(
+      [a],
+      new Set(savingsOverview.goals.map((g) => g.goal.id)),
+      new Set(savingsOverview.accounts.map((x) => x.account.id)),
+    ).length > 0
   const savingsLoading = savingsOverview.isLoading
 
   // first draft: the month's own plan, else last month's, else typical spending
@@ -124,9 +132,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
         previousPlan: previous.data ?? null,
         existing: existing.data,
         keepAllocation,
+        keepExisting,
       }),
     )
-    // keepAllocation reads the savings lists, which are loaded by now
+    // keepAllocation and keepExisting read the savings lists, which are loaded by now
   }, [ready, savingsLoading, draft, previous.data, existing.data, baseline, categories])
 
   if (!draft) {

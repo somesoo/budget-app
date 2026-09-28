@@ -1,6 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { PERSON_LABELS } from '../../config'
-import { useSaveAccount, useSavingsActions } from '../../hooks/useSavings'
+import {
+  useDeleteAccount,
+  useSaveAccount,
+  useSavingsActions,
+  useSavingsOverview,
+} from '../../hooks/useSavings'
+import { formatMoneyCompact } from '../../lib/calculations'
 import type { AccountKind, SavingsAccount } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
@@ -25,12 +31,18 @@ export const ownerLabel = (owner: SavingsAccount['owner']) =>
 export function AccountSheet({
   account,
   onClose,
+  onDeleted,
 }: {
   account?: SavingsAccount
   onClose: () => void
+  /** After the account is deleted: its page has nothing left to show. */
+  onDeleted?: () => void
 }) {
   const save = useSaveAccount()
+  const remove = useDeleteAccount()
   const { setBalance } = useSavingsActions()
+  const overview = useSavingsOverview()
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [name, setName] = useState(account?.name ?? '')
   const [kind, setKind] = useState<AccountKind>(account?.kind ?? 'savings')
   const [owner, setOwner] = useState<SavingsAccount['owner']>(account?.owner ?? 'joint')
@@ -70,6 +82,31 @@ export function AccountSheet({
     if (!account) return
     await save.mutateAsync({ ...account, archived: !account.archived })
     onClose()
+  }
+
+  // what deleting takes with it, said before it happens
+  const summary = account && overview.accounts.find((a) => a.account.id === account.id)
+  const movementCount = account
+    ? overview.movements.filter((m) => m.account_id === account.id).length
+    : 0
+  const deleteWarning = [
+    summary && summary.balance !== 0 && `its balance of ${formatMoneyCompact(summary.balance)}`,
+    summary &&
+      summary.allocated > 0 &&
+      `${formatMoneyCompact(summary.allocated)} set aside on it for goals, which they lose`,
+    movementCount > 0 && `${movementCount} ${movementCount === 1 ? 'movement' : 'movements'}`,
+  ].filter(Boolean)
+
+  const deleteAccount = async () => {
+    if (!account) return
+    setError(null)
+    try {
+      await remove.mutateAsync(account.id)
+      onClose()
+      onDeleted?.()
+    } catch (err) {
+      setError((err as Error).message)
+    }
   }
 
   return (
@@ -153,6 +190,43 @@ export function AccountSheet({
             {account.archived ? 'Show it again' : 'Hide this account'}
           </button>
         )}
+        {account &&
+          (confirmDelete ? (
+            <div className="grid gap-2 rounded-2xl bg-red-500/10 p-3 ring-1 ring-red-400/30">
+              <p className="text-sm leading-snug text-red-200">
+                {deleteWarning.length > 0
+                  ? `Deleting ${account.name} also deletes ${deleteWarning.join(', ')}. This can’t be undone.`
+                  : `Delete ${account.name}? This can’t be undone.`}
+                {deleteWarning.length > 0 &&
+                  ' To keep the history, hide it instead, or move the money to another account first.'}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-xl py-2.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+                >
+                  Keep it
+                </button>
+                <button
+                  type="button"
+                  onClick={deleteAccount}
+                  disabled={remove.isPending}
+                  className="rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white hover:bg-red-400 disabled:opacity-50"
+                >
+                  {remove.isPending ? 'Deleting…' : 'Delete for good'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="rounded-2xl py-2.5 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 hover:bg-red-500/10"
+            >
+              Delete this account
+            </button>
+          ))}
       </form>
     </BottomSheet>
   )

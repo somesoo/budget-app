@@ -250,6 +250,15 @@ back would lose a contribution whenever both phones paid in at the same moment.
 The goal holds a running total, not a list of contributions — it does not
 record who paid in or when. A contributions history would be a separate table.
 
+### Deleting a savings account
+
+An account's *Edit* sheet can hide it or delete it. Deleting takes its
+movements and what it held for goals with it (the goals lose that money), so
+the sheet says exactly what goes before it asks you to confirm. To keep the
+history, hide it, or move the money elsewhere first. A plan that paid into a
+deleted account drops that line when it's next opened, and the amount counts
+as other savings.
+
 ### Insights
 
 A tab of charts over the last six months, all scoped by the month switcher at

@@ -2,10 +2,39 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { useCategories } from './useCategories'
 import type { MonthKey } from '../lib/calculations'
-import type { BudgetPlan, Category, PlanSuggestion } from '../types'
+import type {
+  BudgetPlan,
+  Category,
+  PlanAllocation,
+  PlanCarryover,
+  PlanSuggestion,
+} from '../types'
 import type { PlanRequest } from '../lib/planning'
 
 export const budgetKey = (month: MonthKey) => ['budgets', month] as const
+
+function normalizeAllocations(raw: unknown): PlanAllocation[] {
+  if (!Array.isArray(raw)) return []
+  return raw.flatMap((r) => {
+    if (!r || typeof r !== 'object') return []
+    const row = r as Record<string, unknown>
+    const amount = Number(row.amount)
+    const account_id = typeof row.account_id === 'string' ? row.account_id : null
+    const goal_id = typeof row.goal_id === 'string' ? row.goal_id : null
+    if (!Number.isFinite(amount) || amount <= 0 || (!account_id && !goal_id)) return []
+    return [{ account_id, goal_id, amount }]
+  })
+}
+
+function normalizeCarryover(raw: unknown): PlanCarryover | null {
+  if (!raw || typeof raw !== 'object') return null
+  const row = raw as Record<string, unknown>
+  if (typeof row.goal_id !== 'string') return null
+  return {
+    goal_id: row.goal_id,
+    account_id: typeof row.account_id === 'string' ? row.account_id : null,
+  }
+}
 
 function normalize(row: Record<string, unknown>): BudgetPlan {
   const limits: Record<string, number> = {}
@@ -18,10 +47,17 @@ function normalize(row: Record<string, unknown>): BudgetPlan {
     income: Number(row.income),
     savings: Number(row.savings),
     limits,
+    // absent until migration 0010 has been run
+    allocations: normalizeAllocations(row.allocations),
+    carryover: normalizeCarryover(row.carryover),
     note: (row.note as string | null) ?? null,
     updated_at: String(row.updated_at),
   }
 }
+
+/** The `allocations`/`carryover` columns aren't there: migration 0010 hasn't been run. */
+const missingAllocations = (error: { message?: string }) =>
+  /allocations|carryover/i.test(error.message ?? '')
 
 /**
  * The month's plan, or null when it has none. Also null when the `budgets`
@@ -34,7 +70,8 @@ export function useBudget(month: MonthKey) {
     queryFn: async (): Promise<BudgetPlan | null> => {
       const { data, error } = await supabase
         .from('budgets')
-        .select('month, income, savings, limits, note, updated_at')
+        // '*' rather than a column list: `allocations` only exists after migration 0010
+        .select('*')
         .eq('month', month)
         .maybeSingle()
       if (error) {
@@ -50,10 +87,21 @@ export function useSaveBudget() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (plan: Omit<BudgetPlan, 'updated_at'>) => {
-      const { error } = await supabase
-        .from('budgets')
-        .upsert({ ...plan, updated_at: new Date().toISOString() }, { onConflict: 'month' })
-      if (error) throw error
+      const row = { ...plan, updated_at: new Date().toISOString() }
+      const { error } = await supabase.from('budgets').upsert(row, { onConflict: 'month' })
+      if (!error) return
+      if (!missingAllocations(error)) throw error
+      // before migration 0010 a plan without a split still saves
+      if (plan.allocations.length > 0 || plan.carryover) {
+        throw new Error(
+          'Splitting savings between goals and IKE needs migration 0010_plan_allocations.sql',
+        )
+      }
+      const rest: Partial<typeof row> = { ...row }
+      delete rest.allocations
+      delete rest.carryover
+      const retry = await supabase.from('budgets').upsert(rest, { onConflict: 'month' })
+      if (retry.error) throw retry.error
     },
     onMutate: async (plan) => {
       await qc.cancelQueries({ queryKey: budgetKey(plan.month) })

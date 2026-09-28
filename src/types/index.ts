@@ -54,7 +54,16 @@ export interface Goal {
   note: string | null
 }
 
-export type AccountKind = 'savings' | 'deposit' | 'investment' | 'retirement' | 'cash' | 'other'
+export type AccountKind =
+  | 'savings'
+  | 'deposit'
+  | 'investment'
+  | 'retirement'
+  /** Polish tax-free retirement accounts with a yearly contribution limit (migration 0010). */
+  | 'ike'
+  | 'ikze'
+  | 'cash'
+  | 'other'
 
 /** Where savings are: a bank account, a deposit, cash. Its balance is the sum of its movements. */
 export interface SavingsAccount {
@@ -134,13 +143,36 @@ export interface BudgetPlan {
   month: string
   /** Income the plan counts on. */
   income: number
-  /** What the month means to put aside. */
+  /** What the month means to put aside, in total (allocations included). */
   savings: number
   /** Category id → limit for this month. A missing id falls back to the category's default. */
   limits: Record<string, number>
+  /** Where the savings go: goals and IKE/IKZE. What they don't cover is "other savings". */
+  allocations: PlanAllocation[]
+  /** The goal the previous month's unspent money goes to; null leaves it on the account. */
+  carryover: PlanCarryover | null
   /** What's unusual about the month, in your own words. */
   note: string | null
   updated_at: string
+}
+
+/** Where the month before's unspent money goes. */
+export interface PlanCarryover {
+  goal_id: string
+  /** Where the goal's money is kept; null when there's no account yet. */
+  account_id: string | null
+}
+
+/**
+ * Part of a month's savings with a destination. With a goal it's money for
+ * that goal, kept on `account_id`; without one it's money onto the account
+ * itself (a monthly IKE payment). `account_id` is null only for a goal when
+ * there's no account to put it on yet.
+ */
+export interface PlanAllocation {
+  account_id: string | null
+  goal_id: string | null
+  amount: number
 }
 
 /** A drafted plan as returned by /api/plan (Gemini, schema-constrained). */

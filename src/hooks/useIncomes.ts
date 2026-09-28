@@ -4,7 +4,8 @@ import { parseAmountQuery, sanitizeSearch } from '../lib/history'
 import { incomeMonth, monthRange, shiftMonth } from '../lib/calculations'
 import type { Income, NewIncome } from '../types'
 
-const COLUMNS = 'id, amount, person, note, income_date, created_at'
+// '*': for_month and one_off arrive with migrations 0013 and 0014
+const COLUMNS = '*'
 
 /** Whether a row dated `date` belongs in the cached list under `key` (a from/to window, or always). */
 function keyCoversDate(key: QueryKey, date: string): boolean {
@@ -24,6 +25,8 @@ function normalize(row: Record<string, unknown>): Income {
     income_date: String(row.income_date),
     // absent until migration 0013
     for_month: typeof row.for_month === 'string' ? row.for_month : null,
+    // absent until migration 0014: everything is pay
+    one_off: row.one_off === true,
     created_at: String(row.created_at),
   }
 }
@@ -83,25 +86,49 @@ export function useLastIncomes() {
   })
 }
 
+/**
+ * Columns a database without the later migrations doesn't have: saving goes
+ * ahead without them while they're at their default, and says which
+ * migration to run when one was really set.
+ */
+const OPTIONAL_COLUMNS = [
+  {
+    column: 'for_month',
+    isSet: (i: Partial<NewIncome>) => !!i.for_month,
+    needs: 'Counting pay for another month needs migration 0013_money_health.sql',
+  },
+  {
+    column: 'one_off',
+    isSet: (i: Partial<NewIncome>) => i.one_off === true,
+    needs: 'Marking income as one-off needs migration 0014_one_off_income.sql',
+  },
+] as const
+
+/** Runs `write`, leaving out optional columns the database doesn't know yet. */
+async function withOptionalColumns<T extends Partial<NewIncome>>(
+  row: T,
+  write: (row: T) => PromiseLike<{ error: { message?: string } | null }>,
+): Promise<void> {
+  let current = row
+  for (;;) {
+    const { error } = await write(current)
+    if (!error) return
+    const missing = OPTIONAL_COLUMNS.find(
+      (c) => c.column in current && (error.message ?? '').includes(c.column),
+    )
+    if (!missing) throw error
+    if (missing.isSet(current)) throw new Error(missing.needs)
+    const rest = { ...current }
+    delete rest[missing.column]
+    current = rest
+  }
+}
+
 export function useAddIncome() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (income: NewIncome) => {
-      const { error } = await supabase.from('incomes').insert(income)
-      if (!error) return
-      // before migration 0013 there's no for_month: fine unless one was chosen
-      if (/for_month/i.test(error.message ?? '')) {
-        if (income.for_month) {
-          throw new Error('Counting pay for another month needs migration 0013_money_health.sql')
-        }
-        const rest: Partial<NewIncome> = { ...income }
-        delete rest.for_month
-        const retry = await supabase.from('incomes').insert(rest)
-        if (retry.error) throw retry.error
-        return
-      }
-      throw error
-    },
+    mutationFn: (income: NewIncome) =>
+      withOptionalColumns(income, (row) => supabase.from('incomes').insert(row)),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['incomes'] })
     },
@@ -111,10 +138,8 @@ export function useAddIncome() {
 export function useUpdateIncome() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...patch }: Pick<Income, 'id'> & Partial<NewIncome>) => {
-      const { error } = await supabase.from('incomes').update(patch).eq('id', id)
-      if (error) throw error
-    },
+    mutationFn: ({ id, ...patch }: Pick<Income, 'id'> & Partial<NewIncome>) =>
+      withOptionalColumns(patch, (row) => supabase.from('incomes').update(row).eq('id', id)),
     onMutate: async ({ id, ...patch }) => {
       await qc.cancelQueries({ queryKey: ['incomes'] })
       const snapshots = qc.getQueriesData<Income[]>({ queryKey: ['incomes'] })
@@ -168,10 +193,8 @@ export function useDeleteIncome() {
 export function useRestoreIncome() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (income: Income) => {
-      const { error } = await supabase.from('incomes').insert(income)
-      if (error) throw error
-    },
+    mutationFn: (income: Income) =>
+      withOptionalColumns(income, (row) => supabase.from('incomes').insert(row)),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['incomes'] })
     },

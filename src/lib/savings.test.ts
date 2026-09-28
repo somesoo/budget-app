@@ -6,6 +6,7 @@ import {
   balanceHistory,
   goalStatus,
   goalSummaries,
+  goalUse,
   monthsBetween,
   projectBalance,
   savedInMonth,
@@ -208,5 +209,17 @@ describe('accountGain', () => {
       dip,
     ]
     expect(accountGain(movements)).toEqual({ putIn: 6_000, gain: 330 })
+  })
+})
+
+describe('goalUse', () => {
+  it('leaves what was saved minus what was spent', () => {
+    expect(goalUse(9000, 3000)).toEqual({ left: 6000, share: 6000 / 9000 })
+  })
+  it('goes negative when more was spent than saved', () => {
+    expect(goalUse(3300, 3500)).toEqual({ left: -200, share: 0 })
+  })
+  it('has nothing to use from an empty goal', () => {
+    expect(goalUse(0, 0)).toEqual({ left: 0, share: 0 })
   })
 })

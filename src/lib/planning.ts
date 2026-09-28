@@ -59,7 +59,9 @@ export interface PlanBaseline {
   months: MonthKey[]
   categories: CategoryBaseline[]
   /** Average income over the last complete months that had any. */
+  /** Average pay over the recent months that had any; one-offs left out. */
   typicalIncome: number | null
+  /** Pay per month, aligned with `months`. */
   incomeHistory: number[]
 }
 
@@ -93,8 +95,10 @@ export function planBaseline(args: {
   const lastYear = shiftMonth(target, -12)
   const recent = Math.max(months.length - TYPICAL_OVER, 0)
 
+  // pay only: a returned deposit or something sold won't come again next month
   const incomeHistory = months.map(() => 0)
   for (const inc of incomes) {
+    if (inc.one_off) continue
     const i = index.get(incomeMonth(inc))
     if (i !== undefined) incomeHistory[i] += inc.amount
   }

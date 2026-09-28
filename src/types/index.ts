@@ -145,6 +145,11 @@ export interface Income {
    * 28th for the month after (migration 0013). Null: income_date's month.
    */
   for_month: string | null
+  /**
+   * Money that won't come again (a returned deposit, something sold), as
+   * opposed to pay. Left out of the typical income (migration 0014).
+   */
+  one_off: boolean
   created_at: string
 }
 

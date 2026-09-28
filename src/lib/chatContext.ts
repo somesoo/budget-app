@@ -137,7 +137,13 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
       })),
     income: incomes
       .filter((i) => incomeMonth(i) >= firstMonth)
-      .map((i) => ({ date: i.income_date, amount: i.amount, who: who(i.person), note: i.note })),
+      .map((i) => ({
+        date: i.income_date,
+        amount: i.amount,
+        who: who(i.person),
+        note: i.note,
+        oneOff: i.one_off,
+      })),
     projects: projects.map((c) => ({
       name: c.name,
       budget: c.budget_total,

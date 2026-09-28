@@ -26,6 +26,7 @@ describe('toCsv', () => {
           note: 'Salary',
           income_date: '2026-09-10',
           for_month: null,
+          one_off: false,
           created_at: '2026-09-10T08:00:00Z',
         },
       ],

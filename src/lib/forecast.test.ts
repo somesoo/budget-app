@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isAdviceRequest } from '../../api/advice'
-import type { Category, Expense, Goal } from '../types'
-import { buildAdviceRequest, monthForecast } from './forecast'
+import type { Category, Expense, Goal, Income } from '../types'
+import { buildAdviceRequest, expectedIncome, monthForecast } from './forecast'
 import { goalSummaries, accountSummaries } from './savings'
 import { projectSummary } from './projects'
 
@@ -147,5 +147,35 @@ describe('buildAdviceRequest', () => {
     })
     expect(request.savings).toBeNull()
     expect(isAdviceRequest(request)).toBe(true)
+  })
+})
+
+describe('expectedIncome', () => {
+  const income = (amount: number, date: string, one_off = false): Income => ({
+    id: `${date}-${amount}`,
+    amount,
+    person: 'bubs',
+    note: null,
+    income_date: date,
+    for_month: null,
+    one_off,
+    created_at: `${date}T08:00:00Z`,
+  })
+  const history = [income(11_700, '2026-09-01'), income(900, '2026-09-20', true)]
+  const bubs = (incomes: Income[]) =>
+    expectedIncome(incomes, '2026-10', true).find((p) => p.person === 'bubs')!
+
+  it('expects the typical pay, not last month with its one-offs', () => {
+    expect(bubs(history)).toMatchObject({ typical: 11_700, expected: 11_700, basis: 'typical' })
+  })
+
+  it('adds a one-off to the pay still to come', () => {
+    const early = [...history, income(500, '2026-10-03', true)]
+    expect(bubs(early)).toMatchObject({ logged: 500, expected: 12_200, basis: 'typical' })
+  })
+
+  it('takes what came in once the pay is logged', () => {
+    const paid = [...history, income(500, '2026-10-03', true), income(11_000, '2026-10-10')]
+    expect(bubs(paid)).toMatchObject({ expected: 11_500, basis: 'logged' })
   })
 })

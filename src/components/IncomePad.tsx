@@ -1,6 +1,7 @@
 import { ArrowLeft } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { AmountField } from './entry/AmountField'
+import { IncomeKind, ONE_OFF_HELP } from './entry/IncomeKind'
 import { parseAmount } from './entry/useAmountEntry'
 import { DatePicker } from './DatePicker'
 import { UserSwitcher } from './UserSwitcher'
@@ -29,6 +30,7 @@ interface Props {
     date: string
     /** The month it pays for, when not the month of `date`. */
     forMonth: string | null
+    oneOff: boolean
   }) => void
   saving: boolean
 }
@@ -44,6 +46,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
   const [amountText, setAmountText] = useState('')
   const [note, setNote] = useState('')
   const [date, setDate] = useState(todayKey())
+  const [oneOff, setOneOff] = useState(false)
   // null: follow the date (late in the month, the month after); else what was picked
   const [picked, setPicked] = useState<'same' | 'next' | null>(null)
   const dateMonth = monthKeyOfDate(date)
@@ -54,7 +57,8 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
   const { data: recent = [] } = useLastIncomes()
 
   const amount = parseAmount(amountText)
-  const last = recent.find((i) => i.person === person)
+  // the last pay, not a one-off: that's the amount that comes again
+  const last = recent.find((i) => i.person === person && !i.one_off)
 
   return (
     <div className="fixed inset-0 z-30 mx-auto flex max-w-md flex-col overflow-y-auto bg-ink">
@@ -83,7 +87,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
           autoFocus
         />
 
-        {last && (
+        {last && !oneOff && (
           <button
             type="button"
             onClick={() => {
@@ -99,6 +103,12 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
             {last.note && <span className="text-muted"> · {last.note}</span>}
           </button>
         )}
+
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-muted">Kind</span>
+          <IncomeKind oneOff={oneOff} onChange={setOneOff} />
+        </div>
+        {oneOff && <p className="-mt-3 text-xs leading-snug text-muted">{ONE_OFF_HELP}</p>}
 
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-muted">Received by</span>
@@ -141,7 +151,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Note (e.g. salary, bonus)"
+          placeholder={oneOff ? 'Note (e.g. deposit back, sold a chair)' : 'Note (e.g. salary)'}
           maxLength={120}
           className="w-full rounded-2xl bg-white/5 px-4 py-3.5 text-base text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
         />
@@ -158,6 +168,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
               note: note.trim() || null,
               date,
               forMonth: paysFor === dateMonth ? null : paysFor,
+              oneOff,
             })
           }
           className="h-16 w-full rounded-3xl text-xl font-bold text-ink transition active:scale-[0.99] disabled:opacity-40"

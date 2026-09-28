@@ -20,7 +20,8 @@ export function GoalsTile({
   height: number
   onClick: () => void
 }) {
-  const spent = goals.reduce((s, g) => s + (g.trip?.spent ?? 0), 0)
+  // no total here: spending from goals runs across months, and a sum among the
+  // month's tiles would read as this month's spending
   return (
     <button
       type="button"
@@ -33,9 +34,7 @@ export function GoalsTile({
         <PiggyBank weight="fill" aria-hidden className="shrink-0" style={{ color: GOALS_COLOR }} />
       </div>
       <div>
-        <div className="truncate text-base font-bold leading-5 tabular-nums text-white">
-          {formatAmount(Math.round(spent))} {CURRENCY_SUFFIX}
-        </div>
+        <div className="truncate text-[15px] font-bold leading-5 text-white">Spend from one</div>
         <div className="truncate text-[10.5px] font-medium leading-[14px] text-white/90">
           {goals.length} {goals.length === 1 ? 'goal' : 'goals'} · from savings
         </div>

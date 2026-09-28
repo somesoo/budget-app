@@ -134,7 +134,7 @@ export function CategorySheet({
           label="Whose"
           help={
             owner
-              ? `${PERSON_LABELS[owner]}'s allowance: money nobody has to explain. Its tile shows only on ${PERSON_LABELS[owner]}'s phone, and the other sees the amounts but not the notes. It still counts in the plan and every total.`
+              ? `${PERSON_LABELS[owner]}'s allowance: money nobody has to explain. Both of you can log and fix its expenses, but only ${PERSON_LABELS[owner]} sees the notes. It still counts in the plan and every total.`
               : 'Shared by both of you. Make it one person’s to use it as their allowance.'
           }
         >

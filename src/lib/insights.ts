@@ -280,3 +280,26 @@ export function categorySlices(
 
   return slices
 }
+
+/* ---------- pace status: the colour of the money left ---------- */
+
+export type PaceStatus = 'under' | 'on' | 'over'
+
+/**
+ * Spending so far against an even spread of the limit up to today: under it by
+ * more than `band` is green, over it by more is red, anything between is on pace.
+ * Null when there's no limit or the month hasn't started.
+ */
+export function paceStatus(
+  spent: number,
+  limit: number,
+  elapsed: number,
+  days: number,
+  band = 0.1,
+): PaceStatus | null {
+  if (limit <= 0 || elapsed <= 0 || days <= 0) return null
+  const pace = (limit * Math.min(elapsed, days)) / days
+  if (spent < pace * (1 - band)) return 'under'
+  if (spent > pace * (1 + band)) return 'over'
+  return 'on'
+}

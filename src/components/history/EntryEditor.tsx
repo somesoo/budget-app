@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { BottomSheet } from './BottomSheet'
 import { UserSwitcher } from '../UserSwitcher'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { CURRENCY_SUFFIX } from '../../config'
 import { roundMoney, todayKey, withAlpha } from '../../lib/calculations'
 import { formatLogged, type Entry } from '../../lib/history'
@@ -27,8 +28,13 @@ export function EntryEditor({
   const isExpense = entry.kind === 'expense'
   const initialCategory = entry.kind === 'expense' ? entry.item.category_id : ''
 
+  const { person: me } = useDeviceUser()
+  const owner = categories.find((c) => c.id === initialCategory)?.owner
+  // the other one's allowance: its title stays theirs, untouched by this edit
+  const privateNote = isExpense && !!owner && owner !== me
+
   const [amount, setAmount] = useState(String(entry.item.amount))
-  const [note, setNote] = useState(entry.item.note ?? '')
+  const [note, setNote] = useState(privateNote ? '' : (entry.item.note ?? ''))
   const [categoryId, setCategoryId] = useState(initialCategory)
   const goals = categories.filter(
     (c) => c.kind === 'project' && (!c.archived || c.id === initialCategory),
@@ -37,7 +43,7 @@ export function EntryEditor({
   const [date, setDate] = useState(entry.date)
 
   const parsed = roundMoney(Number.parseFloat(amount.replace(',', '.')) || 0)
-  const trimmedNote = note.trim() || null
+  const trimmedNote = privateNote ? entry.item.note : note.trim() || null
   const changed =
     parsed !== entry.item.amount ||
     trimmedNote !== entry.item.note ||
@@ -83,9 +89,12 @@ export function EntryEditor({
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder={isExpense ? 'e.g. Biedronka, cinema' : 'e.g. Salary'}
+            disabled={privateNote}
+            placeholder={
+              privateNote ? 'Kept private' : isExpense ? 'e.g. Biedronka, cinema' : 'e.g. Salary'
+            }
             maxLength={120}
-            className="w-full rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
+            className="w-full rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40 disabled:opacity-60"
           />
         </Field>
 

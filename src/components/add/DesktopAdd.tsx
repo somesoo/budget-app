@@ -57,10 +57,8 @@ export function DesktopAdd() {
   const month = currentMonthKey()
   const { person: devicePerson, setPerson: setDevicePerson } = useDeviceUser()
   const { data: allCategories = [], isLoading, error } = useMonthCategories(month)
-  // shared categories and this device's own allowance, not the other one's
-  const categories = allCategories.filter(
-    (c) => !c.archived && (!c.owner || c.owner === devicePerson),
-  )
+  // both allowances too: either of you can log or fix one (the notes stay private)
+  const categories = allCategories.filter((c) => !c.archived)
   // goals included: what was just logged may have been spent from one
   const { data: everyCategory = [] } = useCategories()
   const { data: expenses = [] } = useMonthlyExpenses(month)

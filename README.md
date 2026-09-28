@@ -321,8 +321,9 @@ leftover there, and borrowing from it warns when it would take a large part.
 ### Allowances
 
 A category can be one person's allowance (Settings → the category → Whose):
-money nobody has to explain. Its tile shows only on that person's phone; the
-other sees its amounts in the plan and in History, but not the notes. One
+money nobody has to explain. Both phones show its tile, so either of you can
+log or fix an expense in it, but only its owner sees the notes (the other's
+editor leaves them untouched). One
 shared sign-in means this is tact, not security.
 
 ### IKE, IKZE and investments: gains and losses

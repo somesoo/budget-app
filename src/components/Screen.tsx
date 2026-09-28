@@ -25,20 +25,24 @@ export function Screen({
   children,
 }: Props) {
   const width = wide ? 'max-w-md lg:max-w-6xl lg:px-8' : 'max-w-md lg:max-w-2xl lg:px-8'
-  const header = (
-    <header className="mb-4 flex shrink-0 items-center justify-between gap-3 lg:mb-6">
-      <h1
-        className={
-          hideTitle
-            ? 'sr-only'
-            : 'truncate text-2xl font-bold text-white lg:text-3xl lg:tracking-tight'
-        }
-      >
-        {title}
-      </h1>
-      {action && <div className="ml-auto">{action}</div>}
-    </header>
-  )
+  // nothing to show but a hidden title: the screen draws its own top row
+  const header =
+    hideTitle && !action ? (
+      <h1 className="sr-only">{title}</h1>
+    ) : (
+      <header className="mb-4 flex shrink-0 items-center justify-between gap-3 lg:mb-6">
+        <h1
+          className={
+            hideTitle
+              ? 'sr-only'
+              : 'truncate text-2xl font-bold text-white lg:text-3xl lg:tracking-tight'
+          }
+        >
+          {title}
+        </h1>
+        {action && <div className="ml-auto">{action}</div>}
+      </header>
+    )
 
   if (fill) {
     return (

@@ -70,6 +70,12 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
     p && {
       income: p.income,
       savings: p.savings,
+      savingsSplit: p.allocations.map((a) => ({
+        to: a.goal_id
+          ? `goal ${goalName.get(a.goal_id) ?? 'closed goal'}`
+          : `account ${accountName.get(a.account_id ?? '') ?? 'hidden account'}`,
+        amount: a.amount,
+      })),
       note: p.note,
       limits: Object.fromEntries(
         Object.entries(p.limits).map(([id, v]) => [name.get(id) ?? 'hidden category', v]),

@@ -22,6 +22,20 @@
     font-size: 16px;
   }
 
+  /*
+   * A grid without columns gets one "auto" column, which grows to its widest
+   * child: a long name, a chart, a scrolling chip row. On a phone that makes
+   * the page wider than the screen and it slides sideways. One column that
+   * never outgrows its container instead. :where() keeps this weaker than any
+   * grid-cols-* utility, so grids with their own columns keep them. Grids
+   * that flow into columns (a carousel, segmented buttons) size theirs with
+   * auto-cols-* and are left alone: a 1fr column next to 100%-wide ones would
+   * get no width at all.
+   */
+  :where(.grid:not(.grid-flow-col)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   input[type='color'] {
     -webkit-appearance: none;
     appearance: none;

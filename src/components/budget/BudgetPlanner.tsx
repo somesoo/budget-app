@@ -1,6 +1,9 @@
 import { ArrowLeft, CaretLeft, CaretRight, Check, Lightbulb, Sparkle } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MoneyInput } from './MoneyInput'
+import { SavingsSplit, hasSplitTargets } from './SavingsSplit'
+import { CarryoverPicker } from './CarryoverPicker'
+import { useMonthMoney } from '../../hooks/useMonthMoney'
 import { CategoryDetail } from '../category/CategoryDetail'
 import { PlanCheckList, RecurringList, SuggestionList } from './PlanSuggestions'
 import { CURRENCY_SUFFIX, LOCALE } from '../../config'
@@ -37,7 +40,9 @@ import {
   type PlanDraft,
 } from '../../lib/planning'
 import { planChecks, planSuggestions, recurringCosts, type Suggestion } from '../../lib/suggestions'
-import type { PlanSuggestion } from '../../types'
+import { carryAllocations, sumAllocations } from '../../lib/allocations'
+import { loanLines } from '../../lib/loans'
+import type { PlanAllocation, PlanSuggestion } from '../../types'
 
 interface Props {
   month: MonthKey
@@ -70,6 +75,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const incomes = useIncomesBetween(from, to)
   const { data: goal } = usePrimaryGoal()
   const savingsOverview = useSavingsOverview()
+  const prevMoney = useMonthMoney(prevMonth)
   const save = useSaveBudget()
   const remove = useDeleteBudget()
   const suggest = useSuggestPlan()
@@ -98,9 +104,28 @@ export function BudgetPlanner({ month, onClose }: Props) {
   /** The category opened up in the three-pane view, or null for the list. */
   const [focused, setFocused] = useState<string | null>(null)
 
+  // last month's savings lines carry over, except to goals and accounts closed since
+  const keepAllocation = (a: PlanAllocation) =>
+    !savingsOverview.available ||
+    carryAllocations(
+      [a],
+      new Set(savingsOverview.goals.filter((g) => !g.goal.archived).map((g) => g.goal.id)),
+      new Set(savingsOverview.accounts.filter((x) => !x.account.archived).map((x) => x.account.id)),
+    ).length > 0
+  // the month's own lines stay unless their goal, account or loan was deleted since
+  const keepExisting = (a: PlanAllocation) =>
+    !savingsOverview.available ||
+    (a.loan_id ? savingsOverview.loans.some((l) => l.loan.id === a.loan_id) : true) &&
+    carryAllocations(
+      [a],
+      new Set(savingsOverview.goals.map((g) => g.goal.id)),
+      new Set(savingsOverview.accounts.map((x) => x.account.id)),
+    ).length > 0
+  const savingsLoading = savingsOverview.isLoading
+
   // first draft: the month's own plan, else last month's, else typical spending
   useEffect(() => {
-    if (!ready || draft) return
+    if (!ready || savingsLoading || draft) return
     setDraft(
       draftFrom({
         source: previous.data ? 'previous' : baseline.months.length ? 'typical' : 'defaults',
@@ -108,9 +133,13 @@ export function BudgetPlanner({ month, onClose }: Props) {
         baseline,
         previousPlan: previous.data ?? null,
         existing: existing.data,
+        keepAllocation,
+        keepExisting,
+        instalments: loanLines(savingsOverview.loans),
       }),
     )
-  }, [ready, draft, previous.data, existing.data, baseline, categories])
+    // keepAllocation, keepExisting and the loans read the savings lists, loaded by now
+  }, [ready, savingsLoading, draft, previous.data, existing.data, baseline, categories])
 
   if (!draft) {
     return (
@@ -134,6 +163,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
         d && {
           ...draftFrom({ source, categories, baseline, previousPlan: previous.data ?? null }),
           note: d.note,
+          // the chips refill the limits; where the savings go stays as set
+          savings: d.savings,
+          allocations: d.allocations,
+          carryover: d.carryover,
         },
     )
 
@@ -166,7 +199,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
       if (!d) return d
       const limits = { ...d.limits }
       for (const c of ai.categories) limits[c.id] = c.amount
-      return { ...d, limits, savings: ai.savings ?? d.savings }
+      // the goals and IKE payments stay; the suggestion can only change what's left over
+      const savings =
+        ai.savings === null ? d.savings : Math.max(ai.savings, sumAllocations(d.allocations))
+      return { ...d, limits, savings }
     })
   }
 
@@ -204,6 +240,8 @@ export function BudgetPlanner({ month, onClose }: Props) {
         income: draft.income,
         savings: draft.savings,
         limits: Object.fromEntries(activeIds.map((id) => [id, draft.limits[id] ?? 0])),
+        allocations: draft.allocations,
+        carryover: draft.carryover,
         note: draft.note.trim() || null,
       },
       { onSuccess: onClose },
@@ -284,35 +322,47 @@ export function BudgetPlanner({ month, onClose }: Props) {
                   onChange={(income) => setDraft({ ...draft, income })}
                 />
               </Row>
-              <Row
-                label="Savings"
-                hint={
-                  savingsOverview.available && savingsOverview.neededPerMonth > 0 ? (
-                    <Hint
-                      active={draft.savings === roundUpPlan(savingsOverview.neededPerMonth)}
-                      onClick={() =>
-                        setDraft({ ...draft, savings: roundUpPlan(savingsOverview.neededPerMonth) })
-                      }
-                    >
-                      goals need {formatAmount(Math.round(savingsOverview.neededPerMonth))}
-                    </Hint>
-                  ) : goal && !savingsOverview.available ? (
-                    <span className="text-xs text-muted">
-                      {monthsToGoal
-                        ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`
-                        : goalLeft > 0
-                          ? `${formatAmount(goalLeft)} to ${goal.name}`
-                          : `${goal.name} reached`}
-                    </span>
-                  ) : null
-                }
-              >
-                <MoneyInput
-                  label="Planned savings"
-                  value={draft.savings}
-                  onChange={(savings) => setDraft({ ...draft, savings })}
+              {hasSplitTargets(savingsOverview) ? (
+                <SavingsSplit
+                  month={month}
+                  value={{ savings: draft.savings, allocations: draft.allocations }}
+                  onChange={(split) => setDraft({ ...draft, ...split })}
+                  overview={savingsOverview}
                 />
-              </Row>
+              ) : (
+                <Row
+                  label="Savings"
+                  hint={
+                    savingsOverview.available && savingsOverview.neededPerMonth > 0 ? (
+                      <Hint
+                        active={draft.savings === roundUpPlan(savingsOverview.neededPerMonth)}
+                        onClick={() =>
+                          setDraft({
+                            ...draft,
+                            savings: roundUpPlan(savingsOverview.neededPerMonth),
+                          })
+                        }
+                      >
+                        goals need {formatAmount(Math.round(savingsOverview.neededPerMonth))}
+                      </Hint>
+                    ) : goal && !savingsOverview.available ? (
+                      <span className="text-xs text-muted">
+                        {monthsToGoal
+                          ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`
+                          : goalLeft > 0
+                            ? `${formatAmount(goalLeft)} to ${goal.name}`
+                            : `${goal.name} reached`}
+                      </span>
+                    ) : null
+                  }
+                >
+                  <MoneyInput
+                    label="Planned savings"
+                    value={draft.savings}
+                    onChange={(savings) => setDraft({ ...draft, savings })}
+                  />
+                </Row>
+              )}
               <div className="mt-3 flex items-baseline justify-between border-t border-white/10 pt-3 text-sm">
                 <span className="text-muted">Spending limits</span>
                 <span className="font-semibold tabular-nums text-white">
@@ -321,6 +371,16 @@ export function BudgetPlanner({ month, onClose }: Props) {
               </div>
               <UnassignedBar income={draft.income} unassigned={unassigned} />
             </section>
+
+            {/* ---------- where last month's leftover goes ---------- */}
+            <CarryoverPicker
+              prevMonth={prevMonth}
+              leftover={prevMoney.leftover}
+              final={prevMoney.final}
+              value={draft.carryover}
+              onChange={(carryover) => setDraft({ ...draft, carryover })}
+              overview={savingsOverview}
+            />
 
             {/* ---------- what makes this month different ---------- */}
             <section>

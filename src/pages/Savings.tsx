@@ -15,6 +15,7 @@ import { SettingsLink } from '../components/SettingsLink'
 import { Screen } from '../components/Screen'
 import { AccountSheet } from '../components/savings/AccountSheet'
 import { AccountCard, GoalCard } from '../components/savings/cards'
+import { LoansCard, SavingsAssistant } from '../components/savings/SavingsAssistant'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { useCategories } from '../hooks/useCategories'
@@ -55,7 +56,7 @@ export function Savings() {
   if (s.isLoading) {
     return (
       <Screen title="Savings" wide action={<SettingsLink />}>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
           <div className="h-72 animate-pulse rounded-3xl bg-white/5" />
           <div className="h-72 animate-pulse rounded-3xl bg-white/5" />
         </div>
@@ -132,6 +133,9 @@ export function Savings() {
         />
       </section>
 
+      <SavingsAssistant overview={s} />
+      <LoansCard overview={s} />
+
       <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
         <button
           type="button"
@@ -152,7 +156,7 @@ export function Savings() {
         ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         {/* ---------- goals ---------- */}
         <section aria-labelledby="goals">
           <SectionHead

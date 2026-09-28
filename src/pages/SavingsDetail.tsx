@@ -1,6 +1,6 @@
 import { ArrowLeft, PencilSimple, Plus } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { RecentEntries } from '../components/add/RecentEntries'
 import { AskLink } from '../components/AskLink'
 import { TooltipRow } from '../components/charts/ChartCard'
@@ -13,6 +13,7 @@ import { StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
 import { MovementList } from '../components/savings/MovementList'
+import { SharesSheet } from '../components/savings/SharesSheet'
 import { useGoals } from '../hooks/useGoal'
 import { useCategories } from '../hooks/useCategories'
 import { useEntryActions } from '../hooks/useEntryActions'
@@ -34,7 +35,11 @@ import { toEntries } from '../lib/history'
 import { monthsEndingAt } from '../lib/insights'
 import { balanceHistory, projectBalance } from '../lib/savings'
 
-type Sheet = { kind: 'money'; mode: MoneyMode; goalId?: string } | { kind: 'edit' } | null
+type Sheet =
+  | { kind: 'money'; mode: MoneyMode; goalId?: string }
+  | { kind: 'edit' }
+  | { kind: 'shares' }
+  | null
 
 /** `/savings/account/:id`: one account's balance over time, what it holds for which goal, every movement. */
 export function SavingsAccountPage() {
@@ -42,6 +47,7 @@ export function SavingsAccountPage() {
   const s = useSavingsOverview()
   const { data: goals = [] } = useGoals()
   const [sheet, setSheet] = useState<Sheet>(null)
+  const navigate = useNavigate()
   const summary = s.accounts.find((a) => a.account.id === id)
 
   if (s.isLoading) return <Frame back="/savings" title="Account" loading />
@@ -101,7 +107,7 @@ export function SavingsAccountPage() {
         />
       }
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="grid grid-cols-3 gap-3 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
             <Stat label="Balance" value={formatMoneyWhole(balance)} />
@@ -157,13 +163,22 @@ export function SavingsAccountPage() {
           <section>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-base font-semibold text-white">Set aside for</h2>
-              <button
-                type="button"
-                onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
-                className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
-              >
-                Assign
-              </button>
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
+                  className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
+                >
+                  Assign
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSheet({ kind: 'shares' })}
+                  className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
+                >
+                  Fix shares
+                </button>
+              </div>
             </div>
             {goalShares.length === 0 ? (
               <p className="text-sm text-muted">No goal has money on this account yet.</p>
@@ -220,7 +235,16 @@ export function SavingsAccountPage() {
           onClose={() => setSheet(null)}
         />
       )}
-      {sheet?.kind === 'edit' && <AccountSheet account={account} onClose={() => setSheet(null)} />}
+      {sheet?.kind === 'shares' && (
+        <SharesSheet summary={summary} goals={s.goals} onClose={() => setSheet(null)} />
+      )}
+      {sheet?.kind === 'edit' && (
+        <AccountSheet
+          account={account}
+          onClose={() => setSheet(null)}
+          onDeleted={() => navigate('/savings')}
+        />
+      )}
     </Frame>
   )
 }
@@ -280,7 +304,7 @@ export function SavingsGoalPage() {
         </div>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
             <p className="text-sm text-muted">Saved</p>

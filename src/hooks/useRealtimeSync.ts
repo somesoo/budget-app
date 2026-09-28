@@ -83,6 +83,10 @@ export function useRealtimeSync(): SyncStatus {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'goal_allocations' }, () => {
         void qc.invalidateQueries({ queryKey: savingsKey })
       })
+      // borrowing from yourselves (migration 0011)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'savings_loans' }, () => {
+        void qc.invalidateQueries({ queryKey: savingsKey })
+      })
       // the Ask tab's conversations (migration 0008)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_threads' }, () => {
         void qc.invalidateQueries({ queryKey: chatKey })

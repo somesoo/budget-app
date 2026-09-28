@@ -1,6 +1,14 @@
 import { LOCALE } from '../config'
 import type { Recurring, Suggestion } from './suggestions'
-import type { BudgetPlan, Category, Expense, Goal, Income } from '../types'
+import type {
+  BudgetPlan,
+  Category,
+  Expense,
+  Goal,
+  Income,
+  PlanAllocation,
+  PlanCarryover,
+} from '../types'
 import {
   currentMonthKey,
   formatMonth,
@@ -119,8 +127,13 @@ export function roundUpPlan(amount: number): number {
 
 export interface PlanDraft {
   income: number
+  /** The total put aside, allocations included. */
   savings: number
   limits: Record<string, number>
+  /** Where the savings go, see lib/allocations. */
+  allocations: PlanAllocation[]
+  /** The goal last month's unspent money goes to. */
+  carryover: PlanCarryover | null
   note: string
 }
 
@@ -133,18 +146,50 @@ export function draftFrom(args: {
   baseline: PlanBaseline
   previousPlan: BudgetPlan | null
   existing?: BudgetPlan | null
+  /** Which of last month's savings lines carry over (not those of closed goals and accounts). */
+  keepAllocation?: (a: PlanAllocation) => boolean
+  /**
+   * Which of the month's own saved lines still point somewhere: a deleted
+   * account's line drops out, and its money counts as other savings.
+   */
+  keepExisting?: (a: PlanAllocation) => boolean
+  /**
+   * This month's instalments on loans from savings (lib/loans). A new plan
+   * pays them instead of whatever last month's plan paid back.
+   */
+  instalments?: PlanAllocation[]
 }): PlanDraft {
-  const { source, categories, baseline, previousPlan, existing } = args
+  const {
+    source,
+    categories,
+    baseline,
+    previousPlan,
+    existing,
+    keepAllocation = () => true,
+    keepExisting = () => true,
+    instalments = [],
+  } = args
   if (existing) {
+    const carryover = existing.carryover
     return {
       income: existing.income,
       savings: existing.savings,
       limits: Object.fromEntries(
         categories.map((c) => [c.id, existing.limits[c.id] ?? c.monthly_limit]),
       ),
+      allocations: existing.allocations.filter(keepExisting),
+      carryover: carryover && keepExisting({ ...carryover, amount: 0 }) ? carryover : null,
       note: existing.note ?? '',
     }
   }
+  const previousLines = previousPlan?.allocations ?? []
+  const sum = (lines: PlanAllocation[]) => lines.reduce((s, a) => s + a.amount, 0)
+  const lastInstalments = previousLines.filter((a) => a.loan_id)
+  const allocations = [
+    ...previousLines.filter((a) => !a.loan_id && keepAllocation(a)),
+    ...instalments,
+  ]
+  const lastCarryover = previousPlan?.carryover ?? null
 
   const typicalById = new Map(baseline.categories.map((b) => [b.category.id, b.typical]))
   const limits = Object.fromEntries(
@@ -164,8 +209,15 @@ export function draftFrom(args: {
       source === 'previous' && previousPlan
         ? previousPlan.income
         : roundMoney(baseline.typicalIncome ?? previousPlan?.income ?? 0),
-    savings: previousPlan?.savings ?? 0,
+    // what went to a goal that has since closed goes back to "other savings";
+    // last month's instalments make way for this month's
+    savings: roundMoney(
+      Math.max((previousPlan?.savings ?? 0) - sum(lastInstalments), 0) + sum(instalments),
+    ),
     limits,
+    allocations,
+    carryover:
+      lastCarryover && keepAllocation({ ...lastCarryover, amount: 0 }) ? lastCarryover : null,
     note: '',
   }
 }

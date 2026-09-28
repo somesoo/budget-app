@@ -34,12 +34,16 @@ const covers = (px: number, height: number) => (px / height) * 100
 
 /**
  * Category tile filled from the bottom in proportion to the monthly limit used.
- * Past 100% the whole tile turns red as a warning.
+ * The big number is what's left to spend this month; past 100% it goes below
+ * zero and the whole tile turns red as a warning.
  */
 export function CategoryTile({ category, spent, onClick, height }: Props) {
   const over = isOverLimit(spent, category.monthly_limit)
   const ratio = limitRatio(spent, category.monthly_limit)
   const fill = fillPercent(spent, category.monthly_limit)
+  const hasLimit = category.monthly_limit > 0
+  // what can still be spent this month; below zero once the limit is passed
+  const left = Math.round(category.monthly_limit - spent)
 
   const onFill = readableTextColor(category.color)
   const titleColor = over || fill < covers(height - PAD, height) ? '#ffffff' : onFill
@@ -85,15 +89,25 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
           style={{ color: amountColor }}
         >
           {/* whole złoty — a third of the screen has no room for "241.5" */}
-          {formatAmount(Math.round(spent))} {CURRENCY_SUFFIX}
+          {hasLimit ? (
+            <>
+              {left < 0 ? '−' : ''}
+              {formatAmount(Math.abs(left))} {CURRENCY_SUFFIX}{' '}
+              <span className="text-[11px] font-semibold opacity-90">
+                {left < 0 ? 'over' : 'left'}
+              </span>
+            </>
+          ) : (
+            `${formatAmount(Math.round(spent))} ${CURRENCY_SUFFIX}`
+          )}
         </div>
         <div
           className="truncate text-[10.5px] font-medium leading-[14px] opacity-90 drop-shadow-sm tabular-nums"
           style={{ color: subLineColor }}
         >
-          {category.monthly_limit > 0
-            ? `of ${formatAmount(category.monthly_limit)} · ${Math.round(ratio * 100)}%`
-            : 'no limit'}
+          {hasLimit
+            ? `spent ${formatAmount(Math.round(spent))} of ${formatAmount(category.monthly_limit)} · ${Math.round(ratio * 100)}%`
+            : 'spent · no limit'}
         </div>
       </div>
     </button>

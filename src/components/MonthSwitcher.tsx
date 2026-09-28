@@ -17,7 +17,7 @@ export function MonthSwitcher({ month, onChange, max = currentMonthKey() }: Prop
         type="button"
         onClick={() => onChange(shiftMonth(month, -1))}
         aria-label="Previous month"
-        className="rounded-full px-3 py-1.5 text-lg text-muted active:bg-white/10"
+        className="rounded-full px-2 py-1.5 text-lg text-muted active:bg-white/10 sm:px-3"
       >
         <CaretLeft className="inline-block align-[-0.125em]" />
       </button>
@@ -29,7 +29,7 @@ export function MonthSwitcher({ month, onChange, max = currentMonthKey() }: Prop
         onClick={() => onChange(shiftMonth(month, 1))}
         disabled={atMax}
         aria-label="Next month"
-        className="rounded-full px-3 py-1.5 text-lg text-muted active:bg-white/10 disabled:opacity-25"
+        className="rounded-full px-2 py-1.5 text-lg text-muted active:bg-white/10 sm:px-3 disabled:opacity-25"
       >
         <CaretRight className="inline-block align-[-0.125em]" />
       </button>

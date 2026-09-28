@@ -42,6 +42,17 @@ export const WEEKDAY_NAMES = [
   'Sunday',
 ]
 
+/**
+ * Yearly contribution limits, per person, set each year by the government:
+ * IKE is 3× and IKZE 1.2× the forecast average monthly salary. Add next year's
+ * figure when it's announced (usually in November); until then the latest
+ * known year is used.
+ */
+export const RETIREMENT_LIMITS: Record<'ike' | 'ikze', Record<number, number>> = {
+  ike: { 2025: 26_019, 2026: 28_260 },
+  ikze: { 2025: 10_407.6, 2026: 11_304 },
+}
+
 /** How far ahead a month can be planned. */
 export const PLAN_AHEAD_MONTHS = 3
 

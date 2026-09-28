@@ -9,6 +9,7 @@ import { SummaryBars } from '../components/SummaryBars'
 import { AlertList } from '../components/alerts/AlertList'
 import { AskLink } from '../components/AskLink'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
+import { PaycheckCard } from '../components/budget/PaycheckCard'
 import { ProjectsCard } from '../components/projects/ProjectsCard'
 import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import { SavingsSummaryCard } from '../components/savings/SavingsSummaryCard'
@@ -104,7 +105,12 @@ export function Budget() {
           categories={categories}
           loading={planLoading}
           onPlan={() => setPlanning(month)}
-          aside={goalSection}
+          aside={
+            <>
+              {plan && <PaycheckCard month={month} plan={plan} overview={savings} />}
+              {goalSection}
+            </>
+          }
         />
       ) : (
         <MonthStatus
@@ -115,6 +121,7 @@ export function Budget() {
           onOpenMonth={setMonth}
           aside={goalSection}
         >
+          {plan && <PaycheckCard month={month} plan={plan} overview={savings} />}
           {month === current && (
             <button
               type="button"

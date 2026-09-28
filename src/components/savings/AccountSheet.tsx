@@ -1,6 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { PERSON_LABELS } from '../../config'
-import { useSaveAccount, useSavingsActions } from '../../hooks/useSavings'
+import {
+  useDeleteAccount,
+  useSaveAccount,
+  useSavingsActions,
+  useSavingsOverview,
+} from '../../hooks/useSavings'
+import { formatMoneyCompact } from '../../lib/calculations'
+import { emptyAccountSteps } from '../../lib/loans'
 import type { AccountKind, SavingsAccount } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
@@ -11,7 +18,9 @@ export const ACCOUNT_KINDS: Record<AccountKind, string> = {
   savings: 'Savings account',
   deposit: 'Term deposit',
   investment: 'Investments',
-  retirement: 'Retirement (IKE, IKZE)',
+  ike: 'IKE',
+  ikze: 'IKZE',
+  retirement: 'Other retirement',
   cash: 'Cash',
   other: 'Other',
 }
@@ -23,12 +32,27 @@ export const ownerLabel = (owner: SavingsAccount['owner']) =>
 export function AccountSheet({
   account,
   onClose,
+  onDeleted,
+  startDeleting = false,
 }: {
   account?: SavingsAccount
   onClose: () => void
+  /** After the account is deleted: its page has nothing left to show. */
+  onDeleted?: () => void
+  /** Opened to close the account: the delete step is showing already. */
+  startDeleting?: boolean
 }) {
   const save = useSaveAccount()
-  const { setBalance } = useSavingsActions()
+  const remove = useDeleteAccount()
+  const { setBalance, transfer } = useSavingsActions()
+  const overview = useSavingsOverview()
+  const [confirmDelete, setConfirmDelete] = useState(startDeleting)
+  // where the money goes before the account is deleted
+  const others = overview.accounts.filter(
+    (a) => !a.account.archived && a.account.id !== account?.id,
+  )
+  const [moveTo, setMoveTo] = useState(others[0]?.account.id ?? '')
+  const [moving, setMoving] = useState(false)
   const [name, setName] = useState(account?.name ?? '')
   const [kind, setKind] = useState<AccountKind>(account?.kind ?? 'savings')
   const [owner, setOwner] = useState<SavingsAccount['owner']>(account?.owner ?? 'joint')
@@ -70,6 +94,63 @@ export function AccountSheet({
     onClose()
   }
 
+  // what deleting takes with it, said before it happens
+  const summary = account && overview.accounts.find((a) => a.account.id === account.id)
+  const movementCount = account
+    ? overview.movements.filter((m) => m.account_id === account.id).length
+    : 0
+  const openLoanCount = account
+    ? overview.loans.filter((l) => l.loan.account_id === account.id && l.remaining > 0).length
+    : 0
+  const deleteWarning = [
+    summary && summary.balance !== 0 && `its balance of ${formatMoneyCompact(summary.balance)}`,
+    summary &&
+      summary.allocated > 0 &&
+      `${formatMoneyCompact(summary.allocated)} set aside on it for goals, which they lose`,
+    movementCount > 0 && `${movementCount} ${movementCount === 1 ? 'movement' : 'movements'}`,
+    openLoanCount > 0 &&
+      `${openLoanCount} ${openLoanCount === 1 ? 'loan' : 'loans'} still being paid back to it`,
+  ].filter(Boolean)
+  const steps = summary ? emptyAccountSteps(summary) : []
+  const target = others.find((a) => a.account.id === moveTo)
+
+  // every goal's share moves across with its money, then the empty account goes
+  const moveThenDelete = async () => {
+    if (!account || !target) return
+    setError(null)
+    setMoving(true)
+    try {
+      for (const step of steps) {
+        await transfer.mutateAsync({
+          from: account.id,
+          to: target.account.id,
+          amount: step.amount,
+          goal: step.goalId,
+          note: `Closing ${account.name}`,
+        })
+      }
+      await remove.mutateAsync(account.id)
+      onClose()
+      onDeleted?.()
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setMoving(false)
+    }
+  }
+
+  const deleteAccount = async () => {
+    if (!account) return
+    setError(null)
+    try {
+      await remove.mutateAsync(account.id)
+      onClose()
+      onDeleted?.()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
   return (
     <BottomSheet title={account ? `Edit ${account.name}` : 'New account'} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
@@ -101,6 +182,13 @@ export function AccountSheet({
             </Select>
           </Field>
         </div>
+        {(kind === 'ike' || kind === 'ikze') && (
+          <p className="-mt-2 text-xs leading-snug text-muted">
+            {owner === 'joint'
+              ? `An ${kind.toUpperCase()} is always one person’s: pick whose it is.`
+              : `The planner keeps track of the yearly ${kind.toUpperCase()} limit and suggests a monthly payment that uses it up by December.`}
+          </p>
+        )}
         <Field
           label="Interest, % a year (optional)"
           help={
@@ -144,6 +232,70 @@ export function AccountSheet({
             {account.archived ? 'Show it again' : 'Hide this account'}
           </button>
         )}
+        {account &&
+          (confirmDelete ? (
+            <div className="grid gap-2 rounded-2xl bg-red-500/10 p-3 ring-1 ring-red-400/30">
+              {steps.length > 0 && target && (
+                <div className="grid gap-2 rounded-xl bg-white/5 p-3">
+                  <p className="text-sm leading-snug text-slate-200">
+                    Keep the money: move the {formatMoneyCompact(summary!.balance)} to another
+                    account first, each goal keeping its share, then delete.
+                  </p>
+                  <Select value={moveTo} onChange={setMoveTo}>
+                    {others.map((a) => (
+                      <option key={a.account.id} value={a.account.id}>
+                        {a.account.name} · {formatMoneyCompact(a.balance)}
+                      </option>
+                    ))}
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={moveThenDelete}
+                    disabled={moving || remove.isPending}
+                    className="rounded-xl bg-slate-100 py-2.5 text-sm font-bold text-ink hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    {moving ? 'Moving…' : `Move it to ${target.account.name}, then delete`}
+                  </button>
+                  <p className="text-xs leading-snug text-muted">
+                    In the bank: transfer {formatMoneyCompact(summary!.balance)} from{' '}
+                    {account.name} to {target.account.name}, then close {account.name}.
+                  </p>
+                </div>
+              )}
+              <p className="text-sm leading-snug text-red-200">
+                {deleteWarning.length > 0
+                  ? `Deleting ${account.name} also deletes ${deleteWarning.join(', ')}. This can’t be undone.`
+                  : `Delete ${account.name}? This can’t be undone.`}
+                {deleteWarning.length > 0 &&
+                  ' To keep the history, hide it instead, or move the money to another account first.'}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-xl py-2.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+                >
+                  Keep it
+                </button>
+                <button
+                  type="button"
+                  onClick={deleteAccount}
+                  disabled={remove.isPending}
+                  className="rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white hover:bg-red-400 disabled:opacity-50"
+                >
+                  {remove.isPending ? 'Deleting…' : 'Delete for good'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="rounded-2xl py-2.5 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 hover:bg-red-500/10"
+            >
+              Delete this account
+            </button>
+          ))}
       </form>
     </BottomSheet>
   )

@@ -54,9 +54,18 @@ through Supabase Realtime.
 12. Paste and run `supabase/migrations/0009_goals_are_trips.sql`: goals and
    trips become one thing. Every goal can be spent from (the Goals tile on the
    Add tab), outside the monthly budget; a trip without a goal gets one.
-13. Check **Database → Replication** that `expenses`, `categories` and `goals`
+13. Paste and run `supabase/migrations/0010_plan_allocations.sql`: a plan can
+   split its savings between goals and IKE/IKZE accounts and name the goal the
+   month before's unspent money goes to, and IKE/IKZE become account kinds of
+   their own (retirement accounts with IKE or IKZE in the name switch over).
+   Until it's run, plans save without the split.
+14. Paste and run `supabase/migrations/0011_savings_loans.sql`: borrowing from
+   savings and paying it back in instalments. Until it's run, *I need money*
+   says to run it and everything else works.
+15. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
-   `savings_movements`, `goal_allocations`, `ai_threads` and `ai_messages`) are in the
+   `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages` and
+   `savings_loans`) are in the
    `supabase_realtime` publication — the migrations add them.
 
 ### 2. Local development
@@ -188,6 +197,32 @@ month, and the same month a year ago — each one tap to adopt, rounded up to
 spending, or the defaults. "What's different about this month?" is a free-text
 note saved with the plan.
 
+**From the paycheck.** Once there are savings accounts, the planner's
+*Savings* splits into lines: one per open goal (with a chip for what it needs
+a month to be on time, and the account it goes onto) and one per IKE/IKZE
+account, plus *Other savings* for the rest. The plan's savings total is their
+sum. An IKE/IKZE line shows what's been paid in this calendar year against the
+yearly limit (`RETIREMENT_LIMITS` in `src/config.ts` — add each new year's
+figure when it's announced) and offers *max out*: the monthly payment that
+uses the rest of the limit by December. Planning past the limit shows a
+warning. Deposits and transfers in count toward the limit; interest doesn't,
+and withdrawals don't give it back.
+
+Planning a month also asks **where the month before's unspent money goes**:
+one of the goals, or nowhere (it stays on the account). Unspent is income −
+planned savings − spending. At the start of the planned month it shows up as a
+line in *From the paycheck*, booked as a deposit noted "Leftover from
+<month>" so it isn't mistaken for the goal's regular line.
+
+Logging a paycheck with "+ Income" opens *From the paycheck* straight away,
+so the savings leave before the money gets spent.
+
+On the Budget tab, *From the paycheck* lists the month's lines against what
+was actually paid in. In the running month each unfinished line has a *Pay in*
+button — tap, then confirm — that books the rest as a deposit onto the right
+account (and goal). A goal line counts deposits for that goal; an IKE line
+counts deposits and transfers onto the account.
+
 **AI draft** (`api/plan.ts`) sends Gemini monthly totals per category and of
 income for up to 12 months, the goal and your note — no individual expenses —
 and gets back a limit and a one-line reason per category, suggested savings and
@@ -218,6 +253,40 @@ back would lose a contribution whenever both phones paid in at the same moment.
 
 The goal holds a running total, not a list of contributions — it does not
 record who paid in or when. A contributions history would be a separate table.
+
+### What do you want to do? (the Savings tab)
+
+Guided steps for the usual money moves. Each works on the balances the app
+has, books the change here and says which transfer to make in the bank:
+
+- **Save more**: what's still free this month (see *Safe to spend*), a
+  quarter, half or all of it as a suggestion, and the goal that needs it most
+  first (behind, then on track).
+- **I need money**: borrow from savings for something that can't wait
+  (migration `0011_savings_loans.sql`). It suggests where to take it from:
+  money no goal is waiting for, then goals without a deadline, then the
+  furthest deadline, and says what a dated goal would then need a month. You
+  pick how many months to pay it back over; every new plan puts the instalment
+  aside first, and *From the paycheck* pays it back. Open loans are listed
+  on the Savings tab with a *Pay back* button.
+- **Move money** between accounts.
+- **Fix goal shares**: set what each goal holds on an account when an
+  assignment went wrong. Only the shares change, never the balance.
+- **Close an account**: move everything to another account, each goal keeping
+  its share, then delete it.
+
+Saving more than the plan, or borrowing, moves *Safe to spend* too: the plan's
+savings count as spoken for until paid in, anything beyond them counts as
+well, and money taken back out of savings is money to spend.
+
+### Deleting a savings account
+
+An account's *Edit* sheet can hide it or delete it. Deleting takes its
+movements and what it held for goals with it (the goals lose that money), so
+the sheet says exactly what goes before it asks you to confirm. To keep the
+history, hide it, or move the money elsewhere first. A plan that paid into a
+deleted account drops that line when it's next opened, and the amount counts
+as other savings.
 
 ### Insights
 
@@ -316,10 +385,21 @@ scroll-snap), with dots underneath. Because tile height varies, the points at
 which a tile's text flips to dark as the fill rises are computed from the
 actual height (`CategoryTile`).
 
+### Safe to spend
+
+The line at the top of the Add tab is the month's money that's really free:
+income logged this month − what the month puts aside (the plan's savings,
+paid in yet or not, or more if more went in; minus anything borrowed back out)
+− what's been spent, trips left out. Until a paycheck is logged
+the plan's expected income stands in, marked "expected". Below zero it turns
+red. Without a plan or income it falls back to spent against the limits.
+
 ### Tile fill and heatmap
 
 - A category tile fills from the bottom: `spent / monthly limit`
-  (`fillPercent`). Past 100% the whole tile turns red.
+  (`fillPercent`). Its big number is what's left to spend this month, with
+  what's been spent underneath. Past 100% it goes below zero ("−246 zł over")
+  and the whole tile turns red.
 - A calendar day's intensity is relative to the month's daily average
   (`heatIntensity`): twice the average or more is full saturation.
 - Text color comes from `readableTextColor` (WCAG contrast), so any category

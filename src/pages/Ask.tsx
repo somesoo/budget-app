@@ -88,7 +88,7 @@ export function Ask() {
           <p className="mt-1 text-sm leading-relaxed text-slate-300">
             <Trans
               k="ask.setup"
-              values={{ file: 'supabase/migrations/0008_ai_chat.sql' }}
+              values={{ file: 'supabase/archive/0008_ai_chat.sql' }}
               tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
             />
           </p>

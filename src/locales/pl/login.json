@@ -28,8 +28,8 @@
     "context": "Sign-in screen: the submit button while the sign-in is in progress."
   },
   "wrongPassword": {
-    "message": "Nieprawidłowe hasło. Spróbuj jeszcze raz.",
-    "context": "Sign-in screen: error under the password field when the password doesn't match."
+    "message": "Email lub hasło się nie zgadza. Spróbuj jeszcze raz.",
+    "context": "Sign-in screen: error under the password field when the email and password don't match an account."
   },
   "offline": {
     "message": "Brak połączenia z serwerem. Sprawdź internet.",

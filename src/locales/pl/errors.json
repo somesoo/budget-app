@@ -11,6 +11,10 @@
     "message": "Serwer AI tu nie działa. Działa na Vercelu albo lokalnie przez `vercel dev`.",
     "context": "Error for the developer: the AI functions run on Vercel only. Keep `vercel dev` as is."
   },
+  "aiNoKey": {
+    "message": "Funkcje AI potrzebują klucza Gemini. Dodaj go w Ustawienia → AI.",
+    "context": "Error when no Gemini key is set anywhere. \"Settings → AI\" names the card where it's added."
+  },
   "migration": {
     "message": "{what}: potrzebna migracja {file}",
     "context": "Error when a feature needs a database update; {what} is one of the feature descriptions below, {file} the migration file."

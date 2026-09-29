@@ -4,12 +4,13 @@ import {
   Compass,
   DownloadSimple,
   Plus,
+  Sparkle,
   SignOut,
   Trash,
   WifiHigh,
   WifiSlash,
 } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ADD_WIDGETS } from '../components/add/widgets'
 import { MoneyInput } from '../components/budget/MoneyInput'
@@ -23,6 +24,7 @@ import { useCategories } from '../hooks/useCategories'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { usePeople, usePeopleActions } from '../hooks/usePeople'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
+import { GeminiKeyUnavailableError, useGeminiKey, useSaveGeminiKey } from '../hooks/useGeminiKey'
 import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { DEFAULT_PREFS, setPrefs, usePrefs } from '../hooks/usePrefs'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
@@ -92,6 +94,7 @@ export function Settings() {
             accounts={savings.accounts.length}
             goals={savings.goals.length}
           />
+          <AiCard />
           <HelpCard />
           <DataCard categories={categories} />
           <AccountCard />
@@ -147,7 +150,7 @@ function PeopleCard() {
           <Trans
             k="settings.people.migration"
             values={{
-              file: 'supabase/migrations/0015_people.sql',
+              file: 'supabase/archive/0015_people.sql',
               names: formatList(people.map((p) => p.name)),
             }}
             tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
@@ -599,6 +602,139 @@ function DataCard({ categories }: { categories: Category[] }) {
         {state.busy ? t('settings.data.preparing') : t('settings.data.download')}
       </button>
       {state.message && <p className="mt-2 text-xs text-muted">{state.message}</p>}
+    </SettingsCard>
+  )
+}
+
+/* ---------- AI ---------- */
+
+const AI_STUDIO = 'https://aistudio.google.com/apikey'
+
+/**
+ * The Gemini key behind Advice, the plan draft and Ask. GEMINI_API_KEY on the
+ * server wins; without it, one pasted here is checked with Google and kept in
+ * the database, where only the server functions can read it.
+ */
+function AiCard() {
+  const status = useGeminiKey()
+  const save = useSaveGeminiKey()
+  const [draft, setDraft] = useState('')
+  const [replacing, setReplacing] = useState(false)
+
+  // plain `npm run dev` has no server functions: nothing to set here
+  if (status.error instanceof GeminiKeyUnavailableError) return null
+
+  const current = status.data
+  const editable = current?.canStore && current.source !== 'server'
+  const showInput = editable && (current.source === null || replacing)
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!draft.trim()) return
+    save.mutate(draft.trim(), {
+      onSuccess: () => {
+        setDraft('')
+        setReplacing(false)
+      },
+    })
+  }
+
+  return (
+    <SettingsCard title={t('settings.ai.title')} help={t('settings.ai.help')}>
+      {status.isPending ? (
+        <p className="text-sm text-muted">{t('settings.ai.checking')}</p>
+      ) : status.error ? (
+        <p className="text-sm text-red-300">{(status.error as Error).message}</p>
+      ) : (
+        <div className="space-y-3">
+          <p className="flex items-center gap-2 text-sm">
+            <Sparkle
+              aria-hidden
+              weight={current?.source ? 'fill' : 'regular'}
+              className={current?.source ? 'text-positive' : 'text-muted'}
+            />
+            <span className={current?.source ? 'text-slate-200' : 'text-muted'}>
+              {current?.source === 'server'
+                ? t('settings.ai.fromServer', { hint: current.hint ?? '' })
+                : current?.source === 'app'
+                  ? t('settings.ai.saved', { hint: current.hint ?? '' })
+                  : t('settings.ai.none')}
+            </span>
+          </p>
+
+          {!current?.canStore && current?.source !== 'server' && (
+            <p className="text-xs leading-relaxed text-amber-200">{t('settings.ai.cantStore')}</p>
+          )}
+
+          {showInput && (
+            <form onSubmit={submit} className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={draft}
+                  onChange={(e) => {
+                    setDraft(e.target.value)
+                    if (save.error) save.reset()
+                  }}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder={t('settings.ai.placeholder')}
+                  aria-label={t('settings.ai.placeholder')}
+                  className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white outline-none ring-1 ring-white/10 placeholder:font-sans placeholder:text-muted/60 focus:ring-white/40"
+                />
+                <button
+                  type="submit"
+                  disabled={!draft.trim() || save.isPending}
+                  className="shrink-0 rounded-xl bg-slate-50 px-4 text-sm font-semibold text-ink disabled:opacity-40"
+                >
+                  {save.isPending ? t('settings.ai.checkingKey') : t('settings.ai.save')}
+                </button>
+              </div>
+              <p className="text-xs leading-relaxed text-muted">
+                <Trans
+                  k="settings.ai.getKey"
+                  tags={{
+                    link: (s) => (
+                      <a
+                        href={AI_STUDIO}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-semibold text-accent-soft underline underline-offset-2"
+                      >
+                        {s}
+                      </a>
+                    ),
+                  }}
+                />
+              </p>
+            </form>
+          )}
+
+          {save.error && <p className="text-sm text-red-300">{(save.error as Error).message}</p>}
+
+          {editable && current.source === 'app' && (
+            <div className="flex flex-wrap gap-2">
+              {!replacing && (
+                <button
+                  type="button"
+                  onClick={() => setReplacing(true)}
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+                >
+                  {t('settings.ai.replace')}
+                </button>
+              )}
+              <button
+                type="button"
+                disabled={save.isPending}
+                onClick={() => save.mutate(null)}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-red-300 ring-1 ring-red-400/30 hover:bg-red-500/10 disabled:opacity-40"
+              >
+                <Trash aria-hidden /> {t('settings.ai.remove')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </SettingsCard>
   )
 }

@@ -55,7 +55,8 @@ function isChatBody(b: unknown): b is ChatBody {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!(await authorize(req, res))) return
+  const apiKey = await authorize(req, res)
+  if (!apiKey) return
 
   const body: unknown = req.body
   if (JSON.stringify(body ?? null).length > MAX_CHAT_CHARS || !isChatBody(body)) {
@@ -63,6 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const result = await chatGemini({
+    apiKey,
     systemPrompt: SYSTEM_PROMPT,
     context: body.context,
     history: body.history,

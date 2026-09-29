@@ -116,7 +116,8 @@ function isPlanRequest(b: unknown): b is PlanRequest {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!(await authorize(req, res))) return
+  const apiKey = await authorize(req, res)
+  if (!apiKey) return
 
   const body: unknown = req.body
   // the suggestions make this request bigger than the advice one
@@ -125,6 +126,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const result = await askGemini({
+    apiKey,
     systemPrompt: systemPrompt(body),
     input: body,
     schema: RESPONSE_SCHEMA,

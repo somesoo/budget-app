@@ -65,7 +65,7 @@ export function BorrowSheet({
         <p className="pb-4 text-sm leading-relaxed text-slate-300">
           <Trans
             k="borrow.migration"
-            values={{ file: 'supabase/migrations/0011_savings_loans.sql' }}
+            values={{ file: 'supabase/archive/0011_savings_loans.sql' }}
             tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
           />
         </p>

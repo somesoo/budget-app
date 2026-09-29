@@ -195,6 +195,8 @@ export function useSuggestPlan() {
         )
       }
       const body = await res.json().catch(() => ({}))
+      // no Gemini key yet: say where to add one
+      if (body.code === 'no_key') throw new PlanUnavailableError(t('errors.aiNoKey'))
       if (!res.ok) throw new Error(body.error ?? t('errors.requestFailed', { status: res.status }))
       return body as PlanSuggestion
     },

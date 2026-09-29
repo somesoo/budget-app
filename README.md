@@ -1,6 +1,6 @@
 # Budget
 
-A shared budgeting app for two people. Adding an expense is three taps
+A shared budgeting app for one to four people. Adding an expense is three taps
 (category → amount → Save). Data is shared and syncs live between phones
 through Supabase Realtime.
 
@@ -14,87 +14,81 @@ through Supabase Realtime.
 
 ## Setup
 
-### 1. Supabase project
+### Quick: one button
+
+For anyone who wants their own copy (a free Vercel and a free Supabase
+account, about five minutes, no terminal):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsomesoo%2Fbudget-app&project-name=budget&repository-name=budget&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22supabase%22%2C%22productSlug%22%3A%22supabase%22%7D%5D)
+
+1. Click the button and sign in to Vercel with GitHub. It copies this
+   repository to your GitHub account.
+2. When it asks for **Supabase**, create a new database: the free plan, a
+   region close to you (Frankfurt for Poland). Vercel fills in every setting
+   the app needs; there is nothing to copy by hand.
+3. **Deploy.** The build creates the tables itself (`scripts/migrate.mjs`),
+   so the first one takes a minute or two.
+4. Open the site. It starts on **Welcome**: type an email and a password for
+   the account everyone in the budget will share, then the names of the
+   people. That's the whole setup.
+5. Optional: **Settings → AI**, paste a free key from
+   [Google AI Studio](https://aistudio.google.com/apikey) to turn on the
+   recommendations, the plan draft and the Ask tab.
+6. On each phone: open the site → *Add to Home Screen*, sign in once.
+
+**Updates:** on your copy on GitHub, *Sync fork*. Vercel deploys it, and the
+deploy runs any new migrations before the new version goes live.
+
+**If something's off:**
+
+- *Database not configured* on the site: Supabase isn't connected. In the
+  Vercel project: **Storage → Connect** your Supabase database, then
+  **Deployments → … → Redeploy**.
+- The deploy fails at `migrate:`: its log names the migration and the error.
+- Forgot the password: Supabase dashboard (reachable from the Vercel
+  project's Storage tab) → **Authentication → Users → … → Reset password**.
+
+### By hand
+
+The same without the button, for a Supabase and a Vercel project you set up
+yourself.
+
+#### 1. Supabase project
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. Open the **SQL Editor** and run these two files — open each one, copy its
-   *contents* into the editor and press Run (pasting the filename gives you a
-   syntax error):
-   - `supabase/migrations/0001_init.sql` — tables, RLS, Realtime publication
-   - `supabase/seed.sql` — 8 starting categories with limits + a savings goal
+2. Open the **SQL Editor**, paste the *contents* of `supabase/schema.sql`
+   and press Run. That's the whole database: tables, access rules, Realtime,
+   and eight starting categories with a goal. (On a Mac,
+   `pbcopy < supabase/schema.sql` puts it on the clipboard.)
 
-   On a Mac, `pbcopy < supabase/migrations/0001_init.sql` puts a file straight
-   on the clipboard.
-3. Create the shared account: **Authentication → Users → Add user**, with
-   *Auto Confirm User* enabled. Use any email you both remember (it is not a
-   secret) and a strong password (that is the secret).
-4. Turn off public sign-ups: **Authentication → Providers → Email** → disable
-   *Enable sign-ups*. Otherwise anyone could create their own account and read
-   the budget.
-5. Now paste and run `supabase/migrations/0002_require_login.sql`, which drops
-   the anonymous access policies and requires a signed-in user. Run it
-   **after** step 3, or the app locks itself out.
-6. Paste and run `supabase/migrations/0003_add_to_goal.sql`, which adds the
-   function that pays into the savings goal.
-7. Paste and run `supabase/migrations/0004_income_and_advice.sql` — the income
-   table and the stored recommendations.
-8. Paste and run `supabase/migrations/0005_budget_plans.sql` — monthly budget
-   plans and hideable categories. The app keeps working without it (no plans,
-   nothing hidden), so it's fine to deploy first and run this after.
-9. Paste and run `supabase/migrations/0006_chart_exclusion.sql` — lets a
-   category be left out of the "Where it goes" donut. Also optional for the
-   app to run.
-10. Paste and run `supabase/migrations/0007_savings.sql`: savings accounts,
-   goals funded from them, and trips/projects (categories with their own
-   budget, outside the monthly limits). Your existing goal and what's saved
-   toward it move onto an account called "Savings". Until it's run, the
-   Savings tab explains what to do and everything else works as before.
-11. Paste and run `supabase/migrations/0008_ai_chat.sql`: the saved
-   conversations of the Ask tab.
-12. Paste and run `supabase/migrations/0009_goals_are_trips.sql`: goals and
-   trips become one thing. Every goal can be spent from (the Goals tile on the
-   Add tab), outside the monthly budget; a trip without a goal gets one.
-13. Paste and run `supabase/migrations/0010_plan_allocations.sql`: a plan can
-   split its savings between goals and IKE/IKZE accounts and name the goal the
-   month before's unspent money goes to, and IKE/IKZE become account kinds of
-   their own (retirement accounts with IKE or IKZE in the name switch over).
-   Until it's run, plans save without the split.
-14. Paste and run `supabase/migrations/0011_savings_loans.sql`: borrowing from
-   savings and paying it back in instalments. Until it's run, *I need money*
-   says to run it and everything else works.
-15. Paste and run `supabase/migrations/0012_carryover_keep.sql`: how much of
-   the month before's leftover stays on the account before the goals get
-   theirs. Until it's run, all of it goes to the goals.
-16. Paste and run `supabase/migrations/0013_money_health.sql`: pay that counts
-   for another month, the emergency fund mark on a goal, and allowances (a
-   category that's one person's). Until it's run, all three stay off.
-17. Paste and run `supabase/migrations/0014_one_off_income.sql`: income can be
-   marked one-off (a returned deposit, something sold), which counts for its
-   month but stays out of the typical pay the planner and forecast expect.
-   Until it's run, all income counts as pay.
-18. Paste and run `supabase/migrations/0015_people.sql`: who's in the budget,
-   one to four people with names of your own. An install that already has
-   data keeps Bubs and Meow (rename them in Settings → People); a fresh one
-   asks for the names on first launch. Until it's run, it stays Bubs and Meow.
-19. Paste and run `supabase/migrations/0016_goal_spending_leaves_account.sql`:
-   spending from a goal takes the money off the account it was on (the goal's
-   share first, then what's unassigned there). Until it's run, spending from a
-   goal only counts against the goal and account balances don't move.
-20. Paste and run `supabase/migrations/0017_goal_spending_backfill.sql`: the
-   same for spending from goals logged before step 19, oldest first. Running
-   it twice changes nothing. Skip it (or first delete the correction) for any
-   spending you already took off an account by hand, or it comes off twice.
-21. Check **Database → Replication** that `expenses`, `categories` and `goals`
-   (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
-   `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
-   `savings_loans` and `people`) are in the
-   `supabase_realtime` publication — the migrations add them.
+   Or let the deploy do it: put the database's connection string
+   (Supabase → **Connect** → *Session pooler*) in `DATABASE_URL` on Vercel,
+   and every production deploy creates or updates the database itself. Run
+   `npm run migrate` with it to do the same from your machine.
+3. The account: with `SUPABASE_SERVICE_ROLE_KEY` on Vercel (below), the
+   site's welcome screen makes it. Without it, **Authentication → Users → Add
+   user**, with *Auto Confirm User* on. Either way it's the only one the
+   database accepts.
 
-### 2. Local development
+#### Updating the database
+
+`supabase/schema.sql` is version 1.0.0. Later changes are files in
+`supabase/migrations`; with `DATABASE_URL` (or the integration) set, deploys
+run them for you. Without it, paste each new one into the SQL Editor, in
+order.
+
+**An install from before 1.0.0** was built from the files now in
+`supabase/archive` (0001–0018). If it has all of them, the first deploy with
+`DATABASE_URL` records it as 1.0.0 and carries on. If not, the deploy stops
+and says so: set `MIGRATIONS_BASELINE` to the last one it has (e.g. `0015`),
+and the missing ones run first. Read `0017_goal_spending_backfill.sql` before
+you let it run: it takes earlier spending from goals off the accounts, which
+would count twice where you already corrected a balance by hand.
+
+#### 2. Local development
 
 ```bash
-cp .env.example .env   # URL + anon key from Project Settings → API,
-                       # plus the account email from step 3
+cp .env.example .env   # URL + anon key from Project Settings → API
 npm install
 npm run dev
 ```
@@ -111,25 +105,31 @@ Two things the Supabase dashboard will try to talk you into:
 
 Vite reads `.env` at startup, so restart `npm run dev` after editing it.
 
-### 3. Deploy to Vercel
+#### 3. Deploy to Vercel
 
 1. **Add New → Project** and import this repository. Vercel detects Vite on its
    own: build `npm run build`, output `dist`.
-2. Under **Settings → Environment Variables** add all three, for every
+2. Under **Settings → Environment Variables** add these, for every
    environment you use (Production, Preview, Development):
 
    | Name | Value |
    | --- | --- |
    | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` |
-   | `VITE_SUPABASE_ANON_KEY` | the project's anon key |
-   | `VITE_AUTH_EMAIL` | the shared account's email |
-   | `GEMINI_API_KEY` | your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix** |
+   | `VITE_SUPABASE_ANON_KEY` | the project's anon (publishable) key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | the service_role (secret) key — **no `VITE_` prefix**; lets the welcome screen make the account and Settings → AI keep a Gemini key |
+   | `DATABASE_URL` | optional: the connection string, so each deploy creates or updates the database |
+   | `VITE_AUTH_EMAIL` | optional: the account's email, so no phone has to type it |
+   | `GEMINI_API_KEY` | optional: your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix**; wins over one typed in Settings → AI |
    | `GEMINI_MODEL` | optional, defaults to `gemini-3.5-flash-lite` |
    | `GEMINI_FALLBACK_MODEL` | optional, defaults to `gemini-3.5-flash`; used when the main model stays overloaded |
 
    The prefix matters: anything starting with `VITE_` is compiled into the
-   JavaScript every visitor downloads. `GEMINI_API_KEY` stays on the server,
-   where only `/api/advice` can read it.
+   JavaScript every visitor downloads. The service role key and
+   `GEMINI_API_KEY` stay on the server, where only the `/api` functions can
+   read them. The names the Supabase integration creates (`SUPABASE_URL`,
+   `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`,
+   `POSTGRES_URL_NON_POOLING`, …) work as well, so the one-button install
+   needs none of these.
 
 3. Deploy. Every push to `main` redeploys automatically.
 
@@ -144,9 +144,12 @@ a PWA requires.
 
 ## Signing in
 
-Both phones use the same account. The login screen asks only for a password —
-the email comes from `VITE_AUTH_EMAIL` — and the form is a normal username +
-password form, so the browser's password manager offers to save it.
+Everyone uses the same account, made on the welcome screen of a new install
+(`/api/setup`, which only works while there's no account; after that the
+database refuses any other, see *One account* in `supabase/schema.sql`). The sign-in screen asks
+for the email the first time on a phone and remembers it, or never when
+`VITE_AUTH_EMAIL` is set. It's a normal username + password form, so the
+browser's password manager offers to save it.
 
 After a successful sign-in the Supabase session is stored in that device's
 localStorage and refreshed in the background, so you type the password once per
@@ -430,6 +433,13 @@ they are edited and deleted like any other entry.
 - *Left over*, savings rate, how much a day you can still spend to break even,
   and roughly how many months to the savings goal at this month's surplus.
 
+**The Gemini key** is `GEMINI_API_KEY` on the server when it's set, otherwise
+the one pasted in **Settings → AI**. That one is checked with Google, then
+kept in the `app_secrets` table, which only the server functions can read
+(row level security with no policy; they use the service role key), so it
+never goes back to a phone. Without a key the AI features say where to add
+one.
+
 **Recommendations** come from Gemini, on request ("Get recommendations"),
 through a Vercel function at `api/advice.ts` (the sign-in check, retries and
 model fallback shared with `api/plan.ts` live in `api/_gemini.ts`):
@@ -460,8 +470,10 @@ tier excludes both. Only aggregates are sent, but monthly income is still
 personal — decide which tier you're comfortable with.
 
 **Locally**, `npm run dev` doesn't run `/api` functions; the card says so
-instead of failing. To try recommendations locally, use the Vercel CLI:
-`vercel dev` (with `GEMINI_API_KEY` in `.env`, which is git-ignored).
+instead of failing, the sign-in screen skips the welcome check, and Settings
+leaves out the AI card. To try them locally, use the Vercel CLI: `vercel dev`
+(with `GEMINI_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in `.env`, which is
+git-ignored).
 
 ### The Add tab fits one screen
 
@@ -504,12 +516,15 @@ red. Without a plan or income it falls back to spent against the limits.
 
 ## Data and privacy
 
-After `0002_require_login.sql`, every RLS policy requires an authenticated
-user, so the anon key in the bundle is useless on its own — the password is
-what protects the data. Two things are worth knowing:
+Every RLS policy requires an authenticated user, so the anon key in the
+bundle is useless on its own — the password is what protects the data. Two
+things are worth knowing:
 
-- Public sign-ups must stay disabled (step 4). With them on, anyone could
-  register and pass the `authenticated` check.
+- Nobody else may get an account: anyone signed in passes the
+  `authenticated` check. A trigger on `auth.users` makes the database
+  refuse every account after the first, sign-ups included; turning sign-ups
+  off in Supabase (Authentication → Providers → Email) as well does no harm. To allow a second account on purpose:
+  `drop trigger one_household_account on auth.users;`
 - One shared account means the database cannot tell you apart. Who
   paid is attribution, not identity — anyone signed in can edit or delete any
   expense.

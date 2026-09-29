@@ -1,0 +1,42 @@
+{
+  "title": {
+    "message": "Welcome",
+    "context": "New install, first screen: heading above the form that makes the budget's account."
+  },
+  "intro": {
+    "message": "Make the account everyone in this budget signs in with. Each phone asks for it once.",
+    "context": "New install, first screen: line under the heading. The household shares this one account."
+  },
+  "email": {
+    "message": "Email",
+    "context": "New install, first screen: label above the account's email field."
+  },
+  "emailHelp": {
+    "message": "Just a name for the account, nothing is sent to it.",
+    "context": "New install, first screen: hint under the email field. No confirmation email is sent."
+  },
+  "password": {
+    "message": "Password",
+    "context": "New install, first screen: label above the new password field."
+  },
+  "passwordHelp": {
+    "message": "At least {min} characters. Share it only with the people in the budget.",
+    "context": "New install, first screen: hint under the password field. {min} is the minimum length (a number)."
+  },
+  "create": {
+    "message": "Create account",
+    "context": "New install, first screen: the big submit button."
+  },
+  "creating": {
+    "message": "Creating…",
+    "context": "New install, first screen: the submit button while the account is being made."
+  },
+  "badEmail": {
+    "message": "That doesn't look like an email address.",
+    "context": "New install, first screen: error when the email is malformed."
+  },
+  "failed": {
+    "message": "Couldn't create the account: {error}",
+    "context": "New install, first screen: error; {error} is the server's message."
+  }
+}

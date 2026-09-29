@@ -1,16 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { isSignedIn, readSecret } from './_supabase.js'
 
 /*
  * Shared by the /api functions (the leading underscore keeps Vercel from
  * serving this file as a route of its own).
  *
+ * The Gemini key is GEMINI_API_KEY when it's set on the server (no VITE_
+ * prefix!), otherwise the one typed in Settings → AI, kept in app_secrets.
+ * Without either, the AI features say where to add one.
+ *
  * Env vars:
- *   GEMINI_API_KEY          required, server-only (no VITE_ prefix!)
+ *   GEMINI_API_KEY          optional, server-only; wins over the one in Settings
  *   GEMINI_MODEL            optional, defaults below
  *   GEMINI_FALLBACK_MODEL   optional; tried when the main model stays overloaded
- *   VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY   already set for the frontend;
- *                           used here to check the caller is signed in
+ *   the Supabase ones       see _supabase.ts; used to check the caller is signed in
  */
+
+/** Where the key typed in Settings is stored (app_secrets.name). */
+export const GEMINI_SECRET = 'gemini_api_key'
 
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 // A different model, so a busy one doesn't take the whole feature down.
@@ -34,40 +41,35 @@ export const isName = (v: unknown) => typeof v === 'string' && v.length > 0 && v
 export const clip = (s: unknown, max: number) =>
   typeof s === 'string' ? s.trim().slice(0, max) : ''
 
+/** The key to call Gemini with, and where it came from; null when there's none. */
+export async function geminiKey(): Promise<{ key: string; source: 'server' | 'app' } | null> {
+  if (process.env.GEMINI_API_KEY) return { key: process.env.GEMINI_API_KEY, source: 'server' }
+  const stored = await readSecret(GEMINI_SECRET)
+  return stored ? { key: stored, source: 'app' } : null
+}
+
 /**
- * Checks the env and that the caller is signed in to this Supabase — only a
- * member of the household may spend the Gemini quota. Sends the error
- * response itself and returns false when the request can't go ahead.
+ * Checks that the caller is signed in to this Supabase (only a member of the
+ * household may spend the Gemini quota) and that there's a key. Sends the
+ * error response itself and returns null when the request can't go ahead,
+ * otherwise the key.
  */
-export async function authorize(req: VercelRequest, res: VercelResponse): Promise<boolean> {
+export async function authorize(req: VercelRequest, res: VercelResponse): Promise<string | null> {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Use POST' })
-    return false
+    return null
   }
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY
-  if (!process.env.GEMINI_API_KEY) {
-    res.status(500).json({ error: 'GEMINI_API_KEY is not set on the server' })
-    return false
-  }
-  if (!supabaseUrl || !anonKey) {
-    res.status(500).json({ error: 'Supabase env vars are not set on the server' })
-    return false
-  }
-
-  const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '')
-  if (!token) {
+  if (!(await isSignedIn(req))) {
     res.status(401).json({ error: 'Not signed in' })
-    return false
+    return null
   }
-  const who = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: { apikey: anonKey, authorization: `Bearer ${token}` },
-  })
-  if (!who.ok) {
-    res.status(401).json({ error: 'Not signed in' })
-    return false
+  const found = await geminiKey()
+  if (!found) {
+    // the app turns this code into "add a key in Settings"
+    res.status(503).json({ error: 'No Gemini key', code: 'no_key' })
+    return null
   }
-  return true
+  return found.key
 }
 
 export type GeminiResult =
@@ -83,8 +85,7 @@ type RawResult = { ok: true; text: string; model: string } | { ok: false; error:
  * different model is tried. Details of failures go to the Vercel log, not to
  * the browser.
  */
-async function generate(body: Record<string, unknown>): Promise<RawResult> {
-  const apiKey = process.env.GEMINI_API_KEY!
+async function generate(apiKey: string, body: Record<string, unknown>): Promise<RawResult> {
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL
   const fallback = process.env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL
   const request = JSON.stringify(body)
@@ -119,7 +120,7 @@ async function generate(body: Record<string, unknown>): Promise<RawResult> {
         : status === 429
           ? ': rate limit or quota reached, try again later'
           : status === 400 || status === 403
-            ? ': check GEMINI_API_KEY'
+            ? ': check the Gemini key'
             : RETRYABLE.has(status)
               ? ': Gemini is overloaded right now, try again in a minute'
               : ''
@@ -135,12 +136,13 @@ async function generate(body: Record<string, unknown>): Promise<RawResult> {
 
 /** One schema-constrained JSON call. */
 export async function askGemini(args: {
+  apiKey: string
   systemPrompt: string
   input: unknown
   schema: unknown
   temperature?: number
 }): Promise<GeminiResult> {
-  const result = await generate({
+  const result = await generate(args.apiKey, {
     systemInstruction: { parts: [{ text: args.systemPrompt }] },
     contents: [{ role: 'user', parts: [{ text: JSON.stringify(args.input) }] }],
     generationConfig: {
@@ -165,6 +167,7 @@ export async function askGemini(args: {
  * thread so far, and the answer comes back as plain text.
  */
 export async function chatGemini(args: {
+  apiKey: string
   systemPrompt: string
   context: unknown
   history: { role: 'user' | 'assistant'; content: string }[]
@@ -184,7 +187,7 @@ export async function chatGemini(args: {
       parts: [{ text: m.content }],
     })),
   ]
-  const result = await generate({
+  const result = await generate(args.apiKey, {
     systemInstruction: { parts: [{ text: args.systemPrompt }] },
     contents,
     generationConfig: { temperature: 0.6 },

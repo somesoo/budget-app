@@ -15,6 +15,7 @@ const kindLabel = (kind: SavingsMovement['kind']) => t(`movement.${kind}`)
 /**
  * Movements by month, newest first. Deleting asks once more: it can shrink
  * goal shares when the money it brought in is gone (the database decides how).
+ * Money spent from a goal can't be deleted here; it goes with its expense.
  */
 export function MovementList({
   movements,
@@ -84,7 +85,9 @@ export function MovementList({
                     {m.amount > 0 ? '+' : '−'}
                     {formatMoney(Math.abs(m.amount))}
                   </span>
-                  {confirming === m.id ? (
+                  {m.kind === 'spending' ? (
+                    <span className="h-8 w-8 shrink-0" aria-hidden />
+                  ) : confirming === m.id ? (
                     <span className="flex shrink-0 gap-1">
                       <button
                         type="button"

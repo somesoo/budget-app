@@ -9,7 +9,7 @@ import { createAccount, hasAccount, hasSecretKey } from './_supabase.js'
  *                   there's none yet
  * POST /api/setup   { email, password }: makes the budget's one account.
  *                   Refused once one exists; the database refuses a second
- *                   one too (migration 0016), so a race can't make two.
+ *                   one too (migration 0018), so a race can't make two.
  *
  * No sign-in needed: there's nobody to sign in as yet.
  */

@@ -80,14 +80,14 @@ export async function createAccount(email: string, password: string): Promise<st
   return body.msg ?? body.message ?? `Supabase refused (${res.status})`
 }
 
-/** A value from app_secrets (migration 0016), or undefined. */
+/** A value from app_secrets (migration 0018), or undefined. */
 export async function readSecret(name: string): Promise<string | undefined> {
   if (!hasSecretKey()) return undefined
   const res = await fetch(
     `${supabaseUrl()}/rest/v1/app_secrets?select=value&name=eq.${encodeURIComponent(name)}`,
     { headers: adminHeaders() },
   )
-  // before migration 0016 the table isn't there: no stored secrets
+  // before migration 0018 the table isn't there: no stored secrets
   if (!res.ok) return undefined
   const rows = (await res.json()) as { value: string }[]
   return rows[0]?.value || undefined

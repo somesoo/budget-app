@@ -23,6 +23,10 @@
     "message": "The app has {amount} now.",
     "context": "Correct saved amount sheet: current amount."
   },
+  "savedHelpSpent": {
+    "message": "The app has {amount} on the accounts now, after {spent} spent from it.",
+    "context": "Correct saved amount sheet: current amount, when some of the goal's money has been spent. {amount} and {spent} are amounts."
+  },
   "where": {
     "message": "Where the money is",
     "context": "Correct saved amount sheet: account field label."

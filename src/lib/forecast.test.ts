@@ -94,6 +94,7 @@ describe('buildAdviceRequest', () => {
         goal_id: 'g1',
         transfer_id: null,
         loan_id: null,
+        expense_id: null,
         created_at: '2026-07-01',
       },
     ]

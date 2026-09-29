@@ -23,6 +23,10 @@
     "message": "Aplikacja ma teraz {amount}.",
     "context": "Correct saved amount sheet: current amount."
   },
+  "savedHelpSpent": {
+    "message": "Aplikacja ma teraz {amount} na kontach, po wydaniu z tego celu {spent}.",
+    "context": "Correct saved amount sheet: current amount, when some of the goal's money has been spent. {amount} and {spent} are amounts."
+  },
   "where": {
     "message": "Gdzie są pieniądze",
     "context": "Correct saved amount sheet: account field label."

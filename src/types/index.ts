@@ -85,7 +85,14 @@ export interface SavingsAccount {
   created_at: string
 }
 
-export type MovementKind = 'deposit' | 'withdrawal' | 'interest' | 'adjustment' | 'transfer'
+export type MovementKind =
+  | 'deposit'
+  | 'withdrawal'
+  | 'interest'
+  | 'adjustment'
+  | 'transfer'
+  /** An expense paid from a goal, taken off the account (migration 0016). */
+  | 'spending'
 
 export interface SavingsMovement {
   id: string
@@ -102,6 +109,8 @@ export interface SavingsMovement {
   transfer_id: string | null
   /** The loan a deposit pays back (migration 0011). */
   loan_id: string | null
+  /** The expense a 'spending' movement belongs to (migration 0016). */
+  expense_id: string | null
   created_at: string
 }
 

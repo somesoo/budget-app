@@ -57,6 +57,7 @@ const move = (
   goal_id,
   transfer_id: null,
   loan_id: null,
+  expense_id: null,
   created_at: '2026-01-01T00:00:00Z',
 })
 
@@ -152,6 +153,30 @@ describe('goalSummaries', () => {
     expect(s.funding.map((f) => f.account.id)).toEqual(['a', 'b'])
     expect(s.status).toEqual({ kind: 'on-track', neededPerMonth: 500 })
     expect(totalNeededPerMonth([s])).toBe(500)
+  })
+
+  it('counts what was spent from a goal as put aside, though it left the account', () => {
+    const spend = (account_id: string, amount: number, goal_id: string | null) => ({
+      ...move(account_id, amount, '2026-09-12', 'spending', goal_id),
+      expense_id: 'e1',
+    })
+    const [s] = goalSummaries({
+      goals: [goal('trip', 5000, null)],
+      accounts: [account('a')],
+      movements: [
+        move('a', 5000, '2026-06-05', 'deposit', 'trip'),
+        spend('a', -3000, 'trip'),
+        // taken from unassigned money once the goal ran out: not the goal's
+        spend('a', -200, null),
+      ],
+      allocations: [alloc('a', 'trip', 2000)],
+      now: '2026-09',
+    })
+    expect(s).toMatchObject({ saved: 2000, spent: 3000, putAside: 5000, remaining: 0 })
+    expect(s.status).toEqual({ kind: 'reached' })
+    // spending isn't saving less
+    expect(savedInMonth([spend('a', -3000, 'trip')], '2026-09')).toBe(0)
+    expect(goalUse(s.putAside, 3200)).toEqual({ left: 1800, share: 1800 / 5000 })
   })
 })
 

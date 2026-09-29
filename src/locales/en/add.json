@@ -32,7 +32,7 @@
       "context": "Add screen > bottom sheet heading: pick which savings goal an expense is paid from."
     },
     "help": {
-      "message": "Paid from savings: it counts toward the goal, not this month’s budget.",
+      "message": "Paid from savings: it comes off the account the goal’s money is on, not this month’s budget.",
       "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
     },
     "spentOf": {

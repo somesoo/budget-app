@@ -34,7 +34,7 @@
       "context": "Add screen > bottom sheet heading: pick which savings goal an expense is paid from."
     },
     "help": {
-      "message": "Płacone z oszczędności: liczy się do celu, a nie do budżetu miesiąca.",
+      "message": "Płacone z oszczędności: schodzi z konta, na którym leżą pieniądze celu, a nie z budżetu miesiąca.",
       "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
     },
     "spentOf": {

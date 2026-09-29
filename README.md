@@ -124,10 +124,18 @@ original install was made. Two shortcuts apply here too:
    one to four people with names of your own. An install that already has
    data keeps Bubs and Meow (rename them in Settings → People); a fresh one
    asks for the names on first launch. Until it's run, it stays Bubs and Meow.
-19. Paste and run `supabase/migrations/0016_household_setup.sql`: the
+19. Paste and run `supabase/migrations/0016_goal_spending_leaves_account.sql`:
+   spending from a goal takes the money off the account it was on (the goal's
+   share first, then what's unassigned there). Until it's run, spending from a
+   goal only counts against the goal and account balances don't move.
+20. Paste and run `supabase/migrations/0017_goal_spending_backfill.sql`: the
+   same for spending from goals logged before step 19, oldest first. Running
+   it twice changes nothing. Skip it (or first delete the correction) for any
+   spending you already took off an account by hand, or it comes off twice.
+21. Paste and run `supabase/migrations/0018_household_setup.sql`: the
    database allows only the one account from now on (whatever step 4 says),
    and gets the table where a Gemini key typed in Settings → AI is kept.
-20. Check **Database → Replication** that `expenses`, `categories` and `goals`
+22. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
    `savings_loans` and `people`) are in the
@@ -195,7 +203,7 @@ a PWA requires.
 
 Everyone uses the same account, made on the welcome screen of a new install
 (`/api/setup`, which only works while there's no account; after that
-migration 0016 makes the database refuse any other). The sign-in screen asks
+migration 0018 makes the database refuse any other). The sign-in screen asks
 for the email the first time on a phone and remembers it, or never when
 `VITE_AUTH_EMAIL` is set. It's a normal username + password form, so the
 browser's password manager offers to save it.
@@ -570,7 +578,7 @@ user, so the anon key in the bundle is useless on its own — the password is
 what protects the data. Two things are worth knowing:
 
 - Nobody else may get an account: anyone signed in passes the
-  `authenticated` check. Migration 0016 makes the database refuse every
+  `authenticated` check. Migration 0018 makes the database refuse every
   account after the first, sign-ups included; turning sign-ups off (step 4)
   as well does no harm. To allow a second account on purpose:
   `drop trigger one_household_account on auth.users;`

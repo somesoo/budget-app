@@ -12,7 +12,7 @@ The first release meant for other people to install.
   set up by hand is recognised and only gets what it's missing.
 - **Account made in the app.** A new install opens on *Welcome*: email and
   password for the shared account, then the people's names. The database
-  then refuses any other account (migration 0016), so public sign-ups can't
+  then refuses any other account (migration 0018), so public sign-ups can't
   let a stranger in.
 - **Gemini key in Settings → AI.** Checked with Google and kept on the
   server; `GEMINI_API_KEY` still works and wins. Without a key the AI

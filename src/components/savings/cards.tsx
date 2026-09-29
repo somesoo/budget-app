@@ -84,7 +84,7 @@ export function GoalCard({
   spent?: number
   onSave: () => void
 }) {
-  const { goal, saved, progress, funding, status, pace, remaining } = summary
+  const { goal, putAside, progress, funding, status, pace, remaining } = summary
   return (
     <li className="group relative rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 transition hover:bg-white/[0.06]">
       <div className="flex items-start gap-3">
@@ -105,7 +105,7 @@ export function GoalCard({
             />
           </Link>
           <p className="mt-0.5 text-sm tabular-nums text-slate-300">
-            <span className="font-semibold text-white">{formatMoneyWhole(saved)}</span>
+            <span className="font-semibold text-white">{formatMoneyWhole(putAside)}</span>
             {goal.target_amount > 0 &&
               ` ${t('goalCard.of', { amount: formatMoneyWhole(goal.target_amount) })}`}
             {goal.target_date && (
@@ -139,7 +139,7 @@ export function GoalCard({
             color={goal.color}
           />
         )}
-        <LeftToUse saved={saved} spent={spent} color={goal.color} />
+        <LeftToUse putAside={putAside} spent={spent} color={goal.color} />
       </div>
 
       <div className="mt-2.5 space-y-1">
@@ -158,27 +158,28 @@ export function GoalCard({
 
 /**
  * The second bar of a goal: what can still be spent from it. Shown once
- * something has been spent; spending never lowers what's saved.
+ * something has been spent; the money is gone from the account, but it still
+ * counts as put aside for the goal.
  */
 export function LeftToUse({
-  saved,
+  putAside,
   spent,
   color,
   size = 'sm',
 }: {
-  saved: number
+  putAside: number
   spent: number
   color: string
   size?: 'sm' | 'lg'
 }) {
   if (spent <= 0) return null
-  const { left, share } = goalUse(saved, spent)
+  const { left, share } = goalUse(putAside, spent)
   return (
     <GoalBar
       label={t('goalCard.leftToUse')}
       value={
         left >= 0
-          ? t('paycheck.paidOf', { paid: formatMoneyWhole(left), planned: formatMoneyWhole(saved) })
+          ? t('paycheck.paidOf', { paid: formatMoneyWhole(left), planned: formatMoneyWhole(putAside) })
           : t('goalCard.overspent', { amount: formatMoneyWhole(-left) })
       }
       share={share}

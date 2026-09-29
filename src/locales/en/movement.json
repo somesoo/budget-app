@@ -19,6 +19,10 @@
     "message": "Moved",
     "context": "Savings history: money moved between accounts."
   },
+  "spending": {
+    "message": "Spent",
+    "context": "Savings history: money spent from a goal, taken off the account it was on."
+  },
   "empty": {
     "message": "Nothing here yet.",
     "context": "Savings history: empty state."

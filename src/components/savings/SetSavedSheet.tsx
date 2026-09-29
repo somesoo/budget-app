@@ -85,7 +85,14 @@ export function SetSavedSheet({
 
         <Field
           label={t('setSaved.saved')}
-          help={t('setSaved.savedHelp', { amount: formatMoneyCompact(saved) })}
+          help={
+            summary.spent > 0
+              ? t('setSaved.savedHelpSpent', {
+                  amount: formatMoneyCompact(saved),
+                  spent: formatMoneyCompact(summary.spent),
+                })
+              : t('setSaved.savedHelp', { amount: formatMoneyCompact(saved) })
+          }
         >
           <MoneyInput value={amount} onChange={setAmount} label={t('setSaved.saved')} size="lg" />
         </Field>

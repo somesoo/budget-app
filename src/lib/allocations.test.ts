@@ -48,6 +48,7 @@ const move = (
   goal_id,
   transfer_id: kind === 'transfer' ? 't' : null,
   loan_id: null,
+  expense_id: null,
   created_at: '2026-01-01T00:00:00Z',
 })
 

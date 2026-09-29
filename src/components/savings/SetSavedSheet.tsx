@@ -84,7 +84,12 @@ export function SetSavedSheet({
           numbers stay as they are.
         </p>
 
-        <Field label="Saved for it" help={`The app has ${formatMoneyCompact(saved)} now.`}>
+        <Field
+          label="Saved for it"
+          help={`The app has ${formatMoneyCompact(saved)} on the accounts now${
+            summary.spent > 0 ? `, after ${formatMoneyCompact(summary.spent)} spent from it` : ''
+          }.`}
+        >
           <MoneyInput value={amount} onChange={setAmount} label="Saved for it" size="lg" />
         </Field>
 

@@ -76,7 +76,11 @@ through Supabase Realtime.
    one to four people with names of your own. An install that already has
    data keeps Bubs and Meow (rename them in Settings → People); a fresh one
    asks for the names on first launch. Until it's run, it stays Bubs and Meow.
-19. Check **Database → Replication** that `expenses`, `categories` and `goals`
+19. Paste and run `supabase/migrations/0016_goal_spending_leaves_account.sql`:
+   spending from a goal takes the money off the account it was on (the goal's
+   share first, then what's unassigned there). Until it's run, spending from a
+   goal only counts against the goal and account balances don't move.
+20. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
    `savings_loans` and `people`) are in the

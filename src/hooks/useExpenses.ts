@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/
 import { useCallback, useMemo } from 'react'
 import { monthlyOnly } from '../lib/projects'
 import { useCategories } from './useCategories'
+import { savingsKey } from './useSavings'
 import { supabase } from '../lib/supabaseClient'
 import { monthKeyOfDate, monthRange, type MonthKey } from '../lib/calculations'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
@@ -115,6 +116,8 @@ export function useAddExpense() {
     onSettled: () => {
       // every cached month and range window, not just the month written to
       void qc.invalidateQueries({ queryKey: ['expenses'] })
+      // spending from a goal moves money on the accounts (migration 0016)
+      void qc.invalidateQueries({ queryKey: savingsKey })
     },
   })
 }
@@ -149,6 +152,8 @@ export function useUpdateExpense() {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['expenses'] })
+      // spending from a goal moves money on the accounts (migration 0016)
+      void qc.invalidateQueries({ queryKey: savingsKey })
     },
   })
 }
@@ -171,6 +176,8 @@ export function useRestoreExpense() {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['expenses'] })
+      // spending from a goal moves money on the accounts (migration 0016)
+      void qc.invalidateQueries({ queryKey: savingsKey })
     },
   })
 }
@@ -231,6 +238,8 @@ export function useDeleteExpense() {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['expenses'] })
+      // spending from a goal moves money on the accounts (migration 0016)
+      void qc.invalidateQueries({ queryKey: savingsKey })
     },
   })
 }

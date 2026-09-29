@@ -69,7 +69,12 @@ export type GoalStatus =
 
 export interface GoalSummary {
   goal: Goal
+  /** On the accounts for it now. */
   saved: number
+  /** Spent from its share of the accounts (migration 0016): gone from them, but it was saved. */
+  spent: number
+  /** Everything put aside for it: what's there plus what was spent from it. Measures the target. */
+  putAside: number
   /** 0 for an open-ended goal. */
   remaining: number
   /** 0–1 of the target; null for an open-ended goal. */
@@ -125,26 +130,50 @@ export function goalSummaries(args: {
       .map((a) => ({ account: byId.get(a.account_id)!, amount: a.amount }))
       .sort((a, b) => b.amount - a.amount)
     const saved = roundMoney(funding.reduce((s, f) => s + f.amount, 0))
+    const spent = spentFromGoal(movements, goal.id)
+    const putAside = roundMoney(saved + spent)
     const target = goal.target_amount
-    const remaining = target > 0 ? roundMoney(Math.max(target - saved, 0)) : 0
+    const remaining = target > 0 ? roundMoney(Math.max(target - putAside, 0)) : 0
     const pace = goalPace(movements, goal.id, now)
     return {
       goal,
       saved,
+      spent,
+      putAside,
       remaining,
-      progress: target > 0 ? Math.min(saved / target, 1) : null,
+      progress: target > 0 ? Math.min(putAside / target, 1) : null,
       funding,
       pace,
-      status: goalStatus({ target, saved, remaining, pace, targetDate: goal.target_date, now }),
+      status: goalStatus({
+        target,
+        saved: putAside,
+        remaining,
+        pace,
+        targetDate: goal.target_date,
+        now,
+      }),
     }
   })
 }
 
 /**
- * What's left to spend from a goal. Spending from a goal doesn't take it off
- * what's saved (that stays the measure of reaching the target), so what can
- * still be used is saved minus spent. `left` goes negative when more has been
- * spent than put aside; `share` is 0–1 of what's saved.
+ * Spent from a goal's share of the accounts: the 'spending' movements the
+ * database books for its expenses (migration 0016). What an expense took from
+ * unassigned money, when the goal had too little, carries no goal.
+ */
+export function spentFromGoal(movements: SavingsMovement[], goalId: string): number {
+  return roundMoney(
+    movements
+      .filter((m) => m.kind === 'spending' && m.goal_id === goalId)
+      .reduce((s, m) => s - m.amount, 0),
+  )
+}
+
+/**
+ * What's left to spend from a goal, given everything put aside for it
+ * (GoalSummary.putAside, which spending doesn't lower: it stays the measure
+ * of reaching the target) and all that's been spent from it. `left` goes
+ * negative when more has been spent than put aside; `share` is 0–1 of it.
  */
 export function goalUse(saved: number, spent: number): { left: number; share: number } {
   const left = roundMoney(saved - spent)

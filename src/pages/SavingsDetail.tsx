@@ -280,7 +280,7 @@ export function SavingsGoalPage() {
       </Frame>
     )
 
-  const { goal, saved, progress, funding, status, pace, remaining } = summary
+  const { goal, putAside, progress, funding, status, pace, remaining } = summary
   const mine = s.movements.filter((m) => m.goal_id === id)
   const trip = trips.tripOf(id)
   const spending = trip ? trips.expensesOf(trip.project.id) : []
@@ -325,7 +325,7 @@ export function SavingsGoalPage() {
         <div className="space-y-6">
           <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
             <p className="text-sm text-muted">Saved</p>
-            <p className="text-3xl font-bold tabular-nums text-white">{formatMoneyWhole(saved)}</p>
+            <p className="text-3xl font-bold tabular-nums text-white">{formatMoneyWhole(putAside)}</p>
             {progress !== null && (
               <>
                 <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
@@ -342,7 +342,7 @@ export function SavingsGoalPage() {
             )}
             {trip && (
               <div className="mt-3">
-                <LeftToUse saved={saved} spent={trip.spent} color={goal.color} size="lg" />
+                <LeftToUse putAside={putAside} spent={trip.spent} color={goal.color} size="lg" />
               </div>
             )}
             <div className="mt-3">

@@ -45,6 +45,8 @@ const goal = (id: string, status: GoalSummary['status'], date: string | null, re
       is_emergency: false,
     } satisfies Goal,
     saved: 0,
+    spent: 0,
+    putAside: 0,
     remaining,
     progress: null,
     funding: [],
@@ -75,6 +77,7 @@ const deposit = (amount: number, date: string, loan_id: string | null = null): S
   goal_id: 'trip',
   transfer_id: null,
   loan_id,
+  expense_id: null,
   created_at: '2026-01-01T00:00:00Z',
 })
 

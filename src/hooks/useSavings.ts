@@ -58,6 +58,8 @@ function normalizeMovement(r: Record<string, unknown>): SavingsMovement {
     transfer_id: (r.transfer_id as string | null) ?? null,
     // absent until migration 0011 has been run
     loan_id: (r.loan_id as string | null) ?? null,
+    // absent until migration 0016 has been run
+    expense_id: (r.expense_id as string | null) ?? null,
     created_at: String(r.created_at),
   }
 }

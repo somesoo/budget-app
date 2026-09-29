@@ -71,7 +71,8 @@ export function GoalPicker({
   return (
     <BottomSheet title="Spent from a goal" onClose={onClose}>
       <p className="-mt-2 mb-3 text-sm text-muted">
-        Paid from savings: it counts toward the goal, not this month’s budget.
+        Paid from savings: it comes off the account the goal’s money is on, not this month’s
+        budget.
       </p>
       {goals.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted">

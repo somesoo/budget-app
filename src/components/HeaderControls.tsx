@@ -1,7 +1,7 @@
 import { ArrowsLeftRight, CalendarBlank } from '@phosphor-icons/react'
-import { PERSON_LABELS } from '../config'
 import { formatDayShort, todayKey, yesterdayKey } from '../lib/calculations'
-import { PERSONS, type Person } from '../types'
+import { type Person } from '../types'
+import { personIds, personLabel } from '../lib/people'
 
 const pillBase =
   'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-semibold ring-1'
@@ -10,8 +10,8 @@ const pill = `${pillBase} bg-white/5 text-white ring-white/10 active:bg-white/10
 const pillActive = `${pillBase} bg-slate-50 text-ink ring-white`
 
 /**
- * Who paid, as a single pill: with two people one tap flips it, so it fits in
- * a header where a two-segment switcher wouldn't.
+ * Who paid, as a single pill: each tap moves to the next person, so it fits
+ * in a header where a switcher with everyone wouldn't.
  */
 export function PersonToggle({
   value,
@@ -20,18 +20,21 @@ export function PersonToggle({
   value: Person
   onChange: (person: Person) => void
 }) {
-  const next = PERSONS[(PERSONS.indexOf(value) + 1) % PERSONS.length]
+  const people = personIds()
+  // nobody to switch to
+  if (people.length < 2) return null
+  const next = people[(people.indexOf(value) + 1) % people.length]
   return (
     <button
       type="button"
       onClick={() => onChange(next)}
-      aria-label={`Paid by ${PERSON_LABELS[value]}. Tap for ${PERSON_LABELS[next]}`}
+      aria-label={`Paid by ${personLabel(value)}. Tap for ${personLabel(next)}`}
       className={pill}
     >
       <span aria-hidden className="text-muted">
         <ArrowsLeftRight />
       </span>
-      {PERSON_LABELS[value]}
+      {personLabel(value)}
     </button>
   )
 }

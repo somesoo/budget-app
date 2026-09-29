@@ -6,6 +6,9 @@ import { CURRENCY_SUFFIX } from '../../config'
 import { roundMoney, todayKey, withAlpha } from '../../lib/calculations'
 import { formatLogged, type Entry } from '../../lib/history'
 import type { Category, NewExpense, NewIncome, Person } from '../../types'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
+import { isOthersAllowance } from '../../lib/allowance'
+import { personIds } from '../../lib/people'
 
 interface Props {
   entry: Entry
@@ -35,6 +38,7 @@ export function EntryEditor({
     (c) => c.kind === 'project' && (!c.archived || c.id === initialCategory),
   )
   const [person, setPerson] = useState<Person>(entry.item.person)
+  const { person: me } = useDeviceUser()
   const [date, setDate] = useState(entry.date)
   const initialOneOff = entry.kind === 'income' && entry.item.one_off
   const [oneOff, setOneOff] = useState(initialOneOff)
@@ -104,7 +108,9 @@ export function EntryEditor({
           <Field label="Category">
             <Chips
               list={categories.filter(
-                (c) => c.kind !== 'project' && (!c.archived || c.id === initialCategory),
+                (c) =>
+                  c.id === initialCategory ||
+                  (c.kind !== 'project' && !c.archived && !isOthersAllowance(c, me)),
               )}
               value={categoryId}
               onChange={setCategoryId}
@@ -124,10 +130,15 @@ export function EntryEditor({
           </Field>
         )}
 
-        <div className="flex items-end gap-3">
-          <Field label={isExpense ? 'Paid by' : 'Received by'}>
-            <UserSwitcher value={person} onChange={setPerson} />
-          </Field>
+        {/* with three or four people the names need a row of their own */}
+        <div
+          className={`flex gap-3 ${personIds().length > 2 ? 'flex-col' : 'items-end'}`}
+        >
+          {personIds().length > 1 && (
+            <Field label={isExpense ? 'Paid by' : 'Received by'}>
+              <UserSwitcher value={person} onChange={setPerson} />
+            </Field>
+          )}
           <Field label="Date" grow>
             <input
               type="date"

@@ -17,7 +17,7 @@ import {
  * the retry logic are in _gemini.ts.
  */
 
-const SYSTEM_PROMPT = `You are a practical budgeting assistant for a couple in Poland who share one household budget. Amounts are Polish złoty (PLN).
+const SYSTEM_PROMPT = `You are a practical budgeting assistant for a household in Poland (one to four people, named in the data) who share one budget. Amounts are Polish złoty (PLN).
 
 You receive a JSON summary of one month: expected income, spending so far and projected to month end, each category's monthly limit, spending so far and typical month, a per-person split, the app's own warnings, the month's biggest single expenses (with notes), their savings accounts and goals (saved, target, date, what's needed per month, whether on track), and trips or projects, which are paid from savings and sit outside the monthly budget. The app computed every number, so treat them as correct. Do not recompute totals and do not invent figures that can't be derived from the data.
 

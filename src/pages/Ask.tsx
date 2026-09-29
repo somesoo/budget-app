@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import { useSearchParams } from 'react-router-dom'
 import { BottomSheet } from '../components/history/BottomSheet'
 import { SettingsLink } from '../components/SettingsLink'
-import { PERSON_LABELS } from '../config'
 import {
   ChatUnavailableError,
   useAsk,
@@ -15,6 +14,7 @@ import {
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { plainDashes } from '../lib/calculations'
 import type { ChatThread } from '../types'
+import { personIds, personLabel } from '../lib/people'
 
 const STARTERS = [
   'Are we on track with our savings goals?',
@@ -61,7 +61,7 @@ export function Ask() {
     setPendingQuestion(q)
     setDraft('')
     ask.mutate(
-      { threadId, question: q, person: person ?? 'bubs', context: context.build() },
+      { threadId, question: q, person: person ?? personIds()[0], context: context.build() },
       {
         onSuccess: (id) => {
           if (id !== threadId) setParams({ t: id }, { replace: true })
@@ -161,7 +161,7 @@ export function Ask() {
                     {m.content}
                     {m.person && (
                       <span className="mt-0.5 block text-right text-xs text-muted">
-                        {PERSON_LABELS[m.person]}
+                        {personLabel(m.person)}
                       </span>
                     )}
                   </div>

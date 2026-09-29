@@ -22,7 +22,7 @@ export interface SavingsData {
 
 const PAGE_SIZE = 1000
 
-function isMissingTable(error: { code?: string; message?: string }): boolean {
+export function isMissingTable(error: { code?: string; message?: string }): boolean {
   return (
     error.code === '42P01' ||
     error.code === 'PGRST205' ||

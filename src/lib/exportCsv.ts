@@ -1,7 +1,7 @@
-import { PERSON_LABELS } from '../config'
 import type { Category, Expense, Income } from '../types'
 import { supabase } from './supabaseClient'
 import { todayKey } from './calculations'
+import { personLabel } from './people'
 
 /*
  * Everything logged, as one CSV a spreadsheet opens: a backup, and a way to
@@ -28,7 +28,7 @@ export function toCsv(expenses: Expense[], incomes: Income[], categories: Catego
         e.amount.toFixed(2),
         name.get(e.category_id) ?? '',
         e.note ?? '',
-        PERSON_LABELS[e.person],
+        personLabel(e.person),
       ],
     })),
     ...incomes.map((i) => ({
@@ -40,7 +40,7 @@ export function toCsv(expenses: Expense[], incomes: Income[], categories: Catego
         i.amount.toFixed(2),
         '',
         i.note ?? '',
-        PERSON_LABELS[i.person],
+        personLabel(i.person),
       ],
     })),
   ].sort((a, b) => b.date.localeCompare(a.date) || b.created.localeCompare(a.created))

@@ -9,6 +9,7 @@ import { DatePicker } from '../DatePicker'
 import { BottomSheet } from '../history/BottomSheet'
 import { UserSwitcher } from '../UserSwitcher'
 import { Field, Segments, Select, SubmitRow, inputClass } from './fields'
+import { personIds } from '../../lib/people'
 
 export type MoneyMode = 'deposit' | 'withdraw' | 'interest' | 'balance' | 'allocate' | 'transfer'
 
@@ -54,7 +55,7 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
   const [amount, setAmount] = useState(0)
   const [direction, setDirection] = useState<'assign' | 'release'>('assign')
   const [date, setDate] = useState(todayKey())
-  const [person, setPerson] = useState<Person>(devicePerson ?? 'bubs')
+  const [person, setPerson] = useState<Person>(devicePerson ?? personIds()[0])
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
 

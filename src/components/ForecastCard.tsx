@@ -1,9 +1,9 @@
 import { ChartCard, LegendItem } from './charts/ChartCard'
 import { CHART } from './charts/theme'
-import { PERSON_LABELS } from '../config'
 import { formatAmount, formatMoney, formatMoneyWhole } from '../lib/calculations'
 import type { MonthForecast } from '../lib/forecast'
 import type { Goal } from '../types'
+import { personLabel } from '../lib/people'
 
 const INCOME = '#34d399' // the app's income color: money that stays
 
@@ -43,8 +43,8 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
     .filter((p) => p.expected > 0)
     .map((p) =>
       p.basis === 'typical'
-        ? `${PERSON_LABELS[p.person]} ~${formatAmount(Math.round(p.expected))} expected`
-        : `${PERSON_LABELS[p.person]} ${formatAmount(p.expected)}`,
+        ? `${personLabel(p.person)} ~${formatAmount(Math.round(p.expected))} expected`
+        : `${personLabel(p.person)} ${formatAmount(p.expected)}`,
     )
     .join(' · ')
 

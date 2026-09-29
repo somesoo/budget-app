@@ -17,9 +17,9 @@ import {
  * planner shows the draft next to their own numbers and they pick what to keep.
  */
 
-const SYSTEM_PROMPT = `You help a couple in Poland plan their shared household budget for one month. Amounts are Polish złoty (PLN).
+const SYSTEM_PROMPT = `You help a household in Poland (one to four people) plan their shared budget for one month. Amounts are Polish złoty (PLN).
 
-You receive JSON: the month being planned; up to 12 previous complete months of spending per category (history, oldest first, aligned with historyMonths), each category's typical month (average of the last 3), the same month a year earlier if known, its default limit and the amount currently planned; income history and typical income (pay only: one-off money such as a returned deposit is left out) and the planned income; the planned savings; a savings goal; and a note the couple wrote about what's unusual this month.
+You receive JSON: the month being planned; up to 12 previous complete months of spending per category (history, oldest first, aligned with historyMonths), each category's typical month (average of the last 3), the same month a year earlier if known, its default limit and the amount currently planned; income history and typical income (pay only: one-off money such as a returned deposit is left out) and the planned income; the planned savings; a savings goal; and a note they wrote about what's unusual this month.
 
 The app computed every number, so treat them as correct and don't recompute them.
 

@@ -1,5 +1,5 @@
-import { PERSON_LABELS } from '../config'
-import { PERSONS, type Person } from '../types'
+import { type Person } from '../types'
+import { personIds, personLabel } from '../lib/people'
 
 interface Props {
   onPick: (person: Person) => void
@@ -19,14 +19,14 @@ export function PersonOnboarding({ onPick }: Props) {
         </p>
       </div>
       <div className="grid gap-3">
-        {PERSONS.map((person) => (
+        {personIds().map((person) => (
           <button
             key={person}
             type="button"
             onClick={() => onPick(person)}
             className="h-20 rounded-3xl bg-slate-50 text-2xl font-bold text-ink transition active:scale-[0.98]"
           >
-            {PERSON_LABELS[person]}
+            {personLabel(person)}
           </button>
         ))}
       </div>

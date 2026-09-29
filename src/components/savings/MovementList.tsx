@@ -1,9 +1,9 @@
 import { Trash } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { PERSON_LABELS } from '../../config'
 import { useSavingsActions } from '../../hooks/useSavings'
 import { formatDayShort, formatMoney, formatMonth, monthKeyOfDate } from '../../lib/calculations'
 import type { Goal, SavingsAccount, SavingsMovement } from '../../types'
+import { personLabel } from '../../lib/people'
 
 /** Months listed before "Show all". */
 const MONTHS_SHOWN = 3
@@ -62,7 +62,7 @@ export function MovementList({
               const detail = [
                 showAccount ? accountName(m.account_id) : null,
                 goal ? `for ${goal}` : null,
-                m.person ? PERSON_LABELS[m.person] : null,
+                m.person ? personLabel(m.person) : null,
                 formatDayShort(m.movement_date),
               ]
                 .filter(Boolean)

@@ -32,7 +32,7 @@ export function useCategories() {
         ends_on: c.ends_on ?? null,
         goal_id: c.goal_id ?? null,
         // absent until migration 0013: shared
-        owner: c.owner === 'bubs' || c.owner === 'meow' ? c.owner : null,
+        owner: typeof c.owner === 'string' && c.owner ? c.owner : null,
       }))
     },
     staleTime: 60_000,

@@ -1,4 +1,3 @@
-import { PERSON_LABELS } from '../config'
 import type { Category, Expense, Person } from '../types'
 import { isOthersAllowance } from './allowance'
 import {
@@ -9,6 +8,7 @@ import {
   type MonthKey,
 } from './calculations'
 import { elapsedDays, projectMonthEnd } from './insights'
+import { personLabel } from './people'
 
 /* When spending stops keeping to the budget: the thresholds and the arithmetic
    behind every warning the app shows. */
@@ -229,7 +229,7 @@ function privateOver(args: {
   daysLeft: number
 }): BudgetAlert {
   const { month, category, spent, limit, daysLeft } = args
-  const who = category.owner ? PERSON_LABELS[category.owner] : 'Someone'
+  const who = category.owner ? personLabel(category.owner) : 'Someone'
   return {
     id: `${month}:${category.id}:over`,
     kind: 'over',

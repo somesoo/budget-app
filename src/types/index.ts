@@ -1,7 +1,5 @@
-/** Stored verbatim in the database — see PERSON_LABELS in config.ts for display names. */
-export type Person = 'bubs' | 'meow'
-
-export const PERSONS: Person[] = ['bubs', 'meow']
+/** A person's id, stored verbatim in the database; `lib/people` has their names. */
+export type Person = string
 
 export interface Category {
   id: string

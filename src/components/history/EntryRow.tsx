@@ -1,8 +1,8 @@
-import { PERSON_LABELS } from '../../config'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { formatDayShort, formatMoney, withAlpha } from '../../lib/calculations'
 import type { Entry } from '../../lib/history'
 import type { Category } from '../../types'
+import { personLabel } from '../../lib/people'
 
 const INCOME_COLOR = '#34d399'
 const UNKNOWN_COLOR = '#64748b'
@@ -41,7 +41,7 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
   const title = note ?? where
   const detail = [
     note ? where : null,
-    PERSON_LABELS[entry.item.person],
+    personLabel(entry.item.person),
     privateNote && entry.item.note ? 'note kept private' : null,
     showDate ? formatDayShort(entry.date) : null,
   ]

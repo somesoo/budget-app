@@ -264,7 +264,7 @@ export function Segments<T extends string>({
           type="button"
           onClick={() => onChange(o.value)}
           aria-pressed={value === o.value}
-          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+          className={`min-w-0 truncate rounded-full px-3 py-1.5 text-sm font-semibold transition ${
             value === o.value ? 'bg-slate-50 text-ink' : 'text-muted hover:text-white'
           }`}
         >

@@ -1,11 +1,10 @@
 import { useState, type KeyboardEvent, type PointerEvent } from 'react'
-import { PERSON_LABELS } from '../../config'
 import { useElementWidth } from '../../hooks/useElementWidth'
 import { formatMoney } from '../../lib/calculations'
 import { compactAmount, niceScale, type PersonMonth } from '../../lib/insights'
-import { PERSONS } from '../../types'
 import { ChartTooltip, TooltipRow } from './ChartCard'
 import { AXIS_FONT, CHART } from './theme'
+import { personColor, personIds, personLabel } from '../../lib/people'
 
 interface Props {
   rows: PersonMonth[]
@@ -26,7 +25,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
   const { ref, width } = useElementWidth<HTMLDivElement>()
   const [active, setActive] = useState<number | null>(null)
 
-  const peak = Math.max(...rows.flatMap((r) => PERSONS.map((p) => r[p])))
+  const peak = Math.max(...rows.flatMap((r) => personIds().map((p) => (r.by[p] ?? 0))))
   const { max, step } = niceScale(peak)
   const plotW = Math.max(width - LEFT - RIGHT, 10)
   const height = TOP + PLOT_H + AXIS_BAND
@@ -38,7 +37,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
   for (let v = 0; v <= max + 0.001; v += step) ticks.push(v)
 
   const lastIndex = rows.length - 1
-  const endY = PERSONS.map((p) => y(rows[lastIndex][p]))
+  const endY = personIds().map((p) => y((rows[lastIndex].by[p] ?? 0)))
   // end labels only when they don't collide — otherwise the legend carries identity
   const endLabelsFit = Math.abs(endY[0] - endY[1]) >= MIN_LABEL_GAP
 
@@ -121,11 +120,11 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
             />
           )}
 
-          {PERSONS.map((person, p) => {
+          {personIds().map((person, p) => {
             const solidUntil = partialLast ? lastIndex - 1 : lastIndex
             const d = rows
               .slice(0, solidUntil + 1)
-              .map((r, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(r[person]).toFixed(1)}`)
+              .map((r, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y((r.by[person] ?? 0)).toFixed(1)}`)
               .join(' ')
             const dotIndex = active ?? lastIndex
             return (
@@ -133,7 +132,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
                 <path
                   d={d}
                   fill="none"
-                  stroke={CHART.person[person]}
+                  stroke={personColor(person)}
                   strokeWidth={2}
                   strokeLinejoin="round"
                   strokeLinecap="round"
@@ -141,10 +140,10 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
                 {partialLast && lastIndex > 0 && (
                   <line
                     x1={x(lastIndex - 1)}
-                    y1={y(rows[lastIndex - 1][person])}
+                    y1={y((rows[lastIndex - 1].by[person] ?? 0))}
                     x2={x(lastIndex)}
-                    y2={y(rows[lastIndex][person])}
-                    stroke={CHART.person[person]}
+                    y2={y((rows[lastIndex].by[person] ?? 0))}
+                    stroke={personColor(person)}
                     strokeWidth={2}
                     strokeDasharray="4 4"
                     strokeLinecap="round"
@@ -152,9 +151,9 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
                 )}
                 <circle
                   cx={x(dotIndex)}
-                  cy={y(rows[dotIndex][person])}
+                  cy={y((rows[dotIndex].by[person] ?? 0))}
                   r={4.5}
-                  fill={CHART.person[person]}
+                  fill={personColor(person)}
                   stroke={CHART.surface}
                   strokeWidth={2}
                 />
@@ -167,7 +166,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
                     fontWeight={600}
                     fill={CHART.textSecondary}
                   >
-                    {PERSON_LABELS[person]}
+                    {personLabel(person)}
                   </text>
                 )}
               </g>
@@ -179,19 +178,19 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
       {active !== null && (
         <ChartTooltip
           x={x(active)}
-          y={Math.min(...PERSONS.map((p) => y(rows[active][p])))}
+          y={Math.min(...personIds().map((p) => y((rows[active].by[p] ?? 0))))}
           width={width}
         >
           <p className="mb-1 text-slate-400">
             {monthLabel(rows[active].month)}
             {partialLast && active === lastIndex ? ' · so far' : ''}
           </p>
-          {PERSONS.map((p) => (
+          {personIds().map((p) => (
             <TooltipRow
               key={p}
-              color={CHART.person[p]}
-              label={PERSON_LABELS[p]}
-              value={formatMoney(rows[active][p])}
+              color={personColor(p)}
+              label={personLabel(p)}
+              value={formatMoney((rows[active].by[p] ?? 0))}
             />
           ))}
         </ChartTooltip>

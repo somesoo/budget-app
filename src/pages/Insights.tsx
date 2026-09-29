@@ -18,7 +18,6 @@ import { CHART } from '../components/charts/theme'
 import {
   CURRENCY_SUFFIX,
   INSIGHTS_MONTHS,
-  PERSON_LABELS,
   WEEKDAY_EXCLUDE_FROM,
   WEEKDAY_LABELS,
   WEEKDAY_NAMES,
@@ -55,7 +54,8 @@ import {
   weekdayAverages,
   windowRange,
 } from '../lib/insights'
-import { PERSONS, type Expense, type Goal, type Income } from '../types'
+import { type Expense, type Goal, type Income, type Person } from '../types'
+import { personColor, personIds, personLabel } from '../lib/people'
 
 export function Insights() {
   const [month, setMonth] = useState<MonthKey>(currentMonthKey())
@@ -250,12 +250,14 @@ function InsightsBody({
             dayCutoff={isCurrent ? elapsed : undefined}
           />
 
-          <PeopleCard
-            month={month}
-            expenses={expenses}
-            activeMonths={activeMonths}
-            partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
-          />
+          {personIds().length > 1 && (
+            <PeopleCard
+              month={month}
+              expenses={expenses}
+              activeMonths={activeMonths}
+              partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
+            />
+          )}
 
           <WeekdayCard expenses={expenses} months={months} />
         </div>
@@ -571,14 +573,14 @@ function PeopleCard({
 }) {
   const rows = personByMonth(expenses, activeMonths)
   const current = rows.find((r) => r.month === month) ?? rows[rows.length - 1]
-  const total = PERSONS.reduce((a, p) => a + current[p], 0)
-  const share = (p: (typeof PERSONS)[number]) =>
-    total > 0 ? Math.round((current[p] / total) * 100) : 0
+  const total = personIds().reduce((a, p) => a + (current.by[p] ?? 0), 0)
+  const share = (p: Person) =>
+    total > 0 ? Math.round(((current.by[p] ?? 0) / total) * 100) : 0
 
   const legend = (
     <div className="flex flex-wrap gap-x-4 gap-y-1">
-      {PERSONS.map((p) => (
-        <LegendItem key={p} color={CHART.person[p]} label={PERSON_LABELS[p]} shape="line" />
+      {personIds().map((p) => (
+        <LegendItem key={p} color={personColor(p)} label={personLabel(p)} shape="line" />
       ))}
       {partialLast && rows.length > 1 && (
         <LegendItem color={CHART.textMuted} label="Month in progress" shape="dashed" />
@@ -590,18 +592,18 @@ function PeopleCard({
     total > 0 ? (
       <>
         {formatMonthName(month)}:{' '}
-        {PERSONS.map((p, i) => (
+        {personIds().map((p, i) => (
           <span key={p}>
             {i > 0 && ' · '}
-            {PERSON_LABELS[p]} <strong>{share(p)}%</strong>
+            {personLabel(p)} <strong>{share(p)}%</strong>
           </span>
         ))}
       </>
     ) : undefined
 
   const table = {
-    head: ['Month', ...PERSONS.map((p) => PERSON_LABELS[p])],
-    rows: rows.map((r) => [formatMonthName(r.month), ...PERSONS.map((p) => formatAmount(r[p]))]),
+    head: ['Month', ...personIds().map((p) => personLabel(p))],
+    rows: rows.map((r) => [formatMonthName(r.month), ...personIds().map((p) => formatAmount((r.by[p] ?? 0)))]),
   }
 
   if (rows.length < 2) {
@@ -609,11 +611,11 @@ function PeopleCard({
     return (
       <ChartCard title="Who spent what" headline={headline} legend={legend} table={table}>
         <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full">
-          {PERSONS.map((p) => (
+          {personIds().map((p) => (
             <span
               key={p}
               className="h-full first:rounded-l-full last:rounded-r-full"
-              style={{ width: `${share(p)}%`, backgroundColor: CHART.person[p] }}
+              style={{ width: `${share(p)}%`, backgroundColor: personColor(p) }}
             />
           ))}
         </div>

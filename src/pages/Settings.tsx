@@ -5,6 +5,7 @@ import {
   DownloadSimple,
   Plus,
   SignOut,
+  Trash,
   WifiHigh,
   WifiSlash,
 } from '@phosphor-icons/react'
@@ -20,6 +21,7 @@ import { UserSwitcher } from '../components/UserSwitcher'
 import { resetDismissedAlerts, useDismissedCount } from '../hooks/useBudgetAlerts'
 import { useCategories } from '../hooks/useCategories'
 import { useDeviceUser } from '../hooks/useDeviceUser'
+import { usePeople, usePeopleActions } from '../hooks/usePeople'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
 import { useGoal, useUpsertGoal } from '../hooks/useGoal'
 import { DEFAULT_PREFS, setPrefs, usePrefs } from '../hooks/usePrefs'
@@ -38,6 +40,7 @@ import { downloadCsv } from '../lib/exportCsv'
 import { monthsEndingAt, windowRange } from '../lib/insights'
 import { supabase } from '../lib/supabaseClient'
 import { tourStore } from '../lib/tour'
+import { MAX_PEOPLE, personIds } from '../lib/people'
 import type { Category } from '../types'
 
 /** Months averaged for the "typical" figure next to each limit. */
@@ -68,6 +71,7 @@ export function Settings() {
     <Screen title="Settings" wide>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-4">
+          <PeopleCard />
           <DeviceCard />
           <CategoriesCard
             categories={monthly}
@@ -110,6 +114,128 @@ export function Settings() {
   )
 }
 
+/* ---------- who's in the budget ---------- */
+
+function PeopleCard() {
+  const { people, available } = usePeople()
+  const { add, rename, remove } = usePeopleActions()
+  const [newName, setNewName] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const taken = (name: string, except?: string) =>
+    people.some((p) => p.id !== except && p.name.toLowerCase() === name.trim().toLowerCase())
+
+  const run = async (action: () => Promise<unknown>) => {
+    setError(null)
+    try {
+      await action()
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
+  if (!available) {
+    return (
+      <SettingsCard title="People" help="Who’s in the budget.">
+        <p className="text-sm leading-relaxed text-slate-300">
+          Run <code className="rounded bg-white/10 px-1">supabase/migrations/0015_people.sql</code>{' '}
+          in the SQL Editor to rename {people.map((p) => p.name).join(' and ')}, or to budget for
+          one to four people.
+        </p>
+      </SettingsCard>
+    )
+  }
+
+  return (
+    <SettingsCard
+      title="People"
+      help="Who’s in the budget: one to four. A new name shows on every phone."
+    >
+      <ul className="grid gap-2">
+        {people.map((p) => (
+          <li key={p.id} className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className="h-3 w-3 shrink-0 rounded-full"
+              style={{ backgroundColor: p.color }}
+            />
+            <input
+              defaultValue={p.name}
+              key={p.name}
+              maxLength={30}
+              aria-label={`Name of ${p.name}`}
+              onBlur={(e) => {
+                const name = e.target.value.trim()
+                if (!name || name === p.name) {
+                  e.target.value = p.name
+                  return
+                }
+                if (taken(name, p.id)) {
+                  e.target.value = p.name
+                  setError(`${name} is already in the budget.`)
+                  return
+                }
+                void run(() => rename.mutateAsync({ id: p.id, name }))
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.currentTarget.blur()
+              }}
+              className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2 text-white outline-none ring-1 ring-white/10 focus:ring-white/40"
+            />
+            {people.length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Remove ${p.name} from the budget?`))
+                    void run(() => remove.mutateAsync(p.id))
+                }}
+                aria-label={`Remove ${p.name}`}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted hover:bg-white/5 hover:text-red-300"
+              >
+                <Trash aria-hidden />
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {people.length < MAX_PEOPLE && (
+        <form
+          className="mt-2 flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            const name = newName.trim()
+            if (!name) return
+            if (taken(name)) return setError(`${name} is already in the budget.`)
+            void run(async () => {
+              await add.mutateAsync({ name, people })
+              setNewName('')
+            })
+          }}
+        >
+          <span aria-hidden className="h-3 w-3 shrink-0" />
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            maxLength={30}
+            placeholder="Add a person"
+            aria-label="New person’s name"
+            className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
+          />
+          <button
+            type="submit"
+            disabled={!newName.trim() || add.isPending}
+            aria-label="Add"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-accent-soft ring-1 ring-accent/30 hover:bg-accent/10 disabled:opacity-40"
+          >
+            <Plus weight="bold" aria-hidden />
+          </button>
+        </form>
+      )}
+      {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+    </SettingsCard>
+  )
+}
+
 /* ---------- this device ---------- */
 
 function DeviceCard() {
@@ -117,7 +243,14 @@ function DeviceCard() {
   const status = useRealtimeStatus()
   const live = status === 'live'
   return (
-    <SettingsCard title="This device" help="Who uses it. Kept on the phone, not in the database.">
+    <SettingsCard
+      title="This device"
+      help={
+        personIds().length > 1
+          ? 'Who uses it. Kept on the phone, not in the database.'
+          : 'Kept in sync with the other devices signed in.'
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         {person && <UserSwitcher value={person} onChange={setPerson} />}
         <span

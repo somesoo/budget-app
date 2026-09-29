@@ -7,7 +7,6 @@ import { EntryRow } from '../components/history/EntryRow'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { Segments } from '../components/savings/fields'
-import { PERSON_LABELS } from '../config'
 import { useCategories } from '../hooks/useCategories'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useEntryActions } from '../hooks/useEntryActions'
@@ -35,7 +34,8 @@ import {
   type Entry,
 } from '../lib/history'
 import { ownCategories, ownExpenses } from '../lib/allowance'
-import { PERSONS, type Category, type Person } from '../types'
+import { type Category, type Person } from '../types'
+import { personIds, personLabel } from '../lib/people'
 
 type Kind = 'all' | 'expense' | 'income'
 type Sort = 'date' | 'amount'
@@ -226,7 +226,7 @@ export function History() {
               )}
               {filters.person && (
                 <Applied onRemove={() => patch({ person: null })}>
-                  {PERSON_LABELS[filters.person]}
+                  {personLabel(filters.person)}
                 </Applied>
               )}
               {filters.categoryId && (
@@ -453,16 +453,18 @@ function FilterControls({
           ]}
         />
       </Group>
-      <Group label="Who">
-        <Segments
-          value={filters.person ?? 'both'}
-          onChange={(v) => onChange({ person: v === 'both' ? null : (v as Person) })}
-          options={[
-            { value: 'both', label: 'Both' },
-            ...PERSONS.map((p) => ({ value: p, label: PERSON_LABELS[p] })),
-          ]}
-        />
-      </Group>
+      {personIds().length > 1 && (
+        <Group label="Who">
+          <Segments
+            value={filters.person ?? 'all'}
+            onChange={(v) => onChange({ person: v === 'all' ? null : (v as Person) })}
+            options={[
+              { value: 'all', label: personIds().length === 2 ? 'Both' : 'All' },
+              ...personIds().map((p) => ({ value: p, label: personLabel(p) })),
+            ]}
+          />
+        </Group>
+      )}
       <Group label="Order">
         <Segments
           value={filters.sort}

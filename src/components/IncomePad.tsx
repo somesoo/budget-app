@@ -14,6 +14,7 @@ import {
   shiftMonth,
   todayKey,
 } from '../lib/calculations'
+import { personIds } from '../lib/people'
 
 /** From this day of the month on, pay usually covers the month after. */
 const PAYS_NEXT_FROM_DAY = 25
@@ -110,10 +111,12 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         </div>
         {oneOff && <p className="-mt-3 text-xs leading-snug text-muted">{ONE_OFF_HELP}</p>}
 
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-muted">Received by</span>
-          <UserSwitcher value={person} onChange={onPersonChange} />
-        </div>
+        {personIds().length > 1 && (
+          <div className="flex items-center justify-between gap-3">
+            <span className="shrink-0 text-sm text-muted">Received by</span>
+            <UserSwitcher value={person} onChange={onPersonChange} />
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-muted">Date</span>

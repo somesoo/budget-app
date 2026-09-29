@@ -1,7 +1,6 @@
 import { CaretRight } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { PERSON_LABELS } from '../../config'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import { useIncomesBetween } from '../../hooks/useIncomes'
@@ -32,16 +31,16 @@ import {
   projectMonthEnd,
   windowRange,
 } from '../../lib/insights'
-import { PERSONS, type Category, type Expense } from '../../types'
+import { type Category, type Expense, type Person } from '../../types'
 import { AlertList } from '../alerts/AlertList'
 import { TooltipRow } from '../charts/ChartCard'
 import { CategoryDeltaBars } from '../charts/CategoryDeltaBars'
 import { ColumnChart } from '../charts/ColumnChart'
 import { PaceChart } from '../charts/PaceChart'
 import { SpendDonut } from '../charts/SpendDonut'
-import { CHART } from '../charts/theme'
 import { ForecastCard } from '../ForecastCard'
 import type { Widget } from './WidgetCarousel'
+import { personColor, personIds, personLabel } from '../../lib/people'
 
 /** Every widget the Add screen can show, in order; each can be switched off in Settings. */
 export const ADD_WIDGETS = [
@@ -50,7 +49,7 @@ export const ADD_WIDGETS = [
   { id: 'alerts', label: 'Warnings', help: 'Categories close to or over their limit.' },
   { id: 'delta', label: 'Vs last month', help: 'Categories up or down on the same days last month.' },
   { id: 'forecast', label: 'Forecast', help: 'What’s left of the income at the end of the month.' },
-  { id: 'people', label: 'Who paid', help: 'This month split between the two of you.' },
+  { id: 'people', label: 'Who paid', help: 'This month split between everyone in the budget.' },
   { id: 'goals', label: 'Goals', help: 'How far each savings goal is.' },
   { id: 'week', label: 'Last 7 days', help: 'Spending day by day.' },
 ] as const
@@ -148,7 +147,11 @@ export function useAddWidgets({
     week: () => <WeekWidget expenses={twoMonths} dailyLimit={monthLimit / daysInMonth(month)} />,
   }
 
-  return ADD_WIDGETS.filter((w) => !prefs.hiddenWidgets.includes(w.id)).map((w) => ({
+  // who spent what means nothing with one person in the budget
+  const solo = personIds().length < 2
+  return ADD_WIDGETS.filter(
+    (w) => !prefs.hiddenWidgets.includes(w.id) && !(solo && w.id === 'people'),
+  ).map((w) => ({
     id: w.id,
     label: w.label,
     badge: w.id === 'alerts' ? alerts.length : undefined,
@@ -214,29 +217,29 @@ function DeltaWidget({
 
 function PeopleWidget({ expenses }: { expenses: Expense[] }) {
   const by = Object.fromEntries(
-    PERSONS.map((p) => [p, roundMoney(sumExpenses(expenses.filter((e) => e.person === p)))]),
-  ) as Record<(typeof PERSONS)[number], number>
-  const total = PERSONS.reduce((a, p) => a + by[p], 0)
+    personIds().map((p) => [p, roundMoney(sumExpenses(expenses.filter((e) => e.person === p)))]),
+  ) as Record<Person, number>
+  const total = personIds().reduce((a, p) => a + by[p], 0)
   if (total <= 0) return <Empty>Nothing spent yet this month.</Empty>
   return (
     <div className="space-y-3 pt-1">
       <div className="flex h-3 overflow-hidden rounded-full" aria-hidden>
-        {PERSONS.map((p) => (
+        {personIds().map((p) => (
           <div
             key={p}
-            style={{ width: `${(by[p] / total) * 100}%`, backgroundColor: CHART.person[p] }}
+            style={{ width: `${(by[p] / total) * 100}%`, backgroundColor: personColor(p) }}
           />
         ))}
       </div>
       <ul className="grid gap-2">
-        {PERSONS.map((p) => (
+        {personIds().map((p) => (
           <li key={p} className="flex items-center gap-2 text-sm">
             <span
               aria-hidden
               className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: CHART.person[p] }}
+              style={{ backgroundColor: personColor(p) }}
             />
-            <span className="min-w-0 flex-1 truncate text-slate-200">{PERSON_LABELS[p]}</span>
+            <span className="min-w-0 flex-1 truncate text-slate-200">{personLabel(p)}</span>
             <span className="tabular-nums text-muted">{Math.round((by[p] / total) * 100)}%</span>
             <span className="w-24 text-right font-semibold tabular-nums text-white">
               {formatMoneyWhole(by[p])}

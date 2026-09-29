@@ -26,7 +26,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: 'welcome',
     route: '/',
     title: 'Welcome',
-    body: 'A budget for two: what you spend, what you plan, and what you save, shared between both phones in real time. This tour shows every screen in about two minutes.',
+    body: 'A budget for you, or for up to four people: what you spend, what you plan, and what you save, shared between your phones in real time. This tour shows every screen in about two minutes.',
     tip: 'Skip it any time. It’s in Settings → Help whenever you want it again.',
   },
 
@@ -76,7 +76,7 @@ export const TOUR_STEPS: TourStep[] = [
     route: '/history',
     target: tour('nav-history'),
     title: 'History',
-    body: 'Everything either of you logged, day by day, with the month’s totals.',
+    body: 'Everything anyone logged, day by day, with the month’s totals.',
   },
   {
     id: 'history-search',
@@ -154,16 +154,16 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: 'settings-device',
     route: '/settings',
-    target: card('This device'),
-    title: 'Whose phone is this',
-    body: 'Each phone belongs to one of you: it’s who new expenses are logged for. Change it here if you swap phones.',
+    target: card('People'),
+    title: 'People and this phone',
+    body: 'Each phone belongs to one person: it’s who new expenses are logged for. Change it here if you swap phones, and rename or add people above it.',
   },
   {
     id: 'settings-categories',
     route: '/settings',
     target: card('Categories'),
     title: 'Categories and allowances',
-    body: 'Add, rename, recolour and reorder categories and set their usual limit. Make one a person’s allowance: only their phone shows what’s in it, and the other just hears if it goes over.',
+    body: 'Add, rename, recolour and reorder categories and set their usual limit. Make one a person’s allowance: only their phone shows what’s in it; everyone else just hears if it goes over.',
   },
   {
     id: 'settings-more',

@@ -1,20 +1,12 @@
-import type { Person } from './types'
-
 /**
- * Every user-facing name and tunable number lives here, so renaming the two of
- * you — or changing the quick amounts — is a one-line edit.
+ * Every user-facing name and tunable number lives here, so changing the quick
+ * amounts or the currency is a one-line edit. The people are in the database.
  */
 
 export const APP_NAME = 'Budget'
 
-/** Who uses which phone. The keys are stored in the database, the labels are shown in the UI. */
-export const PERSON_LABELS: Record<Person, string> = {
-  bubs: 'Bubs',
-  meow: 'Meow',
-}
-
 /**
- * The shared account both of you sign in with. Not a secret (the password is),
+ * The shared account everyone signs in with. Not a secret (the password is),
  * it just means the login screen only has to ask for a password.
  */
 export const AUTH_EMAIL = (import.meta.env.VITE_AUTH_EMAIL as string | undefined) ?? ''

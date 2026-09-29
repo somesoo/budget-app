@@ -1,5 +1,6 @@
 import { CURRENCY_SUFFIX, LOCALE } from '../config'
 import type { Category, Expense, Person } from '../types'
+import { zeroByPerson } from './people'
 
 /* ---------- dates ---------- */
 
@@ -175,8 +176,8 @@ export function sumByDay(expenses: Expense[]): Record<string, number> {
 }
 
 export function sumByPerson(expenses: Expense[]): Record<Person, number> {
-  const out: Record<Person, number> = { bubs: 0, meow: 0 }
-  for (const e of expenses) out[e.person] = roundMoney(out[e.person] + e.amount)
+  const out = zeroByPerson()
+  for (const e of expenses) out[e.person] = roundMoney((out[e.person] ?? 0) + e.amount)
   return out
 }
 

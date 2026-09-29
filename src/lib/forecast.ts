@@ -1,11 +1,10 @@
-import { PERSON_LABELS } from '../config'
 import type { BudgetAlert } from './alerts'
 import type { ProjectSummary } from './projects'
 import type { AccountSummary, GoalSummary } from './savings'
 import type { Category, Expense, Goal, Income, Person } from '../types'
-import { PERSONS } from '../types'
 import { daysInMonth, incomeMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
 import { elapsedDays, projectMonthEnd } from './insights'
+import { personIds, personLabel } from './people'
 
 /*
  * The forecast is arithmetic and stays in code. Gemini never computes a number
@@ -36,7 +35,7 @@ export function expectedIncome(
   month: MonthKey,
   isCurrent: boolean,
 ): IncomeExpectation[] {
-  return PERSONS.map((person) => {
+  return personIds().map((person) => {
     const mine = incomes.filter((i) => i.person === person)
     const thisMonth = mine.filter((i) => incomeMonth(i) === month)
     const logged = roundMoney(thisMonth.reduce((a, i) => a + i.amount, 0))
@@ -214,7 +213,7 @@ export function buildAdviceRequest(args: {
     income: {
       expected: forecast.income,
       byPerson: forecast.incomeByPerson.map((p) => ({
-        name: PERSON_LABELS[p.person],
+        name: personLabel(p.person),
         logged: p.logged,
         typicalMonthly: p.typical,
         counted: p.expected,
@@ -235,8 +234,8 @@ export function buildAdviceRequest(args: {
         typicalMonthly: earlierMonths ? Math.round(before / earlierMonths) : null,
       }
     }),
-    people: PERSONS.map((p) => ({
-      name: PERSON_LABELS[p],
+    people: personIds().map((p) => ({
+      name: personLabel(p),
       spentSoFar: roundMoney(
         inMonth.filter((e) => e.person === p).reduce((a, e) => a + e.amount, 0),
       ),
@@ -257,7 +256,7 @@ export function buildAdviceRequest(args: {
         amount: e.amount,
         category: (nameOf.get(e.category_id) ?? 'other').slice(0, 60),
         note: e.note ? e.note.slice(0, 80) : null,
-        who: PERSON_LABELS[e.person],
+        who: personLabel(e.person),
       })),
     savings:
       savings && savings.available

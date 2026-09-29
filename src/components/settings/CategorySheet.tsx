@@ -9,12 +9,12 @@ import {
 } from '../../hooks/useCategories'
 import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import { roundUpPlan } from '../../lib/planning'
-import { PERSON_LABELS } from '../../config'
 import type { Category, Person } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
 import { Field, Select, SubmitRow, Switch, inputClass } from '../savings/fields'
+import { getPeople, personLabel } from '../../lib/people'
 
 /**
  * A monthly category: its name, color, default limit (months without a plan
@@ -130,20 +130,25 @@ export function CategorySheet({
           checked={inChart}
           onChange={setInChart}
         />
-        <Field
-          label="Whose"
-          help={
-            owner
-              ? `${PERSON_LABELS[owner]}'s allowance: money nobody has to explain. Only ${PERSON_LABELS[owner]} sees its tile, spending and entries; the other phone just hears when it goes over its limit. It still counts in the plan and every total.`
-              : 'Shared by both of you. Make it one person’s to use it as their allowance.'
-          }
-        >
-          <Select value={owner} onChange={(v) => setOwner(v as Person | '')}>
-            <option value="">Shared</option>
-            <option value="bubs">{PERSON_LABELS.bubs}'s allowance</option>
-            <option value="meow">{PERSON_LABELS.meow}'s allowance</option>
-          </Select>
-        </Field>
+        {getPeople().length > 1 && (
+          <Field
+            label="Whose"
+            help={
+              owner
+                ? `${personLabel(owner)}'s allowance: money nobody has to explain. Only ${personLabel(owner)} sees its tile, spending and entries; everyone else just hears when it goes over its limit. It still counts in the plan and every total.`
+                : 'Shared by everyone. Make it one person’s to use it as their allowance.'
+            }
+          >
+            <Select value={owner} onChange={(v) => setOwner(v as Person | '')}>
+              <option value="">Shared</option>
+              {getPeople().map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}'s allowance
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
         <Field label="Color">
           <ColorChoice value={color} onChange={setColor} />
         </Field>

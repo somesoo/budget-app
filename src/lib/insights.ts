@@ -11,6 +11,7 @@ import {
   todayKey,
   type MonthKey,
 } from './calculations'
+import { zeroByPerson } from './people'
 
 /* Pure aggregations behind the charts. Everything takes the raw expense list
    for a window of months and derives what one chart needs. */
@@ -141,15 +142,15 @@ export function categoryDeltas(
 
 /* ---------- who spent what, over time ---------- */
 
-export type PersonMonth = { month: MonthKey } & Record<Person, number>
+export type PersonMonth = { month: MonthKey; by: Record<Person, number> }
 
 export function personByMonth(expenses: Expense[], months: MonthKey[]): PersonMonth[] {
   const rows = new Map<MonthKey, PersonMonth>(
-    months.map((month) => [month, { month, bubs: 0, meow: 0 }]),
+    months.map((month) => [month, { month, by: zeroByPerson() }]),
   )
   for (const e of expenses) {
     const row = rows.get(monthKeyOfDate(e.expense_date))
-    if (row) row[e.person] = roundMoney(row[e.person] + e.amount)
+    if (row) row.by[e.person] = roundMoney((row.by[e.person] ?? 0) + e.amount)
   }
   return months.map((m) => rows.get(m)!)
 }

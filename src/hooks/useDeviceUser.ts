@@ -1,17 +1,18 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { PERSONS, type Person } from '../types'
+import { peopleStore } from '../lib/people'
+import type { Person } from '../types'
 
 const STORAGE_KEY = 'budget-app.device-person'
 
 /**
  * Who uses THIS phone. Kept only in the device's localStorage — it never
- * reaches the shared database.
+ * reaches the shared database. Someone no longer in the budget counts as
+ * nobody, so the phone asks again.
  */
 
 function read(): Person | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return PERSONS.includes(raw as Person) ? (raw as Person) : null
+    return localStorage.getItem(STORAGE_KEY) || null
   } catch {
     return null
   }
@@ -45,7 +46,15 @@ function getSnapshot(): Person | null {
 }
 
 export function useDeviceUser() {
-  const person = useSyncExternalStore(subscribe, getSnapshot, () => null)
+  const stored = useSyncExternalStore(subscribe, getSnapshot, () => null)
+  const people = useSyncExternalStore(peopleStore.subscribe, peopleStore.get, peopleStore.get)
+  // with one person in the budget there's nobody else it could be
+  const person =
+    stored && people.some((p) => p.id === stored)
+      ? stored
+      : people.length === 1
+        ? people[0].id
+        : null
 
   const setPerson = useCallback((next: Person) => {
     try {

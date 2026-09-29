@@ -1,4 +1,3 @@
-import { PERSON_LABELS } from '../config'
 import type { BudgetPlan, Category, Expense, Income, SavingsMovement } from '../types'
 import type { BudgetAlert } from './alerts'
 import {
@@ -11,6 +10,7 @@ import {
 } from './calculations'
 import { elapsedDays, monthsEndingAt, projectMonthEnd } from './insights'
 import type { AccountSummary, GoalSummary } from './savings'
+import { getPeople, personLabel } from './people'
 
 /*
  * What the Ask tab sends with every question: a snapshot of the household's
@@ -45,7 +45,7 @@ export interface ChatContextInput {
   }
 }
 
-const who = (p: string | null) => (p ? ((PERSON_LABELS as Record<string, string>)[p] ?? p) : null)
+const who = (p: string | null) => (p ? (personLabel(p) ?? p) : null)
 
 export function buildChatContext(input: ChatContextInput): Record<string, unknown> {
   const {
@@ -92,7 +92,7 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
   return {
     today,
     currency: 'PLN',
-    people: Object.values(PERSON_LABELS),
+    people: getPeople().map((p) => p.name),
     thisMonth: {
       month,
       dayOfMonth: elapsedDays(month),

@@ -36,6 +36,7 @@ import { crossingNote, limitImpact } from '../lib/alerts'
 import { ownCategories } from '../lib/allowance'
 import { elapsedDays, paceStatus, type PaceStatus } from '../lib/insights'
 import type { Category, Person } from '../types'
+import { personIds } from '../lib/people'
 
 const PACE_COLOR: Record<PaceStatus, string> = {
   under: 'text-positive',
@@ -67,7 +68,7 @@ export function Home() {
   const [selected, setSelected] = useState<Category | null>(null)
   // Person for this one expense — defaults to whoever owns the phone, but can be
   // overridden with one tap (e.g. when someone borrows the phone).
-  const [entryPerson, setEntryPerson] = useState<Person>(devicePerson ?? 'bubs')
+  const [entryPerson, setEntryPerson] = useState<Person>(devicePerson ?? personIds()[0])
   const [toast, setToast] = useState<string | null>(null)
 
   useEffect(() => {
@@ -109,7 +110,7 @@ export function Home() {
   const widgets = useAddWidgets({ expenses, categories, allCategories })
 
   const openCategory = (category: Category) => {
-    setEntryPerson(devicePerson ?? 'bubs')
+    setEntryPerson(devicePerson ?? personIds()[0])
     setSelected(category)
   }
 
@@ -206,7 +207,7 @@ export function Home() {
           <button
             type="button"
             onClick={() => {
-              setEntryPerson(devicePerson ?? 'bubs')
+              setEntryPerson(devicePerson ?? personIds()[0])
               setIncomeOpen(true)
             }}
             data-tour="income"

@@ -3,11 +3,13 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/BottomNav'
 import { SideNav } from './components/SideNav'
 import { Login } from './components/Login'
+import { HouseholdSetup } from './components/HouseholdSetup'
 import { PersonOnboarding } from './components/PersonOnboarding'
 import { SetupNotice } from './components/SetupNotice'
 import { Tour } from './components/tour/Tour'
 import { tourSeen, tourStore } from './lib/tour'
 import { useDeviceUser } from './hooks/useDeviceUser'
+import { usePeople } from './hooks/usePeople'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { useSession } from './hooks/useSession'
 import { isSupabaseConfigured } from './lib/supabaseClient'
@@ -25,8 +27,10 @@ import { Insights } from './pages/Insights'
 export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
   const { session, loading } = useSession()
+  // who's in the budget: loaded once signed in, before anything is shown
+  const people = usePeople(!!session)
   useRealtimeSync()
-  const signedIn = !!session && isChosen
+  const signedIn = !!session && isChosen && !people.needsSetup
   // a new device gets the tour once, right after saying whose it is
   useEffect(() => {
     if (signedIn && !tourSeen() && tourStore.get().step === null) tourStore.start('/')
@@ -36,6 +40,8 @@ export default function App() {
   // first paint restores the stored session — don't flash the login screen
   if (loading) return <div className="min-h-[100dvh] bg-ink" />
   if (!session) return <Login />
+  if (people.isLoading) return <div className="min-h-[100dvh] bg-ink" />
+  if (people.needsSetup) return <HouseholdSetup onDone={setPerson} />
   if (!isChosen) return <PersonOnboarding onPick={setPerson} />
 
   return (

@@ -1,3 +1,4 @@
+import { peopleKey } from './usePeople'
 import { useEffect, useSyncExternalStore } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient'
@@ -82,6 +83,10 @@ export function useRealtimeSync(): SyncStatus {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'goal_allocations' }, () => {
         void qc.invalidateQueries({ queryKey: savingsKey })
+      })
+      // who's in the budget (migration 0015): a rename shows on every phone
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'people' }, () => {
+        void qc.invalidateQueries({ queryKey: peopleKey })
       })
       // borrowing from yourselves (migration 0011)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'savings_loans' }, () => {

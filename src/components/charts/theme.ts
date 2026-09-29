@@ -18,7 +18,6 @@ export const CHART = {
   /** Context marks next to the accent. */
   deemphasis: '#475569',
   deemphasisActive: '#64748b',
-  person: { bubs: '#3987e5', meow: '#d95926' },
   /** Diverging: spent more / less than the comparison period. */
   more: '#e66767',
   less: '#3987e5',

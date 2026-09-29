@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { PERSON_LABELS } from '../../config'
 import {
   useDeleteAccount,
   useSaveAccount,
@@ -13,6 +12,7 @@ import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { Field, Select, SubmitRow, inputClass } from './fields'
 import { ColorChoice } from './ColorChoice'
+import { getPeople, personLabel } from '../../lib/people'
 
 export const ACCOUNT_KINDS: Record<AccountKind, string> = {
   savings: 'Savings account',
@@ -26,7 +26,7 @@ export const ACCOUNT_KINDS: Record<AccountKind, string> = {
 }
 
 export const ownerLabel = (owner: SavingsAccount['owner']) =>
-  owner === 'joint' ? 'Joint' : PERSON_LABELS[owner]
+  owner === 'joint' ? 'Joint' : personLabel(owner)
 
 /** New account, or editing one. A new one can start with the balance it has today. */
 export function AccountSheet({
@@ -177,8 +177,11 @@ export function AccountSheet({
           <Field label="Whose">
             <Select value={owner} onChange={(v) => setOwner(v as SavingsAccount['owner'])}>
               <option value="joint">Joint</option>
-              <option value="bubs">{PERSON_LABELS.bubs}</option>
-              <option value="meow">{PERSON_LABELS.meow}</option>
+              {getPeople().map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
             </Select>
           </Field>
         </div>

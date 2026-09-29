@@ -72,10 +72,14 @@ through Supabase Realtime.
    marked one-off (a returned deposit, something sold), which counts for its
    month but stays out of the typical pay the planner and forecast expect.
    Until it's run, all income counts as pay.
-18. Check **Database → Replication** that `expenses`, `categories` and `goals`
+18. Paste and run `supabase/migrations/0015_people.sql`: who's in the budget,
+   one to four people with names of your own. An install that already has
+   data keeps Bubs and Meow (rename them in Settings → People); a fresh one
+   asks for the names on first launch. Until it's run, it stays Bubs and Meow.
+19. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
-   `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages` and
-   `savings_loans`) are in the
+   `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
+   `savings_loans` and `people`) are in the
    `supabase_realtime` publication — the migrations add them.
 
 ### 2. Local development
@@ -148,17 +152,25 @@ force it to ask again.
 
 ### Who is who
 
-Being signed in says *this household*, not *which of us* — the app asks "Who's
-using this phone?" on first launch and stores the answer in **that device's**
-`localStorage` (key `budget-app.device-person`). It never reaches the database,
-so one phone always knows it is Bubs and the other knows it is Meow. The
-switcher on the amount screen changes the person for that one expense (when
-someone borrows the phone); the one in Settings changes the device for good.
+The budget is for one to four people, named in the `people` table (migration
+0015). A fresh install opens on **Who's in this budget?**: type the names, pick
+which of them is holding this phone, and that's the setup. Settings → People
+renames, adds (up to four) and removes them; a rename shows on every phone at
+once. Someone with expenses or income logged can't be removed, only renamed,
+so nothing loses whose it was.
 
-Both names live in [`src/config.ts`](src/config.ts) — change `PERSON_LABELS`
-there and the whole UI follows. The database stores the keys `bubs` and `meow`,
-which also appear in a check constraint in the first migration, so renaming the
-*keys* (as opposed to the labels) means a migration.
+Each person has an id (made from their name, `anna`, `lukasz-zak`) that the
+other tables store, and a name that is only shown, so renaming touches nothing
+else. Before migration 0015 the app keeps the original two, `bubs` and `meow`.
+
+Being signed in says *this household*, not *which of us*: each phone asks
+"Who's using this phone?" on first launch and keeps the answer in **that
+device's** `localStorage` (key `budget-app.device-person`); with one person it
+doesn't need to ask. The person switcher on the amount screen changes it for
+that one expense (when someone borrows the phone); the one in Settings changes
+the device for good. With one person every switcher, the "who spent what"
+widget and chart, and allowances stay out of the way; with three or four the
+switchers wrap onto a row of their own.
 
 ### Live sync
 
@@ -368,7 +380,7 @@ the top:
   as a dashed line.
 - **Change by category** — each category up or down against the previous
   month, centred on zero.
-- **Who spent what** — Bubs and Meow per month.
+- **Who spent what** — each person per month (with two or more people).
 - **Everyday spending by weekday** — average per weekday.
 
 Every chart has a *Show numbers* table under it.
@@ -415,7 +427,7 @@ through a Vercel function at `api/advice.ts` (the sign-in check, retries and
 model fallback shared with `api/plan.ts` live in `api/_gemini.ts`):
 
 - The browser sends the month's **totals only** — income per person, spending
-  and limit per category with a typical month, the Bubs/Meow split, the goal.
+  and limit per category with a typical month, the split between people, the goal.
   No notes, no individual expenses, no email. The card's "What gets sent to
   Gemini?" link says the same.
 - The function checks the caller is signed in to your Supabase before calling
@@ -490,7 +502,7 @@ what protects the data. Two things are worth knowing:
 
 - Public sign-ups must stay disabled (step 4). With them on, anyone could
   register and pass the `authenticated` check.
-- One shared account means the database cannot tell the two of you apart. Who
+- One shared account means the database cannot tell you apart. Who
   paid is attribution, not identity — anyone signed in can edit or delete any
   expense.
 

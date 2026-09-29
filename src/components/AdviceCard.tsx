@@ -170,7 +170,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
           {showWhatsSent && (
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted">
               Income per person, spending per category with its limit and a typical month, the
-              Bubs/Meow split, the app’s warnings, the month’s biggest expenses with their notes,
+              split between people, the app’s warnings, the month’s biggest expenses with their notes,
               savings accounts and goals, and trips. No email or account numbers. On Google’s free
               API tier, submitted data may be used to improve their products and read by human
               reviewers; the paid tier excludes that. Suggestions, not financial advice.

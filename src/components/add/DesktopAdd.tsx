@@ -44,6 +44,7 @@ import { CategoryGrid } from './CategoryGrid'
 import { GoalPicker, GoalsTile } from './GoalPicker'
 import { RecentEntries } from './RecentEntries'
 import { ownExpenses } from '../../lib/allowance'
+import { personIds } from '../../lib/people'
 
 type Mode = 'expense' | 'income'
 
@@ -82,7 +83,7 @@ export function DesktopAdd() {
   const [goalsOpen, setGoalsOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [person, setPerson] = useState<Person>(devicePerson ?? 'bubs')
+  const [person, setPerson] = useState<Person>(devicePerson ?? personIds()[0])
   const [note, setNote] = useState('')
   const [oneOff, setOneOff] = useState(false)
   const [date, setDate] = useState(todayKey())

@@ -80,7 +80,11 @@ through Supabase Realtime.
    spending from a goal takes the money off the account it was on (the goal's
    share first, then what's unassigned there). Until it's run, spending from a
    goal only counts against the goal and account balances don't move.
-20. Check **Database → Replication** that `expenses`, `categories` and `goals`
+20. Paste and run `supabase/migrations/0017_goal_spending_backfill.sql`: the
+   same for spending from goals logged before step 19, oldest first. Running
+   it twice changes nothing. Skip it (or first delete the correction) for any
+   spending you already took off an account by hand, or it comes off twice.
+21. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
    `savings_loans` and `people`) are in the

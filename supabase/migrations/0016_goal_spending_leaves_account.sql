@@ -55,6 +55,7 @@ alter table public.savings_movements add constraint savings_movements_sign_check
     or kind in ('interest', 'adjustment', 'transfer')
   );
 
+alter table public.savings_movements drop constraint if exists savings_movements_spending_check;
 alter table public.savings_movements add constraint savings_movements_spending_check
   check ((kind = 'spending') = (expense_id is not null));
 

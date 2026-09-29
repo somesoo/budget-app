@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { AUTH_EMAIL } from '../config'
+import { rememberEmail, rememberedEmail } from '../lib/account'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabaseClient'
 import { LanguagePicker } from './LanguagePicker'
@@ -7,13 +8,29 @@ import { LanguagePicker } from './LanguagePicker'
 /** The four tiles from public/icon.svg, drawn large as the screen's mark. */
 const MARK_TILES = ['#22c55e', '#f97316', '#38bdf8', '#a855f7']
 
+export function AppMark() {
+  return (
+    <div aria-hidden className="grid w-20 grid-cols-2 gap-1.5">
+      {MARK_TILES.map((color, i) => (
+        <span
+          key={color}
+          className="aspect-square rounded-[0.6rem] motion-safe:animate-tile-in motion-safe:opacity-0"
+          style={{ backgroundColor: color, animationDelay: `${i * 70}ms` }}
+        />
+      ))}
+    </div>
+  )
+}
+
 /**
- * One shared account for both phones. The form is a real <form> with a username
- * field, so the browser's password manager offers to save the password; after
- * that the Supabase session lives in localStorage and this screen stays away.
+ * One shared account for the household. The form is a real <form> with a
+ * username field, so the browser's password manager offers to save the
+ * password; after that the Supabase session lives in localStorage and this
+ * screen stays away. The email is asked for only until it has signed in here
+ * once (or never, when VITE_AUTH_EMAIL sets it).
  */
 export function Login() {
-  const [email, setEmail] = useState(AUTH_EMAIL)
+  const [email, setEmail] = useState(rememberedEmail)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,6 +47,8 @@ export function Login() {
     if (authError) {
       setError(describeError(authError.message))
       setBusy(false)
+    } else {
+      rememberEmail(email.trim())
     }
     // on success onAuthStateChange swaps this screen out
   }
@@ -40,15 +59,7 @@ export function Login() {
         <div className="-mt-10 mb-4 flex justify-end">
           <LanguagePicker />
         </div>
-        <div aria-hidden className="grid w-20 grid-cols-2 gap-1.5">
-          {MARK_TILES.map((color, i) => (
-            <span
-              key={color}
-              className="aspect-square rounded-[0.6rem] motion-safe:animate-tile-in motion-safe:opacity-0"
-              style={{ backgroundColor: color, animationDelay: `${i * 70}ms` }}
-            />
-          ))}
-        </div>
+        <AppMark />
 
         <h1 className="mt-8 text-4xl font-bold tracking-tight text-white">{t('common.appName')}</h1>
         <p className="mt-2 max-w-[28ch] text-base leading-relaxed text-muted">
@@ -69,6 +80,7 @@ export function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             readOnly={Boolean(AUTH_EMAIL)}
+            autoFocus={!email}
             required
             className="w-full rounded-2xl bg-white/5 px-4 py-3.5 text-base text-white outline-none ring-1 ring-white/10 transition focus:ring-2 focus:ring-white/60 read-only:bg-transparent read-only:text-slate-300"
           />
@@ -89,7 +101,7 @@ export function Login() {
                 setPassword(e.target.value)
                 if (error) setError(null)
               }}
-              autoFocus
+              autoFocus={Boolean(email)}
               required
               aria-invalid={Boolean(error)}
               aria-describedby={error ? 'login-error' : undefined}

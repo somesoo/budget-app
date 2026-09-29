@@ -1,0 +1,42 @@
+{
+  "title": {
+    "message": "Witaj",
+    "context": "New install, first screen: heading above the form that makes the budget's account."
+  },
+  "intro": {
+    "message": "Załóż konto, na które będzie się logować każdy w tym budżecie. Każdy telefon zapyta o nie raz.",
+    "context": "New install, first screen: line under the heading. The household shares this one account."
+  },
+  "email": {
+    "message": "Email",
+    "context": "New install, first screen: label above the account's email field."
+  },
+  "emailHelp": {
+    "message": "To tylko nazwa konta, nic na nią nie wyślemy.",
+    "context": "New install, first screen: hint under the email field. No confirmation email is sent."
+  },
+  "password": {
+    "message": "Hasło",
+    "context": "New install, first screen: label above the new password field."
+  },
+  "passwordHelp": {
+    "message": "Co najmniej {min} znaków. Podaj je tylko osobom z budżetu.",
+    "context": "New install, first screen: hint under the password field. {min} is the minimum length (a number)."
+  },
+  "create": {
+    "message": "Załóż konto",
+    "context": "New install, first screen: the big submit button."
+  },
+  "creating": {
+    "message": "Zakładanie…",
+    "context": "New install, first screen: the submit button while the account is being made."
+  },
+  "badEmail": {
+    "message": "To nie wygląda na adres email.",
+    "context": "New install, first screen: error when the email is malformed."
+  },
+  "failed": {
+    "message": "Nie udało się założyć konta: {error}",
+    "context": "New install, first screen: error; {error} is the server's message."
+  }
+}

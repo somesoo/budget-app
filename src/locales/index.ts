@@ -54,6 +54,7 @@ import en_split from './en/split.json'
 import en_suggestions from './en/suggestions.json'
 import en_tile from './en/tile.json'
 import en_tour from './en/tour.json'
+import en_welcome from './en/welcome.json'
 import en_widgets from './en/widgets.json'
 import pl_account from './pl/account.json'
 import pl_accountCard from './pl/accountCard.json'
@@ -109,6 +110,7 @@ import pl_split from './pl/split.json'
 import pl_suggestions from './pl/suggestions.json'
 import pl_tile from './pl/tile.json'
 import pl_tour from './pl/tour.json'
+import pl_welcome from './pl/welcome.json'
 import pl_widgets from './pl/widgets.json'
 
 const en = {
@@ -166,6 +168,7 @@ const en = {
   suggestions: en_suggestions,
   tile: en_tile,
   tour: en_tour,
+  welcome: en_welcome,
   widgets: en_widgets,
 }
 const pl = {
@@ -223,6 +226,7 @@ const pl = {
   suggestions: pl_suggestions,
   tile: pl_tile,
   tour: pl_tour,
+  welcome: pl_welcome,
   widgets: pl_widgets,
 }
 

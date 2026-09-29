@@ -6,6 +6,6 @@
   "hidePassword": { "message": "Hide", "context": "Sign-in screen: the same button once the password is visible; hides it again. Keep it short." },
   "signIn": { "message": "Sign in", "context": "Sign-in screen: the big submit button." },
   "signingIn": { "message": "Signing in…", "context": "Sign-in screen: the submit button while the sign-in is in progress." },
-  "wrongPassword": { "message": "That password is wrong. Try again.", "context": "Sign-in screen: error under the password field when the password doesn't match." },
+  "wrongPassword": { "message": "That email and password don't match. Try again.", "context": "Sign-in screen: error under the password field when the email and password don't match an account." },
   "offline": { "message": "Can't reach the server. Check your connection.", "context": "Sign-in screen: error under the password field when there's no network." }
 }

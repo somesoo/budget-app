@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/BottomNav'
 import { SideNav } from './components/SideNav'
 import { Login } from './components/Login'
+import { Welcome } from './components/Welcome'
 import { HouseholdSetup } from './components/HouseholdSetup'
 import { PersonOnboarding } from './components/PersonOnboarding'
 import { SetupNotice } from './components/SetupNotice'
@@ -12,6 +14,7 @@ import { useDeviceUser } from './hooks/useDeviceUser'
 import { usePeople } from './hooks/usePeople'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { useSession } from './hooks/useSession'
+import { fetchSetupStatus, type SetupStatus } from './lib/account'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { Home } from './pages/Home'
 import { Budget } from './pages/Budget'
@@ -27,6 +30,14 @@ import { Insights } from './pages/Insights'
 export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
   const { session, loading } = useSession()
+  // signed out: a new install with no account yet opens on the welcome screen
+  const qc = useQueryClient()
+  const setupStatus = useQuery({
+    queryKey: ['setup-status'],
+    queryFn: fetchSetupStatus,
+    enabled: isSupabaseConfigured && !loading && !session,
+    staleTime: Infinity,
+  })
   // who's in the budget: loaded once signed in, before anything is shown
   const people = usePeople(!!session)
   useRealtimeSync()
@@ -39,7 +50,18 @@ export default function App() {
   if (!isSupabaseConfigured) return <SetupNotice />
   // first paint restores the stored session — don't flash the login screen
   if (loading) return <div className="min-h-[100dvh] bg-ink" />
-  if (!session) return <Login />
+  if (!session) {
+    if (setupStatus.isPending) return <div className="min-h-[100dvh] bg-ink" />
+    if (setupStatus.data?.needsAccount)
+      return (
+        <Welcome
+          onAccountExists={() =>
+            qc.setQueryData<SetupStatus>(['setup-status'], { canCreate: true, needsAccount: false })
+          }
+        />
+      )
+    return <Login />
+  }
   if (people.isLoading) return <div className="min-h-[100dvh] bg-ink" />
   if (people.needsSetup) return <HouseholdSetup onDone={setPerson} />
   if (!isChosen) return <PersonOnboarding onPick={setPerson} />

@@ -8,7 +8,7 @@
     "context": "Setup screen for the developer. {example} and {env} are file names (.env.example, .env); keep the <code> tags around them. Followed by a code block with the variables."
   },
   "readme": {
-    "message": "W README jest opisana migracja, dane startowe i konfiguracja Realtime.",
-    "context": "Setup screen for the developer: points to the README file for the rest of the setup."
+    "message": "Na Vercelu dodaj Supabase w zakładce Storage projektu i zrób deploy jeszcze raz. Reszta jest w README.",
+    "context": "Setup screen: on Vercel the Supabase integration is added under the project's Storage tab; keep Vercel, Supabase, Storage and README as they are."
   }
 }

@@ -290,6 +290,64 @@
       "context": "Settings > Your data: error message; {error} is a technical message, usually in English."
     }
   },
+  "ai": {
+    "title": {
+      "message": "AI",
+      "context": "Settings > card heading: the Gemini key behind the AI features."
+    },
+    "help": {
+      "message": "Porady, szkic planu i Zapytaj korzystają z Google Gemini. Klucz dostaniesz za darmo.",
+      "context": "Settings > AI card: description. Advice, plan draft and Ask are names of features in the app."
+    },
+    "checking": {
+      "message": "Sprawdzanie…",
+      "context": "Settings > AI: shown while the key status loads."
+    },
+    "none": {
+      "message": "Brak klucza, funkcje AI są wyłączone.",
+      "context": "Settings > AI: status when no Gemini key is set."
+    },
+    "saved": {
+      "message": "Włączone, klucz kończy się na {hint}.",
+      "context": "Settings > AI: status when a key saved in the app is in use; {hint} is its last four characters."
+    },
+    "fromServer": {
+      "message": "Włączone, klucz ustawiony na serwerze (kończy się na {hint}).",
+      "context": "Settings > AI: status when GEMINI_API_KEY on the server is used; it can't be changed here. {hint} is its last four characters."
+    },
+    "cantStore": {
+      "message": "Żeby zapisać klucz tutaj, serwer potrzebuje SUPABASE_SERVICE_ROLE_KEY. W README jest opisane, gdzie go dodać.",
+      "context": "Settings > AI: note when the server can't store a key. Keep SUPABASE_SERVICE_ROLE_KEY and README as they are."
+    },
+    "placeholder": {
+      "message": "Wklej klucz API Gemini",
+      "context": "Settings > AI: placeholder and label of the key field."
+    },
+    "save": {
+      "message": "Zapisz",
+      "context": "Settings > AI: button that checks and saves the key."
+    },
+    "checkingKey": {
+      "message": "Sprawdzanie…",
+      "context": "Settings > AI: the save button while Google checks the key."
+    },
+    "getKey": {
+      "message": "Klucz wygenerujesz w <link>Google AI Studio</link>. Sprawdzamy go w Google i trzymamy na serwerze, nigdy na tym telefonie.",
+      "context": "Settings > AI: hint under the key field. Keep the <link> tags around the name of the site."
+    },
+    "invalid": {
+      "message": "Google nie przyjął tego klucza. Sprawdź go i spróbuj jeszcze raz.",
+      "context": "Settings > AI: error when the pasted key doesn't work."
+    },
+    "replace": {
+      "message": "Zmień klucz",
+      "context": "Settings > AI: button to paste a different key."
+    },
+    "remove": {
+      "message": "Usuń klucz",
+      "context": "Settings > AI: button that deletes the saved key and turns AI off."
+    }
+  },
   "help": {
     "title": {
       "message": "Pomoc",

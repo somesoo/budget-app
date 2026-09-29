@@ -1,6 +1,6 @@
 # Budget
 
-A shared budgeting app for two people. Adding an expense is three taps
+A shared budgeting app for one to four people. Adding an expense is three taps
 (category → amount → Save). Data is shared and syncs live between phones
 through Supabase Realtime.
 
@@ -14,7 +14,55 @@ through Supabase Realtime.
 
 ## Setup
 
-### 1. Supabase project
+### Quick: one button
+
+For anyone who wants their own copy (a free Vercel and a free Supabase
+account, about five minutes, no terminal):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsomesoo%2Fbudget-app&project-name=budget&repository-name=budget&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22supabase%22%2C%22productSlug%22%3A%22supabase%22%7D%5D)
+
+1. Click the button and sign in to Vercel with GitHub. It copies this
+   repository to your GitHub account.
+2. When it asks for **Supabase**, create a new database: the free plan, a
+   region close to you (Frankfurt for Poland). Vercel fills in every setting
+   the app needs; there is nothing to copy by hand.
+3. **Deploy.** The build creates the tables itself (`scripts/migrate.mjs`),
+   so the first one takes a minute or two.
+4. Open the site. It starts on **Welcome**: type an email and a password for
+   the account everyone in the budget will share, then the names of the
+   people. That's the whole setup.
+5. Optional: **Settings → AI**, paste a free key from
+   [Google AI Studio](https://aistudio.google.com/apikey) to turn on the
+   recommendations, the plan draft and the Ask tab.
+6. On each phone: open the site → *Add to Home Screen*, sign in once.
+
+**Updates:** on your copy on GitHub, *Sync fork*. Vercel deploys it, and the
+deploy runs any new migrations before the new version goes live.
+
+**If something's off:**
+
+- *Database not configured* on the site: Supabase isn't connected. In the
+  Vercel project: **Storage → Connect** your Supabase database, then
+  **Deployments → … → Redeploy**.
+- The deploy fails at `migrate:`: its log names the migration and the error.
+- Forgot the password: Supabase dashboard (reachable from the Vercel
+  project's Storage tab) → **Authentication → Users → … → Reset password**.
+
+### By hand
+
+The rest of this section sets it up step by step instead, which is how the
+original install was made. Two shortcuts apply here too:
+
+- Instead of pasting every migration below into the SQL Editor, put the
+  database's connection string (Supabase → **Connect** → *Session pooler*)
+  in `DATABASE_URL` and run `npm run migrate`, locally or as a Vercel env var
+  so every deploy does it. On a database set up by hand it takes everything
+  up to 0015 as done; if you stopped earlier, set `MIGRATIONS_BASELINE` to the
+  last one you ran (e.g. `0012`).
+- With `SUPABASE_SERVICE_ROLE_KEY` set on Vercel, skip creating the account
+  (steps 3–4): the site's welcome screen makes it.
+
+#### 1. Supabase project
 
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Open the **SQL Editor** and run these two files — open each one, copy its
@@ -76,13 +124,16 @@ through Supabase Realtime.
    one to four people with names of your own. An install that already has
    data keeps Bubs and Meow (rename them in Settings → People); a fresh one
    asks for the names on first launch. Until it's run, it stays Bubs and Meow.
-19. Check **Database → Replication** that `expenses`, `categories` and `goals`
+19. Paste and run `supabase/migrations/0016_household_setup.sql`: the
+   database allows only the one account from now on (whatever step 4 says),
+   and gets the table where a Gemini key typed in Settings → AI is kept.
+20. Check **Database → Replication** that `expenses`, `categories` and `goals`
    (and, after steps 7–12, `incomes`, `advice`, `budgets`, `savings_accounts`,
    `savings_movements`, `goal_allocations`, `ai_threads`, `ai_messages`,
    `savings_loans` and `people`) are in the
    `supabase_realtime` publication — the migrations add them.
 
-### 2. Local development
+#### 2. Local development
 
 ```bash
 cp .env.example .env   # URL + anon key from Project Settings → API,
@@ -103,25 +154,31 @@ Two things the Supabase dashboard will try to talk you into:
 
 Vite reads `.env` at startup, so restart `npm run dev` after editing it.
 
-### 3. Deploy to Vercel
+#### 3. Deploy to Vercel
 
 1. **Add New → Project** and import this repository. Vercel detects Vite on its
    own: build `npm run build`, output `dist`.
-2. Under **Settings → Environment Variables** add all three, for every
+2. Under **Settings → Environment Variables** add these, for every
    environment you use (Production, Preview, Development):
 
    | Name | Value |
    | --- | --- |
    | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` |
-   | `VITE_SUPABASE_ANON_KEY` | the project's anon key |
-   | `VITE_AUTH_EMAIL` | the shared account's email |
-   | `GEMINI_API_KEY` | your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix** |
+   | `VITE_SUPABASE_ANON_KEY` | the project's anon (publishable) key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | the service_role (secret) key — **no `VITE_` prefix**; lets the welcome screen make the account and Settings → AI keep a Gemini key |
+   | `DATABASE_URL` | optional: the connection string, so each deploy runs the migrations |
+   | `VITE_AUTH_EMAIL` | optional: the account's email, so no phone has to type it |
+   | `GEMINI_API_KEY` | optional: your key from [Google AI Studio](https://aistudio.google.com/apikey) — **no `VITE_` prefix**; wins over one typed in Settings → AI |
    | `GEMINI_MODEL` | optional, defaults to `gemini-3.5-flash-lite` |
    | `GEMINI_FALLBACK_MODEL` | optional, defaults to `gemini-3.5-flash`; used when the main model stays overloaded |
 
    The prefix matters: anything starting with `VITE_` is compiled into the
-   JavaScript every visitor downloads. `GEMINI_API_KEY` stays on the server,
-   where only `/api/advice` can read it.
+   JavaScript every visitor downloads. The service role key and
+   `GEMINI_API_KEY` stay on the server, where only the `/api` functions can
+   read them. The names the Supabase integration creates (`SUPABASE_URL`,
+   `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`,
+   `POSTGRES_URL_NON_POOLING`, …) work as well, so the one-button install
+   needs none of these.
 
 3. Deploy. Every push to `main` redeploys automatically.
 
@@ -136,9 +193,12 @@ a PWA requires.
 
 ## Signing in
 
-Both phones use the same account. The login screen asks only for a password —
-the email comes from `VITE_AUTH_EMAIL` — and the form is a normal username +
-password form, so the browser's password manager offers to save it.
+Everyone uses the same account, made on the welcome screen of a new install
+(`/api/setup`, which only works while there's no account; after that
+migration 0016 makes the database refuse any other). The sign-in screen asks
+for the email the first time on a phone and remembers it, or never when
+`VITE_AUTH_EMAIL` is set. It's a normal username + password form, so the
+browser's password manager offers to save it.
 
 After a successful sign-in the Supabase session is stored in that device's
 localStorage and refreshed in the background, so you type the password once per
@@ -422,6 +482,13 @@ they are edited and deleted like any other entry.
 - *Left over*, savings rate, how much a day you can still spend to break even,
   and roughly how many months to the savings goal at this month's surplus.
 
+**The Gemini key** is `GEMINI_API_KEY` on the server when it's set, otherwise
+the one pasted in **Settings → AI**. That one is checked with Google, then
+kept in the `app_secrets` table, which only the server functions can read
+(row level security with no policy; they use the service role key), so it
+never goes back to a phone. Without a key the AI features say where to add
+one.
+
 **Recommendations** come from Gemini, on request ("Get recommendations"),
 through a Vercel function at `api/advice.ts` (the sign-in check, retries and
 model fallback shared with `api/plan.ts` live in `api/_gemini.ts`):
@@ -452,8 +519,10 @@ tier excludes both. Only aggregates are sent, but monthly income is still
 personal — decide which tier you're comfortable with.
 
 **Locally**, `npm run dev` doesn't run `/api` functions; the card says so
-instead of failing. To try recommendations locally, use the Vercel CLI:
-`vercel dev` (with `GEMINI_API_KEY` in `.env`, which is git-ignored).
+instead of failing, the sign-in screen skips the welcome check, and Settings
+leaves out the AI card. To try them locally, use the Vercel CLI: `vercel dev`
+(with `GEMINI_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in `.env`, which is
+git-ignored).
 
 ### The Add tab fits one screen
 
@@ -500,8 +569,11 @@ After `0002_require_login.sql`, every RLS policy requires an authenticated
 user, so the anon key in the bundle is useless on its own — the password is
 what protects the data. Two things are worth knowing:
 
-- Public sign-ups must stay disabled (step 4). With them on, anyone could
-  register and pass the `authenticated` check.
+- Nobody else may get an account: anyone signed in passes the
+  `authenticated` check. Migration 0016 makes the database refuse every
+  account after the first, sign-ups included; turning sign-ups off (step 4)
+  as well does no harm. To allow a second account on purpose:
+  `drop trigger one_household_account on auth.users;`
 - One shared account means the database cannot tell you apart. Who
   paid is attribution, not identity — anyone signed in can edit or delete any
   expense.

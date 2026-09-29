@@ -129,7 +129,8 @@ export function isAdviceRequest(b: unknown): b is AdviceRequest {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!(await authorize(req, res))) return
+  const apiKey = await authorize(req, res)
+  if (!apiKey) return
 
   const body: unknown = req.body
   // savings, projects and the biggest expenses make this bigger than it used to be
@@ -138,6 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const result = await askGemini({
+    apiKey,
     systemPrompt: systemPrompt(body),
     input: body,
     schema: RESPONSE_SCHEMA,

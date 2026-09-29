@@ -13,20 +13,23 @@ import { BottomSheet } from '../history/BottomSheet'
 import { Field, Select, SubmitRow, inputClass } from './fields'
 import { ColorChoice } from './ColorChoice'
 import { getPeople, personLabel } from '../../lib/people'
+import { formatList, t } from '../../i18n'
 
-export const ACCOUNT_KINDS: Record<AccountKind, string> = {
-  savings: 'Savings account',
-  deposit: 'Term deposit',
-  investment: 'Investments',
-  ike: 'IKE',
-  ikze: 'IKZE',
-  retirement: 'Other retirement',
-  cash: 'Cash',
-  other: 'Other',
-}
+const ACCOUNT_KINDS: AccountKind[] = [
+  'savings',
+  'deposit',
+  'investment',
+  'ike',
+  'ikze',
+  'retirement',
+  'cash',
+  'other',
+]
+
+export const accountKindLabel = (kind: AccountKind) => t(`account.kind.${kind}`)
 
 export const ownerLabel = (owner: SavingsAccount['owner']) =>
-  owner === 'joint' ? 'Joint' : personLabel(owner)
+  owner === 'joint' ? t('account.joint') : personLabel(owner)
 
 /** New account, or editing one. A new one can start with the balance it has today. */
 export function AccountSheet({
@@ -80,7 +83,11 @@ export function AccountSheet({
         color,
       })
       if (!account && opening > 0) {
-        await setBalance.mutateAsync({ account: id, balance: opening, note: 'Opening balance' })
+        await setBalance.mutateAsync({
+          account: id,
+          balance: opening,
+          note: t('account.openingNote'),
+        })
       }
       onClose()
     } catch (err) {
@@ -103,13 +110,14 @@ export function AccountSheet({
     ? overview.loans.filter((l) => l.loan.account_id === account.id && l.remaining > 0).length
     : 0
   const deleteWarning = [
-    summary && summary.balance !== 0 && `its balance of ${formatMoneyCompact(summary.balance)}`,
+    summary &&
+      summary.balance !== 0 &&
+      t('account.loseBalance', { amount: formatMoneyCompact(summary.balance) }),
     summary &&
       summary.allocated > 0 &&
-      `${formatMoneyCompact(summary.allocated)} set aside on it for goals, which they lose`,
-    movementCount > 0 && `${movementCount} ${movementCount === 1 ? 'movement' : 'movements'}`,
-    openLoanCount > 0 &&
-      `${openLoanCount} ${openLoanCount === 1 ? 'loan' : 'loans'} still being paid back to it`,
+      t('account.loseAllocated', { amount: formatMoneyCompact(summary.allocated) }),
+    movementCount > 0 && t('account.loseMovements', { count: movementCount }),
+    openLoanCount > 0 && t('account.loseLoans', { count: openLoanCount }),
   ].filter(Boolean)
   const steps = summary ? emptyAccountSteps(summary) : []
   const target = others.find((a) => a.account.id === moveTo)
@@ -126,7 +134,7 @@ export function AccountSheet({
           to: target.account.id,
           amount: step.amount,
           goal: step.goalId,
-          note: `Closing ${account.name}`,
+          note: t('account.closingNote', { name: account.name }),
         })
       }
       await remove.mutateAsync(account.id)
@@ -152,31 +160,34 @@ export function AccountSheet({
   }
 
   return (
-    <BottomSheet title={account ? `Edit ${account.name}` : 'New account'} onClose={onClose}>
+    <BottomSheet
+      title={account ? t('project.edit', { name: account.name }) : t('account.new')}
+      onClose={onClose}
+    >
       <form onSubmit={submit} className="grid gap-4 pb-2">
-        <Field label="Name">
+        <Field label={t('settings.categories.name')}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={60}
-            placeholder="e.g. Revolut savings"
+            placeholder={t('account.namePlaceholder')}
             className={inputClass}
             autoFocus={!account}
           />
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Kind">
+          <Field label={t('entry.kind')}>
             <Select value={kind} onChange={(v) => setKind(v as AccountKind)}>
-              {Object.entries(ACCOUNT_KINDS).map(([value, label]) => (
+              {ACCOUNT_KINDS.map((value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {accountKindLabel(value)}
                 </option>
               ))}
             </Select>
           </Field>
-          <Field label="Whose">
+          <Field label={t('categorySheet.whose')}>
             <Select value={owner} onChange={(v) => setOwner(v as SavingsAccount['owner'])}>
-              <option value="joint">Joint</option>
+              <option value="joint">{t('account.joint')}</option>
               {getPeople().map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -188,40 +199,41 @@ export function AccountSheet({
         {(kind === 'ike' || kind === 'ikze') && (
           <p className="-mt-2 text-xs leading-snug text-muted">
             {owner === 'joint'
-              ? `An ${kind.toUpperCase()} is always one person’s: pick whose it is.`
-              : `The planner keeps track of the yearly ${kind.toUpperCase()} limit and suggests a monthly payment that uses it up by December.`}
+              ? t('account.retirementOwner', { kind: kind.toUpperCase() })
+              : t('account.retirementHelp', { kind: kind.toUpperCase() })}
           </p>
         )}
         <Field
-          label="Interest, % a year (optional)"
-          help={
-            rateOk
-              ? 'Used for the projection; the interest itself is added when the bank pays it.'
-              : 'A number between 0 and 100'
-          }
+          label={t('account.interest')}
+          help={rateOk ? t('account.interestHelp') : t('account.interestInvalid')}
         >
           <input
             value={rate}
             onChange={(e) => setRate(e.target.value.replace(/[^\d.,]/g, ''))}
             inputMode="decimal"
-            placeholder="e.g. 5.5"
+            placeholder={t('account.interestPlaceholder')}
             className={inputClass}
           />
         </Field>
         {!account && (
           <Field
-            label="Balance today"
-            help="Whatever is on it already. Assign it to goals afterwards."
+            label={t('account.balanceToday')}
+            help={t('account.balanceTodayHelp')}
           >
-            <MoneyInput value={opening} onChange={setOpening} label="Balance today" size="lg" />
+            <MoneyInput
+              value={opening}
+              onChange={setOpening}
+              label={t('account.balanceToday')}
+              size="lg"
+            />
           </Field>
         )}
-        <Field label="Color">
+        <Field label={t('common.color')}>
           <ColorChoice value={color} onChange={setColor} />
         </Field>
 
         <SubmitRow
-          label={account ? 'Save changes' : 'Add account'}
+          label={account ? t('entry.saveChanges') : t('account.add')}
           disabled={!name.trim() || !rateOk}
           pending={save.isPending || setBalance.isPending}
           error={error}
@@ -232,7 +244,7 @@ export function AccountSheet({
             onClick={archive}
             className="rounded-2xl py-2.5 text-sm font-semibold text-muted ring-1 ring-white/10 hover:bg-white/5"
           >
-            {account.archived ? 'Show it again' : 'Hide this account'}
+            {account.archived ? t('categorySheet.unhide') : t('account.hide')}
           </button>
         )}
         {account &&
@@ -241,8 +253,7 @@ export function AccountSheet({
               {steps.length > 0 && target && (
                 <div className="grid gap-2 rounded-xl bg-white/5 p-3">
                   <p className="text-sm leading-snug text-slate-200">
-                    Keep the money: move the {formatMoneyCompact(summary!.balance)} to another
-                    account first, each goal keeping its share, then delete.
+                    {t('account.keepMoney', { amount: formatMoneyCompact(summary!.balance) })}
                   </p>
                   <Select value={moveTo} onChange={setMoveTo}>
                     {others.map((a) => (
@@ -257,20 +268,26 @@ export function AccountSheet({
                     disabled={moving || remove.isPending}
                     className="rounded-xl bg-slate-100 py-2.5 text-sm font-bold text-ink hover:bg-slate-50 disabled:opacity-50"
                   >
-                    {moving ? 'Moving…' : `Move it to ${target.account.name}, then delete`}
+                    {moving
+                      ? t('account.moving')
+                      : t('account.moveThenDelete', { name: target.account.name })}
                   </button>
                   <p className="text-xs leading-snug text-muted">
-                    In the bank: transfer {formatMoneyCompact(summary!.balance)} from{' '}
-                    {account.name} to {target.account.name}, then close {account.name}.
+                    {t('account.bankSteps', {
+                      amount: formatMoneyCompact(summary!.balance),
+                      from: account.name,
+                      to: target.account.name,
+                    })}
                   </p>
                 </div>
               )}
               <p className="text-sm leading-snug text-red-200">
                 {deleteWarning.length > 0
-                  ? `Deleting ${account.name} also deletes ${deleteWarning.join(', ')}. This can’t be undone.`
-                  : `Delete ${account.name}? This can’t be undone.`}
-                {deleteWarning.length > 0 &&
-                  ' To keep the history, hide it instead, or move the money to another account first.'}
+                  ? t('account.deleteWarning', {
+                      name: account.name,
+                      what: formatList(deleteWarning as string[]),
+                    })
+                  : t('account.deleteConfirm', { name: account.name })}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -278,7 +295,7 @@ export function AccountSheet({
                   onClick={() => setConfirmDelete(false)}
                   className="rounded-xl py-2.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
                 >
-                  Keep it
+                  {t('categorySheet.keep')}
                 </button>
                 <button
                   type="button"
@@ -286,7 +303,7 @@ export function AccountSheet({
                   disabled={remove.isPending}
                   className="rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white hover:bg-red-400 disabled:opacity-50"
                 >
-                  {remove.isPending ? 'Deleting…' : 'Delete for good'}
+                  {remove.isPending ? t('common.deleting') : t('account.deleteForGood')}
                 </button>
               </div>
             </div>
@@ -296,7 +313,7 @@ export function AccountSheet({
               onClick={() => setConfirmDelete(true)}
               className="rounded-2xl py-2.5 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 hover:bg-red-500/10"
             >
-              Delete this account
+              {t('account.delete')}
             </button>
           ))}
       </form>

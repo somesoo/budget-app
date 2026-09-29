@@ -1,0 +1,54 @@
+{
+  "everyday": {
+    "message": "Konto codzienne",
+    "context": "Default name of a new account created when correcting a goal's saved amount."
+  },
+  "note": {
+    "message": "{name}: korekta odłożonej kwoty",
+    "context": "Note saved on the balance correction for goal {name}."
+  },
+  "title": {
+    "message": "Ile ma cel {name}",
+    "context": "Sheet heading: correct how much is saved for goal {name}."
+  },
+  "intro": {
+    "message": "Dla pieniędzy, które już są, ale aplikacja o nich nie wie. Zapisuje się to jako korektę salda konta, a nie oszczędzanie czy wydatek, więc liczby tego miesiąca się nie zmieniają.",
+    "context": "Correct saved amount sheet: explanation."
+  },
+  "saved": {
+    "message": "Odłożone na ten cel",
+    "context": "Correct saved amount sheet: amount field label."
+  },
+  "savedHelp": {
+    "message": "Aplikacja ma teraz {amount}.",
+    "context": "Correct saved amount sheet: current amount."
+  },
+  "where": {
+    "message": "Gdzie są pieniądze",
+    "context": "Correct saved amount sheet: account field label."
+  },
+  "newAccountHelp": {
+    "message": "Dodaje to konto do Oszczędności, tylko z kwotą, którą wskażesz jako odłożoną.",
+    "context": "Correct saved amount sheet: hint when choosing a new account."
+  },
+  "elsewhere": {
+    "message": "Gdzie indziej, np. na koncie codziennym…",
+    "context": "Correct saved amount sheet: option to add a new account."
+  },
+  "callIt": {
+    "message": "Nazwa",
+    "context": "Correct saved amount sheet: name of the new account."
+  },
+  "more": {
+    "message": "{amount} więcej dla celu {name}, na koncie {account}.",
+    "context": "Correct saved amount sheet: summary of the change."
+  },
+  "less": {
+    "message": "{amount} mniej dla celu {name}, z konta {account}.",
+    "context": "Correct saved amount sheet: summary of the change."
+  },
+  "tooMuch": {
+    "message": "{name} ma na tym koncie tylko {amount}. Wybierz konto, na którym są jego pieniądze.",
+    "context": "Correct saved amount sheet: error."
+  }
+}

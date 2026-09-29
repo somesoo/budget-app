@@ -6,7 +6,7 @@ import { CarryoverPicker } from './CarryoverPicker'
 import { useMonthMoney } from '../../hooks/useMonthMoney'
 import { CategoryDetail } from '../category/CategoryDetail'
 import { PlanCheckList, RecurringList, SuggestionList } from './PlanSuggestions'
-import { CURRENCY_SUFFIX, LOCALE } from '../../config'
+import { CURRENCY_SUFFIX } from '../../config'
 import {
   useBudget,
   useDeleteBudget,
@@ -43,13 +43,15 @@ import { planChecks, planSuggestions, recurringCosts, type Suggestion } from '..
 import { carryAllocations, defaultGoalAccount, sumAllocations } from '../../lib/allocations'
 import { loanLines } from '../../lib/loans'
 import type { PlanAllocation, PlanSuggestion } from '../../types'
+import { dateFormat, t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 interface Props {
   month: MonthKey
   onClose: () => void
 }
 
-const shortMonthYear = new Intl.DateTimeFormat(LOCALE, { month: 'short', year: '2-digit' })
+const shortMonthYear = () => dateFormat({ month: 'short', year: '2-digit' })
 
 /**
  * Full-screen planner for one month. Zero-based: income minus savings minus
@@ -242,7 +244,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const goalLeft = goal ? Math.max(goal.target_amount - goal.current_amount, 0) : 0
   const monthsToGoal =
     goal && goalLeft > 0 && draft.savings > 0 ? Math.ceil(goalLeft / draft.savings) : null
-  const lastYearLabel = shortMonthYear.format(
+  const lastYearLabel = shortMonthYear().format(
     new Date(Number(month.slice(0, 4)) - 1, Number(month.slice(5)) - 1, 1),
   )
 
@@ -266,13 +268,13 @@ export function BudgetPlanner({ month, onClose }: Props) {
     <Shell
       month={month}
       onClose={focused ? () => setFocused(null) : onClose}
-      status={existing.data ? 'Editing the saved plan' : 'Not saved yet'}
+      status={existing.data ? t('planner.editing') : t('planner.notSaved')}
       fit={focused !== null}
       footer={
         <>
           {save.error && (
             <p className="mb-2 text-sm text-red-300 lg:mb-0 lg:mr-auto">
-              Not saved: {(save.error as Error).message}. Has migration 0005 been run?
+              {t('planner.saveFailed', { error: (save.error as Error).message })}
             </p>
           )}
           <p className="hidden text-sm text-muted lg:mr-auto lg:block">
@@ -284,7 +286,9 @@ export function BudgetPlanner({ month, onClose }: Props) {
             disabled={save.isPending}
             className="h-14 w-full rounded-2xl bg-slate-100 text-lg font-bold text-ink transition short:lg:h-10 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-50 lg:h-12 lg:w-auto lg:px-10 lg:text-base"
           >
-            {save.isPending ? 'Saving…' : `Save ${formatMonthName(month)} plan`}
+            {save.isPending
+              ? t('common.saving')
+              : t('planner.save', { month: formatMonthName(month) })}
           </button>
         </>
       }
@@ -305,7 +309,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
           }}
           editor={(id, name) => (
             <MoneyInput
-              label={`${name} limit`}
+              label={t('planner.limitOf', { name })}
               value={draft.limits[id] ?? 0}
               onChange={(v) => setLimit(id, v)}
             />
@@ -317,7 +321,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
             {/* ---------- the whole month on one card ---------- */}
             <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
               <Row
-                label="Income"
+                label={t('entry.income')}
                 hint={
                   baseline.typicalIncome !== null && baseline.typicalIncome !== draft.income ? (
                     <Hint
@@ -325,13 +329,15 @@ export function BudgetPlanner({ month, onClose }: Props) {
                         setDraft({ ...draft, income: Math.round(baseline.typicalIncome!) })
                       }
                     >
-                      typical pay {formatAmount(Math.round(baseline.typicalIncome))}
+                      {t('planner.typicalPay', {
+                        amount: formatAmount(Math.round(baseline.typicalIncome)),
+                      })}
                     </Hint>
                   ) : null
                 }
               >
                 <MoneyInput
-                  label="Planned income"
+                  label={t('planner.plannedIncome')}
                   value={draft.income}
                   onChange={(income) => setDraft({ ...draft, income })}
                 />
@@ -345,7 +351,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 />
               ) : (
                 <Row
-                  label="Savings"
+                  label={t('nav.savings')}
                   hint={
                     savingsOverview.available && savingsOverview.neededPerMonth > 0 ? (
                       <Hint
@@ -357,28 +363,30 @@ export function BudgetPlanner({ month, onClose }: Props) {
                           })
                         }
                       >
-                        goals need {formatAmount(Math.round(savingsOverview.neededPerMonth))}
+                        {t('planner.goalsNeed', {
+                          amount: formatAmount(Math.round(savingsOverview.neededPerMonth)),
+                        })}
                       </Hint>
                     ) : goal && !savingsOverview.available ? (
                       <span className="text-xs text-muted">
                         {monthsToGoal
-                          ? `${goal.name} in ~${monthsToGoal} ${monthsToGoal === 1 ? 'month' : 'months'}`
+                          ? t('planner.goalIn', { name: goal.name, count: monthsToGoal })
                           : goalLeft > 0
-                            ? `${formatAmount(goalLeft)} to ${goal.name}`
-                            : `${goal.name} reached`}
+                            ? t('planner.goalLeft', { amount: formatAmount(goalLeft), name: goal.name })
+                            : t('planner.goalReached', { name: goal.name })}
                       </span>
                     ) : null
                   }
                 >
                   <MoneyInput
-                    label="Planned savings"
+                    label={t('planner.plannedSavings')}
                     value={draft.savings}
                     onChange={(savings) => setDraft({ ...draft, savings })}
                   />
                 </Row>
               )}
               <div className="mt-3 flex items-baseline justify-between border-t border-white/10 pt-3 text-sm">
-                <span className="text-muted">Spending limits</span>
+                <span className="text-muted">{t('planner.spendingLimits')}</span>
                 <span className="font-semibold tabular-nums text-white">
                   {formatMoneyCompact(spending)}
                 </span>
@@ -405,7 +413,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 htmlFor="plan-note"
                 className="mb-1.5 block text-base font-semibold text-white"
               >
-                What’s different about {formatMonthName(month)}?
+                {t('planner.noteLabel', { month: formatMonthName(month) })}
               </label>
               <textarea
                 id="plan-note"
@@ -413,11 +421,11 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 onChange={(e) => setDraft({ ...draft, note: e.target.value })}
                 maxLength={500}
                 rows={2}
-                placeholder="e.g. car insurance 1,200 zł, a birthday, a weekend in Kraków"
+                placeholder={t('planner.notePlaceholder')}
                 className="w-full resize-none rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
               />
               <p className="mt-1 text-xs text-muted">
-                Saved with the plan, and the AI draft takes it into account.
+                {t('planner.noteHelp')}
               </p>
             </section>
 
@@ -426,7 +434,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
               <div className="flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
                   <Sparkle weight="fill" aria-hidden />
-                  AI draft
+                  {t('planner.aiDraft')}
                 </h2>
                 {ai && (
                   <button
@@ -434,7 +442,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                     onClick={applyAi}
                     className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
                   >
-                    Use all
+                    {t('planner.useAll')}
                   </button>
                 )}
               </div>
@@ -443,31 +451,29 @@ export function BudgetPlanner({ month, onClose }: Props) {
                   <p className="text-[15px] leading-snug text-white">{plainDashes(ai.summary)}</p>
                   {ai.savings !== null && (
                     <p className="text-sm text-slate-300">
-                      Suggested savings:{' '}
-                      <span className="font-semibold text-white">
-                        {formatAmount(ai.savings)} {CURRENCY_SUFFIX}
-                      </span>
+                      <Trans
+                        k="planner.suggestedSavings"
+                        values={{ amount: `${formatAmount(ai.savings)} ${CURRENCY_SUFFIX}` }}
+                        tags={{ b: (s) => <span className="font-semibold text-white">{s}</span> }}
+                      />
                     </p>
                   )}
                   {ai.tips.length > 0 && (
                     <ul className="list-disc space-y-1 pl-5 text-sm leading-snug text-slate-300">
-                      {ai.tips.map((t, i) => (
-                        <li key={i}>{plainDashes(t)}</li>
+                      {ai.tips.map((tip, i) => (
+                        <li key={i}>{plainDashes(tip)}</li>
                       ))}
                     </ul>
                   )}
                   <p className="text-xs text-muted">
-                    Per-category suggestions are shown under each category. Written by {ai.model}. A
-                    suggestion, not financial advice.
+                    {t('planner.aiFootnote', { model: ai.model })}
                   </p>
                 </div>
               ) : (
                 <p className="mt-1 text-sm text-slate-300">
-                  Drafts limits from{' '}
                   {baseline.months.length
-                    ? `your last ${baseline.months.length} ${baseline.months.length === 1 ? 'month' : 'months'}`
-                    : 'your defaults'}
-                  , the season and your note above.
+                    ? t('planner.aiIntroHistory', { count: baseline.months.length })
+                    : t('planner.aiIntroDefaults')}
                 </p>
               )}
               <button
@@ -476,18 +482,21 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 disabled={suggest.isPending}
                 className="mt-3 w-full rounded-2xl bg-white/10 py-2.5 text-sm font-semibold text-white ring-1 ring-white/15 active:bg-white/20 disabled:opacity-50"
               >
-                {suggest.isPending ? 'Thinking…' : ai ? 'Draft again' : 'Draft a plan with AI'}
+                {suggest.isPending
+                  ? t('advice.thinking')
+                  : ai
+                    ? t('planner.draftAgain')
+                    : t('planner.draft')}
               </button>
               {suggest.error && (
                 <p className="mt-2 text-sm text-red-300">
                   {suggest.error instanceof PlanUnavailableError
                     ? suggest.error.message
-                    : `Couldn’t draft a plan: ${(suggest.error as Error).message}`}
+                    : t('planner.draftFailed', { error: (suggest.error as Error).message })}
                 </p>
               )}
               <p className="mt-2 text-[11px] leading-relaxed text-muted">
-                Sent to Gemini: monthly totals per category and of income, the goal, your note, and
-                the suggestions above, with the names of yearly bills and regular payments.
+                {t('planner.aiSent')}
               </p>
             </section>
 
@@ -495,7 +504,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
             {suggestions.length > 0 && (
               <section aria-labelledby="plan-suggestions">
                 <h2 id="plan-suggestions" className="mb-2 text-base font-semibold text-white">
-                  Suggestions
+                  {t('planner.suggestions')}
                 </h2>
                 <SuggestionList suggestions={suggestions} onApply={applySuggestion} />
               </section>
@@ -504,7 +513,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
             {recurring.length > 0 && (
               <section aria-labelledby="plan-recurring">
                 <h2 id="plan-recurring" className="mb-2 text-base font-semibold text-white">
-                  Already certain
+                  {t('planner.recurring')}
                 </h2>
                 <RecurringList items={recurring} categories={categoriesById} />
               </section>
@@ -512,7 +521,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
 
             <section aria-labelledby="plan-check">
               <h2 id="plan-check" className="mb-2 text-base font-semibold text-white">
-                Before you save
+                {t('planner.checks')}
               </h2>
               <PlanCheckList checks={checks} />
             </section>
@@ -522,17 +531,17 @@ export function BudgetPlanner({ month, onClose }: Props) {
           <div className="space-y-5">
             <section>
               <div className="mb-2 flex items-center justify-between gap-2">
-                <h2 className="text-base font-semibold text-white">Limits</h2>
+                <h2 className="text-base font-semibold text-white">{t('planner.limits')}</h2>
                 <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
                   {previous.data && (
                     <FillChip onClick={() => fill('previous')}>
-                      {formatMonthName(prevMonth)}’s plan
+                      {t('planner.fillPrevious', { month: formatMonthName(prevMonth) })}
                     </FillChip>
                   )}
                   {baseline.months.length > 0 && (
-                    <FillChip onClick={() => fill('typical')}>Typical</FillChip>
+                    <FillChip onClick={() => fill('typical')}>{t('planner.fillTypical')}</FillChip>
                   )}
-                  <FillChip onClick={() => fill('defaults')}>Defaults</FillChip>
+                  <FillChip onClick={() => fill('defaults')}>{t('planner.fillDefaults')}</FillChip>
                 </div>
               </div>
               <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
@@ -550,7 +559,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                         <button
                           type="button"
                           onClick={() => setFocused(category.id)}
-                          title="History, forecast and share"
+                          title={t('planner.openCategory')}
                           className="group flex min-w-0 flex-1 items-center gap-1 text-left"
                         >
                           <span className="truncate text-[15px] font-medium text-white decoration-white/30 underline-offset-4 group-hover:underline">
@@ -559,7 +568,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                           {suggestedIds.has(category.id) && (
                             <Lightbulb
                               weight="fill"
-                              aria-label="Has a suggestion"
+                              aria-label={t('planner.hasSuggestion')}
                               className="shrink-0 text-accent-soft"
                             />
                           )}
@@ -570,7 +579,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                         </button>
                         <div className="w-32 shrink-0">
                           <MoneyInput
-                            label={`${category.name} limit`}
+                            label={t('planner.limitOf', { name: category.name })}
                             value={value}
                             onChange={(v) => setLimit(category.id, v)}
                           />
@@ -582,7 +591,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                             active={value === roundUpPlan(typical)}
                             onClick={() => setLimit(category.id, roundUpPlan(typical))}
                           >
-                            typical {formatAmount(Math.round(typical))}
+                            {t('planner.chipTypical', { amount: formatAmount(Math.round(typical)) })}
                           </Hint>
                         )}
                         {last !== null && (
@@ -590,7 +599,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                             active={value === roundUpPlan(last)}
                             onClick={() => setLimit(category.id, roundUpPlan(last))}
                           >
-                            last {formatAmount(Math.round(last))}
+                            {t('planner.chipLast', { amount: formatAmount(Math.round(last)) })}
                           </Hint>
                         )}
                         {sameMonthLastYear !== null && sameMonthLastYear > 0 && (
@@ -619,7 +628,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                               className="inline-block align-[-0.125em]"
                             />{' '}
                             {formatAmount(suggestion.amount)} {CURRENCY_SUFFIX}
-                            {value === suggestion.amount ? ' · used' : ' · tap to use'}
+                            {value === suggestion.amount ? ` · ${t('planner.used')}` : ` · ${t('planner.tapToUse')}`}
                           </span>
                           <span className="block text-slate-300">
                             {plainDashes(suggestion.reason)}
@@ -632,8 +641,10 @@ export function BudgetPlanner({ month, onClose }: Props) {
               </ul>
               {baseline.months.length > 0 && (
                 <p className="mt-2 text-xs text-muted">
-                  “Typical” is the average of the last {Math.min(3, baseline.months.length)}{' '}
-                  complete months. Chips round up to 10 {CURRENCY_SUFFIX}.
+                  {t('planner.typicalNote', {
+                    count: Math.min(3, baseline.months.length),
+                    currency: CURRENCY_SUFFIX,
+                  })}
                 </p>
               )}
             </section>
@@ -644,7 +655,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 onClick={() => remove.mutate(month, { onSuccess: onClose })}
                 className="w-full rounded-2xl py-3 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 active:bg-red-500/10"
               >
-                Remove {formatMonthName(month)}’s plan (back to default limits)
+                {t('planner.remove', { month: formatMonthName(month) })}
               </button>
             )}
           </div>
@@ -683,14 +694,14 @@ function Shell({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Back"
+          aria-label={t('common.back')}
           className="-ml-2 shrink-0 rounded-full px-2 py-2 text-2xl leading-none text-muted active:bg-white/10"
         >
           <ArrowLeft />
         </button>
         <div className="min-w-0">
           <h1 className="truncate text-xl font-bold text-white lg:text-2xl lg:tracking-tight">
-            Plan {formatMonth(month)}
+            {t('planner.title', { month: formatMonth(month) })}
           </h1>
           {status && <p className="text-xs text-muted">{status}</p>}
         </div>
@@ -776,7 +787,7 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
   if (income <= 0) {
     return (
       <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-muted">
-        Add the income you expect to see whether the plan fits.
+        {t('planner.addIncome')}
       </p>
     )
   }
@@ -793,13 +804,13 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
       >
         {balanced ? (
           <>
-            Every złoty has a job{' '}
+            {t('planner.balanced')}{' '}
             <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" />
           </>
         ) : over ? (
-          'Over income by'
+          t('planner.overBy')
         ) : (
-          'Not assigned yet'
+          t('planner.unassigned')
         )}
       </span>
       {!balanced && (
@@ -815,11 +826,11 @@ function UnassignedBar({ income, unassigned }: { income: number; unassigned: num
 
 /** The footer's reminder, on a laptop, of where the zero-based plan stands. */
 function balanceNote(planned: number, unassigned: number): string {
-  if (planned <= 0) return 'No income planned yet.'
-  if (Math.abs(unassigned) < 1) return 'Every złoty has a job.'
+  if (planned <= 0) return t('planner.noteNoIncome')
+  if (Math.abs(unassigned) < 1) return t('planner.noteBalanced')
   return unassigned < 0
-    ? `${formatMoneyCompact(-unassigned)} more than the income.`
-    : `${formatMoneyCompact(unassigned)} not assigned yet.`
+    ? t('planner.noteOver', { amount: formatMoneyCompact(-unassigned) })
+    : t('planner.noteUnassigned', { amount: formatMoneyCompact(unassigned) })
 }
 
 /**
@@ -859,7 +870,7 @@ function FocusedCategory({
           onClick={onBack}
           className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-300 ring-1 ring-white/10 hover:bg-white/5 active:bg-white/10"
         >
-          All categories
+          {t('planner.allCategories')}
         </button>
         <h2 className="flex min-w-0 flex-1 items-center gap-2.5 text-xl font-bold text-white">
           {category && (
@@ -871,15 +882,15 @@ function FocusedCategory({
           )}
           <span className="truncate">{category?.name}</span>
           <span className="hidden truncate text-base font-medium text-muted short:lg:inline">
-            in the {formatMonth(month)} plan
+            {t('planner.inPlan', { month: formatMonth(month) })}
           </span>
         </h2>
         {categories.length > 1 && index !== -1 && (
-          <nav aria-label="Other categories" className="flex items-center gap-1 text-sm">
+          <nav aria-label={t('planner.otherCategories')} className="flex items-center gap-1 text-sm">
             <button
               type="button"
               onClick={() => onSelect(step(-1).id)}
-              aria-label={`Previous category: ${step(-1).name}`}
+              aria-label={t('planner.previousCategory', { name: step(-1).name })}
               className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
             >
               <CaretLeft aria-hidden className="inline-block align-[-0.125em]" />
@@ -888,7 +899,7 @@ function FocusedCategory({
             <button
               type="button"
               onClick={() => onSelect(step(1).id)}
-              aria-label={`Next category: ${step(1).name}`}
+              aria-label={t('planner.nextCategory', { name: step(1).name })}
               className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
             >
               <span className="mr-1.5 hidden lg:inline">{step(1).name}</span>

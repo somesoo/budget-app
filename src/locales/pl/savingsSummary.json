@@ -1,0 +1,14 @@
+{
+  "putAside": {
+    "message": "Odłożone w miesiącu {month}: <b>{amount}</b>",
+    "context": "Budget tab > Savings summary: saved this month; {month} is the name alone. Keep the <b> tags."
+  },
+  "putAsidePlanned": {
+    "message": "Odłożone w miesiącu {month}: <b>{amount}</b> z planowanych {planned}",
+    "context": "Budget tab > Savings summary with the plan's amount. Keep the <b> tags."
+  },
+  "inAll": {
+    "message": "łącznie {amount}",
+    "context": "Budget tab > Savings summary: total saved."
+  }
+}

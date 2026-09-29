@@ -1,0 +1,213 @@
+{
+  "thousands": {
+    "message": "{value}k",
+    "context": "Compact chart axis label for thousands: 12400 becomes '12.4k'. {value} is the number of thousands. Keep it very short."
+  },
+  "everythingElse": {
+    "one": "Everything else ({count})",
+    "other": "Everything else ({count})",
+    "context": "Spending donut chart: the slice that groups the smaller categories together. {count} is how many categories it holds."
+  },
+  "askQuestion": {
+    "message": "What stands out in {month}'s spending?",
+    "context": "Question pre-filled in the AI chat from the Insights tab; {month} is the name alone."
+  },
+  "loadFailed": {
+    "message": "Could not load expenses: {error}",
+    "context": "Insights: error."
+  },
+  "empty": {
+    "message": "Nothing to chart yet. Add a few expenses and come back.",
+    "context": "Insights: no data yet."
+  },
+  "paceTitle": {
+    "message": "Pace this month",
+    "context": "Insights: pace chart card title (current month)."
+  },
+  "paceThrough": {
+    "message": "Pace through {month}",
+    "context": "Insights: pace chart card title for a past month."
+  },
+  "evenSpread": {
+    "message": "Even spread of limits",
+    "context": "Insights: legend of the dashed pace line."
+  },
+  "day": {
+    "message": "Day",
+    "context": "Insights: data table column header."
+  },
+  "spentToDate": {
+    "message": "Spent to date",
+    "context": "Insights: data table column header."
+  },
+  "projectedEnd": {
+    "message": "Projected month end",
+    "context": "Insights: KPI label."
+  },
+  "overLimits": {
+    "message": "{amount} over limits",
+    "context": "Insights: KPI note."
+  },
+  "withinLimits": {
+    "message": "within {amount} limits",
+    "context": "Insights: KPI note, within the total limits. Lowercase."
+  },
+  "vs": {
+    "message": "vs {month}",
+    "context": "Insights: KPI label comparing with last month; {month} is the name alone."
+  },
+  "vsSameDays": {
+    "message": "vs {month}, same days",
+    "context": "Insights: KPI label comparing the same days of last month."
+  },
+  "noDataFor": {
+    "message": "No data for {month}",
+    "context": "Insights: KPI when last month has no data."
+  },
+  "moreThanLast": {
+    "message": "more than last month",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "lessThanLast": {
+    "message": "less than last month",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "sameAsLast": {
+    "message": "the same as last month",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "youSpent": {
+    "message": "You spent {amount} in {month}.",
+    "context": "Insights pace card headline, past month without limits."
+  },
+  "endedOver": {
+    "message": "{month} ended {amount} over your limits.",
+    "context": "Insights pace card headline, past month."
+  },
+  "endedUnder": {
+    "message": "{month} ended {amount} under your limits.",
+    "context": "Insights pace card headline, past month."
+  },
+  "finishOver": {
+    "message": "At this rate you'll finish about <b>{amount} over</b> your limits.",
+    "context": "Insights pace card headline. Keep the <b> tags."
+  },
+  "finishUnder": {
+    "message": "At this rate you'll finish about <b>{amount} under</b> your limits.",
+    "context": "Insights pace card headline. Keep the <b> tags."
+  },
+  "monthByMonth": {
+    "message": "Month by month",
+    "context": "Insights: chart card title."
+  },
+  "monthByMonthEmpty": {
+    "message": "Shows up once you have two months of expenses. A single month is just the number above.",
+    "context": "Insights: month-by-month card with one month of data."
+  },
+  "onCourseAbove": {
+    "message": "{month} is on course to finish <b>{percent}% above</b> your average month.",
+    "context": "Insights month-by-month headline. Keep the <b> tags."
+  },
+  "onCourseBelow": {
+    "message": "{month} is on course to finish <b>{percent}% below</b> your average month.",
+    "context": "Insights month-by-month headline. Keep the <b> tags."
+  },
+  "wasAbove": {
+    "message": "{month} was <b>{percent}% above</b> your average month.",
+    "context": "Insights month-by-month headline, past month. Keep the <b> tags."
+  },
+  "wasBelow": {
+    "message": "{month} was <b>{percent}% below</b> your average month.",
+    "context": "Insights month-by-month headline, past month. Keep the <b> tags."
+  },
+  "monthlyLimits": {
+    "message": "Monthly limits",
+    "context": "Insights: legend of the dashed limit line."
+  },
+  "month": {
+    "message": "Month",
+    "context": "Insights: data table column header."
+  },
+  "totalChartLabel": {
+    "message": "Total spending per month",
+    "context": "Insights: accessible label of the monthly chart."
+  },
+  "limitsShort": {
+    "message": "limits",
+    "context": "Insights: short label on the chart's dashed line. Very short, lowercase."
+  },
+  "soFar": {
+    "message": "So far",
+    "context": "Insights: chart tooltip row for the running month."
+  },
+  "changeByCategory": {
+    "message": "Change by category",
+    "context": "Insights: chart card title."
+  },
+  "changeEmpty": {
+    "message": "Compares each category with the month before. Nothing logged in {month} yet.",
+    "context": "Insights: change card when last month has no data."
+  },
+  "biggestJump": {
+    "message": "Biggest jump: <b>{name}</b>, +{amount} vs {month}.",
+    "context": "Insights change card headline. Keep the <b> tags."
+  },
+  "biggestJumpSameDays": {
+    "message": "Biggest jump: <b>{name}</b>, +{amount} vs the same days of {month}.",
+    "context": "Insights change card headline, running month. Keep the <b> tags."
+  },
+  "allDown": {
+    "message": "Every category is down, most of all <b>{name}</b>.",
+    "context": "Insights change card headline. Keep the <b> tags."
+  },
+  "moreThan": {
+    "message": "More than {month}",
+    "context": "Insights change card legend; {month} is e.g. 'Aug 1-21'."
+  },
+  "less": {
+    "message": "Less",
+    "context": "Insights change card legend."
+  },
+  "change": {
+    "message": "Change",
+    "context": "Insights: data table column header."
+  },
+  "inProgress": {
+    "message": "Month in progress",
+    "context": "Insights people chart: legend of the dashed segment."
+  },
+  "whoSpent": {
+    "message": "Who spent what",
+    "context": "Insights: chart card title, spending per person."
+  },
+  "trendLater": {
+    "message": "The trend line appears after a second month.",
+    "context": "Insights people card with one month of data."
+  },
+  "weekdayTitle": {
+    "message": "Everyday spending by weekday",
+    "context": "Insights: chart card title."
+  },
+  "priciestDay": {
+    "message": "Your priciest day is <b>{day}</b>, about {amount} on average.",
+    "context": "Insights weekday headline; {day} is a weekday name (e.g. 'Saturday', Polish nominative 'sobota'). Keep the <b> tags."
+  },
+  "average": {
+    "message": "Average",
+    "context": "Insights: table header and tooltip row."
+  },
+  "weekdayChartLabel": {
+    "message": "Average spending per weekday",
+    "context": "Insights: accessible label of the weekday chart."
+  },
+  "weekdayNote": {
+    "one": "Average per day since your first expense, over the last month.",
+    "other": "Average per day since your first expense, over the last {count} months.",
+    "context": "Insights weekday card footnote."
+  },
+  "weekdayExcluded": {
+    "one": "Leaves out {count} expense of {amount} or more, like rent.",
+    "other": "Leaves out {count} expenses of {amount} or more, like rent.",
+    "context": "Insights weekday card footnote: big expenses are excluded."
+  }
+}

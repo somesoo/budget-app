@@ -1,9 +1,8 @@
 /**
- * Every user-facing name and tunable number lives here, so changing the quick
- * amounts or the currency is a one-line edit. The people are in the database.
+ * Tunable numbers live here, so changing the quick amounts or the currency is
+ * a one-line edit. The people are in the database; the text is in
+ * src/locales.
  */
-
-export const APP_NAME = 'Budget'
 
 /**
  * The shared account everyone signs in with. Not a secret (the password is),
@@ -11,8 +10,10 @@ export const APP_NAME = 'Budget'
  */
 export const AUTH_EMAIL = (import.meta.env.VITE_AUTH_EMAIL as string | undefined) ?? ''
 
-/** Number formatting + currency suffix (amounts are stored as plain numbers). */
-export const LOCALE = 'en-GB'
+/**
+ * Currency suffix (amounts are stored as plain numbers). Number and date
+ * formats follow the app's language: see src/i18n.
+ */
 export const CURRENCY_SUFFIX = 'zł'
 
 /** Big one-tap buttons on the amount screen; they add up. Each device can change them in Settings. */
@@ -21,18 +22,6 @@ export const QUICK_AMOUNTS = [10, 20, 50, 100]
 /** One-tap contributions on the savings goal. */
 export const GOAL_QUICK_AMOUNTS = [50, 100, 200, 500]
 
-
-/** Week starts on Monday. */
-export const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-export const WEEKDAY_NAMES = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-]
 
 /**
  * Yearly contribution limits, per person, set each year by the government:

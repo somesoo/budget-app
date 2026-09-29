@@ -1,0 +1,134 @@
+{
+  "accountGone": {
+    "message": "Nic tu nie ma: konto mogło zostać usunięte.",
+    "context": "Account page: the account no longer exists."
+  },
+  "goalGone": {
+    "message": "Nic tu nie ma: cel mógł zostać usunięty.",
+    "context": "Goal page: the goal no longer exists."
+  },
+  "rate": {
+    "message": "{rate}% w skali roku",
+    "context": "Account page subtitle: interest rate."
+  },
+  "balance": {
+    "message": "Saldo",
+    "context": "Account page: stat and chart tooltip label."
+  },
+  "setAside": {
+    "message": "Przypisane",
+    "context": "Account page: money on the account assigned to goals."
+  },
+  "monthEnd": {
+    "message": "Saldo na koniec miesiąca",
+    "context": "Account page: chart heading."
+  },
+  "interestPart": {
+    "message": "Z tego {amount} to odsetki.",
+    "context": "Account page: under the chart heading."
+  },
+  "chartLabel": {
+    "message": "{name}: saldo na koniec każdego miesiąca",
+    "context": "Account page: accessible label of the chart."
+  },
+  "interestSoFar": {
+    "message": "Odsetki dotąd",
+    "context": "Account page: chart tooltip row."
+  },
+  "movements": {
+    "message": "Operacje",
+    "context": "Account page: heading of the deposits/withdrawals list."
+  },
+  "setAsideFor": {
+    "message": "Przypisane do",
+    "context": "Account page: heading of which goals the money is for."
+  },
+  "fixShares": {
+    "message": "Popraw udziały",
+    "context": "Account page: button to correct the goals' shares."
+  },
+  "noShares": {
+    "message": "Żaden cel nie ma jeszcze pieniędzy na tym koncie.",
+    "context": "Account page: empty goal shares."
+  },
+  "inAYear": {
+    "message": "Za rok",
+    "context": "Account page: projection card heading."
+  },
+  "projectionKeep": {
+    "message": "Jeśli dalej będzie wpływać {recent} miesięcznie, jak ostatnio. Dodaj oprocentowanie, żeby zobaczyć, ile zarobi.",
+    "context": "Account page projection: recent deposits continue; no interest rate set."
+  },
+  "projectionKeepRate": {
+    "message": "Jeśli dalej będzie wpływać {recent} miesięcznie, jak ostatnio, plus ok. {earned} odsetek przy {rate}% przed 19% podatkiem.",
+    "context": "Account page projection with interest. The 19% is Poland's capital gains tax (Belka tax)."
+  },
+  "projectionNothing": {
+    "message": "Bez kolejnych wpłat. Dodaj oprocentowanie, żeby zobaczyć, ile zarobi.",
+    "context": "Account page projection: no recent deposits, no rate."
+  },
+  "projectionNothingRate": {
+    "message": "Bez kolejnych wpłat, plus ok. {earned} odsetek przy {rate}% przed 19% podatkiem.",
+    "context": "Account page projection: no deposits, with interest."
+  },
+  "target": {
+    "message": "Cel: {amount}",
+    "context": "Goal page subtitle."
+  },
+  "targetBy": {
+    "message": "Cel: {amount} do {month}",
+    "context": "Goal page subtitle with date; {month} is month and year."
+  },
+  "noFinish": {
+    "message": "Bez mety",
+    "context": "Goal page subtitle for an open-ended goal."
+  },
+  "setSaved": {
+    "message": "Ustaw odłożoną kwotę",
+    "context": "Goal page: button to correct how much is saved."
+  },
+  "askQuestion": {
+    "message": "Jak zdążyć z celem {name} i czego to wymaga?",
+    "context": "Question pre-filled in the AI chat from a goal's page."
+  },
+  "spentFrom": {
+    "message": "Wydane z niego",
+    "context": "Goal page: heading of the expenses paid from the goal."
+  },
+  "spentEmpty": {
+    "message": "Jeszcze nic. Dodawaj koszty z kafelka Cele na karcie Dodaj: nie wchodzą do budżetu miesiąca.",
+    "context": "Goal page: no expenses from it yet."
+  },
+  "inAndOut": {
+    "message": "Wpłaty i wypłaty",
+    "context": "Goal page: heading of its movements."
+  },
+  "noFunding": {
+    "message": "Jeszcze nic nie odłożono na niego na żadnym koncie.",
+    "context": "Goal page: no account holds money for it."
+  },
+  "putIn": {
+    "message": "Wpłacono",
+    "context": "Investment account card: total deposited."
+  },
+  "worthNow": {
+    "message": "Wartość teraz",
+    "context": "Investment account card: current value."
+  },
+  "gained": {
+    "message": "Zysk",
+    "context": "Investment account card: gain."
+  },
+  "lost": {
+    "message": "Strata",
+    "context": "Investment account card: loss."
+  },
+  "investedHelp": {
+    "message": "Jego wartość sama rośnie i spada. Raz w miesiącu lub kwartale <link>zaktualizuj saldo</link> do tego, co pokazuje instytucja: różnica to zysk lub strata i nie liczy się jako oszczędzanie ani do rocznego limitu.",
+    "context": "Investment account card: explanation; <link>…</link> becomes a button, keep the tags."
+  },
+  "back": {
+    "message": "Wróć do Oszczędności",
+    "context": "Accessible label of the back arrow on account and goal pages."
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "edit": {
+    "message": "Edit {name}",
+    "context": "Trip/project sheet heading when editing; {name} is the trip's name."
+  },
+  "new": {
+    "message": "New trip or project",
+    "context": "Trip/project sheet heading when creating one. A trip or project has its own budget, paid from savings, outside the monthly limits."
+  },
+  "namePlaceholder": {
+    "message": "e.g. Japan 2027, Kitchen",
+    "context": "Trip/project sheet: placeholder of the name field."
+  },
+  "budgetLabel": {
+    "message": "Budget for all of it (optional)",
+    "context": "Trip/project sheet: label of the total budget field."
+  },
+  "budget": {
+    "message": "Budget",
+    "context": "Trip/project: its total budget (field label and stat)."
+  },
+  "from": {
+    "message": "From (optional)",
+    "context": "Trip/project sheet: start date field."
+  },
+  "until": {
+    "message": "Until (optional)",
+    "context": "Trip/project sheet: end date field."
+  },
+  "badDates": {
+    "message": "Ends before it starts",
+    "context": "Trip/project sheet: error, the end date is before the start date."
+  },
+  "goal": {
+    "message": "Paid from savings goal (optional)",
+    "context": "Trip/project sheet: which savings goal pays for it."
+  },
+  "goalHelp": {
+    "message": "Its spending stays out of the monthly budget either way; this shows it against what was saved.",
+    "context": "Trip/project sheet: hint under the goal choice."
+  },
+  "unarchive": {
+    "message": "Bring it back to Add",
+    "context": "Trip/project sheet: button that shows a finished trip on the Add screen again."
+  },
+  "archive": {
+    "message": "Finish: take it off the Add screen",
+    "context": "Trip/project sheet: button that marks the trip as finished."
+  },
+  "spentFromGoals": {
+    "message": "Spent from goals",
+    "context": "Budget tab: heading of the list of trips and goals that were spent from (outside the monthly budget)."
+  },
+  "overBy": {
+    "message": "Over by",
+    "context": "Trip card: stat label, how much the trip went over its budget."
+  },
+  "left": {
+    "message": "Left",
+    "context": "Trip card: stat label, what's left of its budget."
+  },
+  "noBudget": {
+    "message": "No budget",
+    "context": "Trip card: stat value when there's no budget."
+  },
+  "untitled": {
+    "message": "Untitled",
+    "context": "Trip card > Where it went: expenses without a note are grouped under this."
+  },
+  "whereItWent": {
+    "message": "Where it went",
+    "context": "Trip card: heading of the biggest things the trip's money went on."
+  },
+  "startsIn": {
+    "one": "Starts in {count} day.",
+    "other": "Starts in {count} days.",
+    "context": "Trip card: the trip hasn't started yet."
+  },
+  "startsInPaid": {
+    "one": "Starts in {count} day. {amount} already paid ahead.",
+    "other": "Starts in {count} days. {amount} already paid ahead.",
+    "context": "Trip card: the trip hasn't started, and {amount} was already spent on it (tickets etc.)."
+  },
+  "running": {
+    "one": "{count} day to go, today included.",
+    "other": "{count} days to go, today included.",
+    "context": "Trip card: the trip is running."
+  },
+  "runningPerDay": {
+    "one": "{count} day to go, today included: about {amount} a day keeps it within budget.",
+    "other": "{count} days to go, today included: about {amount} a day keeps it within budget.",
+    "context": "Trip card: the trip is running, with what can be spent per day."
+  },
+  "finishedUnder": {
+    "message": "Finished {amount} under budget.",
+    "context": "Trip card: the trip is over."
+  },
+  "finishedOver": {
+    "message": "Finished {amount} over budget.",
+    "context": "Trip card: the trip is over."
+  },
+  "finished": {
+    "message": "Finished.",
+    "context": "Trip card: the trip is over (no budget)."
+  },
+  "undated": {
+    "message": "Paid from savings, outside the monthly budget. Add trip dates in Edit to see a daily amount while it runs.",
+    "context": "Trip card: the trip has no dates."
+  },
+  "title": {
+    "message": "Project",
+    "context": "Trip/project page heading while loading or when missing."
+  },
+  "gone": {
+    "message": "Nothing here: it may have been removed.",
+    "context": "Trip/project page: it no longer exists."
+  },
+  "everyExpense": {
+    "message": "Every expense",
+    "context": "Trip/project page: heading of the list of its expenses."
+  },
+  "empty": {
+    "message": "Nothing yet. Tie it to a savings goal in Edit, then add expenses from the Goals tile on the Add tab.",
+    "context": "Trip/project page: no expenses yet."
+  },
+  "datesBoth": {
+    "message": "{from} to {to}",
+    "context": "Trip/project page: its dates, e.g. '5 May 2027 to 19 May 2027'."
+  },
+  "datesFrom": {
+    "message": "From {from}",
+    "context": "Trip/project page: start date only."
+  },
+  "datesTo": {
+    "message": "Until {to}",
+    "context": "Trip/project page: end date only."
+  },
+  "kind": {
+    "message": "Trip or project",
+    "context": "Trip/project page: subtitle when it has no dates."
+  }
+}

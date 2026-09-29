@@ -1,0 +1,62 @@
+{
+  "intro": {
+    "message": "Prosto z wypłaty, zanim cokolwiek zostanie wydane.",
+    "context": "Budget planner > Savings: explanation under the heading; savings are set aside first."
+  },
+  "goal": {
+    "message": "Cel",
+    "context": "Budget planner > Savings: small label under a savings goal's name."
+  },
+  "onTime": {
+    "message": "na czas: {amount}",
+    "context": "Budget planner > Savings: chip that fills in what the goal needs per month to make its date. Lowercase, short."
+  },
+  "onto": {
+    "message": "na konto",
+    "context": "Budget planner > Savings: label before choosing which account a goal's money goes onto. Lowercase."
+  },
+  "noAccount": {
+    "message": "Dodaj konto oszczędnościowe (karta Oszczędności), żeby móc to wpłacić.",
+    "context": "Budget planner > Savings: there's no account to pay into."
+  },
+  "maxOut": {
+    "message": "do limitu: {amount}",
+    "context": "Budget planner > Savings: chip that fills in what's left of an IKE/IKZE account's yearly limit. Lowercase, short."
+  },
+  "paidInYear": {
+    "message": "wpłacono {paid} z {limit} w {year}",
+    "context": "Budget planner > Savings: an IKE/IKZE account's contributions this year against its yearly limit."
+  },
+  "limitReached": {
+    "message": "limit na {year} wyczerpany",
+    "context": "Budget planner > Savings: the IKE/IKZE yearly limit is used up."
+  },
+  "overLimit": {
+    "message": "{amount} ponad limit na {year}, instytucja tego nie przyjmie",
+    "context": "Budget planner > Savings: warning, the plan pays more into an IKE/IKZE than the yearly limit allows."
+  },
+  "limitUnknown": {
+    "message": "Limit na {year} nie jest jeszcze znany; używam limitu na {known}.",
+    "context": "Budget planner > Savings: the IKE/IKZE limit for {year} isn't announced yet; the one for {known} is used."
+  },
+  "owed": {
+    "message": "do spłaty zostało {amount}",
+    "context": "Budget planner > Savings: under a loan repayment, how much is still owed."
+  },
+  "instalment": {
+    "message": "rata: {amount}",
+    "context": "Budget planner > Savings: chip that fills in the loan's next instalment. Lowercase, short."
+  },
+  "other": {
+    "message": "Inne oszczędności",
+    "context": "Budget planner > Savings: savings not tied to a goal or account."
+  },
+  "otherHelp": {
+    "message": "Odłożone, bez konkretnego celu",
+    "context": "Budget planner > Savings: explanation under 'Other savings'."
+  },
+  "lineLabel": {
+    "message": "{name}: z wypłaty",
+    "context": "Budget planner > Savings: accessible label of the amount field of a goal, account or loan {name}."
+  }
+}

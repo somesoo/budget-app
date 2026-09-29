@@ -2,6 +2,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react'
 import type { KeyboardEvent, ReactNode, RefObject } from 'react'
 import type { Category } from '../../types'
 import { CategoryTile } from '../CategoryTile'
+import { t } from '../../i18n'
 
 interface Props {
   categories: Category[]
@@ -48,8 +49,8 @@ export function CategoryGrid({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           onKeyDown={onSearchKeyDown}
-          placeholder="Find a category"
-          aria-label="Find a category, Enter picks the first match"
+          placeholder={t('add.findCategory')}
+          aria-label={t('add.findCategoryLabel')}
           className="w-full rounded-xl bg-white/5 py-2.5 pl-10 pr-16 text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
         />
         <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-xs text-muted ring-1 ring-white/15">
@@ -58,7 +59,7 @@ export function CategoryGrid({
       </label>
 
       {categories.length === 0 && goals.length === 0 && !!query ? (
-        <p className="py-10 text-center text-sm text-muted">No category matches “{query}”.</p>
+        <p className="py-10 text-center text-sm text-muted">{t('add.noMatch', { query })}</p>
       ) : (
         <div className="-m-1 min-h-0 flex-1 overflow-y-auto p-1">
           <Tiles
@@ -71,7 +72,7 @@ export function CategoryGrid({
           />
           {query && goals.length > 0 && (
             <>
-              <h3 className="mb-2 mt-5 text-sm font-semibold text-white">Goals</h3>
+              <h3 className="mb-2 mt-5 text-sm font-semibold text-white">{t('add.goals')}</h3>
               <Tiles
                 list={goals}
                 spentByCategory={spentByCategory}

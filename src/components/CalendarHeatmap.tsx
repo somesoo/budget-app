@@ -1,5 +1,11 @@
-import { WEEKDAY_LABELS } from '../config'
-import { daysInMonth, heatIntensity, monthGrid, todayKey, type MonthKey } from '../lib/calculations'
+import {
+  daysInMonth,
+  heatIntensity,
+  monthGrid,
+  todayKey,
+  weekdayNames,
+  type MonthKey,
+} from '../lib/calculations'
 
 /** The app's accent (CHART.accent): the more spent, the stronger. */
 const HEAT_COLOR = '57, 135, 229'
@@ -27,7 +33,7 @@ export function CalendarHeatmap({
   return (
     <div>
       <div className="mb-1 grid grid-cols-7 gap-1.5">
-        {WEEKDAY_LABELS.map((label) => (
+        {weekdayNames().map((label) => (
           <div key={label} className="py-1 text-center text-xs font-medium text-muted">
             {label}
           </div>

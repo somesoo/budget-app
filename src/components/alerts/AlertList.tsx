@@ -2,6 +2,7 @@ import { CaretRight, Warning, WarningCircle, X } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import type { BudgetAlert } from '../../lib/alerts'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 /** Over a limit is red; close to one or heading over it, amber. Always with an icon and words. */
 export const alertColor = (a: BudgetAlert) => (a.kind === 'over' ? '#fca5a5' : CHART.warning)
@@ -54,8 +55,8 @@ export function AlertList({
           <button
             type="button"
             onClick={() => onDismiss(a)}
-            aria-label={`Dismiss: ${a.title}`}
-            title="Dismiss"
+            aria-label={t('alertList.dismissLabel', { title: a.title })}
+            title={t('alertList.dismiss')}
             className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-white/10 hover:text-white"
           >
             <X />

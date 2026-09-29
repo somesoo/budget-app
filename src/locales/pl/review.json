@@ -1,0 +1,58 @@
+{
+  "title": {
+    "message": "Jak minął miesiąc: {month}",
+    "context": "Budget tab: heading of the review of a finished month; {month} is the month name alone."
+  },
+  "spentOver": {
+    "message": "Wydano {spent} z {limit}, {diff} ponad.",
+    "context": "Month review: total spending against the total limits, over."
+  },
+  "spentUnder": {
+    "message": "Wydano {spent} z {limit}, {diff} poniżej.",
+    "context": "Month review: total spending against the total limits, under."
+  },
+  "spent": {
+    "message": "Wydano {spent}.",
+    "context": "Month review: total spending when there were no limits."
+  },
+  "leftOver": {
+    "message": "Zostało {amount}.",
+    "context": "Month review: income minus spending."
+  },
+  "leftOverPlanned": {
+    "message": "Zostało {amount}, przy planowanych oszczędnościach {planned}.",
+    "context": "Month review: income minus spending, compared with what the plan meant to save."
+  },
+  "short": {
+    "message": "Brakło {amount}.",
+    "context": "Month review: spending was more than income by {amount}."
+  },
+  "shortPlanned": {
+    "message": "Brakło {amount}, przy planowanych oszczędnościach {planned}.",
+    "context": "Month review: spending exceeded income, while the plan meant to save {planned}."
+  },
+  "wentOver": {
+    "message": "Przekroczone",
+    "context": "Month review: heading of the categories that ended over their limit."
+  },
+  "overBy": {
+    "message": "{amount} ponad {limit}",
+    "context": "Month review: a category's overshoot, e.g. '120 zł over 800 zł'."
+  },
+  "leftRoom": {
+    "message": "Z zapasem",
+    "context": "Month review: heading of the categories that ended well under their limit."
+  },
+  "unused": {
+    "message": "niewykorzystane {amount} z {limit}",
+    "context": "Month review: how much of a category's limit went unused."
+  },
+  "planWithIt": {
+    "message": "Zaplanuj z tym ten miesiąc",
+    "context": "Month review: button that opens the planner for the current month using the review."
+  },
+  "seeAll": {
+    "message": "Pokaż cały miesiąc: {month}",
+    "context": "Month review: button that switches to the finished month; {month} is the name alone."
+  }
+}

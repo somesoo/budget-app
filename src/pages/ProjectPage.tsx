@@ -11,6 +11,7 @@ import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import { categoryById, formatDayLong } from '../lib/calculations'
 import { toEntries } from '../lib/history'
 import type { ProjectSummary } from '../lib/projects'
+import { t } from '../i18n'
 
 /**
  * `/project/:id`: a trip or project across all its months. Since goals and
@@ -28,12 +29,12 @@ export function ProjectPage() {
 
   if (projects.isLoading) {
     return (
-      <Frame title="Project">
+      <Frame title={t('project.title')}>
         <div className="h-64 animate-pulse rounded-3xl bg-white/5" />
       </Frame>
     )
   }
-  if (!summary) return <Frame title="Project">Nothing here: it may have been removed.</Frame>
+  if (!summary) return <Frame title={t('project.title')}>{t('project.gone')}</Frame>
 
   const { project } = summary
   if (project.goal_id) return <Navigate to={`/savings/goal/${project.goal_id}`} replace />
@@ -50,10 +51,10 @@ export function ProjectPage() {
           <TripSpendingCard summary={summary} />
 
           <section>
-            <h2 className="mb-2 text-base font-semibold text-white">Every expense</h2>
+            <h2 className="mb-2 text-base font-semibold text-white">{t('project.everyExpense')}</h2>
             {expenses.length === 0 ? (
               <p className="text-sm text-muted">
-                Nothing yet. Tie it to a savings goal in Edit, then add expenses from the Goals tile on the Add tab.
+                {t('project.empty')}
               </p>
             ) : (
               <RecentEntries
@@ -79,10 +80,10 @@ export function ProjectPage() {
 function dates({ project }: ProjectSummary): string {
   const from = project.starts_on ? formatDayLong(project.starts_on) : null
   const to = project.ends_on ? formatDayLong(project.ends_on) : null
-  if (from && to) return `${from} to ${to}`
-  if (from) return `From ${from}`
-  if (to) return `Until ${to}`
-  return 'Trip or project'
+  if (from && to) return t('project.datesBoth', { from, to })
+  if (from) return t('project.datesFrom', { from })
+  if (to) return t('project.datesTo', { to })
+  return t('project.kind')
 }
 
 function Frame({
@@ -103,7 +104,7 @@ function Frame({
       <header className="mb-5 flex items-center gap-3">
         <Link
           to="/budget"
-          aria-label="Back to Budget"
+          aria-label={t('common.backToBudget')}
           className="-ml-2 rounded-full p-2 text-2xl text-muted hover:bg-white/5"
         >
           <ArrowLeft />
@@ -128,7 +129,7 @@ function Frame({
             onClick={onEdit}
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
           >
-            <PencilSimple aria-hidden /> Edit
+            <PencilSimple aria-hidden /> {t('common.edit')}
           </button>
         )}
       </header>

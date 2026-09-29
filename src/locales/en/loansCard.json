@@ -1,0 +1,30 @@
+{
+  "title": {
+    "message": "Borrowed from savings",
+    "context": "Savings tab: heading of the card with loans still being repaid."
+  },
+  "owed": {
+    "message": "{amount} to pay back",
+    "context": "Loans card: total still owed."
+  },
+  "help": {
+    "message": "Each month’s plan puts the instalment aside first; you can also pay a part back now.",
+    "context": "Loans card: footnote."
+  },
+  "progress": {
+    "message": "{repaid} of {amount} back · {monthly}/mo to {name}",
+    "context": "Loans card: a loan's progress and monthly instalment; {name} is the goal or account it goes back to."
+  },
+  "payBack": {
+    "message": "Pay back {amount}",
+    "context": "Loans card: button that pays the next instalment now."
+  },
+  "bank": {
+    "message": "In the bank: transfer {amount} from your everyday account to {account}. {left} will be left to pay back.",
+    "context": "Loans card: what to do in the actual bank before confirming."
+  },
+  "borrowedNote": {
+    "message": "Borrowed: {note}",
+    "context": "Note saved on the withdrawal made when borrowing from savings; {note} is what it's for."
+  }
+}

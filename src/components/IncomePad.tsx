@@ -1,7 +1,7 @@
 import { ArrowLeft } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { AmountField } from './entry/AmountField'
-import { IncomeKind, ONE_OFF_HELP } from './entry/IncomeKind'
+import { IncomeKind, oneOffHelp } from './entry/IncomeKind'
 import { parseAmount } from './entry/useAmountEntry'
 import { DatePicker } from './DatePicker'
 import { UserSwitcher } from './UserSwitcher'
@@ -19,6 +19,7 @@ import { personIds } from '../lib/people'
 /** From this day of the month on, pay usually covers the month after. */
 const PAYS_NEXT_FROM_DAY = 25
 import type { Person } from '../types'
+import { t } from '../i18n'
 
 interface Props {
   person: Person
@@ -67,7 +68,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         <button
           type="button"
           onClick={onCancel}
-          aria-label="Back"
+          aria-label={t('common.back')}
           className="-ml-2 rounded-full px-3 py-2 text-2xl leading-none text-muted active:bg-white/10"
         >
           <ArrowLeft />
@@ -76,7 +77,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
           className="rounded-full px-3 py-1.5 text-sm font-semibold text-ink"
           style={{ backgroundColor: INCOME_COLOR }}
         >
-          Income
+          {t('entry.income')}
         </span>
       </header>
 
@@ -84,7 +85,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         <AmountField
           value={amountText}
           onChange={(v) => setAmountText(v.replace(/[^\d.,]/g, '').replace(/([.,].*)[.,]/g, '$1'))}
-          label="Amount received"
+          label={t('entry.amountReceived')}
           autoFocus
         />
 
@@ -97,7 +98,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
             }}
             className="w-full rounded-2xl bg-white/5 px-4 py-3 text-left text-sm ring-1 ring-white/10 active:bg-white/10"
           >
-            <span className="text-muted">Same as last time: </span>
+            <span className="text-muted">{t('entry.sameAsLast')} </span>
             <span className="font-semibold text-white">
               {formatAmount(last.amount)} {CURRENCY_SUFFIX}
             </span>
@@ -106,25 +107,25 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         )}
 
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-muted">Kind</span>
+          <span className="text-sm text-muted">{t('entry.kind')}</span>
           <IncomeKind oneOff={oneOff} onChange={setOneOff} />
         </div>
-        {oneOff && <p className="-mt-3 text-xs leading-snug text-muted">{ONE_OFF_HELP}</p>}
+        {oneOff && <p className="-mt-3 text-xs leading-snug text-muted">{oneOffHelp()}</p>}
 
         {personIds().length > 1 && (
           <div className="flex items-center justify-between gap-3">
-            <span className="shrink-0 text-sm text-muted">Received by</span>
+            <span className="shrink-0 text-sm text-muted">{t('entry.receivedBy')}</span>
             <UserSwitcher value={person} onChange={onPersonChange} />
           </div>
         )}
 
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-muted">Date</span>
+          <span className="text-sm text-muted">{t('entry.date')}</span>
           <DatePicker value={date} onChange={setDate} />
         </div>
 
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-muted">Pays for</span>
+          <span className="text-sm text-muted">{t('entry.paysFor')}</span>
           <div className="flex rounded-full bg-white/5 p-1 ring-1 ring-white/10">
             {(['same', 'next'] as const).map((which) => {
               const month = which === 'same' ? dateMonth : shiftMonth(dateMonth, 1)
@@ -146,15 +147,17 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
         </div>
         {paysFor !== dateMonth && (
           <p className="-mt-3 text-xs leading-snug text-muted">
-            Counted as {formatMonthName(paysFor)}’s income: its plan, Safe to spend and what it
-            leaves over, not {formatMonthName(dateMonth)}’s.
+            {t('entry.paysForHelp', {
+              month: formatMonthName(paysFor),
+              other: formatMonthName(dateMonth),
+            })}
           </p>
         )}
 
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder={oneOff ? 'Note (e.g. deposit back, sold a chair)' : 'Note (e.g. salary)'}
+          placeholder={oneOff ? t('entry.notePlaceholderOneOff') : t('entry.notePlaceholderPay')}
           maxLength={120}
           className="w-full rounded-2xl bg-white/5 px-4 py-3.5 text-base text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
         />
@@ -177,7 +180,7 @@ export function IncomePad({ person, onPersonChange, onCancel, onSave, saving }: 
           className="h-16 w-full rounded-3xl text-xl font-bold text-ink transition active:scale-[0.99] disabled:opacity-40"
           style={{ backgroundColor: INCOME_COLOR }}
         >
-          {saving ? 'Saving…' : 'Save income'}
+          {saving ? t('common.saving') : t('entry.saveIncome')}
         </button>
       </div>
     </div>

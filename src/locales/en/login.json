@@ -1,0 +1,11 @@
+{
+  "intro": { "message": "Sign in once. This phone stays signed in after that.", "context": "Sign-in screen: line under the app name. The whole household shares one account." },
+  "account": { "message": "Account", "context": "Sign-in screen: label above the email field of the shared account." },
+  "password": { "message": "Password", "context": "Sign-in screen: label above the password field." },
+  "showPassword": { "message": "Show", "context": "Sign-in screen: button inside the password field that reveals the typed password. Keep it short." },
+  "hidePassword": { "message": "Hide", "context": "Sign-in screen: the same button once the password is visible; hides it again. Keep it short." },
+  "signIn": { "message": "Sign in", "context": "Sign-in screen: the big submit button." },
+  "signingIn": { "message": "Signing in…", "context": "Sign-in screen: the submit button while the sign-in is in progress." },
+  "wrongPassword": { "message": "That password is wrong. Try again.", "context": "Sign-in screen: error under the password field when the password doesn't match." },
+  "offline": { "message": "Can't reach the server. Check your connection.", "context": "Sign-in screen: error under the password field when there's no network." }
+}

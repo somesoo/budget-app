@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { BottomSheet } from './BottomSheet'
 import { UserSwitcher } from '../UserSwitcher'
-import { IncomeKind, ONE_OFF_HELP } from '../entry/IncomeKind'
+import { IncomeKind, oneOffHelp } from '../entry/IncomeKind'
 import { CURRENCY_SUFFIX } from '../../config'
 import { roundMoney, todayKey, withAlpha } from '../../lib/calculations'
 import { formatLogged, type Entry } from '../../lib/history'
@@ -9,6 +9,7 @@ import type { Category, NewExpense, NewIncome, Person } from '../../types'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
 import { isOthersAllowance } from '../../lib/allowance'
 import { personIds } from '../../lib/people'
+import { t } from '../../i18n'
 
 interface Props {
   entry: Entry
@@ -79,10 +80,13 @@ export function EntryEditor({
   }
 
   return (
-    <BottomSheet title={isExpense ? 'Edit expense' : 'Edit income'} onClose={onClose}>
+    <BottomSheet
+      title={isExpense ? t('entry.editExpense') : t('entry.editIncome')}
+      onClose={onClose}
+    >
       <form onSubmit={submit} className="space-y-5">
         <label className="flex items-baseline justify-center gap-2 rounded-2xl bg-white/5 px-4 py-4 ring-1 ring-white/10 focus-within:ring-white/40">
-          <span className="sr-only">Amount</span>
+          <span className="sr-only">{t('entry.amount')}</span>
           <input
             value={amount}
             onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ''))}
@@ -94,18 +98,18 @@ export function EntryEditor({
           <span className="shrink-0 text-xl font-semibold text-muted">{CURRENCY_SUFFIX}</span>
         </label>
 
-        <Field label="Title">
+        <Field label={t('entry.title')}>
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder={isExpense ? 'e.g. Biedronka, cinema' : 'e.g. Salary'}
+            placeholder={isExpense ? t('entry.editTitlePlaceholder') : t('entry.editNotePlaceholder')}
             maxLength={120}
             className="w-full rounded-xl bg-white/5 px-3 py-2.5 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
           />
         </Field>
 
         {isExpense && (
-          <Field label="Category">
+          <Field label={t('entry.category')}>
             <Chips
               list={categories.filter(
                 (c) =>
@@ -118,15 +122,15 @@ export function EntryEditor({
           </Field>
         )}
         {isExpense && goals.length > 0 && (
-          <Field label="Or spent from a goal">
+          <Field label={t('entry.orFromGoal')}>
             <Chips list={goals} value={categoryId} onChange={setCategoryId} />
           </Field>
         )}
 
         {!isExpense && (
-          <Field label="Kind">
+          <Field label={t('entry.kind')}>
             <IncomeKind oneOff={oneOff} onChange={setOneOff} />
-            {oneOff && <p className="mt-1.5 text-xs leading-snug text-muted">{ONE_OFF_HELP}</p>}
+            {oneOff && <p className="mt-1.5 text-xs leading-snug text-muted">{oneOffHelp()}</p>}
           </Field>
         )}
 
@@ -135,11 +139,11 @@ export function EntryEditor({
           className={`flex gap-3 ${personIds().length > 2 ? 'flex-col' : 'items-end'}`}
         >
           {personIds().length > 1 && (
-            <Field label={isExpense ? 'Paid by' : 'Received by'}>
+            <Field label={isExpense ? t('entry.paidByLabel') : t('entry.receivedBy')}>
               <UserSwitcher value={person} onChange={setPerson} />
             </Field>
           )}
-          <Field label="Date" grow>
+          <Field label={t('entry.date')} grow>
             <input
               type="date"
               value={date}
@@ -150,7 +154,7 @@ export function EntryEditor({
           </Field>
         </div>
 
-        <p className="text-xs text-muted">Logged {formatLogged(entry.createdAt)}</p>
+        <p className="text-xs text-muted">{t('entry.logged', { when: formatLogged(entry.createdAt) })}</p>
 
         <div className="flex gap-2">
           <button
@@ -161,14 +165,14 @@ export function EntryEditor({
             }}
             className="rounded-xl px-4 py-3 text-sm font-semibold text-red-400 ring-1 ring-red-400/30 active:bg-red-500/10"
           >
-            Delete
+            {t('common.delete')}
           </button>
           <button
             type="submit"
             disabled={!valid || !changed}
             className="flex-1 rounded-xl bg-slate-50 py-3 text-sm font-bold text-ink disabled:opacity-40"
           >
-            {changed ? 'Save changes' : 'No changes'}
+            {changed ? t('entry.saveChanges') : t('entry.noChanges')}
           </button>
         </div>
       </form>

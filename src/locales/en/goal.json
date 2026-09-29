@@ -1,0 +1,30 @@
+{
+  "toGo": {
+    "message": "{amount} to go",
+    "context": "Savings goal progress: how much is still missing."
+  },
+  "reached": {
+    "message": "Goal reached",
+    "context": "Savings goal progress: the target is reached."
+  },
+  "amountToAdd": {
+    "message": "Amount to add",
+    "context": "Savings goal: accessible label of the amount field for adding money."
+  },
+  "minusHint": {
+    "message": "Put a minus in front to take money back out.",
+    "context": "Savings goal: hint under the amount field."
+  },
+  "takeOut": {
+    "message": "Take out {amount}",
+    "context": "Savings goal: button for a negative amount (withdraw). {amount} is a plain number."
+  },
+  "addAmount": {
+    "message": "Add {amount}",
+    "context": "Savings goal: button that adds the typed amount. {amount} is a plain number."
+  },
+  "addMoney": {
+    "message": "Add money",
+    "context": "Savings goal: button that opens the add-money form."
+  }
+}

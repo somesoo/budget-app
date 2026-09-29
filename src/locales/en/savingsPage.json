@@ -1,0 +1,110 @@
+{
+  "setupTitle": {
+    "message": "One step in Supabase first",
+    "context": "Savings tab before the database update: heading."
+  },
+  "setup": {
+    "message": "Savings accounts need the tables from <code>{file}</code>. Paste it into the SQL Editor and run it, as with the earlier ones. Your current goal and what's saved toward it move onto an account called “Savings”.",
+    "context": "Savings tab before the database update. Keep the <code> tags."
+  },
+  "takeOut": {
+    "message": "Take out",
+    "context": "Savings tab toolbar: withdraw money."
+  },
+  "move": {
+    "message": "Move",
+    "context": "Savings tab toolbar: move money between accounts."
+  },
+  "updateBalance": {
+    "message": "Update balance",
+    "context": "Savings tab toolbar: correct an account's balance."
+  },
+  "askQuestion": {
+    "message": "Are we on track with our savings goals, and what should we change?",
+    "context": "Question pre-filled in the AI chat from the Savings tab."
+  },
+  "total": {
+    "message": "Saved in all",
+    "context": "Savings tab: total saved across all accounts."
+  },
+  "putAside": {
+    "message": "Put aside in {month}",
+    "context": "Savings tab: saved this month; {month} is the name alone."
+  },
+  "planCovered": {
+    "message": "The plan's {amount} is covered",
+    "context": "Savings tab: this month's planned savings are reached."
+  },
+  "planToGo": {
+    "message": "{amount} to go of the plan's {planned}",
+    "context": "Savings tab: how much of this month's planned savings is still to put aside."
+  },
+  "noPlan": {
+    "message": "No savings amount planned this month",
+    "context": "Savings tab: the month's plan has no savings."
+  },
+  "unassigned": {
+    "message": "Unassigned",
+    "context": "Savings tab: money on accounts not set aside for a goal."
+  },
+  "unassignedSome": {
+    "message": "Not set aside for any goal yet",
+    "context": "Savings tab: under 'Unassigned'."
+  },
+  "unassignedNone": {
+    "message": "Every złoty has a goal",
+    "context": "Savings tab: under 'Unassigned' when it's zero."
+  },
+  "assign": {
+    "message": "Assign it",
+    "context": "Savings tab: link to assign the unassigned money to a goal."
+  },
+  "goalsEmpty": {
+    "message": "A goal is what the money is for: a trip, an emergency fund, a car.",
+    "context": "Savings tab: empty goals list."
+  },
+  "addGoal": {
+    "message": "Add a goal",
+    "context": "Savings tab: button in the empty goals list."
+  },
+  "needed": {
+    "message": "The dated goals need {amount} a month together.",
+    "context": "Savings tab: under the goals."
+  },
+  "neededPlanned": {
+    "message": "The dated goals need {amount} a month together; {month}'s plan puts aside {planned}.",
+    "context": "Savings tab: under the goals, with this month's plan."
+  },
+  "showClosed": {
+    "one": "Show {count} closed goal",
+    "other": "Show {count} closed goals",
+    "context": "Savings tab: reveals archived goals."
+  },
+  "hideClosed": {
+    "one": "Hide {count} closed goal",
+    "other": "Hide {count} closed goals",
+    "context": "Savings tab: hides archived goals again."
+  },
+  "accounts": {
+    "message": "Accounts",
+    "context": "Savings tab: heading of the accounts list."
+  },
+  "accountsEmpty": {
+    "message": "An account is where the money is: a savings account, a deposit, cash.",
+    "context": "Savings tab: empty accounts list."
+  },
+  "addAccount": {
+    "message": "Add an account",
+    "context": "Savings tab: button in the empty accounts list."
+  },
+  "showHidden": {
+    "one": "Show {count} hidden account",
+    "other": "Show {count} hidden accounts",
+    "context": "Savings tab: reveals hidden accounts."
+  },
+  "hideHidden": {
+    "one": "Hide {count} hidden account",
+    "other": "Hide {count} hidden accounts",
+    "context": "Savings tab: hides them again."
+  }
+}

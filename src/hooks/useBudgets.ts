@@ -10,6 +10,7 @@ import type {
   PlanSuggestion,
 } from '../types'
 import type { PlanRequest } from '../lib/planning'
+import { getLanguage, t } from '../i18n'
 
 export const budgetKey = (month: MonthKey) => ['budgets', month] as const
 
@@ -107,7 +108,7 @@ export function useSaveBudget() {
       if (/carryover_keep/i.test(error.message ?? '')) {
         if (plan.carryover_keep > 0) {
           throw new Error(
-            'Keeping part of the leftover on the account needs migration 0012_carryover_keep.sql',
+            t('errors.migration', { file: '0012_carryover_keep.sql', what: t('errors.featureKeep') }),
           )
         }
         const withoutKeep: Partial<typeof row> = { ...row }
@@ -120,7 +121,7 @@ export function useSaveBudget() {
       // before migration 0010 a plan without a split still saves
       if (plan.allocations.length > 0 || plan.carryover.length > 0) {
         throw new Error(
-          'Splitting savings between goals and IKE needs migration 0010_plan_allocations.sql',
+          t('errors.migration', { file: '0010_plan_allocations.sql', what: t('errors.featureSplit') }),
         )
       }
       const rest: Partial<typeof row> = { ...row }
@@ -181,20 +182,20 @@ export function useSuggestPlan() {
     mutationFn: async (payload: PlanRequest): Promise<PlanSuggestion> => {
       const { data: session } = await supabase.auth.getSession()
       const token = session.session?.access_token
-      if (!token) throw new Error('Not signed in')
+      if (!token) throw new Error(t('errors.notSignedIn'))
 
       const res = await fetch('/api/plan', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, language: getLanguage() }),
       })
       if (res.status === 404) {
         throw new PlanUnavailableError(
-          'The AI server isn’t running here. It works on Vercel, or locally with `vercel dev`.',
+          t('errors.aiUnavailable'),
         )
       }
       const body = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(body.error ?? `Request failed (${res.status})`)
+      if (!res.ok) throw new Error(body.error ?? t('errors.requestFailed', { status: res.status }))
       return body as PlanSuggestion
     },
   })

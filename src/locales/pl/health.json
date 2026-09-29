@@ -1,0 +1,45 @@
+{
+  "title": {
+    "message": "Kondycja finansów",
+    "context": "Budget tab: heading of the money health card (three key ratios)."
+  },
+  "savingsRate": {
+    "message": "Stopa oszczędności",
+    "context": "Money health card: share of income saved."
+  },
+  "savingsRateRule": {
+    "message": "dochodu odłożone; zwykle celuje się w 20% lub więcej",
+    "context": "Money health card: explanation under the savings rate figure. Lowercase fragment continuing the figure (e.g. '18% of income put aside…')."
+  },
+  "fixedCosts": {
+    "message": "Koszty stałe",
+    "context": "Money health card: share of income going to rent and bills."
+  },
+  "fixedCostsRule": {
+    "message": "dochodu na czynsz i rachunki; poniżej 50% zostawia zapas",
+    "context": "Money health card: explanation under the fixed costs figure. Lowercase fragment continuing the figure."
+  },
+  "fixedCostsHint": {
+    "message": "wyłącz czynsz i rachunki z wykresu w Ustawieniach, żeby liczyły się jako stałe",
+    "context": "Money health card: hint when no category counts as a fixed cost. In Settings, categories can be left out of the Home chart; those count as fixed costs."
+  },
+  "emergency": {
+    "message": "Poduszka finansowa",
+    "context": "Money health card: how many months of spending the emergency fund covers."
+  },
+  "months": {
+    "one": "{months} miesiąc",
+    "few": "{months} miesiące",
+    "many": "{months} miesięcy",
+    "other": "{months} miesiąca",
+    "context": "Money health card: the emergency fund in months of spending, e.g. '2.5 months'. {months} is the formatted number."
+  },
+  "emergencyRule": {
+    "message": "wydatków pokryłby cel „{name}”; zwykle celuje się w 3 do 6 miesięcy",
+    "context": "Money health card: explanation under the emergency fund figure; {name} is the goal's name. Lowercase fragment continuing the figure."
+  },
+  "markEmergency": {
+    "message": "Oznacz cel jako poduszkę finansową (cel → Edytuj)",
+    "context": "Money health card: link to Savings when no goal is the emergency fund."
+  }
+}

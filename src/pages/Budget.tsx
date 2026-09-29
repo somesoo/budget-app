@@ -39,6 +39,7 @@ import { elapsedDays } from '../lib/insights'
 import { ownCategories } from '../lib/allowance'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import type { BudgetPlan, Category } from '../types'
+import { t } from '../i18n'
 
 /**
  * The month against its plan — or, for a month still to come, the plan
@@ -64,7 +65,7 @@ export function Budget() {
   ) : (
     goal && (
       <section>
-        <SectionTitle>Goal: {goal.name}</SectionTitle>
+        <SectionTitle>{t('forecast.goal', { name: goal.name })}</SectionTitle>
         <GoalProgress
           goal={goal}
           pending={addToGoal.isPending}
@@ -88,11 +89,11 @@ export function Budget() {
 
   return (
     <Screen
-      title="Budget"
+      title={t('nav.budget')}
       wide
       action={
         <div className="flex items-center gap-2">
-          <AskLink question="How are we doing against this month's plan, and what should we watch?" />
+          <AskLink question={t('budget.askQuestion')} />
           <MonthSwitcher
             month={month}
             onChange={setMonth}
@@ -136,13 +137,16 @@ export function Budget() {
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-white">
                   {nextPlan
-                    ? `${formatMonthName(next)} is planned`
-                    : `Plan ${formatMonthName(next)}`}
+                    ? t('budget.nextPlanned', { month: formatMonthName(next) })
+                    : t('budget.planMonth', { month: formatMonthName(next) })}
                 </span>
                 <span className="block text-sm text-slate-300">
                   {nextPlan
-                    ? `${formatMoneyCompact(sumLimits(nextPlan))} of spending · ${formatMoneyCompact(nextPlan.savings)} to savings`
-                    : 'Set next month’s limits from your history, with an AI draft if you like.'}
+                    ? t('budget.nextSummary', {
+                        spending: formatMoneyCompact(sumLimits(nextPlan)),
+                        savings: formatMoneyCompact(nextPlan.savings),
+                      })
+                    : t('budget.nextHelp')}
                 </span>
               </span>
               <CaretRight aria-hidden className="shrink-0 text-xl text-muted" />
@@ -211,15 +215,17 @@ function MonthStatus({
             className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10"
           >
             <div className="flex items-baseline justify-between gap-3">
-              <p className="text-sm text-muted">Spent</p>
+              <p className="text-sm text-muted">{t('common.spent')}</p>
               <PlanBadge plan={plan} onPlan={onPlan} />
             </div>
             <p className="text-4xl font-bold tabular-nums text-white">{formatMoney(spent)}</p>
             {limit > 0 && (
               <>
                 <p className="mt-1 text-sm text-muted">
-                  of {formatMoneyCompact(limit)} {plan ? 'planned' : 'in default limits'} ·{' '}
-                  {Math.round((spent / limit) * 100)}%
+                  {t(plan ? 'budget.ofPlanned' : 'budget.ofDefaults', {
+                    limit: formatMoneyCompact(limit),
+                    percent: Math.round((spent / limit) * 100),
+                  })}
                 </p>
                 <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
                   <div
@@ -231,30 +237,36 @@ function MonthStatus({
                   className={`mt-2 text-sm font-medium ${left < 0 ? 'text-red-300' : 'text-white'}`}
                 >
                   {left < 0
-                    ? `${formatMoneyCompact(-left)} over the plan`
+                    ? t('budget.overPlan', { amount: formatMoneyCompact(-left) })
                     : isCurrent && daysLeft > 0
-                      ? `${formatMoneyCompact(left)} left · about ${formatAmount(Math.floor(left / daysLeft))} ${CURRENCY_SUFFIX} a day for ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`
-                      : `${formatMoneyCompact(left)} under the plan`}
+                      ? t('budget.leftPerDay', {
+                          amount: formatMoneyCompact(left),
+                          perDay: `${formatAmount(Math.floor(left / daysLeft))} ${CURRENCY_SUFFIX}`,
+                          count: daysLeft,
+                        })
+                      : t('budget.underPlan', { amount: formatMoneyCompact(left) })}
                 </p>
               </>
             )}
 
             <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-3">
               <Figure
-                label="Income"
+                label={t('entry.income')}
                 value={formatMoneyCompact(income)}
                 tone="positive"
                 sub={
-                  plan && plan.income > 0 ? `planned ${formatMoneyCompact(plan.income)}` : undefined
+                  plan && plan.income > 0
+                    ? t('budget.planned', { amount: formatMoneyCompact(plan.income) })
+                    : undefined
                 }
               />
               <Figure
-                label={isCurrent ? 'Left over so far' : 'Left over'}
+                label={isCurrent ? t('budget.leftOverSoFar') : t('forecast.leftOver')}
                 value={`${saved < 0 ? '−' : ''}${formatMoneyCompact(Math.abs(saved))}`}
                 tone={saved < 0 ? 'negative' : undefined}
                 sub={
                   plan && plan.savings > 0
-                    ? `to save ${formatMoneyCompact(plan.savings)}`
+                    ? t('budget.toSave', { amount: formatMoneyCompact(plan.savings) })
                     : undefined
                 }
               />
@@ -283,8 +295,8 @@ function MonthStatus({
           <HealthCard month={month} categories={shown} />
 
           {isCurrent && alerts.length > 0 && (
-            <section className="mb-6" aria-label="Warnings">
-              <SectionTitle>Heads-up</SectionTitle>
+            <section className="mb-6" aria-label={t('settings.warnings.title')}>
+              <SectionTitle>{t('budget.headsUp')}</SectionTitle>
               <AlertList alerts={alerts} onDismiss={dismiss} />
             </section>
           )}
@@ -294,7 +306,7 @@ function MonthStatus({
       }
       main={
         <section data-tour="budget-categories" className="mb-6">
-          <SectionTitle>Categories</SectionTitle>
+          <SectionTitle>{t('settings.categories.title')}</SectionTitle>
           <SummaryBars
             categories={ownCategories(shown, me)}
             spentByCategory={byCategory}
@@ -357,18 +369,17 @@ function FuturePlan({
       <div className="lg:max-w-xl">
         <section className="mb-6 rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10">
           <p className="text-lg font-semibold text-white">
-            {formatMonthName(month)} isn’t planned yet
+            {t('budget.notPlanned', { month: formatMonthName(month) })}
           </p>
           <p className="mt-1 text-sm text-muted">
-            Until it is, it’ll use the default limits from Settings. Planning takes a minute: start
-            from last month or your typical spending, tell it what’s different, adjust.
+            {t('budget.notPlannedHelp')}
           </p>
           <button
             type="button"
             onClick={onPlan}
             className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
           >
-            Plan {formatMonthName(month)}
+            {t('budget.planMonth', { month: formatMonthName(month) })}
           </button>
         </section>
         {aside}
@@ -386,15 +397,15 @@ function FuturePlan({
       side={
         <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
           <div className="grid grid-cols-3 gap-2">
-            <Figure label="Income" value={formatMoneyCompact(plan.income)} tone="positive" />
-            <Figure label="Spending" value={formatMoneyCompact(spending)} />
-            <Figure label="Savings" value={formatMoneyCompact(plan.savings)} />
+            <Figure label={t('entry.income')} value={formatMoneyCompact(plan.income)} tone="positive" />
+            <Figure label={t('budget.spending')} value={formatMoneyCompact(spending)} />
+            <Figure label={t('nav.savings')} value={formatMoneyCompact(plan.savings)} />
           </div>
           {plan.income > 0 && Math.abs(unassigned) >= 1 && (
             <p className={`mt-3 text-sm ${unassigned < 0 ? 'text-red-300' : 'text-amber-200'}`}>
               {unassigned < 0
-                ? `Plans ${formatMoneyCompact(-unassigned)} more than the expected income.`
-                : `${formatMoneyCompact(unassigned)} of income has no job yet.`}
+                ? t('budget.overIncome', { amount: formatMoneyCompact(-unassigned) })
+                : t('suggestions.checkUnassigned', { amount: formatMoneyCompact(unassigned) })}
             </p>
           )}
           {plan.note && (
@@ -408,13 +419,13 @@ function FuturePlan({
             onClick={onPlan}
             className="mt-4 w-full rounded-2xl bg-slate-50 py-3 text-sm font-bold text-ink active:scale-[0.99]"
           >
-            Edit plan
+            {t('budget.editPlan')}
           </button>
         </section>
       }
       main={
         <section className="mb-6">
-          <SectionTitle>Limits</SectionTitle>
+          <SectionTitle>{t('planner.limits')}</SectionTitle>
           <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
             {active.map((c) => (
               <li key={c.id}>
@@ -453,7 +464,7 @@ function PlanBadge({ plan, onPlan }: { plan: BudgetPlan | null; onPlan: () => vo
         plan ? 'text-accent-soft ring-accent/35' : 'text-amber-200 ring-amber-300/30'
       }`}
     >
-      {plan ? 'Planned · edit' : 'No plan · set one'}
+      {plan ? t('budget.badgePlanned') : t('budget.badgeNone')}
     </button>
   )
 }

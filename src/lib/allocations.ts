@@ -1,7 +1,8 @@
 import { RETIREMENT_LIMITS } from '../config'
+import { t } from '../i18n'
 import type { GoalSummary } from './savings'
 import type { PlanAllocation, SavingsAccount, SavingsMovement } from '../types'
-import { monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
+import { formatMonthName, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
 import { roundUpPlan } from './planning'
 
 /*
@@ -253,9 +254,30 @@ export function monthSavingsFlow(movements: SavingsMovement[], month: MonthKey) 
 }
 
 const LEFTOVER_PREFIX = 'Leftover from '
+// stored in the database and matched on, so always English, whatever the app's language
+const ENGLISH_MONTH = new Intl.DateTimeFormat('en-GB', { month: 'long' })
+const englishMonthName = (month: MonthKey) => {
+  const [y, m] = month.split('-').map(Number)
+  return ENGLISH_MONTH.format(new Date(y, m - 1, 1))
+}
 
-/** The note a leftover deposit carries: how it's told apart from the plan's own lines. */
-export const leftoverNote = (monthName: string) => `${LEFTOVER_PREFIX}${monthName}`
+/**
+ * The note a leftover deposit carries: how it's told apart from the plan's
+ * own lines. "Leftover from August" in any language: see leftoverLabel.
+ */
+export const leftoverNote = (month: MonthKey) => `${LEFTOVER_PREFIX}${englishMonthName(month)}`
+
+/** A movement's note for display: a leftover's marker in the app's language. */
+export function movementNoteLabel(note: string | null): string | null {
+  if (!note?.startsWith(LEFTOVER_PREFIX)) return note
+  const name = note.slice(LEFTOVER_PREFIX.length)
+  const index = Array.from({ length: 12 }, (_, i) =>
+    ENGLISH_MONTH.format(new Date(2000, i, 1)),
+  ).indexOf(name)
+  if (index < 0) return note
+  const month = formatMonthName(`2000-${String(index + 1).padStart(2, '0')}`)
+  return t('allocations.leftoverFrom', { month })
+}
 
 const isLeftover = (m: SavingsMovement) => m.note?.startsWith(LEFTOVER_PREFIX) ?? false
 

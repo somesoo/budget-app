@@ -1,0 +1,244 @@
+{
+  "welcome": {
+    "title": {
+      "message": "Witaj",
+      "context": "Guided tour, step 'welcome' on the Add screen (shown in the middle of the screen): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Budżet dla ciebie albo dla maksymalnie czterech osób: co wydajecie, co planujecie i co odkładacie, współdzielone między telefonami na bieżąco. Ten przewodnik pokaże każdy ekran w około dwie minuty.",
+      "context": "Guided tour, step 'welcome' on the Add screen (shown in the middle of the screen): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Możesz go pominąć w każdej chwili. Znajdziesz go znowu w Ustawienia → Pomoc.",
+      "context": "Guided tour, step 'welcome' on the Add screen (shown in the middle of the screen): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "safe": {
+    "title": {
+      "message": "Ile jeszcze możesz wydać",
+      "context": "Guided tour, step 'safe' on the Add screen (pointing at the 'can still spend' figure at the top): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Dochód z tego miesiąca minus to, co plan odkłada na oszczędności, minus to, co już wydano, i rachunki, które jeszcze przyjdą. Kolor mówi, jak codzienne wydatki nadążają za miesiącem: zielony poniżej tempa, szary mniej więcej w tempie, czerwony przed nim.",
+      "context": "Guided tour, step 'safe' on the Add screen (pointing at the 'can still spend' figure at the top): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "tiles": {
+    "title": {
+      "message": "Wydatek w dwóch dotknięciach",
+      "context": "Guided tour, step 'tiles' on the Add screen (pointing at the grid of category tiles): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Dotknij kategorii, wpisz kwotę, zapisz. Każdy kafelek pokazuje, ile zostało z limitu, i robi się czerwony po jego przekroczeniu. Przesuń, żeby zobaczyć więcej kategorii.",
+      "context": "Guided tour, step 'tiles' on the Add screen (pointing at the grid of category tiles): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Kafelek Cele na końcu służy do wydawania odłożonych pieniędzy, np. na wakacje: schodzą z celu, a nie z miesiąca.",
+      "context": "Guided tour, step 'tiles' on the Add screen (pointing at the grid of category tiles): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "widgets": {
+    "title": {
+      "message": "Miesiąc w skrócie",
+      "context": "Guided tour, step 'widgets' on the Add screen (pointing at the swipeable widget cards above the tiles): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Przesuwaj między tym, gdzie poszły pieniądze, tempem względem planu, ostrzeżeniami, prognozą, tym, kto ile wydał, i waszymi celami.",
+      "context": "Guided tour, step 'widgets' on the Add screen (pointing at the swipeable widget cards above the tiles): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Wybierz, które się pokazują, w Ustawienia → Widżety na ekranie Dodaj.",
+      "context": "Guided tour, step 'widgets' on the Add screen (pointing at the swipeable widget cards above the tiles): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "income": {
+    "title": {
+      "message": "Zapisz dochód",
+      "context": "Guided tour, step 'income' on the Add screen (pointing at the income button): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Każda wypłata trafia tutaj, do miesiąca, za który płaci (pensja 28. może się liczyć do następnego miesiąca). Oznacz jednorazowe wpływy, jak premia czy zwrot, żeby nie zaburzały zwykłej pensji.",
+      "context": "Guided tour, step 'income' on the Add screen (pointing at the income button): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Zaraz po wypłacie aplikacja pokazuje, co plan wysyła na cele i IKE, żeby odłożyć to, zanim się rozejdzie.",
+      "context": "Guided tour, step 'income' on the Add screen (pointing at the income button): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "ask": {
+    "title": {
+      "message": "Zapytaj o swoje pieniądze",
+      "context": "Guided tour, step 'ask' on the Add screen (pointing at the 'Ask AI' button): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Czat, który zna wasz budżet, wydatki i oszczędności: „czy stać nas na nową kanapę?”, „gdzie przesadziliśmy?”. Większość ekranów ma ten przycisk z gotowym pytaniem o dany ekran.",
+      "context": "Guided tour, step 'ask' on the Add screen (pointing at the 'Ask AI' button): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "nav-history": {
+    "title": {
+      "message": "Historia",
+      "context": "Guided tour, step 'nav-history' on the History screen (pointing at the History tab in the navigation): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Wszystko, co ktokolwiek zapisał, dzień po dniu, z sumami miesiąca.",
+      "context": "Guided tour, step 'nav-history' on the History screen (pointing at the History tab in the navigation): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "history-search": {
+    "title": {
+      "message": "Szukaj, filtruj, poprawiaj",
+      "context": "Guided tour, step 'history-search' on the History screen (pointing at the search, filters and calendar): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Szukaj we wszystkich miesiącach po tytule, kategorii albo kwocie. Filtruj po osobie, kategorii albo rodzaju i sortuj po kwocie; kalendarz pokazuje, które dni kosztowały najwięcej. Dotknij wpisu, żeby go zmienić albo usunąć.",
+      "context": "Guided tour, step 'history-search' on the History screen (pointing at the search, filters and calendar): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "nav-budget": {
+    "title": {
+      "message": "Miesiąc na tle planu",
+      "context": "Guided tour, step 'nav-budget' on the Budget screen (pointing at the month summary card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Ile wydano z tego, co zaplanowano, ile zostaje na dzień, dochód i to, co zostaje na koniec. Przełącznikiem miesięcy na górze cofniesz się albo zaplanujesz kolejne.",
+      "context": "Guided tour, step 'nav-budget' on the Budget screen (pointing at the month summary card): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "plan": {
+    "title": {
+      "message": "Zaplanuj miesiąc",
+      "context": "Guided tour, step 'plan' on the Budget screen (pointing at the button to plan a month): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Ustaw spodziewany dochód, ile idzie na oszczędności i limit dla każdej kategorii, podpowiadany z historii (jeśli chcesz, także szkic od AI). Wysyłaj część każdej wypłaty prosto na cele i IKE, i wybierz, które cele dostaną to, co zostanie na koniec miesiąca.",
+      "context": "Guided tour, step 'plan' on the Budget screen (pointing at the button to plan a month): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Zaplanuj kolejny miesiąc w ostatnich dniach obecnego: będzie gotowy, gdy przyjdzie wypłata.",
+      "context": "Guided tour, step 'plan' on the Budget screen (pointing at the button to plan a month): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "health": {
+    "title": {
+      "message": "Kondycja finansów",
+      "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Trzy liczby warte obserwowania: ile dochodu odkładacie, ile idzie na czynsz i rachunki i na ile miesięcy wystarczy poduszka finansowa.",
+      "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "budget-categories": {
+    "title": {
+      "message": "Każda kategoria",
+      "context": "Guided tour, step 'budget-categories' on the Budget screen (pointing at the list of categories): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Każda na tle swojego limitu, z ostrzeżeniami, gdy jest blisko albo zmierza ponad. Dotknij kategorii, żeby zobaczyć jej historię, prognozę i porównanie z resztą.",
+      "context": "Guided tour, step 'budget-categories' on the Budget screen (pointing at the list of categories): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "nav-savings": {
+    "title": {
+      "message": "Oszczędności",
+      "context": "Guided tour, step 'nav-savings' on the Savings screen (pointing at the savings totals): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Wszystko, co odłożyliście, co w tym miesiącu poszło na bok względem planu, i pieniądze, na które żaden cel jeszcze nie czeka.",
+      "context": "Guided tour, step 'nav-savings' on the Savings screen (pointing at the savings totals): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "savings-assistant": {
+    "title": {
+      "message": "Nie wiesz jak? Zapytaj",
+      "context": "Guided tour, step 'savings-assistant' on the Savings screen (pointing at the savings assistant buttons): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Odłóż więcej, pożycz z oszczędności i spłacaj w ratach, przenieś pieniądze między kontami, wyrównaj saldo albo zamknij konto: każda opcja poprowadzi cię też przez to, co zrobić w banku.",
+      "context": "Guided tour, step 'savings-assistant' on the Savings screen (pointing at the savings assistant buttons): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "savings-goals": {
+    "title": {
+      "message": "Cele i konta",
+      "context": "Guided tour, step 'savings-goals' on the Savings screen (pointing at the goals and accounts): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Cel to, na co są pieniądze (wakacje, poduszka finansowa, nowe auto), z kwotą i terminem; konto to, gdzie leżą (oszczędnościowe, lokata, gotówka, IKE, IKZE). IKE i IKZE pokazują roczny limit i wasz zysk.",
+      "context": "Guided tour, step 'savings-goals' on the Savings screen (pointing at the goals and accounts): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Oznacz jeden cel jako poduszkę finansową: nadwyżki trafiają najpierw do niej, dopóki jest niepełna.",
+      "context": "Guided tour, step 'savings-goals' on the Savings screen (pointing at the goals and accounts): smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "nav-insights": {
+    "title": {
+      "message": "Wykresy",
+      "context": "Guided tour, step 'nav-insights' on the Insights screen (pointing at the advice card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Porady na ten miesiąc, a potem wykresy: tempo względem planu, miesiąc po miesiącu, które kategorie się zmieniły, kto ile wydał i które dni tygodnia kosztują najwięcej.",
+      "context": "Guided tour, step 'nav-insights' on the Insights screen (pointing at the advice card): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "settings-device": {
+    "title": {
+      "message": "Osoby i ten telefon",
+      "context": "Guided tour, step 'settings-device' on the Settings screen (pointing at card('People')): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Każdy telefon należy do jednej osoby: to na nią zapisują się nowe wydatki. Zmień to tutaj, jeśli zamienicie się telefonami, a wyżej zmieniaj imiona i dodawaj osoby.",
+      "context": "Guided tour, step 'settings-device' on the Settings screen (pointing at card('People')): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "settings-categories": {
+    "title": {
+      "message": "Kategorie i kieszonkowe",
+      "context": "Guided tour, step 'settings-categories' on the Settings screen (pointing at card('Categories')): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Dodawaj, zmieniaj nazwy, kolory i kolejność kategorii i ustawiaj ich zwykły limit. Zrób z kategorii czyjeś kieszonkowe: tylko telefon tej osoby pokazuje, co w nim jest; reszta dowie się tylko, gdy zostanie przekroczone.",
+      "context": "Guided tour, step 'settings-categories' on the Settings screen (pointing at card('Categories')): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "settings-more": {
+    "title": {
+      "message": "Dopasuj do siebie",
+      "context": "Guided tour, step 'settings-more' on the Settings screen (pointing at card('Warnings')): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Szybkie kwoty na klawiaturze, które widżety się pokazują, od kiedy włączają się ostrzeżenia i wasze dane jako arkusz: wszystko tutaj.",
+      "context": "Guided tour, step 'settings-more' on the Settings screen (pointing at card('Warnings')): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "done": {
+    "title": {
+      "message": "To wszystko",
+      "context": "Guided tour, step 'done' on the Add screen (shown in the middle of the screen): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Zacznij od zapisania dzisiejszych wydatków, a potem zaplanuj miesiąc na karcie Budżet. Przewodnik jest zawsze w Ustawienia → Pomoc.",
+      "context": "Guided tour, step 'done' on the Add screen (shown in the middle of the screen): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "ui": {
+    "progress": {
+      "message": "{step} z {total}",
+      "context": "Guided tour card, top left: which step this is, e.g. '3 of 20'."
+    },
+    "skip": {
+      "message": "Pomiń przewodnik",
+      "context": "Guided tour card, top right: button that ends the tour early."
+    },
+    "start": {
+      "message": "Pokaż mi",
+      "context": "Guided tour: the main button on the first (welcome) card; starts the tour."
+    },
+    "finish": {
+      "message": "Zaczynamy",
+      "context": "Guided tour: the main button on the last card; ends the tour."
+    }
+  }
+}

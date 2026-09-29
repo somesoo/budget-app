@@ -34,7 +34,7 @@ import { CHART } from '../charts/theme'
 import { SpendDonut } from '../charts/SpendDonut'
 import { AlertStrip } from '../alerts/AlertList'
 import { AmountField } from '../entry/AmountField'
-import { IncomeKind, ONE_OFF_HELP } from '../entry/IncomeKind'
+import { IncomeKind, oneOffHelp } from '../entry/IncomeKind'
 import { LimitPreview } from '../entry/LimitPreview'
 import { useAmountEntry } from '../entry/useAmountEntry'
 import { DateChip, PersonToggle } from '../HeaderControls'
@@ -45,6 +45,8 @@ import { GoalPicker, GoalsTile } from './GoalPicker'
 import { RecentEntries } from './RecentEntries'
 import { ownExpenses } from '../../lib/allowance'
 import { personIds } from '../../lib/people'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 type Mode = 'expense' | 'income'
 
@@ -157,7 +159,9 @@ export function DesktopAdd() {
   const pickTile = (category: Category) => {
     const goal = goals.open.find((g) => category.id === standIn(g.goal).id)?.goal
     if (!goal) return pick(category)
-    pickGoal(goal).catch((err) => setToast(`Couldn’t open it: ${(err as Error).message}`))
+    pickGoal(goal).catch((err) =>
+      setToast(t('entry.openFailed', { error: (err as Error).message })),
+    )
   }
 
   const canSave =
@@ -179,7 +183,7 @@ export function DesktopAdd() {
           note: trimmed,
           expense_date: date,
         },
-        { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
+        { onError: (err) => setToast(t('entry.notSaved', { error: (err as Error).message })) },
       )
       const crossed =
         inThisMonth || isProjectPick
@@ -195,8 +199,8 @@ export function DesktopAdd() {
           : null
       setToast(
         crossed
-          ? `Saved. ${crossed}`
-          : `Saved ${formatMoney(entry.amount)} to ${selected.name}${where}`,
+          ? t('entry.savedCrossed', { note: crossed })
+          : t('entry.savedTo', { amount: formatMoney(entry.amount), name: selected.name }) + where,
       )
     } else {
       addIncome.mutate(
@@ -208,9 +212,9 @@ export function DesktopAdd() {
           for_month: null,
           one_off: oneOff,
         },
-        { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
+        { onError: (err) => setToast(t('entry.notSaved', { error: (err as Error).message })) },
       )
-      setToast(`Income saved · ${formatMoney(entry.amount)}${where}`)
+      setToast(t('entry.incomeSaved', { amount: formatMoney(entry.amount) }) + where)
     }
     // the category stays picked: several receipts from one shop go in a row
     entry.reset()
@@ -254,16 +258,20 @@ export function DesktopAdd() {
     <div className="mx-auto flex h-[100dvh] max-w-7xl flex-col px-8 pb-6 pt-8">
       <header className="mb-6 flex shrink-0 items-center justify-between gap-6">
         <div className="min-w-0">
-          <h1 className="text-3xl font-bold tracking-tight text-white">Add</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white">{t('nav.add')}</h1>
           <p data-tour="safe" className="mt-1 text-sm text-muted">
-            This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
+            <Trans
+              k="add.thisMonth"
+              values={{ amount: formatMoney(monthTotal) }}
+              tags={{ b: (s) => <span className="font-semibold text-white">{s}</span> }}
+            />
             {monthLimit > 0 && (
               <span className={left < 0 ? 'text-red-300' : ''}>
                 {' '}
                 ·{' '}
                 {left < 0
-                  ? `${formatMoneyCompact(-left)} over`
-                  : `${formatMoneyCompact(left)} left`}
+                  ? t('common.amountOver', { amount: formatMoneyCompact(-left) })
+                  : t('common.amountLeft', { amount: formatMoneyCompact(left) })}
               </span>
             )}
           </p>
@@ -281,13 +289,13 @@ export function DesktopAdd() {
 
       {error && (
         <p className="mb-4 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
-          Could not load categories: {(error as Error).message}
+          {t('add.loadFailed', { error: (error as Error).message })}
         </p>
       )}
 
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_24rem] gap-6 wide:grid-cols-[minmax(0,1fr)_24rem_21rem]">
         {/* ---------- categories ---------- */}
-        <section aria-label="Categories" data-tour="tiles" className="flex min-h-0 flex-col">
+        <section aria-label={t('add.categories')} data-tour="tiles" className="flex min-h-0 flex-col">
           {alerts.length > 0 && (
             <div className="mb-3 shrink-0">
               <AlertStrip alerts={alerts} />
@@ -327,7 +335,7 @@ export function DesktopAdd() {
 
         {/* ---------- the entry ---------- */}
         <section
-          aria-label="New entry"
+          aria-label={t('add.newEntry')}
           className="flex min-h-0 flex-col overflow-y-auto rounded-3xl p-5 ring-1 ring-white/10"
           style={{ backgroundColor: CHART.surface }}
         >
@@ -345,7 +353,7 @@ export function DesktopAdd() {
                   mode === m ? 'bg-slate-50 text-ink' : 'text-muted hover:text-white'
                 }`}
               >
-                {m === 'expense' ? 'Expense' : 'Income'}
+                {m === 'expense' ? t('entry.expense') : t('entry.income')}
               </button>
             ))}
           </div>
@@ -364,12 +372,12 @@ export function DesktopAdd() {
                 </span>
               ) : (
                 <span className="flex items-center gap-1.5 text-sm text-muted">
-                  <Receipt aria-hidden /> Pick a category first
+                  <Receipt aria-hidden /> {t('add.pickFirst')}
                 </span>
               )
             ) : (
               <span className="rounded-full bg-positive px-3 py-1.5 text-sm font-semibold text-ink">
-                Income
+                {t('entry.income')}
               </span>
             )}
             <span className="ml-auto flex shrink-0 gap-2">
@@ -383,7 +391,7 @@ export function DesktopAdd() {
             value={entry.text}
             onChange={entry.type}
             onKeyDown={onFieldKey}
-            label={mode === 'expense' ? 'Amount' : 'Amount received'}
+            label={mode === 'expense' ? t('entry.amount') : t('entry.amountReceived')}
             compact
           />
 
@@ -391,8 +399,8 @@ export function DesktopAdd() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             onKeyDown={onFieldKey}
-            placeholder={mode === 'expense' ? 'Title (optional)' : 'Note (e.g. salary, bonus)'}
-            aria-label={mode === 'expense' ? 'Title' : 'Note'}
+            placeholder={mode === 'expense' ? t('entry.titlePlaceholder') : t('entry.notePlaceholder')}
+            aria-label={mode === 'expense' ? t('entry.title') : t('entry.note')}
             maxLength={120}
             className="mt-3 w-full rounded-xl bg-white/5 px-4 py-3 text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
           />
@@ -408,7 +416,7 @@ export function DesktopAdd() {
                     entry.add(amount)
                     amountRef.current?.focus()
                   }}
-                  aria-label={`Add ${amount} ${CURRENCY_SUFFIX}`}
+                  aria-label={t('entry.addAmount', { amount, currency: CURRENCY_SUFFIX })}
                   className="h-11 rounded-xl bg-white/5 text-sm font-semibold tabular-nums text-slate-100 ring-1 ring-white/10 transition hover:bg-white/10 active:scale-[0.97] active:bg-white/15"
                 >
                   +{amount} {CURRENCY_SUFFIX}
@@ -423,13 +431,13 @@ export function DesktopAdd() {
                 disabled={entry.amount <= 0}
                 className="h-11 rounded-xl px-3 text-sm font-semibold text-slate-300 ring-1 ring-white/10 hover:bg-white/5 disabled:opacity-30"
               >
-                Clear
+                {t('entry.clear')}
               </button>
             </div>
           )}
           {mode === 'income' && (
             <div className="mt-3 flex items-center justify-between gap-3">
-              <span className="text-sm text-muted">{oneOff ? ONE_OFF_HELP : 'Kind'}</span>
+              <span className="text-sm text-muted">{oneOff ? oneOffHelp() : t('entry.kind')}</span>
               <IncomeKind oneOff={oneOff} onChange={setOneOff} />
             </div>
           )}
@@ -443,7 +451,7 @@ export function DesktopAdd() {
               }}
               className="mt-3 w-full rounded-xl bg-white/5 px-3 py-2.5 text-left text-sm ring-1 ring-white/10 hover:bg-white/10"
             >
-              <span className="text-muted">Same as last time: </span>
+              <span className="text-muted">{t('entry.sameAsLast')} </span>
               <span className="font-semibold text-white">
                 {formatAmount(lastIncome.amount)} {CURRENCY_SUFFIX}
               </span>
@@ -471,19 +479,21 @@ export function DesktopAdd() {
               disabled={!canSave}
               className="h-12 w-full rounded-2xl bg-slate-100 text-base font-bold text-ink transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40"
             >
-              {mode === 'expense' ? 'Save expense' : 'Save income'}
+              {mode === 'expense' ? t('entry.saveExpense') : t('entry.saveIncome')}
             </button>
             <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted">
-              <kbd className="rounded px-1 ring-1 ring-white/15">Enter</kbd> saves ·{' '}
-              <kbd className="rounded px-1 ring-1 ring-white/15">Esc</kbd> clears
+              <Trans
+                k="add.keys"
+                tags={{ kbd: (s) => <kbd className="rounded px-1 ring-1 ring-white/15">{s}</kbd> }}
+              />
             </p>
           </div>
         </section>
 
         {/* ---------- what just happened ---------- */}
-        <aside aria-label="Recent" className="hidden min-h-0 flex-col gap-4 wide:flex">
+        <aside aria-label={t('add.recent')} className="hidden min-h-0 flex-col gap-4 wide:flex">
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <h2 className="mb-2 px-1 text-base font-semibold text-white">Recent</h2>
+            <h2 className="mb-2 px-1 text-base font-semibold text-white">{t('add.recent')}</h2>
             <RecentEntries
               entries={recent}
               categories={categoryById(everyCategory)}
@@ -561,10 +571,13 @@ function MonthCard({
       className="shrink-0 rounded-3xl p-4 ring-1 ring-white/10"
       style={{ backgroundColor: CHART.surface }}
     >
-      <h2 className="text-base font-semibold text-white">Where it goes</h2>
+      <h2 className="text-base font-semibold text-white">{t('widgets.donut.label')}</h2>
       {hasLimit && left > 0 && daysLeft > 0 && (
         <p className="mt-0.5 text-sm text-slate-300">
-          About {formatMoneyWhole(Math.floor(left / daysLeft))} a day for the {daysLeft} days left.
+          {t('add.perDayLeft', {
+            amount: formatMoneyWhole(Math.floor(left / daysLeft)),
+            count: daysLeft,
+          })}
         </p>
       )}
       {slices.length > 0 ? (
@@ -572,7 +585,7 @@ function MonthCard({
           <SpendDonut slices={slices} />
         </div>
       ) : (
-        <p className="mt-2 text-sm text-muted">Nothing spent yet this month.</p>
+        <p className="mt-2 text-sm text-muted">{t('widgets.nothingSpent')}</p>
       )}
     </section>
   )

@@ -1,0 +1,48 @@
+{
+  "pace": {
+    "under": {
+      "message": "wydatki poniżej tempa",
+      "context": "Add screen: accessible description of the colour of the 'safe to spend' figure (green)."
+    },
+    "on": {
+      "message": "wydatki w tempie",
+      "context": "Add screen: accessible description of the figure's colour (grey)."
+    },
+    "over": {
+      "message": "wydatki powyżej tempa",
+      "context": "Add screen: accessible description of the figure's colour (red)."
+    }
+  },
+  "incomeSaved": {
+    "message": "Zapisano dochód",
+    "context": "Toast after saving an income on the phone; a date may follow."
+  },
+  "saved": {
+    "message": "Zapisano",
+    "context": "Toast after saving an expense on the phone; a date may follow."
+  },
+  "title": {
+    "message": "Na co?",
+    "context": "Add screen (phone): hidden heading for screen readers, asking what the money was spent on."
+  },
+  "safeLabel": {
+    "message": "Możesz wydać: {amount}",
+    "context": "Add screen: accessible label of the big figure at the top."
+  },
+  "leftLabel": {
+    "message": "Zostało w tym miesiącu: {amount}",
+    "context": "Add screen: accessible label of the big figure when there's no plan."
+  },
+  "askQuestion": {
+    "message": "Jak nam idzie w tym miesiącu i ile jeszcze możemy wydać?",
+    "context": "Question pre-filled in the AI chat from the Add screen's Ask button."
+  },
+  "addIncome": {
+    "message": "Dodaj dochód",
+    "context": "Add screen: the button (arrow up) that logs an income."
+  },
+  "payOutHelp": {
+    "message": "Prosto na cele i IKE, zanim się rozejdzie.",
+    "context": "Sheet shown right after logging a paycheck: explanation under 'From the paycheck'."
+  }
+}

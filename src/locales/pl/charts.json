@@ -1,0 +1,34 @@
+{
+  "showNumbers": {
+    "message": "Pokaż liczby",
+    "context": "Chart card: link that shows the chart's data as a table."
+  },
+  "hideNumbers": {
+    "message": "Ukryj liczby",
+    "context": "Chart card: link that hides the data table again."
+  },
+  "paceLabel": {
+    "message": "Skumulowane wydatki w tym miesiącu na tle tempa budżetu",
+    "context": "Accessible label of the pace line chart."
+  },
+  "notYet": {
+    "message": "Jeszcze nie",
+    "context": "Pace chart tooltip: for a day that hasn't happened yet."
+  },
+  "pace": {
+    "message": "Tempo",
+    "context": "Pace chart: the dashed line where spending would be if the limits were spread evenly over the month."
+  },
+  "personLabel": {
+    "message": "Miesięczne wydatki na osobę",
+    "context": "Accessible label of the per-person line chart (Insights)."
+  },
+  "soFar": {
+    "message": "dotąd",
+    "context": "Chart tooltip: after the current month's name, the month isn't over yet."
+  },
+  "donutList": {
+    "message": "Kategorie, od największej",
+    "context": "Accessible label of the list next to the spending donut."
+  }
+}

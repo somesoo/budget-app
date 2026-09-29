@@ -81,7 +81,7 @@ describe('safe to spend', () => {
   it('leaves the month before\'s leftover and interest out of the flow', () => {
     const movements = [
       move('acc', 1_000, '2026-10-03'),
-      { ...move('acc', 700, '2026-10-02', 'deposit', 'trip'), note: leftoverNote('September') },
+      { ...move('acc', 700, '2026-10-02', 'deposit', 'trip'), note: leftoverNote('2026-09') },
       move('acc', 40, '2026-10-31', 'interest'),
       move('acc', -300, '2026-10-12'),
       move('acc', 900, '2026-09-29'),
@@ -208,7 +208,7 @@ describe('allocationProgress', () => {
   })
 
   it('leaves a leftover deposit to its own line', () => {
-    const note = leftoverNote('September')
+    const note = leftoverNote('2026-09')
     const movements = [
       { ...move('acc', 800, '2026-10-02', 'deposit', 'trip'), note },
       move('acc', 100, '2026-10-03', 'deposit', 'trip'),

@@ -9,17 +9,19 @@ import {
   type Icon,
 } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
+import { t } from '../i18n'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { AlertCount } from './alerts/AlertList'
 
-export const TABS: { to: string; label: string; icon: Icon }[] = [
-  { to: '/', label: 'Add', icon: Plus },
-  { to: '/history', label: 'History', icon: ListBullets },
-  { to: '/budget', label: 'Budget', icon: ChartPieSlice },
-  { to: '/savings', label: 'Savings', icon: PiggyBank },
-  { to: '/insights', label: 'Insights', icon: ChartLineUp },
-  { to: '/ask', label: 'Ask', icon: ChatCircleDots },
-  { to: '/settings', label: 'Settings', icon: GearSix },
+/** `id` names the tab for the tour (data-tour="nav-<id>"); the label is translated. */
+export const TABS: { to: string; id: string; label: () => string; icon: Icon }[] = [
+  { to: '/', id: 'add', label: () => t('nav.add'), icon: Plus },
+  { to: '/history', id: 'history', label: () => t('nav.history'), icon: ListBullets },
+  { to: '/budget', id: 'budget', label: () => t('nav.budget'), icon: ChartPieSlice },
+  { to: '/savings', id: 'savings', label: () => t('nav.savings'), icon: PiggyBank },
+  { to: '/insights', id: 'insights', label: () => t('nav.insights'), icon: ChartLineUp },
+  { to: '/ask', id: 'ask', label: () => t('nav.ask'), icon: ChatCircleDots },
+  { to: '/settings', id: 'settings', label: () => t('nav.settings'), icon: GearSix },
 ]
 
 /**
@@ -39,7 +41,7 @@ export function BottomNav() {
             <NavLink
               to={tab.to}
               end={tab.to === '/'}
-              data-tour={`nav-${tab.label.toLowerCase()}`}
+              data-tour={`nav-${tab.id}`}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition ${
                   isActive ? 'text-white' : 'text-muted'
@@ -60,7 +62,7 @@ export function BottomNav() {
                       </span>
                     )}
                   </span>
-                  {tab.label}
+                  {tab.label()}
                 </>
               )}
             </NavLink>

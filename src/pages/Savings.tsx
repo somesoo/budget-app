@@ -24,6 +24,8 @@ import { useSavingsOverview } from '../hooks/useSavings'
 import { currentMonthKey, formatMoneyWhole, formatMonthName, shiftMonth } from '../lib/calculations'
 import { monthsEndingAt } from '../lib/insights'
 import { EMERGENCY_MONTHS, balanceHistory } from '../lib/savings'
+import { t } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
 type Sheet =
   | { kind: 'money'; mode: MoneyMode; goalId?: string }
@@ -58,7 +60,7 @@ export function Savings() {
 
   if (s.isLoading) {
     return (
-      <Screen title="Savings" wide action={<SettingsLink />}>
+      <Screen title={t('nav.savings')} wide action={<SettingsLink />}>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
           <div className="h-72 animate-pulse rounded-3xl bg-white/5" />
           <div className="h-72 animate-pulse rounded-3xl bg-white/5" />
@@ -69,15 +71,16 @@ export function Savings() {
 
   if (!s.available) {
     return (
-      <Screen title="Savings" wide action={<SettingsLink />}>
+      <Screen title={t('nav.savings')} wide action={<SettingsLink />}>
         <section className="max-w-xl rounded-3xl bg-white/5 p-5 ring-1 ring-white/10">
           <PiggyBank aria-hidden className="text-3xl text-accent-soft" />
-          <h2 className="mt-3 text-lg font-semibold text-white">One step in Supabase first</h2>
+          <h2 className="mt-3 text-lg font-semibold text-white">{t('savingsPage.setupTitle')}</h2>
           <p className="mt-1 text-sm leading-relaxed text-slate-300">
-            Savings accounts need the tables from{' '}
-            <code className="rounded bg-white/10 px-1">supabase/migrations/0007_savings.sql</code>.
-            Paste it into the SQL Editor and run it, as with the earlier ones. Your current goal and
-            what's saved toward it move onto an account called “Savings”.
+            <Trans
+              k="savingsPage.setup"
+              values={{ file: 'supabase/migrations/0007_savings.sql' }}
+              tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
+            />
           </p>
           {s.error && <p className="mt-2 text-sm text-red-300">{(s.error as Error).message}</p>}
         </section>
@@ -87,19 +90,19 @@ export function Savings() {
 
   const planned = s.plannedThisMonth
   const toolbar: { mode: MoneyMode; label: string; icon: ReactNode }[] = [
-    { mode: 'withdraw', label: 'Take out', icon: <ArrowUp aria-hidden /> },
-    { mode: 'transfer', label: 'Move', icon: <ArrowsLeftRight aria-hidden /> },
-    { mode: 'interest', label: 'Interest', icon: <Coins aria-hidden /> },
-    { mode: 'balance', label: 'Update balance', icon: <Scales aria-hidden /> },
+    { mode: 'withdraw', label: t('savingsPage.takeOut'), icon: <ArrowUp aria-hidden /> },
+    { mode: 'transfer', label: t('savingsPage.move'), icon: <ArrowsLeftRight aria-hidden /> },
+    { mode: 'interest', label: t('movement.interest'), icon: <Coins aria-hidden /> },
+    { mode: 'balance', label: t('savingsPage.updateBalance'), icon: <Scales aria-hidden /> },
   ]
 
   return (
     <Screen
-      title="Savings"
+      title={t('nav.savings')}
       wide
       action={
         <div className="flex items-center gap-1">
-          <AskLink question="Are we on track with our savings goals, and what should we change?" />
+          <AskLink question={t('savingsPage.askQuestion')} />
           <SettingsLink />
         </div>
       }
@@ -109,22 +112,27 @@ export function Savings() {
         data-tour="savings-totals"
         className="mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5"
       >
-        <Figure label="Saved in all" value={formatMoneyWhole(s.total)} big />
+        <Figure label={t('savingsPage.total')} value={formatMoneyWhole(s.total)} big />
         <Figure
-          label={`Put aside in ${formatMonthName(month)}`}
+          label={t('savingsPage.putAside', { month: formatMonthName(month) })}
           value={formatMoneyWhole(s.savedThisMonth)}
           sub={
             planned !== null && planned > 0
               ? s.savedThisMonth >= planned
-                ? `The plan's ${formatMoneyWhole(planned)} is covered`
-                : `${formatMoneyWhole(planned - s.savedThisMonth)} to go of the plan's ${formatMoneyWhole(planned)}`
-              : 'No savings amount planned this month'
+                ? t('savingsPage.planCovered', { amount: formatMoneyWhole(planned) })
+                : t('savingsPage.planToGo', {
+                    amount: formatMoneyWhole(planned - s.savedThisMonth),
+                    planned: formatMoneyWhole(planned),
+                  })
+              : t('savingsPage.noPlan')
           }
         />
         <Figure
-          label="Unassigned"
+          label={t('savingsPage.unassigned')}
           value={formatMoneyWhole(s.unassigned)}
-          sub={s.unassigned > 0.5 ? 'Not set aside for any goal yet' : 'Every złoty has a goal'}
+          sub={
+            s.unassigned > 0.5 ? t('savingsPage.unassignedSome') : t('savingsPage.unassignedNone')
+          }
           action={
             s.unassigned > 0.5 && openGoals.length > 0 ? (
               <button
@@ -132,7 +140,7 @@ export function Savings() {
                 onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
                 className="mt-1 text-sm font-semibold text-accent-soft hover:underline"
               >
-                Assign it
+                {t('savingsPage.assign')}
               </button>
             ) : null
           }
@@ -148,16 +156,16 @@ export function Savings() {
           onClick={() => setSheet({ kind: 'money', mode: 'deposit' })}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-4 text-sm font-bold text-ink hover:bg-slate-50"
         >
-          <Plus weight="bold" aria-hidden /> Save money
+          <Plus weight="bold" aria-hidden /> {t('money.title.deposit')}
         </button>
-        {toolbar.map((t) => (
+        {toolbar.map((tool) => (
           <button
-            key={t.mode}
+            key={tool.mode}
             type="button"
-            onClick={() => setSheet({ kind: 'money', mode: t.mode })}
+            onClick={() => setSheet({ kind: 'money', mode: tool.mode })}
             className="flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
           >
-            {t.icon} {t.label}
+            {tool.icon} {tool.label}
           </button>
         ))}
       </div>
@@ -167,15 +175,15 @@ export function Savings() {
         <section aria-labelledby="goals" data-tour="savings-goals">
           <SectionHead
             id="goals"
-            title="Goals"
+            title={t('add.goals')}
             onAdd={() => setSheet({ kind: 'goal' })}
-            addLabel="New goal"
+            addLabel={t('goalSheet.new')}
           />
           {openGoals.length === 0 ? (
             <Empty
               icon={<Target aria-hidden />}
-              text="A goal is what the money is for: a trip, an emergency fund, a car."
-              cta="Add a goal"
+              text={t('savingsPage.goalsEmpty')}
+              cta={t('savingsPage.addGoal')}
               onClick={() => setSheet({ kind: 'goal' })}
             />
           ) : (
@@ -192,12 +200,15 @@ export function Savings() {
           )}
           {s.neededPerMonth > 0 && (
             <p className="mt-3 text-sm leading-snug text-slate-300">
-              The dated goals need {formatMoneyWhole(s.neededPerMonth)} a month together
               {planned !== null
-                ? `; ${formatMonthName(month)}'s plan puts aside ${formatMoneyWhole(planned)}.`
-                : '.'}{' '}
+                ? t('savingsPage.neededPlanned', {
+                    amount: formatMoneyWhole(s.neededPerMonth),
+                    month: formatMonthName(month),
+                    planned: formatMoneyWhole(planned),
+                  })
+                : t('savingsPage.needed', { amount: formatMoneyWhole(s.neededPerMonth) })}{' '}
               <Link to="/budget" className="font-semibold text-accent-soft hover:underline">
-                Plan {formatMonthName(shiftMonth(month, 1))}
+                {t('budget.planMonth', { month: formatMonthName(shiftMonth(month, 1)) })}
               </Link>
             </p>
           )}
@@ -205,8 +216,8 @@ export function Savings() {
             <Toggle
               open={showClosed}
               onClick={() => setShowClosed((v) => !v)}
-              count={closedGoals.length}
-              what="closed goal"
+              showLabel={t('savingsPage.showClosed', { count: closedGoals.length })}
+              hideLabel={t('savingsPage.hideClosed', { count: closedGoals.length })}
             />
           )}
           {showClosed && (
@@ -227,15 +238,15 @@ export function Savings() {
         <section aria-labelledby="accounts">
           <SectionHead
             id="accounts"
-            title="Accounts"
+            title={t('savingsPage.accounts')}
             onAdd={() => setSheet({ kind: 'account' })}
-            addLabel="New account"
+            addLabel={t('account.new')}
           />
           {openAccounts.length === 0 ? (
             <Empty
               icon={<Bank aria-hidden />}
-              text="An account is where the money is: a savings account, a deposit, cash."
-              cta="Add an account"
+              text={t('savingsPage.accountsEmpty')}
+              cta={t('savingsPage.addAccount')}
               onClick={() => setSheet({ kind: 'account' })}
             />
           ) : (
@@ -249,8 +260,8 @@ export function Savings() {
             <Toggle
               open={showHidden}
               onClick={() => setShowHidden((v) => !v)}
-              count={hiddenAccounts.length}
-              what="hidden account"
+              showLabel={t('savingsPage.showHidden', { count: hiddenAccounts.length })}
+              hideLabel={t('savingsPage.hideHidden', { count: hiddenAccounts.length })}
             />
           )}
           {hiddenAccounts.length > 0 && showHidden && (
@@ -367,13 +378,13 @@ function Empty({
 function Toggle({
   open,
   onClick,
-  count,
-  what,
+  showLabel,
+  hideLabel,
 }: {
   open: boolean
   onClick: () => void
-  count: number
-  what: string
+  showLabel: string
+  hideLabel: string
 }) {
   return (
     <button
@@ -381,8 +392,7 @@ function Toggle({
       onClick={onClick}
       className="mt-3 text-sm font-medium text-muted hover:text-white"
     >
-      {open ? 'Hide' : 'Show'} {count} {what}
-      {count === 1 ? '' : 's'}
+      {open ? hideLabel : showLabel}
     </button>
   )
 }

@@ -1,0 +1,42 @@
+{
+  "notSignedIn": {
+    "message": "Not signed in",
+    "context": "Error when the session has expired."
+  },
+  "requestFailed": {
+    "message": "Request failed ({status})",
+    "context": "Generic server error with its HTTP status code."
+  },
+  "aiUnavailable": {
+    "message": "The AI server isn’t running here. It works on Vercel, or locally with `vercel dev`.",
+    "context": "Error for the developer: the AI functions run on Vercel only. Keep `vercel dev` as is."
+  },
+  "migration": {
+    "message": "{what} needs migration {file}",
+    "context": "Error when a feature needs a database update; {what} is one of the feature descriptions below, {file} the migration file."
+  },
+  "featureKeep": {
+    "message": "Keeping part of the leftover on the account",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureSplit": {
+    "message": "Splitting savings between goals and IKE",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureForMonth": {
+    "message": "Counting pay for another month",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureOneOff": {
+    "message": "Marking income as one-off",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "maxPeople": {
+    "message": "Up to {count} people.",
+    "context": "Settings > People: error when adding more than the maximum."
+  },
+  "personHasEntries": {
+    "message": "They have entries logged, so they stay. Rename them instead.",
+    "context": "Settings > People: a person with logged entries can't be removed."
+  }
+}

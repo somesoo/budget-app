@@ -3,6 +3,7 @@ import { formatDayShort, formatMoney, withAlpha } from '../../lib/calculations'
 import type { Entry } from '../../lib/history'
 import type { Category } from '../../types'
 import { personLabel } from '../../lib/people'
+import { t } from '../../i18n'
 
 const INCOME_COLOR = '#34d399'
 const UNKNOWN_COLOR = '#64748b'
@@ -29,11 +30,12 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
   const oneOff = entry.kind === 'income' && entry.item.one_off
   const categoryName = isIncome
     ? oneOff
-      ? 'One-off income'
-      : 'Income'
-    : (category?.name ?? 'Unknown category')
+      ? t('entry.oneOffIncome')
+      : t('entry.income')
+    : (category?.name ?? t('entry.unknownCategory'))
   // spent from a savings goal: say so, it isn't part of the month
-  const where = category?.kind === 'project' ? `Goal: ${categoryName}` : categoryName
+  const where =
+    category?.kind === 'project' ? t('entry.fromGoal', { name: categoryName }) : categoryName
   const { person: me } = useDeviceUser()
   // the other one's allowance: the amount, not what it went on
   const privateNote = !!category?.owner && category.owner !== me
@@ -42,7 +44,7 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
   const detail = [
     note ? where : null,
     personLabel(entry.item.person),
-    privateNote && entry.item.note ? 'note kept private' : null,
+    privateNote && entry.item.note ? t('entry.notePrivate') : null,
     showDate ? formatDayShort(entry.date) : null,
   ]
     .filter(Boolean)
@@ -90,7 +92,10 @@ export function EntryRow({ entry, categories, onOpen, dense = false, showDate = 
     <button
       type="button"
       onClick={onOpen}
-      aria-label={`${note ? `${title}, ` : ''}${categoryName}, ${formatMoney(entry.item.amount)}. Edit`}
+      aria-label={t('entry.rowLabel', {
+        what: note ? `${title}, ${categoryName}` : categoryName,
+        amount: formatMoney(entry.item.amount),
+      })}
       className={`${base} transition active:bg-white/5`}
     >
       {content}

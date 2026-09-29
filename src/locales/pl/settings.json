@@ -1,0 +1,321 @@
+{
+  "title": {
+    "message": "Ustawienia",
+    "context": "Settings screen: the page heading."
+  },
+  "people": {
+    "title": {
+      "message": "Osoby",
+      "context": "Settings > card heading: the people who share the budget (one to four)."
+    },
+    "helpShort": {
+      "message": "Kto jest w budżecie.",
+      "context": "Settings > People card: one-line description, shown before the database is updated for editable people."
+    },
+    "help": {
+      "message": "Kto jest w budżecie: od jednej do czterech osób. Nowe imię pokaże się na każdym telefonie.",
+      "context": "Settings > People card: one-line description under the heading."
+    },
+    "migration": {
+      "message": "Uruchom <code>{file}</code> w SQL Editorze, żeby zmienić imiona ({names}) albo prowadzić budżet dla od jednej do czterech osób.",
+      "context": "Settings > People card, shown until a database update has been run. {file} is a file path (keep the <code> tags), {names} the current people joined like 'Ala and Ola'. 'SQL Editor' is a Supabase dashboard page."
+    },
+    "nameOf": {
+      "message": "Imię: {name}",
+      "context": "Settings > People: accessible label of the text field holding a person's name. {name} is the current name."
+    },
+    "taken": {
+      "message": "{name} już jest w budżecie.",
+      "context": "Settings > People: error when a typed name is already used by another person."
+    },
+    "confirmRemove": {
+      "message": "Usunąć {name} z budżetu?",
+      "context": "Settings > People: browser confirmation before removing a person."
+    },
+    "remove": {
+      "message": "Usuń: {name}",
+      "context": "Settings > People: accessible label of the bin button next to a person."
+    },
+    "addPlaceholder": {
+      "message": "Dodaj osobę",
+      "context": "Settings > People: placeholder of the empty field for a new person's name."
+    },
+    "newName": {
+      "message": "Imię nowej osoby",
+      "context": "Settings > People: accessible label of the field for a new person's name."
+    }
+  },
+  "device": {
+    "title": {
+      "message": "To urządzenie",
+      "context": "Settings > card heading: settings of this phone or computer only."
+    },
+    "helpPeople": {
+      "message": "Kto go używa. Zapisane na telefonie, nie w bazie danych.",
+      "context": "Settings > This device card: description when there are several people; the card picks whose phone this is."
+    },
+    "helpAlone": {
+      "message": "Synchronizowane z innymi zalogowanymi urządzeniami.",
+      "context": "Settings > This device card: description when the budget has just one person."
+    },
+    "live": {
+      "message": "Synchronizacja na żywo",
+      "context": "Settings > This device: connection status, changes from other phones arrive instantly."
+    },
+    "connecting": {
+      "message": "Łączenie…",
+      "context": "Settings > This device: connection status while connecting."
+    },
+    "offline": {
+      "message": "Offline",
+      "context": "Settings > This device: connection status with no connection."
+    }
+  },
+  "language": {
+    "title": {
+      "message": "Język",
+      "context": "Settings > card heading: the app's language. Each language's name is shown in that language, next to it."
+    },
+    "help": {
+      "message": "Całej aplikacji, na tym urządzeniu.",
+      "context": "Settings > Language card: one-line description; the choice is stored on this phone only."
+    }
+  },
+  "categories": {
+    "title": {
+      "message": "Kategorie",
+      "context": "Settings > card heading: the spending categories with their monthly limits."
+    },
+    "help": {
+      "message": "Domyślne limity: miesiąc zaplanowany w Budżecie ma własne.",
+      "context": "Settings > Categories card: description. The limits here are defaults; a month planned in the Budget tab has its own."
+    },
+    "new": {
+      "message": "Nowa",
+      "context": "Settings > Categories card: small button in the corner that creates a category."
+    },
+    "name": {
+      "message": "Nazwa",
+      "context": "Settings > Categories: column header above the category names."
+    },
+    "usually": {
+      "message": "Zwykle",
+      "context": "Settings > Categories: column header above what each category typically costs a month (an average). Very short."
+    },
+    "limit": {
+      "message": "Limit",
+      "context": "Settings > Categories: column header above each category's monthly limit. Very short."
+    },
+    "total": {
+      "message": "Miesięcznie",
+      "context": "Settings > Categories: label of the totals row at the bottom (all categories together, per month)."
+    },
+    "leftOut": {
+      "message": "Pominięta na wykresie",
+      "context": "Settings > Categories: accessible label of a small donut icon next to categories that are hidden from the Home spending chart."
+    },
+    "usuallyOver": {
+      "message": "Zwykle kosztuje więcej niż limit",
+      "context": "Settings > Categories: tooltip on a 'Usually' figure shown in amber."
+    },
+    "legend": {
+      "one": "„Zwykle” to średnia z ostatniego pełnego miesiąca; na bursztynowo, gdy przekracza limit. {icon} oznacza kategorie pominięte na wykresie na ekranie Dodaj.",
+      "few": "„Zwykle” to średnia z ostatnich {count} pełnych miesięcy; na bursztynowo, gdy przekracza limit. {icon} oznacza kategorie pominięte na wykresie na ekranie Dodaj.",
+      "many": "„Zwykle” to średnia z ostatnich {count} pełnych miesięcy; na bursztynowo, gdy przekracza limit. {icon} oznacza kategorie pominięte na wykresie na ekranie Dodaj.",
+      "other": "„Zwykle” to średnia z ostatnich {count} pełnych miesięcy; na bursztynowo, gdy przekracza limit. {icon} oznacza kategorie pominięte na wykresie na ekranie Dodaj.",
+      "context": "Settings > Categories: small explanation under the table. {count} is the number of months averaged; {icon} is a small donut icon, keep it in the sentence."
+    },
+    "showHidden": {
+      "one": "Pokaż {count} ukrytą",
+      "few": "Pokaż {count} ukryte",
+      "many": "Pokaż {count} ukrytych",
+      "other": "Pokaż {count} ukrytej",
+      "context": "Settings > Categories: button that reveals hidden (archived) categories. {count} is how many."
+    },
+    "hideHidden": {
+      "one": "Zwiń {count} ukrytą",
+      "few": "Zwiń {count} ukryte",
+      "many": "Zwiń {count} ukrytych",
+      "other": "Zwiń {count} ukrytej",
+      "context": "Settings > Categories: the same button once the hidden categories are shown; collapses them again."
+    }
+  },
+  "quickAmounts": {
+    "title": {
+      "message": "Szybkie kwoty",
+      "context": "Settings > card heading: the four one-tap amount buttons on the Add screen's keypad."
+    },
+    "help": {
+      "message": "Cztery kwoty pod jednym dotknięciem na ekranie Dodaj; kolejne dotknięcia się sumują. Tylko to urządzenie.",
+      "context": "Settings > Quick amounts card: description."
+    },
+    "reset": {
+      "message": "Przywróć",
+      "context": "Settings > Quick amounts: button that restores the default amounts."
+    },
+    "label": {
+      "message": "Szybka kwota {n}",
+      "context": "Settings > Quick amounts: accessible label of each amount field; {n} is 1 to 4."
+    }
+  },
+  "widgets": {
+    "title": {
+      "message": "Widżety na ekranie Dodaj",
+      "context": "Settings > card heading: which swipeable cards show above the category tiles on the Add screen."
+    },
+    "help": {
+      "message": "Karty nad kafelkami kategorii, przesuwane w lewo i w prawo. Tylko to urządzenie.",
+      "context": "Settings > Widgets card: description."
+    }
+  },
+  "warnings": {
+    "title": {
+      "message": "Ostrzeżenia",
+      "context": "Settings > card heading: when the app warns that a category is close to or over its limit."
+    },
+    "help": {
+      "message": "Kiedy aplikacja mówi, że kategorii trzeba pilnować. Tylko to urządzenie.",
+      "context": "Settings > Warnings card: description."
+    },
+    "nearLabel": {
+      "message": "Ostrzegaj, gdy kategoria osiągnie",
+      "context": "Settings > Warnings: label above a choice of 70% / 80% / 90% (of the category's limit)."
+    },
+    "pace": {
+      "message": "Ostrzegaj o tempie",
+      "context": "Settings > Warnings: switch label."
+    },
+    "paceHelp": {
+      "message": "Gdy dotychczasowe wydatki doprowadzą kategorię ponad limit do końca miesiąca.",
+      "context": "Settings > Warnings: explanation under the 'Warn about the pace' switch."
+    },
+    "bringBack": {
+      "one": "Przywróć {count} odrzucone ostrzeżenie",
+      "few": "Przywróć {count} odrzucone ostrzeżenia",
+      "many": "Przywróć {count} odrzuconych ostrzeżeń",
+      "other": "Przywróć {count} odrzuconego ostrzeżenia",
+      "context": "Settings > Warnings: button that shows again warnings the user closed."
+    }
+  },
+  "savings": {
+    "title": {
+      "message": "Oszczędności",
+      "context": "Settings: heading of the link row to the Savings tab."
+    },
+    "summary": {
+      "message": "{accounts}, {goals}: zarządzane na karcie Oszczędności",
+      "context": "Settings > Savings link: e.g. '2 accounts, 3 goals: managed in the Savings tab'. {accounts} and {goals} are the phrases below."
+    },
+    "accounts": {
+      "one": "{count} konto",
+      "few": "{count} konta",
+      "many": "{count} kont",
+      "other": "{count} konta",
+      "context": "Settings > Savings link: number of savings accounts, used as {accounts}."
+    },
+    "goals": {
+      "one": "{count} cel",
+      "few": "{count} cele",
+      "many": "{count} celów",
+      "other": "{count} celu",
+      "context": "Settings > Savings link: number of savings goals, used as {goals}."
+    },
+    "goalTitle": {
+      "message": "Cel oszczędnościowy",
+      "context": "Settings > card heading for the single savings goal (older database, before savings accounts existed)."
+    },
+    "goalHelp": {
+      "message": "Uruchom migrację 0007, żeby mieć konta i kilka celów.",
+      "context": "Settings > Savings goal card: hint to update the database."
+    },
+    "defaultGoalName": {
+      "message": "Wakacje",
+      "context": "Settings > Savings goal: default name of a new savings goal."
+    },
+    "goalName": {
+      "message": "Nazwa celu",
+      "context": "Settings > Savings goal: placeholder and label of the name field."
+    },
+    "goalFallback": {
+      "message": "Cel",
+      "context": "Settings > Savings goal: name used when the field is left empty."
+    },
+    "saved": {
+      "message": "Odłożone",
+      "context": "Settings > Savings goal: label of the field for how much is saved."
+    },
+    "target": {
+      "message": "Cel",
+      "context": "Settings > Savings goal: label of the field for the target amount."
+    },
+    "progress": {
+      "message": "{saved} z {target} · {percent}%",
+      "context": "Settings > Savings goal: progress under the bar. Amounts with currency."
+    },
+    "save": {
+      "message": "Zapisz cel",
+      "context": "Settings > Savings goal: button that saves changes."
+    },
+    "create": {
+      "message": "Utwórz cel",
+      "context": "Settings > Savings goal: button that creates the goal."
+    }
+  },
+  "data": {
+    "title": {
+      "message": "Twoje dane",
+      "context": "Settings > card heading: exporting everything logged."
+    },
+    "help": {
+      "message": "Wszystkie wydatki i dochody jako arkusz (CSV).",
+      "context": "Settings > Your data card: description."
+    },
+    "download": {
+      "message": "Pobierz CSV",
+      "context": "Settings > Your data: button that downloads the file."
+    },
+    "preparing": {
+      "message": "Przygotowuję…",
+      "context": "Settings > Your data: the button while the file is being prepared."
+    },
+    "downloaded": {
+      "one": "Pobrano {formatted} wpis.",
+      "few": "Pobrano {formatted} wpisy.",
+      "many": "Pobrano {formatted} wpisów.",
+      "other": "Pobrano {formatted} wpisu.",
+      "context": "Settings > Your data: message after the download; {formatted} is the number of rows, formatted (e.g. 1,204)."
+    },
+    "failed": {
+      "message": "Nie udało się wyeksportować: {error}",
+      "context": "Settings > Your data: error message; {error} is a technical message, usually in English."
+    }
+  },
+  "help": {
+    "title": {
+      "message": "Pomoc",
+      "context": "Settings > card heading: the guided tour."
+    },
+    "help": {
+      "message": "Przejście przez każdy ekran, krok po kroku.",
+      "context": "Settings > Help card: description of the guided tour."
+    },
+    "tour": {
+      "message": "Uruchom przewodnik",
+      "context": "Settings > Help: button that starts the guided tour."
+    }
+  },
+  "account": {
+    "title": {
+      "message": "Konto",
+      "context": "Settings > card heading: the shared sign-in account."
+    },
+    "signedInAs": {
+      "message": "Zalogowano jako {email}",
+      "context": "Settings > Account card: description; {email} is the account's email address."
+    },
+    "signOut": {
+      "message": "Wyloguj to urządzenie",
+      "context": "Settings > Account: button that signs this device out."
+    }
+  }
+}

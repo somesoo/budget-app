@@ -1,0 +1,150 @@
+{
+  "kind": {
+    "savings": {
+      "message": "Konto oszczędnościowe",
+      "context": "Savings account kind (dropdown and label under an account's name)."
+    },
+    "deposit": {
+      "message": "Lokata",
+      "context": "Savings account kind."
+    },
+    "investment": {
+      "message": "Inwestycje",
+      "context": "Savings account kind."
+    },
+    "ike": {
+      "message": "IKE",
+      "context": "Savings account kind: Polish individual retirement account (Indywidualne Konto Emerytalne). Keep the acronym."
+    },
+    "ikze": {
+      "message": "IKZE",
+      "context": "Savings account kind: Polish individual retirement security account. Keep the acronym."
+    },
+    "retirement": {
+      "message": "Inne emerytalne",
+      "context": "Savings account kind: any other retirement account."
+    },
+    "cash": {
+      "message": "Gotówka",
+      "context": "Savings account kind: cash at home."
+    },
+    "other": {
+      "message": "Inne",
+      "context": "Savings account kind."
+    }
+  },
+  "joint": {
+    "message": "Wspólne",
+    "context": "Savings account owner: shared by the household."
+  },
+  "openingNote": {
+    "message": "Saldo początkowe",
+    "context": "Note saved on the first balance of a new account; shows in its history."
+  },
+  "loseBalance": {
+    "message": "jego saldo {amount}",
+    "context": "Account delete warning, a list item: what deleting takes with it. Lowercase fragment."
+  },
+  "loseAllocated": {
+    "message": "{amount} odłożone na nim na cele, które je stracą",
+    "context": "Account delete warning, a list item. Lowercase fragment."
+  },
+  "loseMovements": {
+    "one": "{count} operację",
+    "few": "{count} operacje",
+    "many": "{count} operacji",
+    "other": "{count} operacji",
+    "context": "Account delete warning, a list item: the number of deposits/withdrawals in its history."
+  },
+  "loseLoans": {
+    "one": "{count} pożyczkę wciąż spłacaną na to konto",
+    "few": "{count} pożyczki wciąż spłacane na to konto",
+    "many": "{count} pożyczek wciąż spłacanych na to konto",
+    "other": "{count} pożyczki wciąż spłacanej na to konto",
+    "context": "Account delete warning, a list item."
+  },
+  "closingNote": {
+    "message": "Zamknięcie: {name}",
+    "context": "Note saved on the transfers made when closing account {name}."
+  },
+  "new": {
+    "message": "Nowe konto",
+    "context": "Account sheet heading when creating one."
+  },
+  "namePlaceholder": {
+    "message": "np. Oszczędności Revolut",
+    "context": "Account sheet: placeholder of the name field."
+  },
+  "retirementOwner": {
+    "message": "{kind} zawsze należy do jednej osoby: wybierz, czyje to konto.",
+    "context": "Account sheet: hint for an IKE/IKZE account set as joint. {kind} is IKE or IKZE."
+  },
+  "retirementHelp": {
+    "message": "Planer pilnuje rocznego limitu {kind} i proponuje miesięczną wpłatę, która wykorzysta go do grudnia.",
+    "context": "Account sheet: hint for an IKE/IKZE account."
+  },
+  "interest": {
+    "message": "Oprocentowanie, % w skali roku (opcjonalnie)",
+    "context": "Account sheet: interest rate field."
+  },
+  "interestHelp": {
+    "message": "Służy do prognozy; same odsetki dodajesz, gdy bank je wypłaci.",
+    "context": "Account sheet: hint under the interest field."
+  },
+  "interestInvalid": {
+    "message": "Liczba od 0 do 100",
+    "context": "Account sheet: error under the interest field."
+  },
+  "interestPlaceholder": {
+    "message": "np. 5,5",
+    "context": "Account sheet: placeholder of the interest field. Use the local decimal separator."
+  },
+  "balanceToday": {
+    "message": "Saldo dzisiaj",
+    "context": "Account sheet (new account): its current balance."
+  },
+  "balanceTodayHelp": {
+    "message": "To, co już na nim jest. Przypisz to później do celów.",
+    "context": "Account sheet: hint under the balance field."
+  },
+  "add": {
+    "message": "Dodaj konto",
+    "context": "Account sheet: button that creates the account."
+  },
+  "hide": {
+    "message": "Ukryj to konto",
+    "context": "Account sheet: hides (archives) the account."
+  },
+  "keepMoney": {
+    "message": "Zachowaj pieniądze: najpierw przenieś {amount} na inne konto (każdy cel zachowa swój udział), potem usuń.",
+    "context": "Account sheet > delete: suggestion to move the money before deleting."
+  },
+  "moving": {
+    "message": "Przenoszę…",
+    "context": "Account sheet > delete: while moving the money."
+  },
+  "moveThenDelete": {
+    "message": "Przenieś na {name}, potem usuń",
+    "context": "Account sheet > delete: button."
+  },
+  "bankSteps": {
+    "message": "W banku: przelej {amount} z {from} na {to}, potem zamknij {from}.",
+    "context": "Account sheet > delete: what to do in the actual bank."
+  },
+  "deleteWarning": {
+    "message": "Usunięcie {name} usunie też {what}. Tego nie da się cofnąć. Żeby zachować historię, lepiej je ukryj albo najpierw przenieś pieniądze na inne konto.",
+    "context": "Account sheet > delete: warning; {what} is a list like 'its balance of 500 zł and 12 movements'."
+  },
+  "deleteConfirm": {
+    "message": "Usunąć {name}? Tego nie da się cofnąć.",
+    "context": "Account sheet > delete: confirmation for an empty account."
+  },
+  "deleteForGood": {
+    "message": "Usuń na zawsze",
+    "context": "Account sheet > delete: final button."
+  },
+  "delete": {
+    "message": "Usuń to konto",
+    "context": "Account sheet: opens the delete confirmation."
+  }
+}

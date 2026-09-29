@@ -1,0 +1,6 @@
+{
+  "unassigned": {
+    "message": "{amount} unassigned",
+    "context": "Account card: money on the account not set aside for a goal."
+  }
+}

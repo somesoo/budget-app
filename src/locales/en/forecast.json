@@ -1,0 +1,88 @@
+{
+  "title": {
+    "message": "Forecast",
+    "context": "Card heading (Add screen widget, Budget and Insights): what's left of the month's income at its end."
+  },
+  "noIncomeCurrent": {
+    "message": "Log your paychecks with “+ Income” on the Add tab and this turns into a forecast of what you’ll have left at the end of the month.",
+    "context": "Forecast card when this month has no income logged. '+ Income' is the button on the Add tab (use its translated name)."
+  },
+  "noIncomePast": {
+    "message": "No income was logged for this month.",
+    "context": "Forecast card for a past month without income."
+  },
+  "expected": {
+    "message": "{name} ~{amount} expected",
+    "context": "Forecast card, under Income: a person's typical pay, used until this month's paycheck is logged. '~' means about."
+  },
+  "onCourseSave": {
+    "message": "On course to save <b>{amount}</b> this month.",
+    "context": "Forecast card headline (current month). Keep the <b> tags."
+  },
+  "onCourseSaveRate": {
+    "message": "On course to save <b>{amount}</b> this month, {percent}% of income.",
+    "context": "Forecast card headline (current month) with the share of income saved. Keep the <b> tags."
+  },
+  "onCourseOverspend": {
+    "message": "On course to spend <b>{amount} more</b> than you earn this month.",
+    "context": "Forecast card headline (current month) when spending is projected above income. Keep the <b> tags."
+  },
+  "saved": {
+    "message": "Saved <b>{amount}</b>.",
+    "context": "Forecast card headline for a past month. Keep the <b> tags."
+  },
+  "savedRate": {
+    "message": "Saved <b>{amount}</b>, {percent}% of income.",
+    "context": "Forecast card headline for a past month with the share of income saved. Keep the <b> tags."
+  },
+  "overspent": {
+    "message": "Spent <b>{amount} more</b> than you earned.",
+    "context": "Forecast card headline for a past month that spent more than it earned. Keep the <b> tags."
+  },
+  "stillToSpend": {
+    "message": "Still to spend (projected)",
+    "context": "Forecast card: legend of the lighter bar segment, spending projected for the rest of the month."
+  },
+  "leftOver": {
+    "message": "Left over",
+    "context": "Forecast card: legend and label, income minus spending at the month's end."
+  },
+  "shortfall": {
+    "message": "Shortfall",
+    "context": "Forecast card table: spending above income."
+  },
+  "spentSoFar": {
+    "message": "Spent so far",
+    "context": "Forecast card table row."
+  },
+  "projected": {
+    "message": "Projected spending",
+    "context": "Forecast card: the whole month's spending, projected."
+  },
+  "soFar": {
+    "message": "{amount} so far",
+    "context": "Forecast card: under projected spending, what's been spent so far."
+  },
+  "breakEven": {
+    "message": "To break even",
+    "context": "Forecast card: label of what can be spent per day without spending more than the income."
+  },
+  "breakEvenDetail": {
+    "one": "up to <b>{amount}</b> a day for the remaining {count} day",
+    "other": "up to <b>{amount}</b> a day for the remaining {count} days",
+    "context": "Forecast card, under 'To break even'. Keep the <b> tags."
+  },
+  "goal": {
+    "message": "Goal: {name}",
+    "context": "Forecast card: label with the main savings goal's name."
+  },
+  "goalDetail": {
+    "one": "about <b>{count} month</b> if a surplus like this one went to it every month",
+    "other": "about <b>{count} months</b> if a surplus like this one went to it every month",
+    "context": "Forecast card, under 'Goal: …': how long the goal takes at this month's surplus. Keep the <b> tags."
+  },
+  "expectedNote": {
+    "message": "“Expected” is that person’s typical month, used until this month’s paycheck is logged.",
+    "context": "Forecast card: footnote explaining 'expected' income."
+  }
+}

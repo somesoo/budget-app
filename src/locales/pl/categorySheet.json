@@ -1,0 +1,105 @@
+{
+  "new": {
+    "message": "Nowa kategoria",
+    "context": "Settings > category sheet heading when creating one."
+  },
+  "namePlaceholder": {
+    "message": "np. Prezenty",
+    "context": "Category sheet: placeholder of the name field."
+  },
+  "limit": {
+    "message": "Domyślny limit miesięczny",
+    "context": "Category sheet: label of the limit field."
+  },
+  "limitHelp": {
+    "message": "Używają go miesiące bez planu.",
+    "context": "Category sheet: hint under the limit field."
+  },
+  "limitHelpTypical": {
+    "message": "Używają go miesiące bez planu. Średnia z ostatnich 3 miesięcy to {amount}.",
+    "context": "Category sheet: hint under the limit field; {amount} is a tappable amount that fills in the average."
+  },
+  "inChart": {
+    "message": "Na wykresie „Na co idzie”",
+    "context": "Category sheet: switch label; 'Where it goes' is the spending donut's name."
+  },
+  "inChartHelp": {
+    "message": "Wyłącz dla kosztów stałych, jak czynsz; nadal liczą się wszędzie indziej.",
+    "context": "Category sheet: hint under the chart switch."
+  },
+  "whose": {
+    "message": "Czyja",
+    "context": "Category sheet: label of the choice between shared and one person's allowance."
+  },
+  "allowanceHelp": {
+    "message": "Kieszonkowe: {name}. Pieniądze, z których nikt nie musi się tłumaczyć. Tylko {name} widzi kafelek, wydatki i wpisy; reszta dowie się tylko, gdy limit zostanie przekroczony. Nadal liczy się do planu i wszystkich sum.",
+    "context": "Category sheet: explanation when the category is {name}'s personal allowance (pocket money)."
+  },
+  "sharedHelp": {
+    "message": "Wspólna dla wszystkich. Przypisz ją jednej osobie, żeby była jej kieszonkowym.",
+    "context": "Category sheet: explanation when the category is shared."
+  },
+  "shared": {
+    "message": "Wspólna",
+    "context": "Category sheet: option, the category belongs to everyone."
+  },
+  "allowanceOf": {
+    "message": "Kieszonkowe: {name}",
+    "context": "Category sheet: option, the category is {name}'s personal allowance."
+  },
+  "add": {
+    "message": "Dodaj kategorię",
+    "context": "Category sheet: button that creates the category."
+  },
+  "moveUp": {
+    "message": "W górę",
+    "context": "Category sheet: moves the category one place up in the order."
+  },
+  "moveDown": {
+    "message": "W dół",
+    "context": "Category sheet: moves the category one place down."
+  },
+  "hide": {
+    "message": "Ukryj",
+    "context": "Category sheet: hides (archives) the category."
+  },
+  "unhide": {
+    "message": "Pokaż ponownie",
+    "context": "Category sheet: brings a hidden category back."
+  },
+  "hideHelp": {
+    "message": "Ukrycie usuwa ją z ekranu Dodaj i z planowania; stare wydatki ją zachowują.",
+    "context": "Category sheet: explanation of hiding."
+  },
+  "delete": {
+    "message": "Usuń kategorię",
+    "context": "Category sheet: opens the delete confirmation."
+  },
+  "checking": {
+    "message": "Sprawdzam jej wydatki…",
+    "context": "Category sheet > delete: while counting the category's expenses."
+  },
+  "moveTo": {
+    "one": "W „{name}” jest {count} wydatek. Przenieś go do",
+    "few": "W „{name}” są {count} wydatki. Przenieś je do",
+    "many": "W „{name}” jest {count} wydatków. Przenieś je do",
+    "other": "W „{name}” jest {count} wydatku. Przenieś je do",
+    "context": "Category sheet > delete: label above choosing where the expenses go; followed by a list of categories."
+  },
+  "hiddenSuffix": {
+    "message": "(ukryta)",
+    "context": "Category sheet > delete: after a hidden category's name in the list."
+  },
+  "confirmEmpty": {
+    "message": "Brak wydatków w „{name}”. Usunąć ją na dobre?",
+    "context": "Category sheet > delete: confirmation for a category without expenses."
+  },
+  "keep": {
+    "message": "Zostaw",
+    "context": "Category sheet > delete: cancels the deletion."
+  },
+  "moveAndDelete": {
+    "message": "Przenieś i usuń",
+    "context": "Category sheet > delete: moves the expenses, then deletes."
+  }
+}

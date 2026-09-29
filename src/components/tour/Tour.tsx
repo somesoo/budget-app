@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { TOUR_STEPS, tourStore } from '../../lib/tour'
+import { t } from '../../i18n'
 
 /** Room around the element the spotlight picks out. */
 const PAD = 8
@@ -329,7 +330,7 @@ export function Tour() {
           >
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-accent-soft">
-                {shown + 1} of {TOUR_STEPS.length}
+                {t('tour.ui.progress', { step: shown + 1, total: TOUR_STEPS.length })}
               </p>
               {shown !== TOUR_STEPS.length - 1 && (
                 <button
@@ -337,7 +338,7 @@ export function Tour() {
                   onClick={() => void finish()}
                   className="-mr-2 rounded-full px-2 py-1 text-sm text-muted hover:bg-white/5 hover:text-white"
                 >
-                  Skip tour
+                  {t('tour.ui.skip')}
                 </button>
               )}
             </div>
@@ -352,12 +353,12 @@ export function Tour() {
             </div>
 
             <h2 id="tour-title" className="text-lg font-bold text-white">
-              {content.title}
+              {t(content.title)}
             </h2>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-slate-200">{content.body}</p>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-slate-200">{t(content.body)}</p>
             {content.tip && (
               <p className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-sm leading-snug text-slate-300">
-                {content.tip}
+                {t(content.tip)}
               </p>
             )}
 
@@ -368,7 +369,7 @@ export function Tour() {
                   onClick={() => tourStore.go(step - 1)}
                   className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
                 >
-                  Back
+                  {t('common.back')}
                 </button>
               )}
               <button
@@ -377,7 +378,11 @@ export function Tour() {
                 onClick={() => (last ? void finish() : tourStore.go(step + 1))}
                 className="flex-1 rounded-xl bg-slate-50 py-3 text-sm font-bold text-ink hover:bg-white"
               >
-                {shown === 0 ? 'Show me around' : shown === TOUR_STEPS.length - 1 ? 'Start using it' : 'Next'}
+                {shown === 0
+                  ? t('tour.ui.start')
+                  : shown === TOUR_STEPS.length - 1
+                    ? t('tour.ui.finish')
+                    : t('common.next')}
               </button>
             </div>
           </div>

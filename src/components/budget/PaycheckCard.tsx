@@ -20,6 +20,7 @@ import {
 } from '../../lib/calculations'
 import { splitLeftover } from '../../lib/planning'
 import type { BudgetPlan, SavingsAccount, SavingsLoan } from '../../types'
+import { t } from '../../i18n'
 
 interface Row {
   key: string
@@ -80,9 +81,9 @@ export function PaycheckCard({
       if (line.loan_id) {
         return {
           key: allocationKey(line),
-          name: `Pay back: ${loan?.note ?? 'a loan'}`,
+          name: t('paycheck.payBack', { note: loan?.note ?? t('paycheck.aLoan') }),
           color: '#f59e0b',
-          sub: `to ${goal?.name ?? account?.name ?? 'savings'}`,
+          sub: t('paycheck.to', { name: goal?.name ?? account?.name ?? t('paycheck.savings') }),
           planned: line.amount,
           paid,
           remaining,
@@ -90,34 +91,34 @@ export function PaycheckCard({
           goalId: line.goal_id,
           loan,
           payable: !!loan && !!account && !account.archived,
-          note: `Paid back: ${loan?.note ?? ''}`,
+          note: t('paycheck.paidBackNote', { note: loan?.note ?? '' }),
         }
       }
       return {
         key: allocationKey(line),
-        name: goal?.name ?? account?.name ?? 'Closed',
+        name: goal?.name ?? account?.name ?? t('paycheck.closed'),
         color: goal?.color ?? account?.color ?? '#64748b',
         sub: goal
           ? account
-            ? `onto ${account.name}`
-            : 'no account chosen'
+            ? t('paycheck.onto', { name: account.name })
+            : t('paycheck.noAccount')
           : account && (account.kind === 'ike' || account.kind === 'ikze')
             ? account.kind.toUpperCase()
-            : 'account',
+            : t('paycheck.account'),
         planned: line.amount,
         paid,
         remaining,
         account,
         goalId: line.goal_id,
         payable: !!account && !account.archived && !goal?.archived,
-        note: `${formatMonthName(month)} plan`,
+        note: t('paycheck.planNote', { month: formatMonthName(month) }),
       }
     },
   )
 
   // last month's unspent money, split between the goals chosen while planning this one
   if (previous.leftover !== null && previous.leftover > 0) {
-    const note = leftoverNote(formatMonthName(prevMonth))
+    const note = leftoverNote(prevMonth)
     const parts = splitLeftover(previous.leftover, plan.carryover, plan.carryover_keep)
     plan.carryover.forEach((carry, i) => {
       const carryGoal = goalById.get(carry.goal_id)
@@ -128,7 +129,14 @@ export function PaycheckCard({
         key: `leftover:${carry.goal_id}`,
         name: carryGoal.name,
         color: carryGoal.color,
-        sub: `${plan.carryover.length > 1 ? `${carry.share}% of ` : ''}unspent in ${formatMonthName(prevMonth)}${account ? ` · onto ${account.name}` : ''}`,
+        sub: [
+          plan.carryover.length > 1
+            ? t('paycheck.shareUnspent', { share: carry.share, month: formatMonthName(prevMonth) })
+            : t('paycheck.unspent', { month: formatMonthName(prevMonth) }),
+          account ? t('paycheck.onto', { name: account.name }) : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
         planned: parts[i],
         paid,
         remaining: roundMoney(Math.max(parts[i] - paid, 0)),
@@ -136,7 +144,9 @@ export function PaycheckCard({
         goalId: carry.goal_id,
         payable: !!account && !account.archived && !carryGoal.archived,
         note,
-        waiting: previous.final ? undefined : `at the end of ${formatMonthName(prevMonth)}`,
+        waiting: previous.final
+          ? undefined
+          : t('paycheck.atEndOf', { month: formatMonthName(prevMonth) }),
       })
     })
   }
@@ -175,12 +185,16 @@ export function PaycheckCard({
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[15px] text-white">{row.name}</p>
                 <p className="truncate text-xs tabular-nums text-muted">
-                  {row.sub} · {formatMoneyCompact(row.paid)} of {formatMoneyCompact(row.planned)}
+                  {row.sub} ·{' '}
+                  {t('paycheck.paidOf', {
+                    paid: formatMoneyCompact(row.paid),
+                    planned: formatMoneyCompact(row.planned),
+                  })}
                 </p>
               </div>
               {row.remaining === 0 ? (
                 <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-positive">
-                  <Check weight="bold" aria-hidden /> Paid in
+                  <Check weight="bold" aria-hidden /> {t('paycheck.paidIn')}
                 </span>
               ) : canPay ? (
                 <button
@@ -194,12 +208,13 @@ export function PaycheckCard({
                   }`}
                 >
                   {confirming === row.key
-                    ? `Confirm ${formatMoneyCompact(row.remaining)}`
-                    : `Pay in ${formatMoneyCompact(row.remaining)}`}
+                    ? t('paycheck.confirm', { amount: formatMoneyCompact(row.remaining) })
+                    : t('paycheck.payIn', { amount: formatMoneyCompact(row.remaining) })}
                 </button>
               ) : (
                 <span className="shrink-0 text-right text-sm tabular-nums text-amber-200">
-                  {row.waiting ?? `${formatMoneyCompact(row.remaining)} to go`}
+                  {row.waiting ??
+                    t('carryover.toGo', { amount: formatMoneyCompact(row.remaining) })}
                 </span>
               )}
             </li>
@@ -208,10 +223,12 @@ export function PaycheckCard({
       </ul>
       {other > 0 && (
         <p className="mt-1 text-xs text-muted">
-          Plus {formatMoneyCompact(other)} of other savings, anywhere you like.
+          {t('paycheck.other', { amount: formatMoneyCompact(other) })}
         </p>
       )}
-      {error && <p className="mt-2 text-sm text-red-300">Not paid in: {error}</p>}
+      {error && (
+        <p className="mt-2 text-sm text-red-300">{t('paycheck.failed', { error })}</p>
+      )}
     </>
   )
 
@@ -220,9 +237,9 @@ export function PaycheckCard({
   return (
     <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-semibold text-white">From the paycheck</h2>
+        <h2 className="text-base font-semibold text-white">{t('paycheck.title')}</h2>
         <span className="text-xs tabular-nums text-muted">
-          {done} of {rows.length} done
+          {t('paycheck.done', { done, total: rows.length })}
         </span>
       </div>
       {list}

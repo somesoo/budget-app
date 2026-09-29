@@ -1,0 +1,219 @@
+{
+  "thousands": {
+    "message": "{value} tys.",
+    "context": "Compact chart axis label for thousands: 12400 becomes '12.4k'. {value} is the number of thousands. Keep it very short."
+  },
+  "everythingElse": {
+    "one": "Reszta ({count})",
+    "few": "Reszta ({count})",
+    "many": "Reszta ({count})",
+    "other": "Reszta ({count})",
+    "context": "Spending donut chart: the slice that groups the smaller categories together. {count} is how many categories it holds."
+  },
+  "askQuestion": {
+    "message": "Co wyróżnia się w wydatkach miesiąca {month}?",
+    "context": "Question pre-filled in the AI chat from the Insights tab; {month} is the name alone."
+  },
+  "loadFailed": {
+    "message": "Nie udało się wczytać wydatków: {error}",
+    "context": "Insights: error."
+  },
+  "empty": {
+    "message": "Jeszcze nie ma czego pokazać. Dodaj kilka wydatków i wróć.",
+    "context": "Insights: no data yet."
+  },
+  "paceTitle": {
+    "message": "Tempo w tym miesiącu",
+    "context": "Insights: pace chart card title (current month)."
+  },
+  "paceThrough": {
+    "message": "Tempo w miesiącu {month}",
+    "context": "Insights: pace chart card title for a past month."
+  },
+  "evenSpread": {
+    "message": "Równy rozkład limitów",
+    "context": "Insights: legend of the dashed pace line."
+  },
+  "day": {
+    "message": "Dzień",
+    "context": "Insights: data table column header."
+  },
+  "spentToDate": {
+    "message": "Wydano do dnia",
+    "context": "Insights: data table column header."
+  },
+  "projectedEnd": {
+    "message": "Prognoza na koniec miesiąca",
+    "context": "Insights: KPI label."
+  },
+  "overLimits": {
+    "message": "{amount} ponad limity",
+    "context": "Insights: KPI note."
+  },
+  "withinLimits": {
+    "message": "w granicach limitów {amount}",
+    "context": "Insights: KPI note, within the total limits. Lowercase."
+  },
+  "vs": {
+    "message": "vs {month}",
+    "context": "Insights: KPI label comparing with last month; {month} is the name alone."
+  },
+  "vsSameDays": {
+    "message": "vs {month}, te same dni",
+    "context": "Insights: KPI label comparing the same days of last month."
+  },
+  "noDataFor": {
+    "message": "Brak danych za {month}",
+    "context": "Insights: KPI when last month has no data."
+  },
+  "moreThanLast": {
+    "message": "więcej niż w poprzednim miesiącu",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "lessThanLast": {
+    "message": "mniej niż w poprzednim miesiącu",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "sameAsLast": {
+    "message": "tyle samo co w poprzednim miesiącu",
+    "context": "Insights: KPI under the percentage. Lowercase."
+  },
+  "youSpent": {
+    "message": "W miesiącu {month} wydaliście {amount}.",
+    "context": "Insights pace card headline, past month without limits."
+  },
+  "endedOver": {
+    "message": "{month}: zakończony {amount} ponad limitami.",
+    "context": "Insights pace card headline, past month."
+  },
+  "endedUnder": {
+    "message": "{month}: zakończony {amount} poniżej limitów.",
+    "context": "Insights pace card headline, past month."
+  },
+  "finishOver": {
+    "message": "W tym tempie skończycie ok. <b>{amount} ponad</b> limitami.",
+    "context": "Insights pace card headline. Keep the <b> tags."
+  },
+  "finishUnder": {
+    "message": "W tym tempie skończycie ok. <b>{amount} poniżej</b> limitów.",
+    "context": "Insights pace card headline. Keep the <b> tags."
+  },
+  "monthByMonth": {
+    "message": "Miesiąc po miesiącu",
+    "context": "Insights: chart card title."
+  },
+  "monthByMonthEmpty": {
+    "message": "Pojawi się, gdy będą dwa miesiące wydatków. Jeden miesiąc to po prostu liczba powyżej.",
+    "context": "Insights: month-by-month card with one month of data."
+  },
+  "onCourseAbove": {
+    "message": "{month} zmierza do wyniku <b>{percent}% powyżej</b> waszego średniego miesiąca.",
+    "context": "Insights month-by-month headline. Keep the <b> tags."
+  },
+  "onCourseBelow": {
+    "message": "{month} zmierza do wyniku <b>{percent}% poniżej</b> waszego średniego miesiąca.",
+    "context": "Insights month-by-month headline. Keep the <b> tags."
+  },
+  "wasAbove": {
+    "message": "{month} był <b>{percent}% powyżej</b> waszego średniego miesiąca.",
+    "context": "Insights month-by-month headline, past month. Keep the <b> tags."
+  },
+  "wasBelow": {
+    "message": "{month} był <b>{percent}% poniżej</b> waszego średniego miesiąca.",
+    "context": "Insights month-by-month headline, past month. Keep the <b> tags."
+  },
+  "monthlyLimits": {
+    "message": "Limity miesięczne",
+    "context": "Insights: legend of the dashed limit line."
+  },
+  "month": {
+    "message": "Miesiąc",
+    "context": "Insights: data table column header."
+  },
+  "totalChartLabel": {
+    "message": "Łączne wydatki miesięcznie",
+    "context": "Insights: accessible label of the monthly chart."
+  },
+  "limitsShort": {
+    "message": "limity",
+    "context": "Insights: short label on the chart's dashed line. Very short, lowercase."
+  },
+  "soFar": {
+    "message": "Dotąd",
+    "context": "Insights: chart tooltip row for the running month."
+  },
+  "changeByCategory": {
+    "message": "Zmiana wg kategorii",
+    "context": "Insights: chart card title."
+  },
+  "changeEmpty": {
+    "message": "Porównuje każdą kategorię z poprzednim miesiącem. W miesiącu {month} jeszcze nic nie zapisano.",
+    "context": "Insights: change card when last month has no data."
+  },
+  "biggestJump": {
+    "message": "Największy wzrost: <b>{name}</b>, +{amount} vs {month}.",
+    "context": "Insights change card headline. Keep the <b> tags."
+  },
+  "biggestJumpSameDays": {
+    "message": "Największy wzrost: <b>{name}</b>, +{amount} vs te same dni miesiąca {month}.",
+    "context": "Insights change card headline, running month. Keep the <b> tags."
+  },
+  "allDown": {
+    "message": "Każda kategoria spadła, najbardziej <b>{name}</b>.",
+    "context": "Insights change card headline. Keep the <b> tags."
+  },
+  "moreThan": {
+    "message": "Więcej niż {month}",
+    "context": "Insights change card legend; {month} is e.g. 'Aug 1-21'."
+  },
+  "less": {
+    "message": "Mniej",
+    "context": "Insights change card legend."
+  },
+  "change": {
+    "message": "Zmiana",
+    "context": "Insights: data table column header."
+  },
+  "inProgress": {
+    "message": "Miesiąc w toku",
+    "context": "Insights people chart: legend of the dashed segment."
+  },
+  "whoSpent": {
+    "message": "Kto ile wydał",
+    "context": "Insights: chart card title, spending per person."
+  },
+  "trendLater": {
+    "message": "Linia trendu pojawi się po drugim miesiącu.",
+    "context": "Insights people card with one month of data."
+  },
+  "weekdayTitle": {
+    "message": "Codzienne wydatki wg dnia tygodnia",
+    "context": "Insights: chart card title."
+  },
+  "priciestDay": {
+    "message": "Najdroższy dzień to <b>{day}</b>, średnio ok. {amount}.",
+    "context": "Insights weekday headline; {day} is a weekday name (e.g. 'Saturday', Polish nominative 'sobota'). Keep the <b> tags."
+  },
+  "average": {
+    "message": "Średnio",
+    "context": "Insights: table header and tooltip row."
+  },
+  "weekdayChartLabel": {
+    "message": "Średnie wydatki wg dnia tygodnia",
+    "context": "Insights: accessible label of the weekday chart."
+  },
+  "weekdayNote": {
+    "one": "Średnia dzienna od pierwszego wydatku, z ostatniego miesiąca.",
+    "few": "Średnia dzienna od pierwszego wydatku, z ostatnich {count} miesięcy.",
+    "many": "Średnia dzienna od pierwszego wydatku, z ostatnich {count} miesięcy.",
+    "other": "Średnia dzienna od pierwszego wydatku, z ostatnich {count} miesiąca.",
+    "context": "Insights weekday card footnote."
+  },
+  "weekdayExcluded": {
+    "one": "Pomija {count} wydatek od {amount} wzwyż, np. czynsz.",
+    "few": "Pomija {count} wydatki od {amount} wzwyż, np. czynsz.",
+    "many": "Pomija {count} wydatków od {amount} wzwyż, np. czynsz.",
+    "other": "Pomija {count} wydatku od {amount} wzwyż, np. czynsz.",
+    "context": "Insights weekday card footnote: big expenses are excluded."
+  }
+}

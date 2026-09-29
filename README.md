@@ -506,6 +506,16 @@ what protects the data. Two things are worth knowing:
   paid is attribution, not identity — anyone signed in can edit or delete any
   expense.
 
+## Languages
+
+English and Polish, switched in **Settings → Language** (or on the sign-in
+screen); each device keeps its own choice, starting from the browser's
+language. Dates, numbers and plurals follow it, and so do the AI
+recommendations and plan drafts. Every text is in `src/locales/<language>/*.json`
+with a note on where it appears: see [src/locales/README.md](src/locales/README.md)
+for translating or adding a language. `npm run i18n` keeps the other languages
+in step with English.
+
 ## Layout
 
 ```
@@ -515,7 +525,9 @@ src/
 ├── pages/        # Home, History, Budget, Insights, Settings
 ├── hooks/        # useDeviceUser, useSession, useExpenses, useRealtimeSync
 ├── lib/          # supabaseClient, calculations, insights, forecast, history, planning
-├── config.ts     # names, labels, quick amounts — all the tunables
+├── i18n/         # t(), <Trans>, the language setting, locale-aware dates and numbers
+├── locales/      # the text of the app: en/ (source) and pl/, one JSON file per area
+├── config.ts     # quick amounts, currency, limits — the tunables
 └── types/        # Expense, Category, Goal
 api/
 ├── _gemini.ts    # shared: sign-in check, Gemini call with retry + fallback

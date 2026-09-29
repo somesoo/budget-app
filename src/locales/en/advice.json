@@ -1,0 +1,76 @@
+{
+  "area": {
+    "spending": {
+      "message": "Spending",
+      "context": "AI recommendations card (Insights tab): small label above a recommendation about spending."
+    },
+    "savings": {
+      "message": "Savings",
+      "context": "AI recommendations card: label above a recommendation about savings."
+    },
+    "goals": {
+      "message": "Goals",
+      "context": "AI recommendations card: label above a recommendation about a savings goal."
+    },
+    "income": {
+      "message": "Income",
+      "context": "AI recommendations card: label above a recommendation about income."
+    },
+    "other": {
+      "message": "Tip",
+      "context": "AI recommendations card: label above any other recommendation."
+    }
+  },
+  "justNow": {
+    "message": "just now",
+    "context": "AI recommendations card: when they were generated, under the heading (after the model name)."
+  },
+  "failed": {
+    "message": "Couldn’t get recommendations: {error}",
+    "context": "AI recommendations card: error; {error} is a technical message."
+  },
+  "title": {
+    "message": "Recommendations",
+    "context": "AI recommendations card (Insights tab): heading."
+  },
+  "thinking": {
+    "message": "Thinking…",
+    "context": "AI recommendations card: button while the AI is working."
+  },
+  "refresh": {
+    "message": "Refresh",
+    "context": "AI recommendations card: button that asks for new recommendations."
+  },
+  "get": {
+    "message": "Get recommendations",
+    "context": "AI recommendations card: button that asks for the first recommendations of the month."
+  },
+  "intro": {
+    "message": "Gemini looks at this month, your savings and goals, and suggests where to adjust.",
+    "context": "AI recommendations card: explanation before any are generated. Gemini is Google's AI model; keep the name."
+  },
+  "whatsSent": {
+    "message": "What gets sent to Gemini?",
+    "context": "AI recommendations card: small link that explains which data goes to the AI."
+  },
+  "hideSent": {
+    "message": "Hide what’s sent",
+    "context": "AI recommendations card: the same link once the explanation is open."
+  },
+  "sentDetail": {
+    "message": "Income per person, spending per category with its limit and a typical month, the split between people, the app’s warnings, the month’s biggest expenses with their notes, savings accounts and goals, and trips. No email or account numbers. On Google’s free API tier, submitted data may be used to improve their products and read by human reviewers; the paid tier excludes that. Suggestions, not financial advice.",
+    "context": "AI recommendations card: privacy note listing the data sent to Google's Gemini. Keep it accurate."
+  },
+  "impact": {
+    "message": "~{amount} {currency}/mo",
+    "context": "AI recommendation: small badge with the rough monthly amount it could save, e.g. '~200 zł/mo'. Very short."
+  },
+  "askMore": {
+    "message": "Tell me more about this: {title}",
+    "context": "Question pre-filled in the Ask (AI chat) tab when opening a recommendation; {title} is the recommendation's title."
+  },
+  "askAbout": {
+    "message": "Ask about it",
+    "context": "AI recommendation: link that opens the AI chat with a question about it."
+  }
+}

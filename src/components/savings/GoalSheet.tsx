@@ -7,6 +7,7 @@ import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from './ColorChoice'
 import { Field, Segments, SubmitRow, Switch, inputClass } from './fields'
+import { t } from '../../i18n'
 
 /**
  * New goal, or editing one. A goal can be open-ended (an emergency fund) or
@@ -86,14 +87,17 @@ export function GoalSheet({
   }
 
   return (
-    <BottomSheet title={goal ? `Edit ${goal.name}` : 'New goal'} onClose={onClose}>
+    <BottomSheet
+      title={goal ? t('project.edit', { name: goal.name }) : t('goalSheet.new')}
+      onClose={onClose}
+    >
       <form onSubmit={submit} className="grid gap-4 pb-2">
-        <Field label="What it's for">
+        <Field label={t('goalSheet.name')}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={60}
-            placeholder="e.g. Japan 2027, Emergency fund"
+            placeholder={t('goalSheet.namePlaceholder')}
             className={inputClass}
             autoFocus={!goal}
           />
@@ -102,23 +106,28 @@ export function GoalSheet({
           value={shape}
           onChange={setShape}
           options={[
-            { value: 'target', label: 'Has a target' },
-            { value: 'open', label: 'Keeps growing' },
+            { value: 'target', label: t('goalSheet.hasTarget') },
+            { value: 'open', label: t('goalSheet.open') },
           ]}
         />
         {shape === 'target' ? (
           <div className="grid grid-cols-2 gap-3">
             <Field
-              label="Target"
+              label={t('settings.savings.target')}
               help={
                 emergencyHint && /emergency|cushion|poduszk/i.test(name)
-                  ? `${formatMoneyWhole(emergencyHint)} is 3 months of your typical spending.`
+                  ? t('goalSheet.emergencyHint', { amount: formatMoneyWhole(emergencyHint) })
                   : undefined
               }
             >
-              <MoneyInput value={target} onChange={setTarget} label="Target" size="lg" />
+              <MoneyInput
+                value={target}
+                onChange={setTarget}
+                label={t('settings.savings.target')}
+                size="lg"
+              />
             </Field>
-            <Field label="By (optional)">
+            <Field label={t('goalSheet.by')}>
               <input
                 type="date"
                 value={date}
@@ -130,12 +139,12 @@ export function GoalSheet({
           </div>
         ) : (
           <p className="text-sm text-muted">
-            No finish line: good for an emergency fund or a general cushion.
+            {t('goalSheet.openHelp')}
           </p>
         )}
         {trip && (
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Trip from (optional)">
+            <Field label={t('goalSheet.tripFrom')}>
               <input
                 type="date"
                 value={starts}
@@ -144,8 +153,8 @@ export function GoalSheet({
               />
             </Field>
             <Field
-              label="Until (optional)"
-              help={datesOk ? undefined : 'Ends before it starts'}
+              label={t('project.until')}
+              help={datesOk ? undefined : t('project.badDates')}
             >
               <input
                 type="date"
@@ -157,12 +166,12 @@ export function GoalSheet({
           </div>
         )}
         <Switch
-          label="This is our emergency fund"
-          help="The Budget tab says how many months of spending it covers, last month's leftover goes here first while it's short, and borrowing warns before emptying it."
+          label={t('goalSheet.emergency')}
+          help={t('goalSheet.emergencyHelp')}
           checked={emergency}
           onChange={setEmergency}
         />
-        <Field label="Note (optional)">
+        <Field label={t('goalSheet.note')}>
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -170,11 +179,11 @@ export function GoalSheet({
             className={inputClass}
           />
         </Field>
-        <Field label="Color">
+        <Field label={t('common.color')}>
           <ColorChoice value={color} onChange={setColor} />
         </Field>
         <SubmitRow
-          label={goal ? 'Save changes' : 'Add goal'}
+          label={goal ? t('entry.saveChanges') : t('goalSheet.add')}
           disabled={!name.trim() || (shape === 'target' && target <= 0) || !datesOk}
           pending={upsert.isPending || updateCategory.isPending}
           error={error}
@@ -185,7 +194,7 @@ export function GoalSheet({
             onClick={archive}
             className="rounded-2xl py-2.5 text-sm font-semibold text-muted ring-1 ring-white/10 hover:bg-white/5"
           >
-            {goal.archived ? 'Bring it back' : 'Close this goal'}
+            {goal.archived ? t('goalSheet.unarchive') : t('goalSheet.archive')}
           </button>
         )}
       </form>

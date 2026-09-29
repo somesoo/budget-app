@@ -5,9 +5,12 @@ export function SettingsCard({
   title,
   help,
   action,
+  tour,
   children,
 }: {
   title: string
+  /** Names the card for the guided tour (data-tour). */
+  tour?: string
   help?: string
   action?: ReactNode
   children: ReactNode
@@ -16,6 +19,7 @@ export function SettingsCard({
     <section
       className="rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 lg:p-5"
       aria-label={title}
+      data-tour={tour}
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">

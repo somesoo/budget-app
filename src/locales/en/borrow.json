@@ -1,0 +1,91 @@
+{
+  "title": {
+    "message": "I need money",
+    "context": "Savings > sheet heading: borrowing from your own savings, paid back in instalments."
+  },
+  "migration": {
+    "message": "Borrowing from savings needs <code>{file}</code>. Run it in the SQL Editor, as with the earlier ones.",
+    "context": "Borrow sheet, before the database update. Keep the <code> tags around {file}."
+  },
+  "intro": {
+    "message": "Borrow it from your savings and pay it back in instalments: the coming months’ plans put each one aside first, until the goal is whole again.",
+    "context": "Borrow sheet: explanation at the top."
+  },
+  "howMuch": {
+    "message": "How much",
+    "context": "Borrow sheet: amount field label."
+  },
+  "whatFor": {
+    "message": "What for",
+    "context": "Borrow sheet: reason field label."
+  },
+  "whatForPlaceholder": {
+    "message": "e.g. car repair",
+    "context": "Borrow sheet: placeholder of the reason field."
+  },
+  "from": {
+    "message": "Take it from",
+    "context": "Borrow sheet: heading of the list of goals/accounts to borrow from."
+  },
+  "noPlace": {
+    "message": "No single place has {amount}. Borrow less, or twice from two places.",
+    "context": "Borrow sheet: no account or goal holds the whole amount."
+  },
+  "noPlaceTotal": {
+    "message": "No single place has {amount} (there’s {total} saved in all). Borrow less, or twice from two places.",
+    "context": "Borrow sheet: no account or goal holds the whole amount, with the total saved."
+  },
+  "unassigned": {
+    "message": "Unassigned money",
+    "context": "Borrow sheet / money sheet: money on an account not set aside for any goal."
+  },
+  "suggested": {
+    "message": "suggested",
+    "context": "Borrow sheet: small badge on the best source. Lowercase."
+  },
+  "on": {
+    "message": "on {name}",
+    "context": "Borrow sheet: which account the source is on. Lowercase fragment."
+  },
+  "neededAfter": {
+    "message": "until paid back it needs {amount}/mo to stay on time",
+    "context": "Borrow sheet: what the goal would need per month until repaid. Lowercase fragment."
+  },
+  "emergencyShare": {
+    "message": "That’s {percent}% of {name}, your emergency fund.",
+    "context": "Borrow sheet: warning when borrowing from the emergency fund."
+  },
+  "emergencyMost": {
+    "message": "More than half: only for something that really can’t wait, and pay it back first.",
+    "context": "Borrow sheet: follows the emergency fund warning when it's more than half."
+  },
+  "emergencySome": {
+    "message": "Fine for a real emergency; pay it back before the next one.",
+    "context": "Borrow sheet: follows the emergency fund warning when it's less than half."
+  },
+  "repayOver": {
+    "message": "Pay it back over",
+    "context": "Borrow sheet: label above the choice of repayment months."
+  },
+  "months": {
+    "one": "{count} month",
+    "other": "{count} months",
+    "context": "Borrow sheet: a repayment period chip."
+  },
+  "bank": {
+    "message": "<b>In the bank:</b> transfer {amount} from {account} to your everyday account. From next month’s plan, {monthly} a month goes back.",
+    "context": "Borrow sheet: what to do in the actual bank. Keep the <b> tags."
+  },
+  "bankGoal": {
+    "message": "<b>In the bank:</b> transfer {amount} from {account} to your everyday account. From next month’s plan, {monthly} a month goes back to {goal}.",
+    "context": "Borrow sheet: what to do in the actual bank, repaid to goal {goal}. Keep the <b> tags."
+  },
+  "submit": {
+    "message": "Borrow",
+    "context": "Borrow sheet: submit button without an amount."
+  },
+  "submitAmount": {
+    "message": "Borrow {amount}",
+    "context": "Borrow sheet: submit button."
+  }
+}

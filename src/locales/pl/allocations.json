@@ -1,0 +1,6 @@
+{
+  "leftoverFrom": {
+    "message": "Nadwyżka z miesiąca: {month}",
+    "context": "Savings > list of deposits: note on a deposit made from last month's unspent money. {month} is the month name alone, e.g. 'August'."
+  }
+}

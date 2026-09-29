@@ -1,11 +1,12 @@
 import { Sparkle } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
+import { t } from '../i18n'
 
 /**
  * Opens the Ask tab with a question ready to send (not sent: it can be
  * edited first). On the phone this is how Ask is reached.
  */
-export function AskLink({ question, label = 'Ask AI' }: { question?: string; label?: string }) {
+export function AskLink({ question, label = t('ask.link') }: { question?: string; label?: string }) {
   return (
     <Link
       aria-label={label}

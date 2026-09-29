@@ -17,6 +17,7 @@ import { formatAmount, plainDashes } from '../lib/calculations'
 import type { AdviceRequest } from '../lib/forecast'
 import type { AdviceArea, Recommendation } from '../types'
 import { CHART } from './charts/theme'
+import { locale, t } from '../i18n'
 
 interface Props {
   month: string
@@ -25,22 +26,22 @@ interface Props {
   buildRequest: () => AdviceRequest
 }
 
-const AREAS: Record<AdviceArea, { label: string; icon: Icon }> = {
-  spending: { label: 'Spending', icon: Receipt },
-  savings: { label: 'Savings', icon: PiggyBank },
-  goals: { label: 'Goals', icon: Target },
-  income: { label: 'Income', icon: Coins },
-  other: { label: 'Tip', icon: Lightbulb },
+const AREAS: Record<AdviceArea, { label: () => string; icon: Icon }> = {
+  spending: { label: () => t('advice.area.spending'), icon: Receipt },
+  savings: { label: () => t('advice.area.savings'), icon: PiggyBank },
+  goals: { label: () => t('advice.area.goals'), icon: Target },
+  income: { label: () => t('advice.area.income'), icon: Coins },
+  other: { label: () => t('advice.area.other'), icon: Lightbulb },
 }
 
 function timeAgo(iso: string): string {
   const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes} min ago`
+  if (minutes < 1) return t('advice.justNow')
+  const ago = new Intl.RelativeTimeFormat(locale(), { style: 'short' })
+  if (minutes < 60) return ago.format(-minutes, 'minute')
   const hours = Math.round(minutes / 60)
-  if (hours < 24) return `${hours} h ago`
-  const days = Math.round(hours / 24)
-  return `${days} ${days === 1 ? 'day' : 'days'} ago`
+  if (hours < 24) return ago.format(-hours, 'hour')
+  return new Intl.RelativeTimeFormat(locale()).format(-Math.round(hours / 24), 'day')
 }
 
 /**
@@ -64,7 +65,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
     generate.error instanceof AdviceUnavailableError
       ? generate.error.message
       : generate.error
-        ? `Couldn’t get recommendations: ${(generate.error as Error).message}`
+        ? t('advice.failed', { error: (generate.error as Error).message })
         : null
 
   const recommendations = advice?.content.recommendations ?? []
@@ -83,7 +84,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
             className="flex items-center gap-1.5 text-base font-semibold text-white"
           >
             <Sparkle weight="fill" aria-hidden className="text-accent-soft" />
-            Recommendations
+            {t('advice.title')}
           </h2>
           {advice && (
             <p className="mt-0.5 text-xs text-muted">
@@ -111,7 +112,11 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
                 className={generate.isPending ? 'motion-safe:animate-spin' : ''}
               />
             )}
-            {generate.isPending ? 'Thinking…' : advice ? 'Refresh' : 'Get recommendations'}
+            {generate.isPending
+              ? t('advice.thinking')
+              : advice
+                ? t('advice.refresh')
+                : t('advice.get')}
           </button>
         )}
       </div>
@@ -147,7 +152,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
         </>
       ) : (
         <p className="mt-2 max-w-2xl text-sm text-slate-300">
-          Gemini looks at this month, your savings and goals, and suggests where to adjust.
+          {t('advice.intro')}
         </p>
       )}
 
@@ -165,15 +170,11 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
             aria-expanded={showWhatsSent}
             className="text-xs font-medium text-muted hover:text-white"
           >
-            {showWhatsSent ? 'Hide what’s sent' : 'What gets sent to Gemini?'}
+            {showWhatsSent ? t('advice.hideSent') : t('advice.whatsSent')}
           </button>
           {showWhatsSent && (
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted">
-              Income per person, spending per category with its limit and a typical month, the
-              split between people, the app’s warnings, the month’s biggest expenses with their notes,
-              savings accounts and goals, and trips. No email or account numbers. On Google’s free
-              API tier, submitted data may be used to improve their products and read by human
-              reviewers; the paid tier excludes that. Suggestions, not financial advice.
+              {t('advice.sentDetail')}
             </p>
           )}
         </div>
@@ -209,7 +210,7 @@ function RecommendationItem({
   const impact =
     rec.monthlyImpact !== null && rec.monthlyImpact > 0 ? (
       <span className="shrink-0 rounded-full bg-positive/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-positive">
-        ~{formatAmount(rec.monthlyImpact)} {CURRENCY_SUFFIX}/mo
+        {t('advice.impact', { amount: formatAmount(rec.monthlyImpact), currency: CURRENCY_SUFFIX })}
       </span>
     ) : null
 
@@ -226,7 +227,7 @@ function RecommendationItem({
       >
         <area.icon aria-hidden className="shrink-0 text-lg text-accent-soft lg:mt-0.5" />
         <span className="min-w-0 flex-1">
-          <span className="hidden text-xs text-muted lg:block">{area.label}</span>
+          <span className="hidden text-xs text-muted lg:block">{area.label()}</span>
           <span className="line-clamp-2 text-sm font-semibold leading-snug text-white lg:line-clamp-none lg:text-[15px]">
             {title}
           </span>
@@ -244,10 +245,10 @@ function RecommendationItem({
         <div className="mt-3 flex items-center justify-between gap-2 lg:mt-auto lg:pt-3">
           <span className="hidden lg:inline">{impact}</span>
           <Link
-            to={`/ask?q=${encodeURIComponent(`Tell me more about this: ${title}`)}`}
+            to={`/ask?q=${encodeURIComponent(t('advice.askMore', { title }))}`}
             className="text-sm font-semibold text-accent-soft hover:underline"
           >
-            Ask about it
+            {t('advice.askAbout')}
           </Link>
         </div>
       </div>

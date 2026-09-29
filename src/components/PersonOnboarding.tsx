@@ -1,5 +1,6 @@
 import { type Person } from '../types'
 import { personIds, personLabel } from '../lib/people'
+import { t } from '../i18n'
 
 interface Props {
   onPick: (person: Person) => void
@@ -13,9 +14,9 @@ export function PersonOnboarding({ onPick }: Props) {
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center gap-6 px-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Who's using this phone?</h1>
+        <h1 className="text-3xl font-bold text-white">{t('onboarding.title')}</h1>
         <p className="mt-2 text-sm text-muted">
-          We'll remember it on this device. You can change it any time with one tap.
+          {t('onboarding.intro')}
         </p>
       </div>
       <div className="grid gap-3">

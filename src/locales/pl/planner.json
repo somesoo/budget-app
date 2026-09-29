@@ -1,0 +1,247 @@
+{
+  "title": {
+    "message": "Plan: {month}",
+    "context": "Budget planner (full screen): heading, {month} is month and year, e.g. 'Plan October 2026'."
+  },
+  "editing": {
+    "message": "Edycja zapisanego planu",
+    "context": "Budget planner: small line under the heading when the month already has a saved plan."
+  },
+  "notSaved": {
+    "message": "Jeszcze niezapisany",
+    "context": "Budget planner: small line under the heading for a new plan."
+  },
+  "saveFailed": {
+    "message": "Nie zapisano: {error}. Czy migracja 0005 została uruchomiona?",
+    "context": "Budget planner: error when saving fails; {error} is technical. 'Migration 0005' is a database update file."
+  },
+  "save": {
+    "message": "Zapisz plan: {month}",
+    "context": "Budget planner: main save button; {month} is the month name alone, e.g. 'Save October plan'."
+  },
+  "limitOf": {
+    "message": "Limit: {name}",
+    "context": "Budget planner: accessible label of a category's limit field, e.g. 'Food limit'."
+  },
+  "typicalPay": {
+    "message": "zwykła pensja {amount}",
+    "context": "Budget planner: small tappable chip under Income that fills in the usual monthly pay. Lowercase, short."
+  },
+  "plannedIncome": {
+    "message": "Planowany dochód",
+    "context": "Budget planner: accessible label of the income field."
+  },
+  "goalsNeed": {
+    "message": "cele potrzebują {amount}",
+    "context": "Budget planner: chip under Savings that fills in what the savings goals need per month. Lowercase, short."
+  },
+  "goalIn": {
+    "one": "{name} za ~{count} miesiąc",
+    "few": "{name} za ~{count} miesiące",
+    "many": "{name} za ~{count} miesięcy",
+    "other": "{name} za ~{count} miesiąca",
+    "context": "Budget planner (older database): how long the savings goal {name} takes at the planned savings. '~' means about."
+  },
+  "goalLeft": {
+    "message": "{amount} do celu {name}",
+    "context": "Budget planner (older database): how much the goal {name} still needs."
+  },
+  "goalReached": {
+    "message": "{name}: osiągnięty",
+    "context": "Budget planner (older database): the goal is reached."
+  },
+  "plannedSavings": {
+    "message": "Planowane oszczędności",
+    "context": "Budget planner: accessible label of the savings field."
+  },
+  "spendingLimits": {
+    "message": "Limity wydatków",
+    "context": "Budget planner: the sum of all category limits."
+  },
+  "noteLabel": {
+    "message": "Co jest inne w miesiącu: {month}?",
+    "context": "Budget planner: label of the free-text note for the month; {month} is the month name alone."
+  },
+  "notePlaceholder": {
+    "message": "np. ubezpieczenie auta 1200 zł, urodziny, weekend w Krakowie",
+    "context": "Budget planner: placeholder of the note field with examples."
+  },
+  "noteHelp": {
+    "message": "Zapisuje się z planem, a szkic AI bierze ją pod uwagę.",
+    "context": "Budget planner: hint under the note field."
+  },
+  "aiDraft": {
+    "message": "Szkic AI",
+    "context": "Budget planner: heading of the box where the AI proposes a plan."
+  },
+  "useAll": {
+    "message": "Użyj wszystkich",
+    "context": "Budget planner > AI draft: button that applies every AI-suggested limit."
+  },
+  "suggestedSavings": {
+    "message": "Proponowane oszczędności: <b>{amount}</b>",
+    "context": "Budget planner > AI draft: savings the AI proposes. Keep the <b> tags."
+  },
+  "aiFootnote": {
+    "message": "Propozycje dla kategorii są pod każdą z nich. Napisane przez {model}. To sugestia, a nie porada finansowa.",
+    "context": "Budget planner > AI draft: footnote; {model} is the AI model's name."
+  },
+  "aiIntroHistory": {
+    "one": "Proponuje limity na podstawie ostatniego miesiąca, pory roku i notatki powyżej.",
+    "few": "Proponuje limity na podstawie ostatnich {count} miesięcy, pory roku i notatki powyżej.",
+    "many": "Proponuje limity na podstawie ostatnich {count} miesięcy, pory roku i notatki powyżej.",
+    "other": "Proponuje limity na podstawie ostatnich {count} miesiąca, pory roku i notatki powyżej.",
+    "context": "Budget planner > AI draft: explanation before asking the AI."
+  },
+  "aiIntroDefaults": {
+    "message": "Proponuje limity na podstawie domyślnych, pory roku i notatki powyżej.",
+    "context": "Budget planner > AI draft: explanation when there's no history yet."
+  },
+  "draft": {
+    "message": "Przygotuj plan z AI",
+    "context": "Budget planner > AI draft: button that asks the AI."
+  },
+  "draftAgain": {
+    "message": "Przygotuj ponownie",
+    "context": "Budget planner > AI draft: button that asks the AI again."
+  },
+  "draftFailed": {
+    "message": "Nie udało się przygotować planu: {error}",
+    "context": "Budget planner > AI draft: error; {error} is technical."
+  },
+  "aiSent": {
+    "message": "Wysyłane do Gemini: miesięczne sumy dla kategorii i dochodu, cel, twoja notatka i sugestie powyżej, z nazwami rocznych rachunków i stałych płatności.",
+    "context": "Budget planner > AI draft: privacy footnote listing what goes to Google's Gemini."
+  },
+  "suggestions": {
+    "message": "Sugestie",
+    "context": "Budget planner: heading of the list of suggestions worked out from past months."
+  },
+  "recurring": {
+    "message": "Już pewne",
+    "context": "Budget planner: heading of the list of regular payments that come every month (subscriptions, rent)."
+  },
+  "checks": {
+    "message": "Zanim zapiszesz",
+    "context": "Budget planner: heading of the checks on the draft plan."
+  },
+  "limits": {
+    "message": "Limity",
+    "context": "Budget planner: heading of the per-category limits list."
+  },
+  "fillPrevious": {
+    "message": "Plan: {month}",
+    "context": "Budget planner: chip that copies the previous month's limits; {month} is the month name alone, e.g. 'September’s plan'."
+  },
+  "fillTypical": {
+    "message": "Typowe",
+    "context": "Budget planner: chip that fills every limit with what the category typically costs."
+  },
+  "fillDefaults": {
+    "message": "Domyślne",
+    "context": "Budget planner: chip that fills every limit with the category's default from Settings."
+  },
+  "openCategory": {
+    "message": "Historia, prognoza i udział",
+    "context": "Budget planner: tooltip of a category's name, which opens its history, forecast and share."
+  },
+  "hasSuggestion": {
+    "message": "Ma sugestię",
+    "context": "Budget planner: accessible label of a lightbulb icon next to a category with a suggestion."
+  },
+  "chipTypical": {
+    "message": "typowo {amount}",
+    "context": "Budget planner: small chip under a category's limit: what it typically costs. Lowercase, very short."
+  },
+  "chipLast": {
+    "message": "ostatnio {amount}",
+    "context": "Budget planner: small chip: what the category cost last month. Lowercase, very short."
+  },
+  "used": {
+    "message": "użyte",
+    "context": "Budget planner: after an AI suggestion that's been applied. Very short."
+  },
+  "tapToUse": {
+    "message": "dotknij, żeby użyć",
+    "context": "Budget planner: after an AI suggestion that hasn't been applied. Very short."
+  },
+  "typicalNote": {
+    "one": "„Typowo” to średnia z ostatniego pełnego miesiąca. Kwoty są zaokrąglane w górę do 10 {currency}.",
+    "few": "„Typowo” to średnia z ostatnich {count} pełnych miesięcy. Kwoty są zaokrąglane w górę do 10 {currency}.",
+    "many": "„Typowo” to średnia z ostatnich {count} pełnych miesięcy. Kwoty są zaokrąglane w górę do 10 {currency}.",
+    "other": "„Typowo” to średnia z ostatnich {count} pełnych miesięcy. Kwoty są zaokrąglane w górę do 10 {currency}.",
+    "context": "Budget planner: footnote under the limits."
+  },
+  "remove": {
+    "message": "Usuń plan: {month} (powrót do domyślnych limitów)",
+    "context": "Budget planner: button that deletes the saved plan; {month} is the month name alone."
+  },
+  "addIncome": {
+    "message": "Dodaj spodziewany dochód, żeby sprawdzić, czy plan się mieści.",
+    "context": "Budget planner: hint when no income is entered."
+  },
+  "balanced": {
+    "message": "Każda złotówka ma przeznaczenie",
+    "context": "Budget planner: the plan is balanced (zero-based budgeting: all income is assigned). Adapt 'złoty' to the currency idiom."
+  },
+  "overBy": {
+    "message": "Ponad dochód o",
+    "context": "Budget planner: the plan assigns more than the income; followed by the amount."
+  },
+  "unassigned": {
+    "message": "Jeszcze nieprzypisane",
+    "context": "Budget planner: part of the income has no category or savings yet; followed by the amount."
+  },
+  "noteNoIncome": {
+    "message": "Nie zaplanowano jeszcze dochodu.",
+    "context": "Budget planner footer (laptop): status of the plan."
+  },
+  "noteBalanced": {
+    "message": "Każda złotówka ma przeznaczenie.",
+    "context": "Budget planner footer (laptop): the plan is balanced."
+  },
+  "noteOver": {
+    "message": "{amount} więcej niż dochód.",
+    "context": "Budget planner footer (laptop): the plan exceeds the income."
+  },
+  "noteUnassigned": {
+    "message": "{amount} jeszcze nieprzypisane.",
+    "context": "Budget planner footer (laptop): income not yet assigned."
+  },
+  "allCategories": {
+    "message": "Wszystkie kategorie",
+    "context": "Budget planner, one category opened: button back to the list."
+  },
+  "inPlan": {
+    "message": "w planie: {month}",
+    "context": "Budget planner, one category opened (short laptop screens): after the category name; {month} is month and year."
+  },
+  "otherCategories": {
+    "message": "Inne kategorie",
+    "context": "Budget planner: accessible label of the previous/next category buttons."
+  },
+  "previousCategory": {
+    "message": "Poprzednia kategoria: {name}",
+    "context": "Budget planner: accessible label of the left arrow."
+  },
+  "nextCategory": {
+    "message": "Następna kategoria: {name}",
+    "context": "Budget planner: accessible label of the right arrow."
+  },
+  "apply": {
+    "message": "Zastosuj",
+    "context": "Budget planner: button on a suggestion that applies its limit."
+  },
+  "recurringIntro": {
+    "message": "{amount} przychodzi co miesiąc w podobnej kwocie:",
+    "context": "Budget planner > 'Already certain': intro before the list of regular payments; {amount} is their total."
+  },
+  "inCategory": {
+    "message": "w kategorii {name}",
+    "context": "Budget planner > 'Already certain': after a payment's note, which category it's in. Lowercase."
+  },
+  "hiddenCategory": {
+    "message": "ukrytej",
+    "context": "Budget planner: used as {name} when the category is hidden."
+  }
+}

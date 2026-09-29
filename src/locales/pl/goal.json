@@ -1,0 +1,30 @@
+{
+  "toGo": {
+    "message": "brakuje {amount}",
+    "context": "Savings goal progress: how much is still missing."
+  },
+  "reached": {
+    "message": "Cel osiągnięty",
+    "context": "Savings goal progress: the target is reached."
+  },
+  "amountToAdd": {
+    "message": "Kwota do dodania",
+    "context": "Savings goal: accessible label of the amount field for adding money."
+  },
+  "minusHint": {
+    "message": "Wpisz minus na początku, żeby wypłacić pieniądze.",
+    "context": "Savings goal: hint under the amount field."
+  },
+  "takeOut": {
+    "message": "Wypłać {amount}",
+    "context": "Savings goal: button for a negative amount (withdraw). {amount} is a plain number."
+  },
+  "addAmount": {
+    "message": "Dodaj {amount}",
+    "context": "Savings goal: button that adds the typed amount. {amount} is a plain number."
+  },
+  "addMoney": {
+    "message": "Dodaj pieniądze",
+    "context": "Savings goal: button that opens the add-money form."
+  }
+}

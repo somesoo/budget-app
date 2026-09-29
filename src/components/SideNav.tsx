@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { APP_NAME } from '../config'
+import { t } from '../i18n'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { AlertCount } from './alerts/AlertList'
 import { TABS } from './BottomNav'
@@ -25,7 +25,7 @@ export function SideNav() {
             />
           ))}
         </span>
-        <span className="text-lg font-bold tracking-tight text-white">{APP_NAME}</span>
+        <span className="text-lg font-bold tracking-tight text-white">{t('common.appName')}</span>
       </div>
       <ul className="grid gap-1">
         {TABS.map((tab) => (
@@ -33,7 +33,7 @@ export function SideNav() {
             <NavLink
               to={tab.to}
               end={tab.to === '/'}
-              data-tour={`nav-${tab.label.toLowerCase()}`}
+              data-tour={`nav-${tab.id}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition ${
                   isActive
@@ -49,7 +49,7 @@ export function SideNav() {
                     className="text-xl"
                     weight={isActive ? 'fill' : 'regular'}
                   />
-                  <span className="flex-1">{tab.label}</span>
+                  <span className="flex-1">{tab.label()}</span>
                   {tab.to === '/budget' && <AlertCount count={alerts.length} />}
                 </>
               )}

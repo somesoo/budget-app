@@ -1,4 +1,5 @@
-import { CURRENCY_SUFFIX, LOCALE } from '../config'
+import { CURRENCY_SUFFIX } from '../config'
+import { dateFormat, numberFormat } from '../i18n'
 import type { Category, Expense, Person } from '../types'
 import { zeroByPerson } from './people'
 
@@ -56,46 +57,52 @@ export function shiftMonth(month: MonthKey, delta: number): MonthKey {
   return toMonthKey(new Date(y, m - 1 + delta, 1))
 }
 
-const monthFormatter = new Intl.DateTimeFormat(LOCALE, { month: 'long', year: 'numeric' })
-const dayFormatter = new Intl.DateTimeFormat(LOCALE, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-})
+// functions, not constants: the language can change while the app runs
+const monthFormatter = () => dateFormat({ month: 'long', year: 'numeric' })
+const dayFormatter = () => dateFormat({ day: 'numeric', month: 'long', year: 'numeric' })
 
 /** "September 2026" */
 export function formatMonth(month: MonthKey): string {
   const [y, m] = month.split('-').map(Number)
-  return monthFormatter.format(new Date(y, m - 1, 1))
+  return monthFormatter().format(new Date(y, m - 1, 1))
 }
 
-const monthShortFormatter = new Intl.DateTimeFormat(LOCALE, { month: 'short' })
-const monthNameFormatter = new Intl.DateTimeFormat(LOCALE, { month: 'long' })
+const monthShortFormatter = () => dateFormat({ month: 'short' })
+// standalone ("wrzesień", not "września"): the name on its own, as in a heading
+const monthNameFormatter = () => dateFormat({ month: 'long' })
 
 /** "Sep" — axis labels. */
 export function formatMonthShort(month: MonthKey): string {
   const [y, m] = month.split('-').map(Number)
-  return monthShortFormatter.format(new Date(y, m - 1, 1))
+  return monthShortFormatter().format(new Date(y, m - 1, 1))
 }
 
 /** "September" — in sentences, where the year is obvious. */
 export function formatMonthName(month: MonthKey): string {
   const [y, m] = month.split('-').map(Number)
-  return monthNameFormatter.format(new Date(y, m - 1, 1))
+  return monthNameFormatter().format(new Date(y, m - 1, 1))
 }
 
 /** "5 September 2026" */
 export function formatDayLong(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number)
-  return dayFormatter.format(new Date(y, m - 1, d))
+  return dayFormatter().format(new Date(y, m - 1, d))
 }
 
-const shortDayFormatter = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short' })
+const shortDayFormatter = () => dateFormat({ day: 'numeric', month: 'short' })
 
 /** "5 Sep" — for tight spaces like the date chip. */
 export function formatDayShort(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number)
-  return shortDayFormatter.format(new Date(y, m - 1, d))
+  return shortDayFormatter().format(new Date(y, m - 1, d))
+}
+
+/** Weekday names, Monday first: "Mon" … "Sun", or "Monday" … "Sunday" when long. */
+export function weekdayNames(width: 'short' | 'long' = 'short'): string[] {
+  // 2024-01-01 was a Monday
+  return Array.from({ length: 7 }, (_, i) =>
+    dateFormat({ weekday: width }).format(new Date(2024, 0, 1 + i)),
+  )
 }
 
 /**
@@ -120,25 +127,23 @@ export function daysInMonth(month: MonthKey): number {
 
 /* ---------- amounts ---------- */
 
-const amountFormatter = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 })
-const preciseFormatter = new Intl.NumberFormat(LOCALE, {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
+const amountFormatter = () => numberFormat({ maximumFractionDigits: 2 })
+const preciseFormatter = () =>
+  numberFormat({ minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 /** Compact, for tiles and lists: "1,569" */
 export function formatAmount(amount: number): string {
-  return amountFormatter.format(amount)
+  return amountFormatter().format(amount)
 }
 
 /** With currency: "1,569.00 zł" */
 export function formatMoney(amount: number): string {
-  return `${preciseFormatter.format(amount)} ${CURRENCY_SUFFIX}`
+  return `${preciseFormatter().format(amount)} ${CURRENCY_SUFFIX}`
 }
 
 /** "7,550 zł" for a round amount, "482.50 zł" otherwise — totals in tight spaces. */
 export function formatMoneyCompact(amount: number): string {
-  return Number.isInteger(amount) ? `${amountFormatter.format(amount)} ${CURRENCY_SUFFIX}` : formatMoney(amount)
+  return Number.isInteger(amount) ? `${amountFormatter().format(amount)} ${CURRENCY_SUFFIX}` : formatMoney(amount)
 }
 
 /**
@@ -146,15 +151,11 @@ export function formatMoneyCompact(amount: number): string {
  * grosze would claim a precision the number doesn't have.
  */
 export function formatMoneyWhole(amount: number): string {
-  return `${amountFormatter.format(Math.round(amount))} ${CURRENCY_SUFFIX}`
+  return `${amountFormatter().format(Math.round(amount))} ${CURRENCY_SUFFIX}`
 }
 
 export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100
-}
-
-export function pluralize(count: number, singular: string, plural: string): string {
-  return count === 1 ? singular : plural
 }
 
 /* ---------- aggregates ---------- */

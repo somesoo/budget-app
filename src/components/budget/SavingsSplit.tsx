@@ -16,6 +16,7 @@ import {
 import { formatAmount, formatMoneyCompact, type MonthKey } from '../../lib/calculations'
 import { roundUpPlan } from '../../lib/planning'
 import type { PlanAllocation } from '../../types'
+import { t } from '../../i18n'
 
 type Split = { savings: number; allocations: PlanAllocation[] }
 
@@ -59,12 +60,12 @@ export function SavingsSplit({
   return (
     <div className="mt-1 border-t border-white/10 pt-3">
       <div className="flex items-baseline justify-between">
-        <p className="text-sm font-medium text-white">Savings</p>
+        <p className="text-sm font-medium text-white">{t('nav.savings')}</p>
         <p className="text-sm font-semibold tabular-nums text-white">
           {formatMoneyCompact(value.savings)}
         </p>
       </div>
-      <p className="text-xs text-muted">Straight from the paycheck, before any spending.</p>
+      <p className="text-xs text-muted">{t('split.intro')}</p>
 
       <ul className="mt-2 space-y-2.5">
         {goals.map((g) => {
@@ -82,19 +83,19 @@ export function SavingsSplit({
               key={g.goal.id}
               color={g.goal.color}
               name={g.goal.name}
-              kind="Goal"
+              kind={t('split.goal')}
               amount={amount}
               onAmount={(v) => set(v)}
               hints={
                 <>
                   {needed !== null && needed > 0 && (
                     <Chip active={amount === needed} onClick={() => set(needed)}>
-                      on time: {formatAmount(needed)}
+                      {t('split.onTime', { amount: formatAmount(needed) })}
                     </Chip>
                   )}
                   {g.remaining > 0 && (
                     <span className="text-xs text-muted">
-                      {formatMoneyCompact(Math.round(g.remaining))} to go
+                      {t('carryover.toGo', { amount: formatMoneyCompact(Math.round(g.remaining)) })}
                     </span>
                   )}
                 </>
@@ -102,7 +103,7 @@ export function SavingsSplit({
               footer={
                 openAccounts.length > 1 && amount > 0 ? (
                   <label className="flex items-center gap-1.5 text-xs text-muted">
-                    onto
+                    {t('split.onto')}
                     <Select
                       size="sm"
                       value={account_id ?? ''}
@@ -117,7 +118,7 @@ export function SavingsSplit({
                   </label>
                 ) : openAccounts.length === 0 && amount > 0 ? (
                   <p className="text-xs text-amber-200">
-                    Add a savings account (Savings tab) to pay this in.
+                    {t('split.noAccount')}
                   </p>
                 ) : null
               }
@@ -146,13 +147,17 @@ export function SavingsSplit({
                 <>
                   {s.toMaxOut > 0 && (
                     <Chip active={amount === s.toMaxOut} onClick={() => set(s.toMaxOut)}>
-                      max out: {formatAmount(s.toMaxOut)}
+                      {t('split.maxOut', { amount: formatAmount(s.toMaxOut) })}
                     </Chip>
                   )}
                   <span className="text-xs tabular-nums text-muted">
                     {s.room > 0
-                      ? `${formatAmount(Math.round(s.contributed))} of ${formatAmount(s.limit)} paid in ${year}`
-                      : `${year} limit reached`}
+                      ? t('split.paidInYear', {
+                          paid: formatAmount(Math.round(s.contributed)),
+                          limit: formatAmount(s.limit),
+                          year,
+                        })
+                      : t('split.limitReached', { year })}
                   </span>
                 </>
               }
@@ -161,12 +166,12 @@ export function SavingsSplit({
                   {over > 0 && (
                     <p className="flex items-center gap-1 text-xs text-red-300">
                       <Warning weight="fill" aria-hidden />
-                      {formatMoneyCompact(over)} over the {year} limit — the provider will refuse it
+                      {t('split.overLimit', { amount: formatMoneyCompact(over), year })}
                     </p>
                   )}
                   {String(s.limitYear) !== year && (
                     <p className="text-xs text-muted">
-                      {year}’s limit isn’t known yet; using {s.limitYear}’s.
+                      {t('split.limitUnknown', { year, known: s.limitYear })}
                     </p>
                   )}
                 </>
@@ -191,14 +196,16 @@ export function SavingsSplit({
             <Line
               key={l.loan.id}
               color="#f59e0b"
-              name={`Pay back: ${l.loan.note}`}
-              kind={`to ${goal ?? 'savings'} · ${formatMoneyCompact(l.remaining)} still owed`}
+              name={t('paycheck.payBack', { note: l.loan.note })}
+              kind={`${t('paycheck.to', { name: goal ?? t('paycheck.savings') })} · ${t('split.owed', {
+                amount: formatMoneyCompact(l.remaining),
+              })}`}
               amount={amount}
               onAmount={set}
               hints={
                 l.nextInstalment > 0 && (
                   <Chip active={amount === l.nextInstalment} onClick={() => set(l.nextInstalment)}>
-                    instalment: {formatAmount(l.nextInstalment)}
+                    {t('split.instalment', { amount: formatAmount(l.nextInstalment) })}
                   </Chip>
                 )
               }
@@ -208,12 +215,12 @@ export function SavingsSplit({
 
         <li className="flex items-center gap-3">
           <div className="min-w-0 flex-1 pl-5">
-            <p className="text-[15px] text-white">Other savings</p>
-            <p className="text-xs text-muted">Put aside, no particular goal</p>
+            <p className="text-[15px] text-white">{t('split.other')}</p>
+            <p className="text-xs text-muted">{t('split.otherHelp')}</p>
           </div>
           <div className="w-32 shrink-0">
             <MoneyInput
-              label="Other savings"
+              label={t('split.other')}
               value={Math.max(other, 0)}
               onChange={(v) =>
                 onChange({ ...value, savings: sumAllocations(value.allocations) + v })
@@ -256,7 +263,11 @@ function Line({
           <p className="truncate text-xs text-muted">{kind}</p>
         </div>
         <div className="w-32 shrink-0">
-          <MoneyInput label={`${name}: from the paycheck`} value={amount} onChange={onAmount} />
+          <MoneyInput
+            label={t('split.lineLabel', { name })}
+            value={amount}
+            onChange={onAmount}
+          />
         </div>
       </div>
       {(hints || footer) && (

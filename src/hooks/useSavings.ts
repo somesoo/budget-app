@@ -6,6 +6,7 @@ import { loanSummaries } from '../lib/loans'
 import { accountSummaries, goalSummaries, savedInMonth, totalNeededPerMonth } from '../lib/savings'
 import { useBudget } from './useBudgets'
 import { goalsKey, useGoals } from './useGoal'
+import { t } from '../i18n'
 
 export const savingsKey = ['savings'] as const
 
@@ -254,7 +255,7 @@ export function useSavingsActions() {
             p_account: v.account,
             p_amount: v.amount,
             p_goal: v.goal,
-            ...extra({ ...v, note: `Borrowed: ${v.note}` }),
+            ...extra({ ...v, note: t('loansCard.borrowedNote', { note: v.note }) }),
           })
         } catch (err) {
           await supabase.from('savings_loans').delete().eq('id', data.id)
@@ -271,7 +272,7 @@ export function useSavingsActions() {
           p_amount: v.amount,
           p_goal: v.loan.goal_id,
           p_kind: 'deposit',
-          ...extra({ ...v, note: v.note ?? `Paid back: ${v.loan.note}` }),
+          ...extra({ ...v, note: v.note ?? t('paycheck.paidBackNote', { note: v.loan.note }) }),
         })
         const { error } = await supabase
           .from('savings_movements')

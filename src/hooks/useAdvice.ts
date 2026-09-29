@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import type { AdviceRequest } from '../lib/forecast'
 import type { Advice } from '../types'
+import { getLanguage, t } from '../i18n'
 
 export const adviceKey = (month: string) => ['advice', month] as const
 
@@ -35,20 +36,21 @@ export function useGenerateAdvice(month: string) {
     mutationFn: async (payload: AdviceRequest) => {
       const { data: session } = await supabase.auth.getSession()
       const token = session.session?.access_token
-      if (!token) throw new Error('Not signed in')
+      if (!token) throw new Error(t('errors.notSignedIn'))
 
       const res = await fetch('/api/advice', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload),
+        // the language the recommendations are written in
+        body: JSON.stringify({ ...payload, language: getLanguage() }),
       })
       if (res.status === 404) {
         throw new AdviceUnavailableError(
-          'The recommendations server isn’t running here. It works on Vercel, or locally with `vercel dev`.',
+          t('errors.aiUnavailable'),
         )
       }
       const body = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(body.error ?? `Request failed (${res.status})`)
+      if (!res.ok) throw new Error(body.error ?? t('errors.requestFailed', { status: res.status }))
 
       const { error } = await supabase.from('advice').insert({ month, content: body })
       if (error) throw error

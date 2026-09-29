@@ -10,6 +10,7 @@ import {
   type MonthKey,
 } from '../../lib/calculations'
 import { monthReview } from '../../lib/suggestions'
+import { t } from '../../i18n'
 
 /** Rows of each list shown; the category bars below have the rest. */
 const ROWS = 3
@@ -52,42 +53,58 @@ export function MonthReviewCard({
       aria-labelledby="review"
     >
       <h2 id="review" className="text-base font-semibold text-white">
-        How {name} went
+        {t('review.title', { month: name })}
       </h2>
       <p className="mt-1 text-sm leading-snug text-slate-300">
         {r.limit > 0
-          ? `Spent ${formatMoneyWhole(r.spent)} of ${formatMoneyWhole(r.limit)}, ${formatMoneyWhole(Math.abs(diff))} ${
-              diff > 0 ? 'over' : 'under'
-            }. `
-          : `Spent ${formatMoneyWhole(r.spent)}. `}
+          ? t(diff > 0 ? 'review.spentOver' : 'review.spentUnder', {
+              spent: formatMoneyWhole(r.spent),
+              limit: formatMoneyWhole(r.limit),
+              diff: formatMoneyWhole(Math.abs(diff)),
+            })
+          : t('review.spent', { spent: formatMoneyWhole(r.spent) })}{' '}
         {r.income > 0 &&
-          `${r.saved >= 0 ? 'Left over' : 'Short by'} ${formatMoneyWhole(Math.abs(r.saved))}${
-            r.plannedSavings
-              ? `, against ${formatMoneyWhole(r.plannedSavings)} planned for savings`
-              : ''
-          }.`}
+          t(
+            r.saved >= 0
+              ? r.plannedSavings
+                ? 'review.leftOverPlanned'
+                : 'review.leftOver'
+              : r.plannedSavings
+                ? 'review.shortPlanned'
+                : 'review.short',
+            {
+              amount: formatMoneyWhole(Math.abs(r.saved)),
+              planned: formatMoneyWhole(r.plannedSavings ?? 0),
+            },
+          )}
       </p>
 
       {r.over.length > 0 && (
         <ReviewList
-          title="Went over"
+          title={t('review.wentOver')}
           month={month}
           rows={r.over.slice(0, ROWS).map((x) => ({
             id: x.category.id,
             name: x.category.name,
-            text: `${formatMoneyWhole(x.spent - x.limit)} over ${formatMoneyWhole(x.limit)}`,
+            text: t('review.overBy', {
+              amount: formatMoneyWhole(x.spent - x.limit),
+              limit: formatMoneyWhole(x.limit),
+            }),
             warn: true,
           }))}
         />
       )}
       {r.under.length > 0 && (
         <ReviewList
-          title="Left room"
+          title={t('review.leftRoom')}
           month={month}
           rows={r.under.slice(0, ROWS).map((x) => ({
             id: x.category.id,
             name: x.category.name,
-            text: `${formatMoneyWhole(x.limit - x.spent)} of ${formatMoneyWhole(x.limit)} unused`,
+            text: t('review.unused', {
+              amount: formatMoneyWhole(x.limit - x.spent),
+              limit: formatMoneyWhole(x.limit),
+            }),
             warn: false,
           }))}
         />
@@ -100,7 +117,7 @@ export function MonthReviewCard({
             onClick={onPlan}
             className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-ink hover:bg-slate-50"
           >
-            Plan this month with it
+            {t('review.planWithIt')}
           </button>
         )}
         <button
@@ -108,7 +125,7 @@ export function MonthReviewCard({
           onClick={onOpen}
           className="rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
         >
-          See all of {name}
+          {t('review.seeAll', { month: name })}
         </button>
       </div>
     </section>

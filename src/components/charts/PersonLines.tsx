@@ -5,6 +5,7 @@ import { compactAmount, niceScale, type PersonMonth } from '../../lib/insights'
 import { ChartTooltip, TooltipRow } from './ChartCard'
 import { AXIS_FONT, CHART } from './theme'
 import { personColor, personIds, personLabel } from '../../lib/people'
+import { t } from '../../i18n'
 
 interface Props {
   rows: PersonMonth[]
@@ -61,7 +62,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
           width={width}
           height={height}
           role="img"
-          aria-label="Monthly spending per person"
+          aria-label={t('charts.personLabel')}
           tabIndex={0}
           className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           onPointerDown={pick}
@@ -183,7 +184,7 @@ export function PersonLines({ rows, monthLabel, partialLast = false }: Props) {
         >
           <p className="mb-1 text-slate-400">
             {monthLabel(rows[active].month)}
-            {partialLast && active === lastIndex ? ' · so far' : ''}
+            {partialLast && active === lastIndex ? ` · ${t('charts.soFar')}` : ''}
           </p>
           {personIds().map((p) => (
             <TooltipRow

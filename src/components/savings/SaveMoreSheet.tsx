@@ -7,6 +7,8 @@ import { currentMonthKey, formatMoneyCompact, roundMoney } from '../../lib/calcu
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { Field, Select, SubmitRow } from './fields'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 const NO_GOAL = ''
 
@@ -63,7 +65,7 @@ export function SaveMoreSheet({
         amount,
         goal: goalId || null,
         person,
-        note: 'Extra savings',
+        note: t('saveMore.note'),
       })
       onClose()
     } catch (err) {
@@ -73,29 +75,29 @@ export function SaveMoreSheet({
 
   if (open.length === 0) {
     return (
-      <BottomSheet title="Save more" onClose={onClose}>
-        <p className="pb-4 text-sm text-muted">Add a savings account first.</p>
+      <BottomSheet title={t('saveMore.title')} onClose={onClose}>
+        <p className="pb-4 text-sm text-muted">{t('saveMore.noAccount')}</p>
       </BottomSheet>
     )
   }
 
   const chips = [
-    { value: roundDown(free / 4), label: 'a quarter' },
-    { value: roundDown(free / 2), label: 'half' },
-    { value: roundDown(free), label: 'all of it' },
+    { value: roundDown(free / 4), label: t('saveMore.quarter') },
+    { value: roundDown(free / 2), label: t('saveMore.half') },
+    { value: roundDown(free), label: t('saveMore.all') },
   ].filter((c, i, all) => c.value > 0 && all.findIndex((x) => x.value === c.value) === i)
   const need = (id: string) => {
     const g = goals.find((x) => x.goal.id === id)
     return g && (g.status.kind === 'behind' || g.status.kind === 'on-track')
-      ? ` · needs ${formatMoneyCompact(Math.round(g.status.neededPerMonth))}/mo`
+      ? ` · ${t('saveMore.needs', { amount: formatMoneyCompact(Math.round(g.status.neededPerMonth)) })}`
       : ''
   }
 
   return (
-    <BottomSheet title="Save more" onClose={onClose}>
+    <BottomSheet title={t('saveMore.title')} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
         <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-          <p className="text-sm text-muted">Safe to spend this month</p>
+          <p className="text-sm text-muted">{t('saveMore.safe')}</p>
           <p
             className={`text-2xl font-bold tabular-nums ${free < 0 ? 'text-red-300' : 'text-white'}`}
           >
@@ -104,15 +106,15 @@ export function SaveMoreSheet({
           </p>
           <p className="mt-1 text-xs leading-snug text-slate-300">
             {money.safe === null
-              ? 'No income logged or planned this month, so there’s nothing to go on: save what you know you can.'
+              ? t('saveMore.noIncome')
               : free <= 0
-                ? 'Nothing is free this month. Saving more now would come out of money that’s already needed.'
-                : 'What’s left of this month’s income after the planned savings and what’s been spent. Keep some for the rest of the month.'}
+                ? t('saveMore.nothingFree')
+                : t('saveMore.safeHelp')}
           </p>
         </div>
 
-        <Field label="How much">
-          <MoneyInput value={amount} onChange={setAmount} label="Amount" size="lg" />
+        <Field label={t('borrow.howMuch')}>
+          <MoneyInput value={amount} onChange={setAmount} label={t('entry.amount')} size="lg" />
         </Field>
         {chips.length > 0 && (
           <div className="-mt-2 flex flex-wrap gap-1.5">
@@ -135,7 +137,7 @@ export function SaveMoreSheet({
           </div>
         )}
 
-        <Field label="For">
+        <Field label={t('money.for')}>
           <Select value={goalId} onChange={pickGoal}>
             {goals.map((g) => (
               <option key={g.goal.id} value={g.goal.id}>
@@ -143,10 +145,10 @@ export function SaveMoreSheet({
                 {need(g.goal.id)}
               </option>
             ))}
-            <option value={NO_GOAL}>No goal (unassigned)</option>
+            <option value={NO_GOAL}>{t('money.noGoal')}</option>
           </Select>
         </Field>
-        <Field label="Onto">
+        <Field label={t('saveMore.onto')}>
           <Select value={accountId} onChange={setAccountId}>
             {open.map((a) => (
               <option key={a.id} value={a.id}>
@@ -158,19 +160,25 @@ export function SaveMoreSheet({
 
         {amount > 0 && account && (
           <p className="rounded-xl bg-accent/10 px-3 py-2.5 text-sm leading-snug text-slate-200 ring-1 ring-accent/25">
-            <span className="font-semibold text-white">In the bank:</span> transfer{' '}
-            {formatMoneyCompact(amount)} from your everyday account to {account.name}
-            {goal ? ` (title: ${goal.goal.name})` : ''}. Then save it here.
+            <Trans
+              k={goal ? 'saveMore.bankGoal' : 'saveMore.bank'}
+              values={{
+                amount: formatMoneyCompact(amount),
+                account: account.name,
+                goal: goal?.goal.name ?? '',
+              }}
+              tags={{ b: (s) => <span className="font-semibold text-white">{s}</span> }}
+            />
             {free > 0 && amount > free && (
               <span className="mt-1 block text-amber-200">
-                That’s {formatMoneyCompact(roundMoney(amount - free))} more than is free this month.
+                {t('saveMore.moreThanFree', { amount: formatMoneyCompact(roundMoney(amount - free)) })}
               </span>
             )}
           </p>
         )}
 
         <SubmitRow
-          label={`Save ${formatMoneyCompact(amount)}`}
+          label={t('saveMore.submit', { amount: formatMoneyCompact(amount) })}
           disabled={amount <= 0 || !accountId}
           pending={saveTo.isPending}
           error={error}

@@ -1,0 +1,118 @@
+{
+  "setupTitle": {
+    "message": "Najpierw jeden krok w Supabase",
+    "context": "Savings tab before the database update: heading."
+  },
+  "setup": {
+    "message": "Konta oszczędnościowe wymagają tabel z <code>{file}</code>. Wklej go do SQL Editora i uruchom, jak poprzednie. Obecny cel i to, co na niego odłożono, trafią na konto o nazwie „Savings”.",
+    "context": "Savings tab before the database update. Keep the <code> tags."
+  },
+  "takeOut": {
+    "message": "Wypłać",
+    "context": "Savings tab toolbar: withdraw money."
+  },
+  "move": {
+    "message": "Przenieś",
+    "context": "Savings tab toolbar: move money between accounts."
+  },
+  "updateBalance": {
+    "message": "Zaktualizuj saldo",
+    "context": "Savings tab toolbar: correct an account's balance."
+  },
+  "askQuestion": {
+    "message": "Czy nasze cele oszczędnościowe idą zgodnie z planem i co warto zmienić?",
+    "context": "Question pre-filled in the AI chat from the Savings tab."
+  },
+  "total": {
+    "message": "Łącznie odłożone",
+    "context": "Savings tab: total saved across all accounts."
+  },
+  "putAside": {
+    "message": "Odłożone w miesiącu {month}",
+    "context": "Savings tab: saved this month; {month} is the name alone."
+  },
+  "planCovered": {
+    "message": "Plan na {amount} jest wykonany",
+    "context": "Savings tab: this month's planned savings are reached."
+  },
+  "planToGo": {
+    "message": "Brakuje {amount} z planowanych {planned}",
+    "context": "Savings tab: how much of this month's planned savings is still to put aside."
+  },
+  "noPlan": {
+    "message": "Brak zaplanowanej kwoty oszczędności w tym miesiącu",
+    "context": "Savings tab: the month's plan has no savings."
+  },
+  "unassigned": {
+    "message": "Nieprzypisane",
+    "context": "Savings tab: money on accounts not set aside for a goal."
+  },
+  "unassignedSome": {
+    "message": "Jeszcze nieodłożone na żaden cel",
+    "context": "Savings tab: under 'Unassigned'."
+  },
+  "unassignedNone": {
+    "message": "Każda złotówka ma cel",
+    "context": "Savings tab: under 'Unassigned' when it's zero."
+  },
+  "assign": {
+    "message": "Przypisz",
+    "context": "Savings tab: link to assign the unassigned money to a goal."
+  },
+  "goalsEmpty": {
+    "message": "Cel to, na co są pieniądze: wyjazd, poduszka finansowa, samochód.",
+    "context": "Savings tab: empty goals list."
+  },
+  "addGoal": {
+    "message": "Dodaj cel",
+    "context": "Savings tab: button in the empty goals list."
+  },
+  "needed": {
+    "message": "Cele z terminem potrzebują razem {amount} miesięcznie.",
+    "context": "Savings tab: under the goals."
+  },
+  "neededPlanned": {
+    "message": "Cele z terminem potrzebują razem {amount} miesięcznie; plan na {month} odkłada {planned}.",
+    "context": "Savings tab: under the goals, with this month's plan."
+  },
+  "showClosed": {
+    "one": "Pokaż {count} zamknięty cel",
+    "few": "Pokaż {count} zamknięte cele",
+    "many": "Pokaż {count} zamkniętych celów",
+    "other": "Pokaż {count} zamkniętego celu",
+    "context": "Savings tab: reveals archived goals."
+  },
+  "hideClosed": {
+    "one": "Ukryj {count} zamknięty cel",
+    "few": "Ukryj {count} zamknięte cele",
+    "many": "Ukryj {count} zamkniętych celów",
+    "other": "Ukryj {count} zamkniętego celu",
+    "context": "Savings tab: hides archived goals again."
+  },
+  "accounts": {
+    "message": "Konta",
+    "context": "Savings tab: heading of the accounts list."
+  },
+  "accountsEmpty": {
+    "message": "Konto to miejsce, gdzie są pieniądze: konto oszczędnościowe, lokata, gotówka.",
+    "context": "Savings tab: empty accounts list."
+  },
+  "addAccount": {
+    "message": "Dodaj konto",
+    "context": "Savings tab: button in the empty accounts list."
+  },
+  "showHidden": {
+    "one": "Pokaż {count} ukryte konto",
+    "few": "Pokaż {count} ukryte konta",
+    "many": "Pokaż {count} ukrytych kont",
+    "other": "Pokaż {count} ukrytego konta",
+    "context": "Savings tab: reveals hidden accounts."
+  },
+  "hideHidden": {
+    "one": "Zwiń {count} ukryte konto",
+    "few": "Zwiń {count} ukryte konta",
+    "many": "Zwiń {count} ukrytych kont",
+    "other": "Zwiń {count} ukrytego konta",
+    "context": "Savings tab: hides them again."
+  }
+}

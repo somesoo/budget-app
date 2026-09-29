@@ -2,6 +2,7 @@ import { ArrowsLeftRight, CalendarBlank } from '@phosphor-icons/react'
 import { formatDayShort, todayKey, yesterdayKey } from '../lib/calculations'
 import { type Person } from '../types'
 import { personIds, personLabel } from '../lib/people'
+import { t } from '../i18n'
 
 const pillBase =
   'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-semibold ring-1'
@@ -28,7 +29,7 @@ export function PersonToggle({
     <button
       type="button"
       onClick={() => onChange(next)}
-      aria-label={`Paid by ${personLabel(value)}. Tap for ${personLabel(next)}`}
+      aria-label={t('entry.paidBy', { name: personLabel(value), next: personLabel(next) })}
       className={pill}
     >
       <span aria-hidden className="text-muted">
@@ -48,7 +49,12 @@ export function DateChip({
   onChange: (dateKey: string) => void
 }) {
   const today = todayKey()
-  const label = value === today ? 'Today' : value === yesterdayKey() ? 'Yest.' : formatDayShort(value)
+  const label =
+    value === today
+      ? t('common.today')
+      : value === yesterdayKey()
+        ? t('date.yesterdayShort')
+        : formatDayShort(value)
   const changed = value !== today
 
   return (
@@ -60,7 +66,7 @@ export function DateChip({
         value={value}
         max={today}
         onChange={(e) => e.target.value && onChange(e.target.value)}
-        aria-label="Expense date"
+        aria-label={t('entry.expenseDate')}
         className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
       />
     </label>

@@ -4,6 +4,8 @@ import { formatAmount, formatMoney, formatMoneyWhole } from '../lib/calculations
 import type { MonthForecast } from '../lib/forecast'
 import type { Goal } from '../types'
 import { personLabel } from '../lib/people'
+import { t } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
 const INCOME = '#34d399' // the app's income color: money that stays
 
@@ -23,11 +25,9 @@ interface Props {
 export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
   if (f.income <= 0) {
     return (
-      <ChartCard title="Forecast" bare={bare}>
+      <ChartCard title={t('forecast.title')} bare={bare}>
         <p className="text-sm text-muted">
-          {isCurrent
-            ? 'Log your paychecks with “+ Income” on the Add tab and this turns into a forecast of what you’ll have left at the end of the month.'
-            : 'No income was logged for this month.'}
+          {isCurrent ? t('forecast.noIncomeCurrent') : t('forecast.noIncomePast')}
         </p>
       </ChartCard>
     )
@@ -43,7 +43,10 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
     .filter((p) => p.expected > 0)
     .map((p) =>
       p.basis === 'typical'
-        ? `${personLabel(p.person)} ~${formatAmount(Math.round(p.expected))} expected`
+        ? t('forecast.expected', {
+            name: personLabel(p.person),
+            amount: formatAmount(Math.round(p.expected)),
+          })
         : `${personLabel(p.person)} ${formatAmount(p.expected)}`,
     )
     .join(' · ')
@@ -52,48 +55,68 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
 
   return (
     <ChartCard
-      title="Forecast"
+      title={t('forecast.title')}
       bare={bare}
       headline={
         isCurrent ? (
           saving ? (
-            <>
-              On course to save <strong>{formatMoneyWhole(f.projectedSavings)}</strong> this month
-              {f.savingsRate !== null && <>, {Math.round(f.savingsRate * 100)}% of income</>}.
-            </>
+            <Trans
+              k={f.savingsRate !== null ? 'forecast.onCourseSaveRate' : 'forecast.onCourseSave'}
+              values={{
+                amount: formatMoneyWhole(f.projectedSavings),
+                percent: Math.round((f.savingsRate ?? 0) * 100),
+              }}
+              tags={{ b: (s) => <strong>{s}</strong> }}
+            />
           ) : (
-            <>
-              On course to spend <strong>{formatMoneyWhole(-f.projectedSavings)} more</strong> than
-              you earn this month.
-            </>
+            <Trans
+              k="forecast.onCourseOverspend"
+              values={{ amount: formatMoneyWhole(-f.projectedSavings) }}
+              tags={{ b: (s) => <strong>{s}</strong> }}
+            />
           )
         ) : saving ? (
-          <>
-            Saved <strong>{formatMoney(f.projectedSavings)}</strong>
-            {f.savingsRate !== null && <>, {Math.round(f.savingsRate * 100)}% of income</>}.
-          </>
+          <Trans
+            k={f.savingsRate !== null ? 'forecast.savedRate' : 'forecast.saved'}
+            values={{
+              amount: formatMoney(f.projectedSavings),
+              percent: Math.round((f.savingsRate ?? 0) * 100),
+            }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         ) : (
-          <>
-            Spent <strong>{formatMoney(-f.projectedSavings)} more</strong> than you earned.
-          </>
+          <Trans
+            k="forecast.overspent"
+            values={{ amount: formatMoney(-f.projectedSavings) }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         )
       }
       legend={
         <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <LegendItem color={CHART.accent} label="Spent" shape="rect" />
+          <LegendItem color={CHART.accent} label={t('common.spent')} shape="rect" />
           {isCurrent && rest > 0 && (
-            <LegendItem color="rgba(57,135,229,0.4)" label="Still to spend (projected)" shape="rect" />
+            <LegendItem
+              color="rgba(57,135,229,0.4)"
+              label={t('forecast.stillToSpend')}
+              shape="rect"
+            />
           )}
-          {saving && <LegendItem color={INCOME} label="Left over" shape="rect" />}
+          {saving && <LegendItem color={INCOME} label={t('forecast.leftOver')} shape="rect" />}
         </div>
       }
       table={{
-        head: ['', 'Amount'],
+        head: ['', t('entry.amount')],
         rows: [
-          ['Income', formatAmount(f.income)],
-          ['Spent so far', formatAmount(f.spentSoFar)],
-          ...(isCurrent ? [['Projected spending', formatAmount(Math.round(f.projectedSpend))]] : []),
-          [saving ? 'Left over' : 'Shortfall', formatAmount(Math.round(Math.abs(f.projectedSavings)))],
+          [t('entry.income'), formatAmount(f.income)],
+          [t('forecast.spentSoFar'), formatAmount(f.spentSoFar)],
+          ...(isCurrent
+            ? [[t('forecast.projected'), formatAmount(Math.round(f.projectedSpend))]]
+            : []),
+          [
+            saving ? t('forecast.leftOver') : t('forecast.shortfall'),
+            formatAmount(Math.round(Math.abs(f.projectedSavings))),
+          ],
         ],
       }}
     >
@@ -122,44 +145,50 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
             aria-hidden
             className="absolute -top-1 h-6 w-0.5 bg-slate-50"
             style={{ left: `${incomeMarker}%` }}
-            title="Income"
+            title={t('entry.income')}
           />
         )}
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
         <div>
-          <dt className="text-xs text-muted">Income</dt>
+          <dt className="text-xs text-muted">{t('entry.income')}</dt>
           <dd className="font-semibold text-white">{formatMoney(f.income)}</dd>
           <dd className="text-xs text-muted">{basis}</dd>
         </div>
         <div>
-          <dt className="text-xs text-muted">{isCurrent ? 'Projected spending' : 'Spent'}</dt>
+          <dt className="text-xs text-muted">{isCurrent ? t('forecast.projected') : t('common.spent')}</dt>
           <dd className="font-semibold text-white">{estimate(f.projectedSpend)}</dd>
           {isCurrent && (
-            <dd className="text-xs text-muted">{formatMoney(f.spentSoFar)} so far</dd>
+            <dd className="text-xs text-muted">
+              {t('forecast.soFar', { amount: formatMoney(f.spentSoFar) })}
+            </dd>
           )}
         </div>
 
         {f.perDayToBreakEven !== null && (
           <div className="col-span-2">
-            <dt className="text-xs text-muted">To break even</dt>
+            <dt className="text-xs text-muted">{t('forecast.breakEven')}</dt>
             <dd className="text-white">
-              up to <span className="font-semibold">{formatMoneyWhole(f.perDayToBreakEven)}</span>{' '}
-              a day for the remaining {f.daysLeft} {f.daysLeft === 1 ? 'day' : 'days'}
+              <Trans
+                k="forecast.breakEvenDetail"
+                count={f.daysLeft}
+                values={{ amount: formatMoneyWhole(f.perDayToBreakEven) }}
+                tags={{ b: (s) => <span className="font-semibold">{s}</span> }}
+              />
             </dd>
           </div>
         )}
 
         {goal && f.monthsToGoal !== null && (
           <div className="col-span-2">
-            <dt className="text-xs text-muted">Goal: {goal.name}</dt>
+            <dt className="text-xs text-muted">{t('forecast.goal', { name: goal.name })}</dt>
             <dd className="text-white">
-              about{' '}
-              <span className="font-semibold">
-                {f.monthsToGoal} {f.monthsToGoal === 1 ? 'month' : 'months'}
-              </span>{' '}
-              if a surplus like this one went to it every month
+              <Trans
+                k="forecast.goalDetail"
+                count={f.monthsToGoal}
+                tags={{ b: (s) => <span className="font-semibold">{s}</span> }}
+              />
             </dd>
           </div>
         )}
@@ -167,7 +196,7 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
 
       {f.incomeByPerson.some((p) => p.basis === 'typical') && (
         <p className="mt-3 text-xs text-muted">
-          “Expected” is that person’s typical month, used until this month’s paycheck is logged.
+          {t('forecast.expectedNote')}
         </p>
       )}
     </ChartCard>

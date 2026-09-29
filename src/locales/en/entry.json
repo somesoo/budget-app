@@ -1,0 +1,236 @@
+{
+  "expense": {
+    "message": "Expense",
+    "context": "Toggle between logging an expense or an income (Add screen, entry editor)."
+  },
+  "income": {
+    "message": "Income",
+    "context": "Toggle between logging an expense or an income; also a label on income entries."
+  },
+  "amount": {
+    "message": "Amount",
+    "context": "Label of the amount field when logging an expense."
+  },
+  "amountReceived": {
+    "message": "Amount received",
+    "context": "Label of the amount field when logging an income."
+  },
+  "titlePlaceholder": {
+    "message": "Title (optional)",
+    "context": "Placeholder of the optional text field when logging an expense (what it was, e.g. 'Groceries at Lidl')."
+  },
+  "notePlaceholder": {
+    "message": "Note (e.g. salary, bonus)",
+    "context": "Placeholder of the text field when logging an income."
+  },
+  "title": {
+    "message": "Title",
+    "context": "Accessible label of the expense's text field."
+  },
+  "note": {
+    "message": "Note",
+    "context": "Accessible label of the income's text field."
+  },
+  "addAmount": {
+    "message": "Add {amount} {currency}",
+    "context": "Accessible label of a quick-amount button, e.g. 'Add 50 zł'. Tapping adds to the amount."
+  },
+  "clear": {
+    "message": "Clear",
+    "context": "Button that clears the typed amount."
+  },
+  "kind": {
+    "message": "Kind",
+    "context": "Income entry: label before the Pay / One-off choice."
+  },
+  "pay": {
+    "message": "Pay",
+    "context": "Income kind: regular pay (salary) that repeats every month. Very short."
+  },
+  "oneOff": {
+    "message": "One-off",
+    "context": "Income kind: money that comes once (a refund, something sold, a bonus). Very short."
+  },
+  "oneOffHelp": {
+    "message": "Counted in this month, left out of the typical income the next plan and the forecast expect.",
+    "context": "Explanation shown when an income is marked one-off."
+  },
+  "sameAsLast": {
+    "message": "Same as last time:",
+    "context": "Income entry: button that fills in the last income's amount; followed by the amount and note."
+  },
+  "saveExpense": {
+    "message": "Save expense",
+    "context": "Main button that saves a new expense."
+  },
+  "saveIncome": {
+    "message": "Save income",
+    "context": "Main button that saves a new income."
+  },
+  "notSaved": {
+    "message": "Not saved: {error}",
+    "context": "Toast after a failed save; {error} is a technical message."
+  },
+  "openFailed": {
+    "message": "Couldn’t open it: {error}",
+    "context": "Toast when a savings goal can't be opened for spending; {error} is a technical message."
+  },
+  "savedCrossed": {
+    "message": "Saved. {note}",
+    "context": "Toast after saving an expense that changed its category's warning level; {note} is e.g. 'Food is now at 85% of its limit'."
+  },
+  "savedTo": {
+    "message": "Saved {amount} to {name}",
+    "context": "Toast after saving an expense: {amount} with currency, {name} the category. A date like ' · 5 September 2026' may follow."
+  },
+  "incomeSaved": {
+    "message": "Income saved · {amount}",
+    "context": "Toast after saving an income; a date may follow."
+  },
+  "backToCategories": {
+    "message": "Back to categories",
+    "context": "Accessible label of the back arrow on the phone's amount screen."
+  },
+  "tapAgain": {
+    "message": "Tap again to add more",
+    "context": "Phone amount screen: hint under the quick amount buttons; tapping a button again adds its amount once more."
+  },
+  "receivedBy": {
+    "message": "Received by",
+    "context": "Income screen: label before choosing which person the income belongs to."
+  },
+  "date": {
+    "message": "Date",
+    "context": "Label before a date picker."
+  },
+  "paysFor": {
+    "message": "Pays for",
+    "context": "Income screen: label before choosing which month the income pays for (the month it came in, or the next)."
+  },
+  "paysForHelp": {
+    "message": "Counted as {month}’s income: its plan, Safe to spend and what it leaves over, not {other}’s.",
+    "context": "Income screen: shown when the income is counted for the next month. {month} and {other} are month names (e.g. 'October', 'September'). 'Safe to spend' is the name of the figure on the Add screen."
+  },
+  "notePlaceholderPay": {
+    "message": "Note (e.g. salary)",
+    "context": "Income screen: placeholder of the note field for regular pay."
+  },
+  "notePlaceholderOneOff": {
+    "message": "Note (e.g. deposit back, sold a chair)",
+    "context": "Income screen: placeholder of the note field for a one-off income."
+  },
+  "preview": {
+    "afterThis": {
+      "message": "{name} after this",
+      "context": "Limit preview while typing an expense: label of the bar showing the category {name} with this expense added."
+    },
+    "soFar": {
+      "message": "{name} so far",
+      "context": "Limit preview for a trip/goal category {name}: what's been spent on it so far."
+    },
+    "thisMonth": {
+      "message": "{name} this month",
+      "context": "Limit preview: what the category {name} has spent this month."
+    },
+    "overLimit": {
+      "message": "{amount} over the limit",
+      "context": "Limit preview: this expense takes the category over its monthly limit by {amount}."
+    },
+    "overBudget": {
+      "message": "{amount} over the budget",
+      "context": "Limit preview for a trip/goal: over its total budget by {amount}."
+    },
+    "nearLimit": {
+      "message": "{percent}% of the limit, {left} left",
+      "context": "Limit preview: close to the monthly limit."
+    },
+    "nearBudget": {
+      "message": "{percent}% of the budget, {left} left",
+      "context": "Limit preview for a trip/goal: close to its total budget."
+    },
+    "left": {
+      "message": "{amount} left in {name}",
+      "context": "Limit preview: still available in category {name}."
+    }
+  },
+  "paidBy": {
+    "message": "Paid by {name}. Tap for {next}",
+    "context": "Accessible label of the person pill on the amount screen: whose expense it is, and who tapping switches to."
+  },
+  "expenseDate": {
+    "message": "Expense date",
+    "context": "Accessible label of the date pill on the amount screen."
+  },
+  "expenseDeleted": {
+    "message": "Expense deleted · {amount}",
+    "context": "Toast after deleting an expense; has an Undo button."
+  },
+  "incomeDeleted": {
+    "message": "Income deleted · {amount}",
+    "context": "Toast after deleting an income; has an Undo button."
+  },
+  "undo": {
+    "message": "Undo",
+    "context": "Toast button that restores the deleted entry."
+  },
+  "editExpense": {
+    "message": "Edit expense",
+    "context": "Edit sheet heading (tap an expense in History)."
+  },
+  "editIncome": {
+    "message": "Edit income",
+    "context": "Edit sheet heading (tap an income in History)."
+  },
+  "editTitlePlaceholder": {
+    "message": "e.g. Biedronka, cinema",
+    "context": "Edit sheet: placeholder of an expense's title. Biedronka is a Polish supermarket chain."
+  },
+  "editNotePlaceholder": {
+    "message": "e.g. Salary",
+    "context": "Edit sheet: placeholder of an income's note."
+  },
+  "category": {
+    "message": "Category",
+    "context": "Edit sheet: label above the category chips."
+  },
+  "orFromGoal": {
+    "message": "Or spent from a goal",
+    "context": "Edit sheet: label above the savings goals an expense can be moved to."
+  },
+  "paidByLabel": {
+    "message": "Paid by",
+    "context": "Edit sheet: label above choosing who paid."
+  },
+  "logged": {
+    "message": "Logged {when}",
+    "context": "Edit sheet: when the entry was typed in, e.g. 'Logged 24 Sep, 18:02'."
+  },
+  "saveChanges": {
+    "message": "Save changes",
+    "context": "Edit sheet: save button."
+  },
+  "noChanges": {
+    "message": "No changes",
+    "context": "Edit sheet: disabled save button while nothing changed."
+  },
+  "oneOffIncome": {
+    "message": "One-off income",
+    "context": "History row: label of an income marked one-off."
+  },
+  "unknownCategory": {
+    "message": "Unknown category",
+    "context": "History row: the expense's category no longer exists."
+  },
+  "fromGoal": {
+    "message": "Goal: {name}",
+    "context": "History row: an expense paid from the savings goal {name}."
+  },
+  "notePrivate": {
+    "message": "note kept private",
+    "context": "History row: another person's allowance expense; its note is hidden. Lowercase."
+  },
+  "rowLabel": {
+    "message": "{what}, {amount}. Edit",
+    "context": "Accessible label of a history row button, e.g. 'Lidl, Food, 42.00 zł. Edit'."
+  }
+}

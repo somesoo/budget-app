@@ -6,10 +6,12 @@ import { formatMoneyCompact, formatMonthName, type MonthKey } from '../../lib/ca
 import { evenShares, isShare, splitLeftover } from '../../lib/planning'
 import type { GoalSummary } from '../../lib/savings'
 import type { PlanCarryover } from '../../types'
+import { CURRENCY_SUFFIX } from '../../config'
+import { dateFormat, t } from '../../i18n'
 
 const monthYear = (date: string) => {
   const [y, m] = date.split('-').map(Number)
-  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+  return dateFormat({ month: 'short', year: 'numeric' }).format(new Date(y, m - 1, 1))
 }
 
 /** A month's worth of what a dated goal needs, rounded up to 10 zł; null without a deadline. */
@@ -30,26 +32,34 @@ function gap(g: GoalSummary, planned: number): number | null {
  * own monthly payment is enough to make it: the leftover is for what isn't.
  */
 function needLine(g: GoalSummary, planned: number): string {
-  const togo = g.remaining > 0 ? `${formatMoneyCompact(Math.round(g.remaining))} to go` : ''
-  const inPlan = planned > 0 ? `the plan puts ${formatMoneyCompact(planned)} a month aside` : ''
+  const togo =
+    g.remaining > 0 ? t('carryover.toGo', { amount: formatMoneyCompact(Math.round(g.remaining)) }) : ''
+  const inPlan = planned > 0 ? t('carryover.inPlan', { amount: formatMoneyCompact(planned) }) : ''
+  const line = (...parts: string[]) => parts.filter(Boolean).join(' · ')
   switch (g.status.kind) {
     case 'reached':
-      return 'Reached'
+      return t('carryover.reached')
     case 'open':
-      return ['No target: an open-ended fund', inPlan].filter(Boolean).join(' · ')
+      return line(t('carryover.open'), inPlan)
     case 'on-track':
     case 'behind': {
       const n = need(g)!
-      const by = monthYear(g.goal.target_date!)
-      if (planned >= n) return `${togo} · ${inPlan}, enough to make it by ${by} ✓`
-      return `${togo} · needs ${formatMoneyCompact(n)}/mo by ${by}; ${
-        planned > 0 ? `the plan puts ${formatMoneyCompact(planned)}, ` : 'none in the plan, '
-      }${formatMoneyCompact(n - planned)} short`
+      const values = {
+        by: monthYear(g.goal.target_date!),
+        need: formatMoneyCompact(n),
+        planned: formatMoneyCompact(planned),
+        short: formatMoneyCompact(n - planned),
+      }
+      if (planned >= n) return line(togo, t('carryover.enough', values))
+      return line(
+        togo,
+        planned > 0 ? t('carryover.shortPlanned', values) : t('carryover.shortNone', values),
+      )
     }
     case 'overdue':
-      return `${togo} · the date has passed`
+      return line(togo, t('carryover.overdue'))
     case 'no-date':
-      return [togo, inPlan, 'no date: add one in Edit to see what it needs'].filter(Boolean).join(' · ')
+      return line(togo, inPlan, t('carryover.noDate'))
   }
 }
 
@@ -98,12 +108,21 @@ export function CarryoverPicker({
   const total = value.filter(isShare).reduce((s, c) => s + c.share, 0)
   const status =
     leftover === null
-      ? `No income logged in ${name} yet, so nothing to go on.`
+      ? t('carryover.noIncome', { month: name })
       : leftover <= 0
-        ? `${name} has nothing left${final ? '' : ' so far'}${
-            leftover < 0 ? ` (${formatMoneyCompact(Math.round(-leftover))} over)` : ''
-          }.`
-        : `${formatMoneyCompact(Math.floor(leftover))} left${final ? '' : ' so far; the final amount is known at the end of the month'}.`
+        ? t(
+            leftover < 0
+              ? final
+                ? 'carryover.nothingLeftOver'
+                : 'carryover.nothingLeftOverSoFar'
+              : final
+                ? 'carryover.nothingLeft'
+                : 'carryover.nothingLeftSoFar',
+            { month: name, over: formatMoneyCompact(Math.round(-leftover)) },
+          )
+        : t(final ? 'carryover.left' : 'carryover.leftSoFar', {
+            amount: formatMoneyCompact(Math.floor(leftover)),
+          })
 
   const toggle = (goalId: string) => {
     if (chosen.has(goalId)) {
@@ -148,15 +167,14 @@ export function CarryoverPicker({
         className="flex items-center gap-1.5 text-base font-semibold text-white"
       >
         <ArrowBendDownRight aria-hidden />
-        What {name} doesn’t spend goes to
+        {t('carryover.title', { month: name })}
       </h2>
       <p className="mt-1 text-sm text-slate-300">
-        Income, minus what was saved, minus spending. {status} Pick one goal or several, and
-        give each a percentage or a set amount in złoty.
+        {t('carryover.intro', { status })}
       </p>
 
       {goals.length === 0 ? (
-        <p className="mt-3 text-sm text-muted">No goals yet: add one on the Savings tab.</p>
+        <p className="mt-3 text-sm text-muted">{t('carryover.noGoals')}</p>
       ) : (
         <ul className="mt-3 grid gap-1.5">
           {goals.map((g) => {
@@ -193,7 +211,7 @@ export function CarryoverPicker({
                       <span className="truncate text-[15px] text-white">{g.goal.name}</span>
                       {g.goal.is_emergency && (
                         <span className="shrink-0 rounded-full bg-positive/15 px-1.5 py-0.5 text-[10px] font-semibold text-positive">
-                          emergency fund
+                          {t('savings.emergencyBadge')}
                         </span>
                       )}
                     </span>
@@ -205,7 +223,7 @@ export function CarryoverPicker({
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 pl-[50px]">
                     <div
                       role="group"
-                      aria-label={`${g.goal.name}: percentage or set amount`}
+                      aria-label={t('carryover.modeLabel', { name: g.goal.name })}
                       className="flex rounded-lg bg-white/5 p-0.5 text-xs ring-1 ring-white/10"
                     >
                       {(['share', 'fixed'] as const).map((mode) => (
@@ -223,13 +241,13 @@ export function CarryoverPicker({
                               : 'text-muted'
                           }`}
                         >
-                          {mode === 'share' ? '%' : 'zł'}
+                          {mode === 'share' ? '%' : CURRENCY_SUFFIX}
                         </button>
                       ))}
                     </div>
                     <label className="flex items-baseline gap-1 rounded-lg bg-white/5 px-2 py-1 ring-1 ring-white/10 focus-within:ring-white/40">
                       <span className="sr-only">
-                        {g.goal.name}: {isShare(c) ? 'share in percent' : 'amount in złoty'}
+                        {t(isShare(c) ? 'carryover.shareLabel' : 'carryover.fixedLabel', { name: g.goal.name })}
                       </span>
                       <input
                         value={isShare(c) ? c.share : (c.fixed ?? 0)}
@@ -246,7 +264,7 @@ export function CarryoverPicker({
                           isShare(c) ? 'w-9' : 'w-16'
                         }`}
                       />
-                      <span className="text-xs text-muted">{isShare(c) ? '%' : 'zł'}</span>
+                      <span className="text-xs text-muted">{isShare(c) ? '%' : CURRENCY_SUFFIX}</span>
                     </label>
                     {(gap(g, planned[g.goal.id] ?? 0) ?? 0) > 0 &&
                       c.fixed !== gap(g, planned[g.goal.id] ?? 0) && (
@@ -257,7 +275,9 @@ export function CarryoverPicker({
                           }
                           className="rounded-full px-2 py-0.5 text-xs tabular-nums text-muted ring-1 ring-white/10 hover:text-white"
                         >
-                          use the {formatMoneyCompact(gap(g, planned[g.goal.id] ?? 0)!)} short
+                          {t('carryover.useShort', {
+                            amount: formatMoneyCompact(gap(g, planned[g.goal.id] ?? 0)!),
+                          })}
                         </button>
                       )}
                     {amount > 0 && (
@@ -276,45 +296,50 @@ export function CarryoverPicker({
       {value.length > 0 && (
         <div className="mt-3 flex items-center gap-3 border-t border-white/10 pt-3">
           <div className="min-w-0 flex-1">
-            <p className="text-sm text-white">Keep on the account</p>
+            <p className="text-sm text-white">{t('carryover.keep')}</p>
             <p className="text-xs leading-snug text-muted">
-              A cushion for the start of the month; the goals share what’s above it
-              {amount > 0 ? `: ${formatMoneyCompact(Math.max(Math.floor(amount - keep), 0))}` : ''}.
+              {amount > 0
+                ? t('carryover.keepHelpAmount', {
+                    amount: formatMoneyCompact(Math.max(Math.floor(amount - keep), 0)),
+                  })
+                : t('carryover.keepHelp')}
             </p>
           </div>
           <div className="w-32 shrink-0">
-            <MoneyInput label="Keep on the account" value={keep} onChange={onKeepChange} />
+            <MoneyInput label={t('carryover.keep')} value={keep} onChange={onKeepChange} />
           </div>
         </div>
       )}
       {amount > 0 && fixedTotal > amount - keep && (
         <p className="mt-2 text-xs text-amber-200">
-          The set amounts come to {formatMoneyCompact(fixedTotal)}, more than the{' '}
-          {formatMoneyCompact(Math.max(Math.floor(amount - keep), 0))} to share; they’re filled in
-          order until it runs out.
+          {t('carryover.fixedTooMuch', {
+            fixed: formatMoneyCompact(fixedTotal),
+            amount: formatMoneyCompact(Math.max(Math.floor(amount - keep), 0)),
+          })}
         </p>
       )}
       {amount > 0 && value.length > 0 && shared.length === 0 && assigned < Math.floor(amount - keep) && (
         <p className="mt-2 text-xs text-slate-300">
-          {formatMoneyCompact(Math.floor(amount - keep) - assigned)} more stays on the account; give
-          one goal a percentage to take the rest.
+          {t('carryover.restStays', {
+            amount: formatMoneyCompact(Math.floor(amount - keep) - assigned),
+          })}
         </p>
       )}
       {shared.length > 1 && total !== 100 && (
         <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-          <span className="text-amber-200">The percentages add up to {total}%, not 100%.</span>
+          <span className="text-amber-200">{t('carryover.percentages', { total })}</span>
           <button
             type="button"
             onClick={() => onChange(evenShares(value, true))}
             className="shrink-0 rounded-full px-2.5 py-1 font-semibold text-accent-soft ring-1 ring-accent/35"
           >
-            Split evenly
+            {t('carryover.splitEvenly')}
           </button>
         </div>
       )}
       {value.length === 0 && goals.length > 0 && (
         <p className="mt-2 text-xs text-amber-200">
-          None picked: whatever’s left stays on the account and is easy to spend.
+          {t('carryover.nonePicked')}
         </p>
       )}
     </section>

@@ -1,4 +1,4 @@
-import { LOCALE } from '../config'
+import { dateFormat, t } from '../i18n'
 import { roundMoney, todayKey, yesterdayKey } from './calculations'
 import type { Expense, Income } from '../types'
 
@@ -63,17 +63,9 @@ export function totals(entries: Entry[]): { spent: number; earned: number } {
   return { spent: roundMoney(spent), earned: roundMoney(earned) }
 }
 
-const weekdayFormatter = new Intl.DateTimeFormat(LOCALE, {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-})
-const weekdayYearFormatter = new Intl.DateTimeFormat(LOCALE, {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-})
+const weekdayFormatter = () => dateFormat({ weekday: 'short', day: 'numeric', month: 'short' })
+const weekdayYearFormatter = () =>
+  dateFormat({ weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 
 /**
  * Day header: "Today", "Yesterday", or "Mon, 22 Sep". The year only shows up
@@ -83,22 +75,18 @@ export function dayHeading(dateKey: string): { title: string; subtitle: string |
   const [y, m, d] = dateKey.split('-').map(Number)
   const date = new Date(y, m - 1, d)
   const sameYear = y === new Date().getFullYear()
-  const long = (sameYear ? weekdayFormatter : weekdayYearFormatter).format(date)
-  if (dateKey === todayKey()) return { title: 'Today', subtitle: long }
-  if (dateKey === yesterdayKey()) return { title: 'Yesterday', subtitle: long }
+  const long = (sameYear ? weekdayFormatter : weekdayYearFormatter)().format(date)
+  if (dateKey === todayKey()) return { title: t('common.today'), subtitle: long }
+  if (dateKey === yesterdayKey()) return { title: t('common.yesterday'), subtitle: long }
   return { title: long, subtitle: null }
 }
 
-const loggedFormatter = new Intl.DateTimeFormat(LOCALE, {
-  day: 'numeric',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-})
+const loggedFormatter = () =>
+  dateFormat({ day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 /** "Logged 24 Sep, 18:02" — when the row was entered, as opposed to its date. */
 export function formatLogged(createdAt: string): string {
-  return loggedFormatter.format(new Date(createdAt))
+  return loggedFormatter().format(new Date(createdAt))
 }
 
 /**

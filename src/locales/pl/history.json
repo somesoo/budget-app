@@ -1,0 +1,126 @@
+{
+  "whereAll": {
+    "message": "we wszystkich miesiącach",
+    "context": "History: after the entry count when searching, e.g. '12 entries across all months'. Lowercase."
+  },
+  "whereDay": {
+    "message": "w dniu {day}",
+    "context": "History: after the entry count when a calendar day is picked; {day} is e.g. 'Mon, 22 Sep'. Lowercase."
+  },
+  "whereMonth": {
+    "message": "w miesiącu {month}",
+    "context": "History: after the entry count; {month} is the month name alone. Lowercase."
+  },
+  "searchPlaceholder": {
+    "message": "Szukaj po tytule, kategorii lub kwocie",
+    "context": "History: placeholder of the search field."
+  },
+  "searchLabel": {
+    "message": "Szukaj we wszystkich wpisach",
+    "context": "History: accessible label of the search field."
+  },
+  "clearSearch": {
+    "message": "Wyczyść wyszukiwanie",
+    "context": "History: accessible label of the × in the search field."
+  },
+  "filters": {
+    "message": "Filtry i sortowanie",
+    "context": "History: button and sheet heading."
+  },
+  "calendarView": {
+    "message": "Widok kalendarza",
+    "context": "History: button that shows the calendar heatmap."
+  },
+  "biggestFirst": {
+    "message": "Od największych",
+    "context": "History: sort option (by amount)."
+  },
+  "newestFirst": {
+    "message": "Od najnowszych",
+    "context": "History: sort option (by date)."
+  },
+  "clearAll": {
+    "message": "Wyczyść wszystko",
+    "context": "History: removes every applied filter."
+  },
+  "net": {
+    "message": "Bilans",
+    "context": "History totals: income minus spending."
+  },
+  "entries": {
+    "one": "{count} wpis",
+    "few": "{count} wpisy",
+    "many": "{count} wpisów",
+    "other": "{count} wpisu",
+    "context": "History: number of entries shown; followed by 'in September' etc."
+  },
+  "newest": {
+    "one": "najnowszy {count}",
+    "few": "najnowsze {count}",
+    "many": "najnowszych {count}",
+    "other": "najnowsze {count}",
+    "context": "History search: only the newest {count} results are shown. Lowercase."
+  },
+  "noMatchFilters": {
+    "message": "Nic nie pasuje do tych filtrów",
+    "context": "History: empty with filters on."
+  },
+  "empty": {
+    "message": "Nic jeszcze nie zapisano w miesiącu {month}",
+    "context": "History: empty month."
+  },
+  "clearFilters": {
+    "message": "Wyczyść filtry",
+    "context": "History: button in the empty state."
+  },
+  "calendar": {
+    "message": "Kalendarz",
+    "context": "History (laptop): panel heading."
+  },
+  "filterAndSort": {
+    "message": "Filtruj i sortuj",
+    "context": "History (laptop): panel heading."
+  },
+  "showEntries": {
+    "one": "Pokaż {count} wpis",
+    "few": "Pokaż {count} wpisy",
+    "many": "Pokaż {count} wpisów",
+    "other": "Pokaż {count} wpisu",
+    "context": "History filters sheet: button that closes it."
+  },
+  "show": {
+    "message": "Pokaż",
+    "context": "History filters: label above All / Spent / Income."
+  },
+  "all": {
+    "message": "Wszystko",
+    "context": "History filters: everything / everyone."
+  },
+  "who": {
+    "message": "Kto",
+    "context": "History filters: label above the people."
+  },
+  "both": {
+    "message": "Oboje",
+    "context": "History filters: both people (budget of two)."
+  },
+  "order": {
+    "message": "Kolejność",
+    "context": "History filters: label above the sort options."
+  },
+  "noSpending": {
+    "message": "Brak wydatków w tym widoku.",
+    "context": "History (laptop) > Where it went: empty."
+  },
+  "andMore": {
+    "one": "i {count} więcej",
+    "few": "i {count} więcej",
+    "many": "i {count} więcej",
+    "other": "i {count} więcej",
+    "context": "History (laptop) > Where it went: more categories not shown."
+  },
+  "removeFilter": {
+    "message": "Usuń filtr: {name}",
+    "context": "History: accessible label of the × on an applied filter chip."
+  }
+}

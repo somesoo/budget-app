@@ -1,0 +1,93 @@
+{
+  "title": {
+    "message": "Potrzebuję pieniędzy",
+    "context": "Savings > sheet heading: borrowing from your own savings, paid back in instalments."
+  },
+  "migration": {
+    "message": "Pożyczanie z oszczędności wymaga <code>{file}</code>. Uruchom go w SQL Editorze, jak poprzednie.",
+    "context": "Borrow sheet, before the database update. Keep the <code> tags around {file}."
+  },
+  "intro": {
+    "message": "Pożycz z oszczędności i spłacaj w ratach: plany kolejnych miesięcy najpierw odłożą każdą ratę, aż cel znów będzie pełny.",
+    "context": "Borrow sheet: explanation at the top."
+  },
+  "howMuch": {
+    "message": "Ile",
+    "context": "Borrow sheet: amount field label."
+  },
+  "whatFor": {
+    "message": "Na co",
+    "context": "Borrow sheet: reason field label."
+  },
+  "whatForPlaceholder": {
+    "message": "np. naprawa auta",
+    "context": "Borrow sheet: placeholder of the reason field."
+  },
+  "from": {
+    "message": "Weź z",
+    "context": "Borrow sheet: heading of the list of goals/accounts to borrow from."
+  },
+  "noPlace": {
+    "message": "Żadne miejsce nie ma {amount}. Pożycz mniej albo dwa razy z dwóch miejsc.",
+    "context": "Borrow sheet: no account or goal holds the whole amount."
+  },
+  "noPlaceTotal": {
+    "message": "Żadne miejsce nie ma {amount} (łącznie odłożone jest {total}). Pożycz mniej albo dwa razy z dwóch miejsc.",
+    "context": "Borrow sheet: no account or goal holds the whole amount, with the total saved."
+  },
+  "unassigned": {
+    "message": "Nieprzypisane pieniądze",
+    "context": "Borrow sheet / money sheet: money on an account not set aside for any goal."
+  },
+  "suggested": {
+    "message": "sugerowane",
+    "context": "Borrow sheet: small badge on the best source. Lowercase."
+  },
+  "on": {
+    "message": "na koncie {name}",
+    "context": "Borrow sheet: which account the source is on. Lowercase fragment."
+  },
+  "neededAfter": {
+    "message": "do spłaty potrzebuje {amount}/mies., żeby zdążyć",
+    "context": "Borrow sheet: what the goal would need per month until repaid. Lowercase fragment."
+  },
+  "emergencyShare": {
+    "message": "To {percent}% celu {name}, waszej poduszki finansowej.",
+    "context": "Borrow sheet: warning when borrowing from the emergency fund."
+  },
+  "emergencyMost": {
+    "message": "Ponad połowa: tylko na coś, co naprawdę nie może czekać, i spłać to w pierwszej kolejności.",
+    "context": "Borrow sheet: follows the emergency fund warning when it's more than half."
+  },
+  "emergencySome": {
+    "message": "W porządku w prawdziwej potrzebie; spłać przed następną.",
+    "context": "Borrow sheet: follows the emergency fund warning when it's less than half."
+  },
+  "repayOver": {
+    "message": "Spłać w ciągu",
+    "context": "Borrow sheet: label above the choice of repayment months."
+  },
+  "months": {
+    "one": "{count} miesiąca",
+    "few": "{count} miesięcy",
+    "many": "{count} miesięcy",
+    "other": "{count} miesiąca",
+    "context": "Borrow sheet: a repayment period chip."
+  },
+  "bank": {
+    "message": "<b>W banku:</b> przelej {amount} z {account} na konto codzienne. Od planu na przyszły miesiąc {monthly} miesięcznie będzie wracać.",
+    "context": "Borrow sheet: what to do in the actual bank. Keep the <b> tags."
+  },
+  "bankGoal": {
+    "message": "<b>W banku:</b> przelej {amount} z {account} na konto codzienne. Od planu na przyszły miesiąc {monthly} miesięcznie będzie wracać do celu {goal}.",
+    "context": "Borrow sheet: what to do in the actual bank, repaid to goal {goal}. Keep the <b> tags."
+  },
+  "submit": {
+    "message": "Pożycz",
+    "context": "Borrow sheet: submit button without an amount."
+  },
+  "submitAmount": {
+    "message": "Pożycz {amount}",
+    "context": "Borrow sheet: submit button."
+  }
+}

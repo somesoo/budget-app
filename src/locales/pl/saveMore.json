@@ -1,0 +1,66 @@
+{
+  "title": {
+    "message": "Odłóż więcej",
+    "context": "Savings: sheet heading for putting extra money aside this month."
+  },
+  "note": {
+    "message": "Dodatkowe oszczędności",
+    "context": "Note saved on the deposit made from the 'Save more' sheet."
+  },
+  "noAccount": {
+    "message": "Najpierw dodaj konto oszczędnościowe.",
+    "context": "Save more sheet when there are no accounts."
+  },
+  "quarter": {
+    "message": "ćwierć",
+    "context": "Save more sheet: chip label after an amount, a quarter of what's free. Lowercase."
+  },
+  "half": {
+    "message": "połowa",
+    "context": "Save more sheet: chip label, half of what's free. Lowercase."
+  },
+  "all": {
+    "message": "wszystko",
+    "context": "Save more sheet: chip label, everything that's free. Lowercase."
+  },
+  "needs": {
+    "message": "potrzebuje {amount}/mies.",
+    "context": "Save more sheet: after a goal in the list, what it needs per month. Lowercase."
+  },
+  "safe": {
+    "message": "Możesz wydać w tym miesiącu",
+    "context": "Save more sheet: label of the figure of what's still free this month. Same term as on the Add screen."
+  },
+  "noIncome": {
+    "message": "Brak zapisanego lub zaplanowanego dochodu w tym miesiącu, więc nie ma z czego liczyć: odłóż tyle, ile wiesz, że możesz.",
+    "context": "Save more sheet: explanation when there's no income."
+  },
+  "nothingFree": {
+    "message": "W tym miesiącu nic nie jest wolne. Odkładanie więcej teraz poszłoby z pieniędzy, które są już potrzebne.",
+    "context": "Save more sheet: nothing is free."
+  },
+  "safeHelp": {
+    "message": "Co zostaje z dochodu tego miesiąca po planowanych oszczędnościach i dotychczasowych wydatkach. Zostaw trochę na resztę miesiąca.",
+    "context": "Save more sheet: explanation of the figure."
+  },
+  "onto": {
+    "message": "Na konto",
+    "context": "Save more sheet: which account the money goes onto."
+  },
+  "bank": {
+    "message": "<b>W banku:</b> przelej {amount} z konta codziennego na {account}. Potem zapisz to tutaj.",
+    "context": "Save more sheet: what to do in the actual bank. Keep the <b> tags."
+  },
+  "bankGoal": {
+    "message": "<b>W banku:</b> przelej {amount} z konta codziennego na {account} (tytuł: {goal}). Potem zapisz to tutaj.",
+    "context": "Save more sheet: what to do in the bank, with the goal's name as the transfer title. Keep the <b> tags."
+  },
+  "moreThanFree": {
+    "message": "To o {amount} więcej, niż jest wolne w tym miesiącu.",
+    "context": "Save more sheet: warning."
+  },
+  "submit": {
+    "message": "Odłóż {amount}",
+    "context": "Save more sheet: submit button."
+  }
+}

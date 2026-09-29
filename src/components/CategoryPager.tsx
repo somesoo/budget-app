@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { CategoryTile } from './CategoryTile'
 import type { Category } from '../types'
+import { t } from '../i18n'
 
 interface Props {
   categories: Category[]
@@ -61,7 +62,9 @@ export function CategoryPager({ categories, spentByCategory, onSelect, trailing 
             <div
               key={index}
               aria-label={
-                pages.length > 1 ? `Categories, page ${index + 1} of ${pages.length}` : undefined
+                pages.length > 1
+                  ? t('tile.page', { n: index + 1, total: pages.length })
+                  : undefined
               }
               className="grid w-full shrink-0 snap-start snap-always content-start"
               style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: GAP }}
@@ -90,7 +93,7 @@ export function CategoryPager({ categories, spentByCategory, onSelect, trailing 
               key={index}
               type="button"
               onClick={() => goTo(index)}
-              aria-label={`Page ${index + 1}`}
+              aria-label={t('tile.pageDot', { n: index + 1 })}
               aria-current={index === page}
               className="flex h-6 w-6 items-center justify-center"
             >

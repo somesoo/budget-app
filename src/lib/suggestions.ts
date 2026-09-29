@@ -1,3 +1,4 @@
+import { formatList, t } from '../i18n'
 import type { Category, Expense, Goal } from '../types'
 import {
   formatMoneyWhole,
@@ -98,10 +99,17 @@ export function planSuggestions(args: {
           kind: 'raise',
           categoryId: category.id,
           limit: roundUpPlan(typical),
-          title: `Raise ${name} to ${formatMoneyWhole(roundUpPlan(typical))}`,
-          detail: `Over ${formatMoneyWhole(limit)} in each of the last ${STREAK} months (${recent
-            .map((x, i) => `${formatMonthShort(recentMonths[i])} ${formatMoneyWhole(x)}`)
-            .join(', ')}). A limit it can meet is one that gets kept.`,
+          title: t('suggestions.raiseTitle', {
+            name,
+            amount: formatMoneyWhole(roundUpPlan(typical)),
+          }),
+          detail: t('suggestions.raiseDetail', {
+            limit: formatMoneyWhole(limit),
+            count: STREAK,
+            months: recent
+              .map((x, i) => `${formatMonthShort(recentMonths[i])} ${formatMoneyWhole(x)}`)
+              .join(', '),
+          }),
         })
         covered = true
       } else if (recent.every((x) => x < limit * UNDER_RATIO)) {
@@ -113,10 +121,13 @@ export function planSuggestions(args: {
             kind: 'lower',
             categoryId: category.id,
             limit: proposed,
-            title: `Lower ${name} to ${formatMoneyWhole(proposed)}`,
-            detail: `Under ${Math.round(UNDER_RATIO * 100)}% of its limit for ${STREAK} months, at most ${formatMoneyWhole(
-              Math.max(...recent),
-            )}. That frees ${formatMoneyWhole(freed)} for savings.`,
+            title: t('suggestions.lowerTitle', { name, amount: formatMoneyWhole(proposed) }),
+            detail: t('suggestions.lowerDetail', {
+              percent: Math.round(UNDER_RATIO * 100),
+              count: STREAK,
+              most: formatMoneyWhole(Math.max(...recent)),
+              freed: formatMoneyWhole(freed),
+            }),
           })
           covered = true
         }
@@ -131,9 +142,20 @@ export function planSuggestions(args: {
         kind: 'annual',
         categoryId: category.id,
         limit: proposed,
-        title: `${bill.note}: ${formatMoneyWhole(bill.amount)} last ${formatMonthName(target)}`,
-        detail: `Paid in ${formatMonth(lastYear)}, in ${name}, and not since. Plan it in: ${name} to ${formatMoneyWhole(proposed)}.`,
-        noteLine: `${bill.note} ~${formatMoneyWhole(bill.amount)}`,
+        title: t('suggestions.annualTitle', {
+          note: bill.note,
+          amount: formatMoneyWhole(bill.amount),
+          month: formatMonthName(target),
+        }),
+        detail: t('suggestions.annualDetail', {
+          month: formatMonth(lastYear),
+          name,
+          amount: formatMoneyWhole(proposed),
+        }),
+        noteLine: t('suggestions.annualNoteLine', {
+          note: bill.note,
+          amount: formatMoneyWhole(bill.amount),
+        }),
       })
       covered = true
     }
@@ -151,10 +173,13 @@ export function planSuggestions(args: {
         kind: 'seasonal',
         categoryId: category.id,
         limit: roundUpPlan(ly),
-        title: `${formatMonthName(target)} costs more in ${name}`,
-        detail: `${formatMoneyWhole(ly)} last ${formatMonthName(target)}, against a typical ${formatMoneyWhole(
-          typical,
-        )}. Planning ${formatMoneyWhole(roundUpPlan(ly))} matches last year.`,
+        title: t('suggestions.seasonalTitle', { month: formatMonthName(target), name }),
+        detail: t('suggestions.seasonalDetail', {
+          lastYear: formatMoneyWhole(ly),
+          month: formatMonthName(target),
+          typical: formatMoneyWhole(typical),
+          amount: formatMoneyWhole(roundUpPlan(ly)),
+        }),
       })
       covered = true
     }
@@ -170,10 +195,12 @@ export function planSuggestions(args: {
           kind: 'buffer',
           categoryId: category.id,
           limit: p75,
-          title: `Give ${name} some room: ${formatMoneyWhole(p75)}`,
-          detail: `It swings between ${formatMoneyWhole(Math.min(...six))} and ${formatMoneyWhole(
-            Math.max(...six),
-          )} a month. ${formatMoneyWhole(p75)} would have covered 3 months in 4.`,
+          title: t('suggestions.bufferTitle', { name, amount: formatMoneyWhole(p75) }),
+          detail: t('suggestions.bufferDetail', {
+            low: formatMoneyWhole(Math.min(...six)),
+            high: formatMoneyWhole(Math.max(...six)),
+            amount: formatMoneyWhole(p75),
+          }),
         })
       }
     }
@@ -295,13 +322,19 @@ export function planChecks(args: {
   const checks: PlanCheck[] = []
 
   if (draft.income <= 0) {
-    checks.push({ ok: false, text: 'No income planned, so there’s nothing to balance against.' })
+    checks.push({ ok: false, text: t('suggestions.checkNoIncome') })
   } else if (Math.abs(unassigned) < 1) {
-    checks.push({ ok: true, text: 'Income, spending and savings balance.' })
+    checks.push({ ok: true, text: t('suggestions.checkBalanced') })
   } else if (unassigned > 0) {
-    checks.push({ ok: false, text: `${formatMoneyWhole(unassigned)} of income has no job yet.` })
+    checks.push({
+      ok: false,
+      text: t('suggestions.checkUnassigned', { amount: formatMoneyWhole(unassigned) }),
+    })
   } else {
-    checks.push({ ok: false, text: `Plans ${formatMoneyWhole(-unassigned)} more than the income.` })
+    checks.push({
+      ok: false,
+      text: t('suggestions.checkOverplanned', { amount: formatMoneyWhole(-unassigned) }),
+    })
   }
 
   const tight = baseline.categories.filter((b) => {
@@ -312,18 +345,15 @@ export function planChecks(args: {
   })
   if (tight.length > 0) {
     const names = tight.map((b) => b.category.name)
-    const list =
-      names.length === 1
-        ? names[0]
-        : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
     checks.push({
       ok: false,
-      text: `${list} ${names.length === 1 ? 'is' : 'are'} planned below what ${
-        names.length === 1 ? 'it' : 'they'
-      } cost in any of the last ${STREAK} months.`,
+      text: t(names.length === 1 ? 'suggestions.checkTightOne' : 'suggestions.checkTightMany', {
+        names: formatList(names),
+        count: STREAK,
+      }),
     })
   } else if (baseline.months.length >= STREAK) {
-    checks.push({ ok: true, text: `Every limit is within what the last ${STREAK} months cost.` })
+    checks.push({ ok: true, text: t('suggestions.checkRealistic', { count: STREAK }) })
   }
 
   if (draft.income > 0) {
@@ -331,9 +361,11 @@ export function planChecks(args: {
       draft.savings > 0
         ? {
             ok: true,
-            text: `Saving ${Math.round((draft.savings / draft.income) * 100)}% of income.`,
+            text: t('suggestions.checkSaving', {
+              percent: Math.round((draft.savings / draft.income) * 100),
+            }),
           }
-        : { ok: false, text: 'Nothing set aside for savings.' },
+        : { ok: false, text: t('suggestions.checkNoSavings') },
     )
   }
 
@@ -343,7 +375,7 @@ export function planChecks(args: {
       const n = Math.ceil(left / draft.savings)
       checks.push({
         ok: true,
-        text: `${goal.name} in about ${n} ${n === 1 ? 'month' : 'months'} at this rate.`,
+        text: t('suggestions.checkGoal', { name: goal.name, count: n }),
       })
     }
   }

@@ -1,0 +1,89 @@
+{
+  "askQuestion": {
+    "message": "Jak nam idzie względem planu na ten miesiąc i czego pilnować?",
+    "context": "Question pre-filled in the AI chat from the Budget tab's Ask button."
+  },
+  "nextPlanned": {
+    "message": "{month}: zaplanowany",
+    "context": "Budget tab: card for next month when it's already planned; {month} is the name alone."
+  },
+  "planMonth": {
+    "message": "Zaplanuj: {month}",
+    "context": "Budget tab: button/card to plan a month; {month} is the name alone."
+  },
+  "nextSummary": {
+    "message": "{spending} na wydatki · {savings} na oszczędności",
+    "context": "Budget tab: summary of next month's plan."
+  },
+  "nextHelp": {
+    "message": "Ustaw limity na przyszły miesiąc na podstawie historii, jeśli chcesz ze szkicem AI.",
+    "context": "Budget tab: card inviting to plan next month."
+  },
+  "ofPlanned": {
+    "message": "z zaplanowanych {limit} · {percent}%",
+    "context": "Budget tab: under the big 'Spent' figure. Lowercase fragment."
+  },
+  "ofDefaults": {
+    "message": "z {limit} w domyślnych limitach · {percent}%",
+    "context": "Budget tab: under 'Spent' when the month has no plan. Lowercase fragment."
+  },
+  "overPlan": {
+    "message": "{amount} ponad plan",
+    "context": "Budget tab: the month is over its limits."
+  },
+  "leftPerDay": {
+    "one": "zostało {amount} · ok. {perDay} dziennie przez {count} dzień",
+    "few": "zostało {amount} · ok. {perDay} dziennie przez {count} dni",
+    "many": "zostało {amount} · ok. {perDay} dziennie przez {count} dni",
+    "other": "zostało {amount} · ok. {perDay} dziennie przez {count} dnia",
+    "context": "Budget tab: what's left and what it allows per day for the rest of the month."
+  },
+  "underPlan": {
+    "message": "{amount} poniżej planu",
+    "context": "Budget tab: a finished month under its limits."
+  },
+  "planned": {
+    "message": "planowano {amount}",
+    "context": "Budget tab: under Income, the plan's income. Lowercase."
+  },
+  "leftOverSoFar": {
+    "message": "Zostaje dotąd",
+    "context": "Budget tab: income minus spending in the running month."
+  },
+  "toSave": {
+    "message": "do odłożenia {amount}",
+    "context": "Budget tab: under 'Left over', what the plan meant to save. Lowercase."
+  },
+  "headsUp": {
+    "message": "Uwaga",
+    "context": "Budget tab: heading of the warnings list."
+  },
+  "notPlanned": {
+    "message": "{month}: jeszcze niezaplanowany",
+    "context": "Budget tab, future month without a plan."
+  },
+  "notPlannedHelp": {
+    "message": "Do tego czasu używa domyślnych limitów z Ustawień. Planowanie zajmuje minutę: zacznij od poprzedniego miesiąca albo typowych wydatków, opisz, co jest inne, i dopasuj.",
+    "context": "Budget tab, future month without a plan: explanation."
+  },
+  "spending": {
+    "message": "Wydatki",
+    "context": "Budget tab, planned month: total of the limits."
+  },
+  "overIncome": {
+    "message": "Plan przekracza spodziewany dochód o {amount}.",
+    "context": "Budget tab, planned month: the plan exceeds income."
+  },
+  "editPlan": {
+    "message": "Edytuj plan",
+    "context": "Budget tab: button that opens the planner."
+  },
+  "badgePlanned": {
+    "message": "Zaplanowany · edytuj",
+    "context": "Budget tab: small badge next to 'Spent' when the month has a plan; tapping edits it."
+  },
+  "badgeNone": {
+    "message": "Brak planu · ustaw",
+    "context": "Budget tab: small badge when the month has no plan; tapping opens the planner."
+  }
+}

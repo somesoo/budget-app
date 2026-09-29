@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { t } from '../../i18n'
 
 interface Props {
   message: string
@@ -31,7 +32,7 @@ export function UndoToast({ message, onUndo, onDismiss, timeoutMs = 6000 }: Prop
           onClick={onUndo}
           className="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-accent-strong active:bg-accent/10"
         >
-          Undo
+          {t('entry.undo')}
         </button>
       </div>
     </div>

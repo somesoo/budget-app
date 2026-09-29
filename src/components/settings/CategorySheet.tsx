@@ -15,6 +15,8 @@ import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
 import { Field, Select, SubmitRow, Switch, inputClass } from '../savings/fields'
 import { getPeople, personLabel } from '../../lib/people'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 /**
  * A monthly category: its name, color, default limit (months without a plan
@@ -90,70 +92,76 @@ export function CategorySheet({
   }
 
   return (
-    <BottomSheet title={category ? `Edit ${category.name}` : 'New category'} onClose={onClose}>
+    <BottomSheet
+      title={category ? t('project.edit', { name: category.name }) : t('categorySheet.new')}
+      onClose={onClose}
+    >
       <form onSubmit={submit} className="grid gap-4 pb-2">
-        <Field label="Name">
+        <Field label={t('settings.categories.name')}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={40}
-            placeholder="e.g. Gifts"
+            placeholder={t('categorySheet.namePlaceholder')}
             className={inputClass}
             autoFocus={!category}
           />
         </Field>
         <Field
-          label="Default monthly limit"
+          label={t('categorySheet.limit')}
           help={
             typical ? (
-              <>
-                Months without a plan use it. The last 3 months averaged{' '}
-                <button
-                  type="button"
-                  onClick={() => setLimit(roundUpPlan(typical))}
-                  className="font-semibold text-accent-soft hover:underline"
-                >
-                  {formatMoneyWhole(typical)}
-                </button>
-                .
-              </>
+              <Trans
+                k="categorySheet.limitHelpTypical"
+                values={{
+                  amount: (
+                    <button
+                      type="button"
+                      onClick={() => setLimit(roundUpPlan(typical))}
+                      className="font-semibold text-accent-soft hover:underline"
+                    >
+                      {formatMoneyWhole(typical)}
+                    </button>
+                  ),
+                }}
+              />
             ) : (
-              'Months without a plan use it.'
+              t('categorySheet.limitHelp')
             )
           }
         >
-          <MoneyInput value={limit} onChange={setLimit} label="Default monthly limit" size="lg" />
+          <MoneyInput value={limit} onChange={setLimit} label={t('categorySheet.limit')} size="lg" />
         </Field>
         <Switch
-          label="In the “Where it goes” chart"
-          help="Turn off for fixed costs like rent; they still count everywhere else."
+          label={t('categorySheet.inChart')}
+          help={t('categorySheet.inChartHelp')}
           checked={inChart}
           onChange={setInChart}
         />
         {getPeople().length > 1 && (
           <Field
-            label="Whose"
+            label={t('categorySheet.whose')}
             help={
               owner
-                ? `${personLabel(owner)}'s allowance: money nobody has to explain. Only ${personLabel(owner)} sees its tile, spending and entries; everyone else just hears when it goes over its limit. It still counts in the plan and every total.`
-                : 'Shared by everyone. Make it one person’s to use it as their allowance.'
+                ? t('categorySheet.allowanceHelp', { name: personLabel(owner) })
+                : t('categorySheet.sharedHelp')
             }
           >
             <Select value={owner} onChange={(v) => setOwner(v as Person | '')}>
-              <option value="">Shared</option>
+              <option value="">{t('categorySheet.shared')}</option>
               {getPeople().map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}'s allowance
+                  {t('categorySheet.allowanceOf', { name: p.name })}
                 </option>
               ))}
             </Select>
           </Field>
         )}
-        <Field label="Color">
+        <Field label={t('common.color')}>
           <ColorChoice value={color} onChange={setColor} />
         </Field>
         <SubmitRow
-          label={category ? 'Save changes' : 'Add category'}
+          label={category ? t('entry.saveChanges') : t('categorySheet.add')}
           disabled={!name.trim()}
           pending={add.isPending || update.isPending}
           error={error}
@@ -168,7 +176,7 @@ export function CategorySheet({
                   disabled={!neighbours?.up}
                   className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5 disabled:opacity-30"
                 >
-                  <ArrowUp aria-hidden /> Move up
+                  <ArrowUp aria-hidden /> {t('categorySheet.moveUp')}
                 </button>
                 <button
                   type="button"
@@ -176,7 +184,7 @@ export function CategorySheet({
                   disabled={!neighbours?.down}
                   className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5 disabled:opacity-30"
                 >
-                  <ArrowDown aria-hidden /> Move down
+                  <ArrowDown aria-hidden /> {t('categorySheet.moveDown')}
                 </button>
               </>
             )}
@@ -185,13 +193,13 @@ export function CategorySheet({
               onClick={toggleHidden}
               className="ml-auto rounded-full px-3 py-2 text-sm font-semibold text-muted ring-1 ring-white/10 hover:bg-white/5"
             >
-              {category.archived ? 'Show it again' : 'Hide it'}
+              {category.archived ? t('categorySheet.unhide') : t('categorySheet.hide')}
             </button>
           </div>
         )}
         {category && !category.archived && (
           <p className="-mt-2 text-xs text-muted">
-            Hiding takes it off the Add screen and out of planning; old expenses keep it.
+            {t('categorySheet.hideHelp')}
           </p>
         )}
         {category && <DeleteCategory category={category} onDone={onClose} />}
@@ -221,7 +229,7 @@ function DeleteCategory({ category, onDone }: { category: Category; onDone: () =
         onClick={() => setOpen(true)}
         className="flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-sm font-semibold text-red-300 ring-1 ring-red-400/30 hover:bg-red-500/10"
       >
-        <Trash aria-hidden /> Delete category
+        <Trash aria-hidden /> {t('categorySheet.delete')}
       </button>
     )
   }
@@ -240,23 +248,23 @@ function DeleteCategory({ category, onDone }: { category: Category; onDone: () =
   return (
     <div className="grid gap-3 rounded-2xl bg-red-500/10 p-3.5 ring-1 ring-red-400/30">
       {isLoading ? (
-        <p className="text-sm text-slate-300">Checking its expenses…</p>
+        <p className="text-sm text-slate-300">{t('categorySheet.checking')}</p>
       ) : hasExpenses ? (
         <Field
-          label={`${count} ${count === 1 ? 'expense is' : 'expenses are'} in ${category.name}. Move ${count === 1 ? 'it' : 'them'} to`}
+          label={t('categorySheet.moveTo', { count: count ?? 0, name: category.name })}
         >
           <Select value={target} onChange={setMoveTo}>
             {others.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
-                {c.archived ? ' (hidden)' : ''}
+                {c.archived ? ` ${t('categorySheet.hiddenSuffix')}` : ''}
               </option>
             ))}
           </Select>
         </Field>
       ) : (
         <p className="text-sm text-slate-200">
-          No expenses in {category.name}. Delete it for good?
+          {t('categorySheet.confirmEmpty', { name: category.name })}
         </p>
       )}
       <div className="flex gap-2">
@@ -265,7 +273,7 @@ function DeleteCategory({ category, onDone }: { category: Category; onDone: () =
           onClick={() => setOpen(false)}
           className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
         >
-          Keep it
+          {t('categorySheet.keep')}
         </button>
         <button
           type="button"
@@ -273,10 +281,14 @@ function DeleteCategory({ category, onDone }: { category: Category; onDone: () =
           disabled={isLoading || remove.isPending || (hasExpenses && !target)}
           className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white hover:bg-red-400 disabled:opacity-40"
         >
-          {remove.isPending ? 'Deleting…' : hasExpenses ? 'Move and delete' : 'Delete'}
+          {remove.isPending
+            ? t('common.deleting')
+            : hasExpenses
+              ? t('categorySheet.moveAndDelete')
+              : t('common.delete')}
         </button>
       </div>
-      {error && <p className="text-sm text-red-300">Not deleted: {error}</p>}
+      {error && <p className="text-sm text-red-300">{t('common.notDeleted', { error })}</p>}
     </div>
   )
 }

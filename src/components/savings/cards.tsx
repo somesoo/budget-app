@@ -3,32 +3,37 @@ import { Link } from 'react-router-dom'
 import { formatMoneyWhole, formatMonth, type MonthKey } from '../../lib/calculations'
 import { goalUse, type AccountSummary, type GoalStatus, type GoalSummary } from '../../lib/savings'
 import { CHART } from '../charts/theme'
-import { ACCOUNT_KINDS, ownerLabel } from './AccountSheet'
+import { accountKindLabel, ownerLabel } from './AccountSheet'
+import { t } from '../../i18n'
 
 /** A goal's status in words, with an icon where it needs attention. */
 export function StatusLine({ status, pace }: { status: GoalStatus; pace: number }) {
-  const lately = pace > 0 ? `, ${formatMoneyWhole(pace)} a month lately` : ''
+  const lately = pace > 0 ? t('goalStatus.lately', { amount: formatMoneyWhole(pace) }) : ''
   switch (status.kind) {
     case 'reached':
       return (
         <Line icon={<Check weight="bold" className="text-positive" />} tone="text-positive">
-          Reached
+          {t('carryover.reached')}
         </Line>
       )
     case 'open':
-      return <Line tone="text-slate-300">Keeps growing{lately}</Line>
+      return (
+        <Line tone="text-slate-300">
+          {lately ? `${t('goalSheet.open')}, ${lately}` : t('goalSheet.open')}
+        </Line>
+      )
     case 'no-date':
       return (
         <Line tone="text-slate-300">
           {status.eta
-            ? `At this pace, there by ${formatMonth(status.eta)}`
-            : 'Nothing put in lately'}
+            ? t('goalStatus.eta', { month: formatMonth(status.eta) })
+            : t('goalStatus.nothingLately')}
         </Line>
       )
     case 'on-track':
       return (
         <Line icon={<Check weight="bold" className="text-positive" />} tone="text-slate-300">
-          On track: {formatMoneyWhole(status.neededPerMonth)} a month does it
+          {t('goalStatus.onTrack', { amount: formatMoneyWhole(status.neededPerMonth) })}
         </Line>
       )
     case 'behind':
@@ -37,14 +42,16 @@ export function StatusLine({ status, pace }: { status: GoalStatus; pace: number 
           icon={<Warning weight="fill" style={{ color: CHART.warning }} />}
           tone="text-slate-200"
         >
-          Needs {formatMoneyWhole(status.neededPerMonth)} a month; at this pace{' '}
-          {formatMoneyWhole(status.shortfall)} short
+          {t('goalStatus.behind', {
+            amount: formatMoneyWhole(status.neededPerMonth),
+            short: formatMoneyWhole(status.shortfall),
+          })}
         </Line>
       )
     case 'overdue':
       return (
         <Line icon={<WarningCircle weight="fill" className="text-red-300" />} tone="text-slate-200">
-          Its date has passed, {formatMoneyWhole(status.shortfall)} to go
+          {t('goalStatus.overdue', { amount: formatMoneyWhole(status.shortfall) })}
         </Line>
       )
   }
@@ -99,11 +106,12 @@ export function GoalCard({
           </Link>
           <p className="mt-0.5 text-sm tabular-nums text-slate-300">
             <span className="font-semibold text-white">{formatMoneyWhole(saved)}</span>
-            {goal.target_amount > 0 && ` of ${formatMoneyWhole(goal.target_amount)}`}
+            {goal.target_amount > 0 &&
+              ` ${t('goalCard.of', { amount: formatMoneyWhole(goal.target_amount) })}`}
             {goal.target_date && (
               <span className="text-muted">
                 {' '}
-                · by {formatMonth(goal.target_date.slice(0, 7) as MonthKey)}
+                · {t('goalCard.by', { month: formatMonth(goal.target_date.slice(0, 7) as MonthKey) })}
               </span>
             )}
           </p>
@@ -111,18 +119,22 @@ export function GoalCard({
         <button
           type="button"
           onClick={onSave}
-          aria-label={`Save money for ${goal.name}`}
+          aria-label={t('goalCard.saveFor', { name: goal.name })}
           className="relative z-10 flex h-9 shrink-0 items-center gap-1 rounded-full bg-accent/15 px-3 text-sm font-semibold text-accent-soft ring-1 ring-accent/30 hover:bg-accent/25"
         >
-          <Plus weight="bold" aria-hidden /> Save
+          <Plus weight="bold" aria-hidden /> {t('goalCard.save')}
         </button>
       </div>
 
       <div className="mt-3 space-y-2">
         {progress !== null && (
           <GoalBar
-            label="Saved"
-            value={remaining > 0 ? `${formatMoneyWhole(remaining)} to go` : 'All there'}
+            label={t('settings.savings.saved')}
+            value={
+              remaining > 0
+                ? t('carryover.toGo', { amount: formatMoneyWhole(remaining) })
+                : t('goalCard.allThere')
+            }
             share={progress}
             color={goal.color}
           />
@@ -134,7 +146,9 @@ export function GoalCard({
         <StatusLine status={status} pace={pace} />
         {funding.length > 0 && (
           <p className="truncate text-xs text-muted">
-            On {funding.map((f) => `${f.account.name} ${formatMoneyWhole(f.amount)}`).join(', ')}
+            {t('goalCard.on', {
+              list: funding.map((f) => `${f.account.name} ${formatMoneyWhole(f.amount)}`).join(', '),
+            })}
           </p>
         )}
       </div>
@@ -161,11 +175,11 @@ export function LeftToUse({
   const { left, share } = goalUse(saved, spent)
   return (
     <GoalBar
-      label="Left to use"
+      label={t('goalCard.leftToUse')}
       value={
         left >= 0
-          ? `${formatMoneyWhole(left)} of ${formatMoneyWhole(saved)}`
-          : `${formatMoneyWhole(-left)} more spent than saved`
+          ? t('paycheck.paidOf', { paid: formatMoneyWhole(left), planned: formatMoneyWhole(saved) })
+          : t('goalCard.overspent', { amount: formatMoneyWhole(-left) })
       }
       share={share}
       color={color}
@@ -234,7 +248,7 @@ export function AccountCard({ summary, history }: { summary: AccountSummary; his
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold text-white">{account.name}</p>
           <p className="truncate text-xs text-muted">
-            {ACCOUNT_KINDS[account.kind]} · {ownerLabel(account.owner)}
+            {accountKindLabel(account.kind)} · {ownerLabel(account.owner)}
             {account.interest_rate != null && ` · ${account.interest_rate}%`}
           </p>
         </div>
@@ -245,7 +259,7 @@ export function AccountCard({ summary, history }: { summary: AccountSummary; his
           </p>
           {unassigned > 0.5 && (
             <p className="text-xs tabular-nums text-muted">
-              {formatMoneyWhole(unassigned)} unassigned
+              {t('accountCard.unassigned', { amount: formatMoneyWhole(unassigned) })}
             </p>
           )}
         </div>

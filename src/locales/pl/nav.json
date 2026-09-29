@@ -1,0 +1,30 @@
+{
+  "add": {
+    "message": "Dodaj",
+    "context": "Navigation tab (bottom bar on the phone, side bar on a laptop): the main screen for logging an expense or income. One short word."
+  },
+  "history": {
+    "message": "Historia",
+    "context": "Navigation tab: the list of every logged expense and income. One short word."
+  },
+  "budget": {
+    "message": "Budżet",
+    "context": "Navigation tab: this month's limits per category and the plan for the month. One short word."
+  },
+  "savings": {
+    "message": "Oszczędności",
+    "context": "Navigation tab: savings accounts and goals. One short word."
+  },
+  "insights": {
+    "message": "Wykresy",
+    "context": "Navigation tab: charts comparing the last months. One short word."
+  },
+  "ask": {
+    "message": "Zapytaj",
+    "context": "Navigation tab: chat with the AI assistant about the budget. One short word."
+  },
+  "settings": {
+    "message": "Ustawienia",
+    "context": "Navigation tab and the gear button's accessible label: the settings screen. One short word."
+  }
+}

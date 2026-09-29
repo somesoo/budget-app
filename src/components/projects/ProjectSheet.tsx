@@ -7,6 +7,7 @@ import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
 import { Field, Select, SubmitRow, inputClass } from '../savings/fields'
+import { t } from '../../i18n'
 
 /**
  * A trip or other project: a category with a budget for the whole of it and,
@@ -53,23 +54,26 @@ export function ProjectSheet({ project, onClose }: { project?: Category; onClose
   }
 
   return (
-    <BottomSheet title={project ? `Edit ${project.name}` : 'New trip or project'} onClose={onClose}>
+    <BottomSheet
+      title={project ? t('project.edit', { name: project.name }) : t('project.new')}
+      onClose={onClose}
+    >
       <form onSubmit={submit} className="grid gap-4 pb-2">
-        <Field label="Name">
+        <Field label={t('settings.categories.name')}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={40}
-            placeholder="e.g. Japan 2027, Kitchen"
+            placeholder={t('project.namePlaceholder')}
             className={inputClass}
             autoFocus={!project}
           />
         </Field>
-        <Field label="Budget for all of it (optional)">
-          <MoneyInput value={budget} onChange={setBudget} label="Budget" size="lg" />
+        <Field label={t('project.budgetLabel')}>
+          <MoneyInput value={budget} onChange={setBudget} label={t('project.budget')} size="lg" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="From (optional)">
+          <Field label={t('project.from')}>
             <input
               type="date"
               value={starts}
@@ -77,7 +81,7 @@ export function ProjectSheet({ project, onClose }: { project?: Category; onClose
               className={`${inputClass} [color-scheme:dark]`}
             />
           </Field>
-          <Field label="Until (optional)" help={datesOk ? undefined : 'Ends before it starts'}>
+          <Field label={t('project.until')} help={datesOk ? undefined : t('project.badDates')}>
             <input
               type="date"
               value={ends}
@@ -87,11 +91,11 @@ export function ProjectSheet({ project, onClose }: { project?: Category; onClose
           </Field>
         </div>
         <Field
-          label="Paid from savings goal (optional)"
-          help="Its spending stays out of the monthly budget either way; this shows it against what was saved."
+          label={t('project.goal')}
+          help={t('project.goalHelp')}
         >
           <Select value={goal} onChange={setGoal}>
-            <option value="">None</option>
+            <option value="">{t('category.none')}</option>
             {goals
               .filter((g) => !g.archived || g.id === goal)
               .map((g) => (
@@ -101,11 +105,11 @@ export function ProjectSheet({ project, onClose }: { project?: Category; onClose
               ))}
           </Select>
         </Field>
-        <Field label="Color">
+        <Field label={t('common.color')}>
           <ColorChoice value={color} onChange={setColor} />
         </Field>
         <SubmitRow
-          label={project ? 'Save changes' : 'Add'}
+          label={project ? t('entry.saveChanges') : t('common.add')}
           disabled={!name.trim() || !datesOk}
           pending={add.isPending || update.isPending}
           error={error}
@@ -116,7 +120,7 @@ export function ProjectSheet({ project, onClose }: { project?: Category; onClose
             onClick={finish}
             className="rounded-2xl py-2.5 text-sm font-semibold text-muted ring-1 ring-white/10 hover:bg-white/5"
           >
-            {project.archived ? 'Bring it back to Add' : 'Finish: take it off the Add screen'}
+            {project.archived ? t('project.unarchive') : t('project.archive')}
           </button>
         )}
       </form>

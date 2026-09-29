@@ -1,4 +1,3 @@
-import { LOCALE } from '../config'
 import type { Recurring, Suggestion } from './suggestions'
 import type {
   BudgetPlan,
@@ -346,7 +345,8 @@ export interface PlanRequest {
   recurring: { key: string; note: string; amount: number }[]
 }
 
-const shortMonth = new Intl.DateTimeFormat(LOCALE, { month: 'short', year: 'numeric' })
+// for the AI, which reads English data whatever language it answers in
+const shortMonth = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' })
 
 export function buildPlanRequest(args: {
   target: MonthKey

@@ -3,6 +3,7 @@ import type { EntryActions } from '../../hooks/useEntryActions'
 import type { Category } from '../../types'
 import { EntryEditor } from './EntryEditor'
 import { UndoToast } from './UndoToast'
+import { t } from '../../i18n'
 
 /** The edit sheet and the undo toast that go with useEntryActions(). */
 export function EntryDialogs({
@@ -28,7 +29,9 @@ export function EntryDialogs({
       {deleted && (
         <UndoToast
           key={`${deleted.kind}-${deleted.id}`}
-          message={`${deleted.kind === 'expense' ? 'Expense' : 'Income'} deleted · ${formatMoney(deleted.item.amount)}`}
+          message={t(deleted.kind === 'expense' ? 'entry.expenseDeleted' : 'entry.incomeDeleted', {
+            amount: formatMoney(deleted.item.amount),
+          })}
           onUndo={actions.undo}
           onDismiss={actions.dismissUndo}
         />

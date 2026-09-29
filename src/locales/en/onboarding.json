@@ -1,0 +1,10 @@
+{
+  "title": {
+    "message": "Who's using this phone?",
+    "context": "Screen on a new phone of an existing household: pick which person this phone belongs to."
+  },
+  "intro": {
+    "message": "We'll remember it on this device. You can change it any time with one tap.",
+    "context": "Explanation on the 'Who's using this phone?' screen."
+  }
+}

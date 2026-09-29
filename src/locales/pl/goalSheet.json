@@ -1,0 +1,62 @@
+{
+  "new": {
+    "message": "Nowy cel",
+    "context": "Savings goal sheet heading when creating one."
+  },
+  "name": {
+    "message": "Na co",
+    "context": "Goal sheet: name field label."
+  },
+  "namePlaceholder": {
+    "message": "np. Japonia 2027, Poduszka finansowa",
+    "context": "Goal sheet: placeholder of the name field."
+  },
+  "hasTarget": {
+    "message": "Ma kwotę docelową",
+    "context": "Goal sheet: option, the goal has a target amount."
+  },
+  "open": {
+    "message": "Rośnie bez końca",
+    "context": "Goal sheet: option, the goal has no target and just grows."
+  },
+  "emergencyHint": {
+    "message": "{amount} to 3 miesiące waszych typowych wydatków.",
+    "context": "Goal sheet: hint under the target for an emergency fund."
+  },
+  "by": {
+    "message": "Do kiedy (opcjonalnie)",
+    "context": "Goal sheet: target date field."
+  },
+  "openHelp": {
+    "message": "Bez mety: dobre na poduszkę finansową albo ogólny zapas.",
+    "context": "Goal sheet: explanation for a goal without a target."
+  },
+  "tripFrom": {
+    "message": "Wyjazd od (opcjonalnie)",
+    "context": "Goal sheet: start date of the trip the goal pays for."
+  },
+  "emergency": {
+    "message": "To nasza poduszka finansowa",
+    "context": "Goal sheet: switch label."
+  },
+  "emergencyHelp": {
+    "message": "Karta Budżet pokazuje, na ile miesięcy wydatków wystarczy, nadwyżka z poprzedniego miesiąca trafia tu najpierw, dopóki jest niepełna, a przy pożyczaniu pojawi się ostrzeżenie, zanim ją opróżnisz.",
+    "context": "Goal sheet: explanation under the emergency fund switch."
+  },
+  "note": {
+    "message": "Notatka (opcjonalnie)",
+    "context": "Goal sheet: note field label."
+  },
+  "add": {
+    "message": "Dodaj cel",
+    "context": "Goal sheet: button that creates the goal."
+  },
+  "archive": {
+    "message": "Zamknij ten cel",
+    "context": "Goal sheet: archives the goal."
+  },
+  "unarchive": {
+    "message": "Przywróć",
+    "context": "Goal sheet: restores a closed goal."
+  }
+}

@@ -1,5 +1,6 @@
 import { CalendarBlank } from '@phosphor-icons/react'
 import { formatDayShort, todayKey, yesterdayKey } from '../lib/calculations'
+import { t } from '../i18n'
 
 interface Props {
   value: string
@@ -24,18 +25,18 @@ export function DatePicker({ value, onChange }: Props) {
   return (
     <div className="inline-flex items-center rounded-full bg-white/5 p-1 ring-1 ring-white/10">
       <button type="button" onClick={() => onChange(today)} className={chip(value === today)}>
-        Today
+        {t('common.today')}
       </button>
       <button
         type="button"
         onClick={() => onChange(yesterday)}
         className={chip(value === yesterday)}
       >
-        Yest.
+        {t('date.yesterdayShort')}
       </button>
 
       <label className={`relative cursor-pointer ${chip(isOther)}`}>
-        <span className="sr-only">Pick a date</span>
+        <span className="sr-only">{t('date.pick')}</span>
         <span aria-hidden className="flex items-center">
           {isOther ? formatDayShort(value) : <CalendarBlank className="text-[1.1em]" />}
         </span>

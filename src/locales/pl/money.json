@@ -1,0 +1,104 @@
+{
+  "title": {
+    "deposit": {
+      "message": "Odłóż pieniądze",
+      "context": "Savings: sheet heading and button for putting money onto an account."
+    },
+    "withdraw": {
+      "message": "Wypłać pieniądze",
+      "context": "Savings: sheet heading and button for taking money off an account."
+    },
+    "interest": {
+      "message": "Dodaj odsetki",
+      "context": "Savings: sheet heading and button for recording interest the bank paid."
+    },
+    "balance": {
+      "message": "Zaktualizuj saldo",
+      "context": "Savings: sheet heading and button for correcting an account's balance to what the bank shows."
+    },
+    "allocate": {
+      "message": "Przypisz do celu",
+      "context": "Savings: sheet heading and button for setting money on an account aside for a goal."
+    },
+    "transfer": {
+      "message": "Przenieś między kontami",
+      "context": "Savings: sheet heading and button for moving money between two accounts."
+    }
+  },
+  "noAccount": {
+    "message": "Najpierw dodaj konto: pieniądze muszą gdzieś leżeć.",
+    "context": "Money sheet when there are no accounts."
+  },
+  "from": {
+    "message": "Z",
+    "context": "Money sheet (move): source account."
+  },
+  "to": {
+    "message": "Na",
+    "context": "Money sheet (move): target account."
+  },
+  "account": {
+    "message": "Konto",
+    "context": "Money sheet: account field label."
+  },
+  "assign": {
+    "message": "Przypisz",
+    "context": "Money sheet (assign): option, set aside for the goal."
+  },
+  "giveBack": {
+    "message": "Zwolnij",
+    "context": "Money sheet (assign): option / button, release a goal's money back to unassigned."
+  },
+  "for": {
+    "message": "Na cel",
+    "context": "Money sheet (save): which goal the money is for."
+  },
+  "takeFrom": {
+    "message": "Z puli",
+    "context": "Money sheet (take out / move): which goal's share the money comes from."
+  },
+  "unassignedHere": {
+    "message": "{amount} nieprzypisane na tym koncie",
+    "context": "Money sheet (assign): hint."
+  },
+  "shareHere": {
+    "message": "{amount} z tego na tym koncie",
+    "context": "Money sheet (give back): the goal's share on this account."
+  },
+  "available": {
+    "message": "dostępne {amount}",
+    "context": "Money sheet: how much can be taken."
+  },
+  "noGoal": {
+    "message": "Bez celu (nieprzypisane)",
+    "context": "Money sheet (save): option, the money isn't for a goal."
+  },
+  "pickGoal": {
+    "message": "Wybierz cel",
+    "context": "Money sheet (assign): empty option of the goal list."
+  },
+  "here": {
+    "message": "{amount} tutaj",
+    "context": "Money sheet: after a goal in the list, its share on this account."
+  },
+  "bankBalance": {
+    "message": "Saldo według banku",
+    "context": "Money sheet (update balance): field label."
+  },
+  "balanceHelp": {
+    "message": "Aplikacja ma {amount}; różnica zostanie zapisana jako korekta.",
+    "context": "Money sheet (update balance): hint."
+  },
+  "balanceHelpGoals": {
+    "message": "Aplikacja ma {amount}; różnica zostanie zapisana jako korekta. Cele mają z tego {goals}.",
+    "context": "Money sheet (update balance): hint with the goals' part."
+  },
+  "notePlaceholder": {
+    "message": "np. oszczędności z września",
+    "context": "Money sheet (save): placeholder of the note."
+  },
+  "assignTo": {
+    "message": "Przypisz do: {name}",
+    "context": "Money sheet (assign): submit button."
+  }
+}

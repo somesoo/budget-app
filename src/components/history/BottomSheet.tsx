@@ -1,5 +1,6 @@
 import { X } from '@phosphor-icons/react'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { t } from '../../i18n'
 
 interface Props {
   title: string
@@ -48,7 +49,7 @@ export function BottomSheet({ title, onClose, children }: Props) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl text-muted active:bg-white/10"
           >
             <X />

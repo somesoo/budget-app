@@ -20,7 +20,6 @@ import {
   formatMoneyWhole,
   formatMonthName,
   monthRange,
-  pluralize,
   roundMoney,
   withAlpha,
 } from '../lib/calculations'
@@ -36,6 +35,7 @@ import {
 import { ownCategories, ownExpenses } from '../lib/allowance'
 import { type Category, type Person } from '../types'
 import { personIds, personLabel } from '../lib/people'
+import { t } from '../i18n'
 
 type Kind = 'all' | 'expense' | 'income'
 type Sort = 'date' | 'amount'
@@ -141,10 +141,10 @@ export function History() {
   const pickCategory = (id: string) => patch({ categoryId: filters.categoryId === id ? null : id })
 
   const where = searching
-    ? 'across all months'
+    ? t('history.whereAll')
     : calendarOn && day
-      ? `on ${dayHeading(day).subtitle ?? dayHeading(day).title}`
-      : `in ${formatMonthName(month)}`
+      ? t('history.whereDay', { day: dayHeading(day).subtitle ?? dayHeading(day).title })
+      : t('history.whereMonth', { month: formatMonthName(month) })
 
   const controls = (
     <FilterControls
@@ -157,7 +157,7 @@ export function History() {
 
   return (
     <Screen
-      title="History"
+      title={t('nav.history')}
       wide
       action={searching ? null : <MonthSwitcher month={month} onChange={changeMonth} />}
     >
@@ -178,8 +178,8 @@ export function History() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search title, category or amount"
-                aria-label="Search all transactions"
+                placeholder={t('history.searchPlaceholder')}
+                aria-label={t('history.searchLabel')}
                 enterKeyHint="search"
                 className="w-full rounded-xl bg-white/5 py-2.5 pl-9 pr-10 text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/40 [&::-webkit-search-cancel-button]:hidden"
               />
@@ -187,7 +187,7 @@ export function History() {
                 <button
                   type="button"
                   onClick={() => setQuery('')}
-                  aria-label="Clear search"
+                  aria-label={t('history.clearSearch')}
                   className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-lg text-muted hover:bg-white/10"
                 >
                   <X />
@@ -195,7 +195,7 @@ export function History() {
               )}
             </div>
             <IconButton
-              label="Filters and sorting"
+              label={t('history.filters')}
               active={activeCount > 0}
               onClick={() => setFiltersOpen(true)}
               badge={activeCount}
@@ -204,7 +204,7 @@ export function History() {
             </IconButton>
             {!searching && (
               <IconButton
-                label="Calendar view"
+                label={t('history.calendarView')}
                 active={showCalendar}
                 onClick={() => {
                   setShowCalendar((v) => !v)
@@ -221,7 +221,7 @@ export function History() {
             <div className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0">
               {filters.kind !== 'all' && !filters.categoryId && (
                 <Applied onRemove={() => patch({ kind: 'all' })}>
-                  {filters.kind === 'expense' ? 'Spent' : 'Income'}
+                  {filters.kind === 'expense' ? t('common.spent') : t('entry.income')}
                 </Applied>
               )}
               {filters.person && (
@@ -234,7 +234,7 @@ export function History() {
                   onRemove={() => patch({ categoryId: null })}
                   color={categoryMap[filters.categoryId]?.color}
                 >
-                  {categoryMap[filters.categoryId]?.name ?? 'Category'}
+                  {categoryMap[filters.categoryId]?.name ?? t('entry.category')}
                 </Applied>
               )}
               {calendarOn && day && (
@@ -243,14 +243,14 @@ export function History() {
                 </Applied>
               )}
               {byAmount && (
-                <Applied onRemove={() => patch({ sort: 'date' })}>Biggest first</Applied>
+                <Applied onRemove={() => patch({ sort: 'date' })}>{t('history.biggestFirst')}</Applied>
               )}
               <button
                 type="button"
                 onClick={clearAll}
                 className="shrink-0 px-2 text-sm font-semibold text-muted hover:text-white"
               >
-                Clear all
+                {t('history.clearAll')}
               </button>
             </div>
           )}
@@ -271,28 +271,31 @@ export function History() {
           {/* ---------- totals, in one line ---------- */}
           <p className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm tabular-nums">
             <span className="text-muted">
-              Spent <span className="font-semibold text-white">{formatMoneyWhole(sum.spent)}</span>
+              {t('common.spent')}{' '}
+              <span className="font-semibold text-white">{formatMoneyWhole(sum.spent)}</span>
             </span>
             <span className="text-muted">
-              Income{' '}
+              {t('entry.income')}{' '}
               <span className="font-semibold text-positive">{formatMoneyWhole(sum.earned)}</span>
             </span>
             <span className="text-muted">
-              Net{' '}
+              {t('history.net')}{' '}
               <span className={`font-semibold ${net >= 0 ? 'text-positive' : 'text-red-300'}`}>
                 {net >= 0 ? '+' : '−'}
                 {formatMoneyWhole(Math.abs(net))}
               </span>
             </span>
             <span className="text-xs text-muted sm:ml-auto">
-              {entries.length} {pluralize(entries.length, 'entry', 'entries')} {where}
-              {searching && expenses.length >= SEARCH_LIMIT && `, newest ${SEARCH_LIMIT}`}
+              {t('history.entries', { count: entries.length })} {where}
+              {searching &&
+                expenses.length >= SEARCH_LIMIT &&
+                `, ${t('history.newest', { count: SEARCH_LIMIT })}`}
             </span>
           </p>
 
           {/* ---------- the feed ---------- */}
           {loading ? (
-            <div className="space-y-2" aria-label="Loading">
+            <div className="space-y-2" aria-label={t('common.loading')}>
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="h-12 animate-pulse rounded-2xl bg-white/5" />
               ))}
@@ -301,10 +304,10 @@ export function History() {
             <div className="py-10 text-center">
               <p className="text-sm text-muted">
                 {searching
-                  ? `Nothing matches “${query.trim()}”`
+                  ? t('add.noMatchSearch', { query: query.trim() })
                   : anyFilter
-                    ? 'Nothing matches these filters'
-                    : `Nothing logged in ${formatMonthName(month)} yet`}
+                    ? t('history.noMatchFilters')
+                    : t('history.empty', { month: formatMonthName(month) })}
               </p>
               {anyFilter && (
                 <button
@@ -312,7 +315,7 @@ export function History() {
                   onClick={clearAll}
                   className="mt-3 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
                 >
-                  Clear filters
+                  {t('history.clearFilters')}
                 </button>
               )}
             </div>
@@ -354,7 +357,7 @@ export function History() {
         {/* ---------- laptop: calendar, filters and breakdown beside the list ---------- */}
         <aside className="no-scrollbar hidden space-y-4 lg:sticky lg:top-8 lg:block lg:max-h-[calc(100dvh-4rem)] lg:overflow-y-auto">
           {!searching && (
-            <Panel title="Calendar">
+            <Panel title={t('history.calendar')}>
               <CalendarHeatmap
                 month={month}
                 totalsByDay={spentByDay}
@@ -364,10 +367,10 @@ export function History() {
               />
             </Panel>
           )}
-          <Panel title="Filter and sort">
+          <Panel title={t('history.filterAndSort')}>
             <div className="space-y-4">{controls}</div>
           </Panel>
-          <Panel title="Where it went">
+          <Panel title={t('project.whereItWent')}>
             <Breakdown
               entries={matching}
               categories={categoryMap}
@@ -379,7 +382,7 @@ export function History() {
       </div>
 
       {filtersOpen && (
-        <BottomSheet title="Filters and sorting" onClose={() => setFiltersOpen(false)}>
+        <BottomSheet title={t('history.filters')} onClose={() => setFiltersOpen(false)}>
           <div className="space-y-5 pb-2">
             {controls}
             <button
@@ -387,7 +390,7 @@ export function History() {
               onClick={() => setFiltersOpen(false)}
               className="h-12 w-full rounded-2xl bg-slate-100 text-base font-bold text-ink hover:bg-slate-50"
             >
-              Show {entries.length} {pluralize(entries.length, 'entry', 'entries')}
+              {t('history.showEntries', { count: entries.length })}
             </button>
           </div>
         </BottomSheet>
@@ -442,41 +445,41 @@ function FilterControls({
   const shown = categories.filter((c) => !c.archived || c.id === filters.categoryId)
   return (
     <>
-      <Group label="Show">
+      <Group label={t('history.show')}>
         <Segments
           value={kind}
           onChange={(v) => onChange({ kind: v, ...(v === 'income' ? { categoryId: null } : {}) })}
           options={[
-            { value: 'all', label: 'All' },
-            { value: 'expense', label: 'Spent' },
-            { value: 'income', label: 'Income' },
+            { value: 'all', label: t('history.all') },
+            { value: 'expense', label: t('common.spent') },
+            { value: 'income', label: t('entry.income') },
           ]}
         />
       </Group>
       {personIds().length > 1 && (
-        <Group label="Who">
+        <Group label={t('history.who')}>
           <Segments
             value={filters.person ?? 'all'}
             onChange={(v) => onChange({ person: v === 'all' ? null : (v as Person) })}
             options={[
-              { value: 'all', label: personIds().length === 2 ? 'Both' : 'All' },
+              { value: 'all', label: personIds().length === 2 ? t('history.both') : t('history.all') },
               ...personIds().map((p) => ({ value: p, label: personLabel(p) })),
             ]}
           />
         </Group>
       )}
-      <Group label="Order">
+      <Group label={t('history.order')}>
         <Segments
           value={filters.sort}
           onChange={(v) => onChange({ sort: v })}
           options={[
-            { value: 'date', label: 'Newest first' },
-            { value: 'amount', label: 'Biggest first' },
+            { value: 'date', label: t('history.newestFirst') },
+            { value: 'amount', label: t('history.biggestFirst') },
           ]}
         />
       </Group>
       {kind !== 'income' && (
-        <Group label="Category">
+        <Group label={t('entry.category')}>
           <div className="flex flex-wrap gap-1.5">
             {shown.map((c) => {
               const active = filters.categoryId === c.id
@@ -527,7 +530,7 @@ function Breakdown({
       by.set(e.item.category_id, (by.get(e.item.category_id) ?? 0) + e.item.amount)
   }
   const rows = [...by.entries()].sort((a, b) => b[1] - a[1])
-  if (rows.length === 0) return <p className="text-sm text-muted">No spending in this view.</p>
+  if (rows.length === 0) return <p className="text-sm text-muted">{t('history.noSpending')}</p>
   const max = rows[0][1]
   const shown = rows.slice(0, BREAKDOWN_ROWS)
   return (
@@ -545,7 +548,7 @@ function Breakdown({
                 className={`w-full rounded-lg px-2 py-1.5 text-left transition hover:bg-white/5 ${active ? 'bg-white/10' : ''}`}
               >
                 <span className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="truncate text-slate-200">{c?.name ?? 'Other'}</span>
+                  <span className="truncate text-slate-200">{c?.name ?? t('account.kind.other')}</span>
                   <span className="shrink-0 tabular-nums text-white">
                     {formatMoneyWhole(amount)}
                   </span>
@@ -564,7 +567,9 @@ function Breakdown({
         })}
       </ul>
       {rows.length > shown.length && (
-        <p className="mt-1 px-2 text-xs text-muted">and {rows.length - shown.length} more</p>
+        <p className="mt-1 px-2 text-xs text-muted">
+          {t('history.andMore', { count: rows.length - shown.length })}
+        </p>
       )}
     </>
   )
@@ -606,7 +611,9 @@ function Applied({
       <button
         type="button"
         onClick={onRemove}
-        aria-label={`Remove filter: ${typeof children === 'string' ? children : ''}`}
+        aria-label={t('history.removeFilter', {
+          name: typeof children === 'string' ? children : '',
+        })}
         className="flex h-6 w-6 items-center justify-center rounded-full text-muted hover:bg-white/10 hover:text-white"
       >
         <X aria-hidden />

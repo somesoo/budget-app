@@ -1,0 +1,62 @@
+{
+  "intro": {
+    "message": "Straight from the paycheck, before any spending.",
+    "context": "Budget planner > Savings: explanation under the heading; savings are set aside first."
+  },
+  "goal": {
+    "message": "Goal",
+    "context": "Budget planner > Savings: small label under a savings goal's name."
+  },
+  "onTime": {
+    "message": "on time: {amount}",
+    "context": "Budget planner > Savings: chip that fills in what the goal needs per month to make its date. Lowercase, short."
+  },
+  "onto": {
+    "message": "onto",
+    "context": "Budget planner > Savings: label before choosing which account a goal's money goes onto. Lowercase."
+  },
+  "noAccount": {
+    "message": "Add a savings account (Savings tab) to pay this in.",
+    "context": "Budget planner > Savings: there's no account to pay into."
+  },
+  "maxOut": {
+    "message": "max out: {amount}",
+    "context": "Budget planner > Savings: chip that fills in what's left of an IKE/IKZE account's yearly limit. Lowercase, short."
+  },
+  "paidInYear": {
+    "message": "{paid} of {limit} paid in {year}",
+    "context": "Budget planner > Savings: an IKE/IKZE account's contributions this year against its yearly limit."
+  },
+  "limitReached": {
+    "message": "{year} limit reached",
+    "context": "Budget planner > Savings: the IKE/IKZE yearly limit is used up."
+  },
+  "overLimit": {
+    "message": "{amount} over the {year} limit, the provider will refuse it",
+    "context": "Budget planner > Savings: warning, the plan pays more into an IKE/IKZE than the yearly limit allows."
+  },
+  "limitUnknown": {
+    "message": "{year}’s limit isn’t known yet; using {known}’s.",
+    "context": "Budget planner > Savings: the IKE/IKZE limit for {year} isn't announced yet; the one for {known} is used."
+  },
+  "owed": {
+    "message": "{amount} still owed",
+    "context": "Budget planner > Savings: under a loan repayment, how much is still owed."
+  },
+  "instalment": {
+    "message": "instalment: {amount}",
+    "context": "Budget planner > Savings: chip that fills in the loan's next instalment. Lowercase, short."
+  },
+  "other": {
+    "message": "Other savings",
+    "context": "Budget planner > Savings: savings not tied to a goal or account."
+  },
+  "otherHelp": {
+    "message": "Put aside, no particular goal",
+    "context": "Budget planner > Savings: explanation under 'Other savings'."
+  },
+  "lineLabel": {
+    "message": "{name}: from the paycheck",
+    "context": "Budget planner > Savings: accessible label of the amount field of a goal, account or loan {name}."
+  }
+}

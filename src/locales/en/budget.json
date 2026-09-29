@@ -1,0 +1,87 @@
+{
+  "askQuestion": {
+    "message": "How are we doing against this month's plan, and what should we watch?",
+    "context": "Question pre-filled in the AI chat from the Budget tab's Ask button."
+  },
+  "nextPlanned": {
+    "message": "{month} is planned",
+    "context": "Budget tab: card for next month when it's already planned; {month} is the name alone."
+  },
+  "planMonth": {
+    "message": "Plan {month}",
+    "context": "Budget tab: button/card to plan a month; {month} is the name alone."
+  },
+  "nextSummary": {
+    "message": "{spending} of spending · {savings} to savings",
+    "context": "Budget tab: summary of next month's plan."
+  },
+  "nextHelp": {
+    "message": "Set next month’s limits from your history, with an AI draft if you like.",
+    "context": "Budget tab: card inviting to plan next month."
+  },
+  "ofPlanned": {
+    "message": "of {limit} planned · {percent}%",
+    "context": "Budget tab: under the big 'Spent' figure. Lowercase fragment."
+  },
+  "ofDefaults": {
+    "message": "of {limit} in default limits · {percent}%",
+    "context": "Budget tab: under 'Spent' when the month has no plan. Lowercase fragment."
+  },
+  "overPlan": {
+    "message": "{amount} over the plan",
+    "context": "Budget tab: the month is over its limits."
+  },
+  "leftPerDay": {
+    "one": "{amount} left · about {perDay} a day for {count} day",
+    "other": "{amount} left · about {perDay} a day for {count} days",
+    "context": "Budget tab: what's left and what it allows per day for the rest of the month."
+  },
+  "underPlan": {
+    "message": "{amount} under the plan",
+    "context": "Budget tab: a finished month under its limits."
+  },
+  "planned": {
+    "message": "planned {amount}",
+    "context": "Budget tab: under Income, the plan's income. Lowercase."
+  },
+  "leftOverSoFar": {
+    "message": "Left over so far",
+    "context": "Budget tab: income minus spending in the running month."
+  },
+  "toSave": {
+    "message": "to save {amount}",
+    "context": "Budget tab: under 'Left over', what the plan meant to save. Lowercase."
+  },
+  "headsUp": {
+    "message": "Heads-up",
+    "context": "Budget tab: heading of the warnings list."
+  },
+  "notPlanned": {
+    "message": "{month} isn’t planned yet",
+    "context": "Budget tab, future month without a plan."
+  },
+  "notPlannedHelp": {
+    "message": "Until it is, it’ll use the default limits from Settings. Planning takes a minute: start from last month or your typical spending, tell it what’s different, adjust.",
+    "context": "Budget tab, future month without a plan: explanation."
+  },
+  "spending": {
+    "message": "Spending",
+    "context": "Budget tab, planned month: total of the limits."
+  },
+  "overIncome": {
+    "message": "Plans {amount} more than the expected income.",
+    "context": "Budget tab, planned month: the plan exceeds income."
+  },
+  "editPlan": {
+    "message": "Edit plan",
+    "context": "Budget tab: button that opens the planner."
+  },
+  "badgePlanned": {
+    "message": "Planned · edit",
+    "context": "Budget tab: small badge next to 'Spent' when the month has a plan; tapping edits it."
+  },
+  "badgeNone": {
+    "message": "No plan · set one",
+    "context": "Budget tab: small badge when the month has no plan; tapping opens the planner."
+  }
+}

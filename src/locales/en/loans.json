@@ -1,0 +1,6 @@
+{
+  "reasonUnassigned": { "message": "not set aside for any goal", "context": "Savings > Borrow from savings: why a source of money is suggested, shown under the account's name. The money on that account isn't set aside for a goal yet. Lowercase, a fragment." },
+  "reasonDue": { "message": "due {month}", "context": "Savings > Borrow from savings: shown under a goal suggested as a source. {month} is the goal's target month and year, e.g. 'March 2027'. Lowercase fragment." },
+  "reasonNoDeadline": { "message": "no deadline", "context": "Savings > Borrow from savings: shown under a goal suggested as a source that has no target date. Lowercase fragment." },
+  "sharesTooHigh": { "message": "That sets aside {total} but the account only has {balance}. Lower a goal's share.", "context": "Savings > account > correcting how much of the account belongs to each goal: error when the shares add up to more than the account holds. {total} and {balance} are amounts with currency." }
+}

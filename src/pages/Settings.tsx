@@ -42,6 +42,8 @@ import { supabase } from '../lib/supabaseClient'
 import { tourStore } from '../lib/tour'
 import { MAX_PEOPLE, personIds } from '../lib/people'
 import type { Category } from '../types'
+import { formatList, LANGUAGES, setLanguage, t, useLanguage, type Language } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
 /** Months averaged for the "typical" figure next to each limit. */
 const TYPICAL_MONTHS = 3
@@ -68,11 +70,12 @@ export function Settings() {
   const active = monthly.filter((c) => !c.archived)
 
   return (
-    <Screen title="Settings" wide>
+    <Screen title={t('settings.title')} wide>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-4">
           <PeopleCard />
           <DeviceCard />
+          <LanguageCard />
           <CategoriesCard
             categories={monthly}
             typicalOf={typicalOf}
@@ -135,11 +138,20 @@ function PeopleCard() {
 
   if (!available) {
     return (
-      <SettingsCard title="People" help="Who’s in the budget.">
+      <SettingsCard
+        title={t('settings.people.title')}
+        help={t('settings.people.helpShort')}
+        tour="settings-people"
+      >
         <p className="text-sm leading-relaxed text-slate-300">
-          Run <code className="rounded bg-white/10 px-1">supabase/migrations/0015_people.sql</code>{' '}
-          in the SQL Editor to rename {people.map((p) => p.name).join(' and ')}, or to budget for
-          one to four people.
+          <Trans
+            k="settings.people.migration"
+            values={{
+              file: 'supabase/migrations/0015_people.sql',
+              names: formatList(people.map((p) => p.name)),
+            }}
+            tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
+          />
         </p>
       </SettingsCard>
     )
@@ -147,8 +159,9 @@ function PeopleCard() {
 
   return (
     <SettingsCard
-      title="People"
-      help="Who’s in the budget: one to four. A new name shows on every phone."
+      title={t('settings.people.title')}
+      help={t('settings.people.help')}
+      tour="settings-people"
     >
       <ul className="grid gap-2">
         {people.map((p) => (
@@ -162,7 +175,7 @@ function PeopleCard() {
               defaultValue={p.name}
               key={p.name}
               maxLength={30}
-              aria-label={`Name of ${p.name}`}
+              aria-label={t('settings.people.nameOf', { name: p.name })}
               onBlur={(e) => {
                 const name = e.target.value.trim()
                 if (!name || name === p.name) {
@@ -171,7 +184,7 @@ function PeopleCard() {
                 }
                 if (taken(name, p.id)) {
                   e.target.value = p.name
-                  setError(`${name} is already in the budget.`)
+                  setError(t('settings.people.taken', { name }))
                   return
                 }
                 void run(() => rename.mutateAsync({ id: p.id, name }))
@@ -185,10 +198,10 @@ function PeopleCard() {
               <button
                 type="button"
                 onClick={() => {
-                  if (window.confirm(`Remove ${p.name} from the budget?`))
+                  if (window.confirm(t('settings.people.confirmRemove', { name: p.name })))
                     void run(() => remove.mutateAsync(p.id))
                 }}
-                aria-label={`Remove ${p.name}`}
+                aria-label={t('settings.people.remove', { name: p.name })}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted hover:bg-white/5 hover:text-red-300"
               >
                 <Trash aria-hidden />
@@ -205,7 +218,7 @@ function PeopleCard() {
             e.preventDefault()
             const name = newName.trim()
             if (!name) return
-            if (taken(name)) return setError(`${name} is already in the budget.`)
+            if (taken(name)) return setError(t('settings.people.taken', { name }))
             void run(async () => {
               await add.mutateAsync({ name, people })
               setNewName('')
@@ -217,14 +230,14 @@ function PeopleCard() {
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             maxLength={30}
-            placeholder="Add a person"
-            aria-label="New person’s name"
+            placeholder={t('settings.people.addPlaceholder')}
+            aria-label={t('settings.people.newName')}
             className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-2 text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
           />
           <button
             type="submit"
             disabled={!newName.trim() || add.isPending}
-            aria-label="Add"
+            aria-label={t('common.add')}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-accent-soft ring-1 ring-accent/30 hover:bg-accent/10 disabled:opacity-40"
           >
             <Plus weight="bold" aria-hidden />
@@ -244,11 +257,9 @@ function DeviceCard() {
   const live = status === 'live'
   return (
     <SettingsCard
-      title="This device"
+      title={t('settings.device.title')}
       help={
-        personIds().length > 1
-          ? 'Who uses it. Kept on the phone, not in the database.'
-          : 'Kept in sync with the other devices signed in.'
+        personIds().length > 1 ? t('settings.device.helpPeople') : t('settings.device.helpAlone')
       }
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -257,9 +268,31 @@ function DeviceCard() {
           className={`flex items-center gap-1.5 text-sm ${live ? 'text-positive' : 'text-amber-300'}`}
         >
           {live ? <WifiHigh aria-hidden /> : <WifiSlash aria-hidden />}
-          {live ? 'Syncing live' : status === 'connecting' ? 'Connecting…' : 'Offline'}
+          {live
+            ? t('settings.device.live')
+            : status === 'connecting'
+              ? t('settings.device.connecting')
+              : t('settings.device.offline')}
         </span>
       </div>
+    </SettingsCard>
+  )
+}
+
+/* ---------- language ---------- */
+
+function LanguageCard() {
+  const language = useLanguage()
+  return (
+    <SettingsCard title={t('settings.language.title')} help={t('settings.language.help')}>
+      <Segments
+        value={language}
+        onChange={(v) => setLanguage(v as Language)}
+        options={(Object.keys(LANGUAGES) as Language[]).map((id) => ({
+          value: id,
+          label: LANGUAGES[id].name,
+        }))}
+      />
     </SettingsCard>
   )
 }
@@ -301,14 +334,14 @@ function CategoriesCard({
             <span className="truncate text-[15px] text-white">{c.name}</span>
             {!c.show_in_chart && (
               <ChartDonut
-                aria-label="Left out of the chart"
+                aria-label={t('settings.categories.leftOut')}
                 className="shrink-0 text-sm text-muted"
               />
             )}
           </span>
           <span
             className={`text-right text-sm tabular-nums ${over ? 'text-amber-200' : 'text-muted'}`}
-            title={over ? 'Usually costs more than its limit' : undefined}
+            title={over ? t('settings.categories.usuallyOver') : undefined}
           >
             {typical === undefined ? '' : formatAmount(Math.round(typical))}
           </span>
@@ -323,25 +356,26 @@ function CategoriesCard({
 
   return (
     <SettingsCard
-      title="Categories"
-      help="Default limits: a month you plan in Budget uses its own."
+      title={t('settings.categories.title')}
+      help={t('settings.categories.help')}
+      tour="settings-categories"
       action={
         <CardAction onClick={onNew}>
-          <Plus weight="bold" aria-hidden /> New
+          <Plus weight="bold" aria-hidden /> {t('settings.categories.new')}
         </CardAction>
       }
     >
       <div className="grid grid-cols-[auto_minmax(0,1fr)_4.5rem_5rem_auto] gap-3 px-2 pb-1 text-xs text-muted">
         <span className="w-3" />
-        <span>Name</span>
-        <span className="text-right">{hasTypical ? 'Usually' : ''}</span>
-        <span className="text-right">Limit</span>
+        <span>{t('settings.categories.name')}</span>
+        <span className="text-right">{hasTypical ? t('settings.categories.usually') : ''}</span>
+        <span className="text-right">{t('settings.categories.limit')}</span>
         <span className="w-4" />
       </div>
       <ul className="divide-y divide-white/5">{active.map(row)}</ul>
       <div className="mt-1 grid grid-cols-[auto_minmax(0,1fr)_4.5rem_5rem_auto] gap-3 border-t border-white/10 px-2 pt-2.5 text-sm">
         <span className="w-3" />
-        <span className="text-muted">A month</span>
+        <span className="text-muted">{t('settings.categories.total')}</span>
         <span className="text-right tabular-nums text-muted">
           {hasTypical ? formatAmount(Math.round(totalTypical)) : ''}
         </span>
@@ -351,9 +385,11 @@ function CategoriesCard({
         <span className="w-4" />
       </div>
       <p className="mt-3 text-xs leading-snug text-muted">
-        “Usually” is the average of the last {TYPICAL_MONTHS} complete months; amber when it runs
-        over the limit. <ChartDonut aria-hidden className="inline align-[-0.15em]" /> marks
-        categories left out of the Home chart.
+        <Trans
+          k="settings.categories.legend"
+          count={TYPICAL_MONTHS}
+          values={{ icon: <ChartDonut aria-hidden className="inline align-[-0.15em]" /> }}
+        />
       </p>
       {hidden.length > 0 && (
         <>
@@ -363,7 +399,9 @@ function CategoriesCard({
             aria-expanded={showHidden}
             className="mt-3 text-sm font-medium text-muted hover:text-white"
           >
-            {showHidden ? 'Hide' : 'Show'} {hidden.length} hidden
+            {showHidden
+              ? t('settings.categories.hideHidden', { count: hidden.length })
+              : t('settings.categories.showHidden', { count: hidden.length })}
           </button>
           {showHidden && <ul className="mt-1 divide-y divide-white/5">{hidden.map(row)}</ul>}
         </>
@@ -384,12 +422,12 @@ function AddScreenCard() {
   const custom = prefs.quickAmounts.some((n, i) => n !== DEFAULT_PREFS.quickAmounts[i])
   return (
     <SettingsCard
-      title="Quick amounts"
-      help="The four one-tap amounts on Add; tapping them adds up. This device only."
+      title={t('settings.quickAmounts.title')}
+      help={t('settings.quickAmounts.help')}
       action={
         custom ? (
           <CardAction onClick={() => setPrefs({ quickAmounts: DEFAULT_PREFS.quickAmounts })}>
-            Reset
+            {t('settings.quickAmounts.reset')}
           </CardAction>
         ) : undefined
       }
@@ -400,7 +438,7 @@ function AddScreenCard() {
             key={i}
             value={n}
             onChange={(v) => set(i, v)}
-            label={`Quick amount ${i + 1}`}
+            label={t('settings.quickAmounts.label', { n: i + 1 })}
           />
         ))}
       </div>
@@ -418,15 +456,15 @@ function WidgetsCard() {
     })
   return (
     <SettingsCard
-      title="Widgets on Add"
-      help="The cards above the category tiles, swiped left and right. This device only."
+      title={t('settings.widgets.title')}
+      help={t('settings.widgets.help')}
     >
       <div className="space-y-3">
         {ADD_WIDGETS.map((w) => (
           <Switch
             key={w.id}
-            label={w.label}
-            help={w.help}
+            label={w.label()}
+            help={w.help()}
             checked={!prefs.hiddenWidgets.includes(w.id)}
             onChange={(on) => toggle(w.id, on)}
           />
@@ -441,12 +479,13 @@ function WarningsCard() {
   const dismissed = useDismissedCount()
   return (
     <SettingsCard
-      title="Warnings"
-      help="When the app says a category needs watching. This device only."
+      title={t('settings.warnings.title')}
+      help={t('settings.warnings.help')}
+      tour="settings-warnings"
     >
       <div className="space-y-4">
         <div>
-          <p className="mb-2 text-[15px] text-white">Warn when a category reaches</p>
+          <p className="mb-2 text-[15px] text-white">{t('settings.warnings.nearLabel')}</p>
           <Segments
             value={String(prefs.nearRatio)}
             onChange={(v) => setPrefs({ nearRatio: Number(v) })}
@@ -458,8 +497,8 @@ function WarningsCard() {
           />
         </div>
         <Switch
-          label="Warn about the pace"
-          help="When spending so far would take a category over by the month's end."
+          label={t('settings.warnings.pace')}
+          help={t('settings.warnings.paceHelp')}
           checked={prefs.paceWarnings}
           onChange={(v) => setPrefs({ paceWarnings: v })}
         />
@@ -469,7 +508,7 @@ function WarningsCard() {
             onClick={resetDismissedAlerts}
             className="text-sm font-semibold text-accent-soft hover:underline"
           >
-            Bring back {dismissed} dismissed {dismissed === 1 ? 'warning' : 'warnings'}
+            {t('settings.warnings.bringBack', { count: dismissed })}
           </button>
         )}
       </div>
@@ -497,10 +536,12 @@ function SavingsSettings({
         className="group flex items-center gap-3 rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 hover:bg-white/[0.07] lg:p-5"
       >
         <span className="min-w-0 flex-1">
-          <span className="block text-base font-semibold text-white">Savings</span>
+          <span className="block text-base font-semibold text-white">{t('settings.savings.title')}</span>
           <span className="block text-xs text-muted">
-            {accounts} {accounts === 1 ? 'account' : 'accounts'}, {goals}{' '}
-            {goals === 1 ? 'goal' : 'goals'}: managed in the Savings tab
+            {t('settings.savings.summary', {
+              accounts: t('settings.savings.accounts', { count: accounts }),
+              goals: t('settings.savings.goals', { count: goals }),
+            })}
           </span>
         </span>
         <CaretRight aria-hidden className="text-muted transition group-hover:translate-x-0.5" />
@@ -508,7 +549,7 @@ function SavingsSettings({
     )
   }
   return (
-    <SettingsCard title="Savings goal" help="Run migration 0007 for accounts and several goals.">
+    <SettingsCard title={t('settings.savings.goalTitle')} help={t('settings.savings.goalHelp')}>
       {/* keyed so the fields fill in once the goal has loaded, rather than
           keeping empty defaults that "Save goal" would write over it */}
       {isLoading ? (
@@ -535,13 +576,19 @@ function DataCard({ categories }: { categories: Category[] }) {
     setState({ busy: true, message: null })
     try {
       const count = await downloadCsv(categories)
-      setState({ busy: false, message: `Downloaded ${formatAmount(count)} entries.` })
+      setState({
+        busy: false,
+        message: t('settings.data.downloaded', { count, formatted: formatAmount(count) }),
+      })
     } catch (err) {
-      setState({ busy: false, message: `Couldn’t export: ${(err as Error).message}` })
+      setState({
+        busy: false,
+        message: t('settings.data.failed', { error: (err as Error).message }),
+      })
     }
   }
   return (
-    <SettingsCard title="Your data" help="Every expense and income, as a spreadsheet (CSV).">
+    <SettingsCard title={t('settings.data.title')} help={t('settings.data.help')}>
       <button
         type="button"
         onClick={run}
@@ -549,7 +596,7 @@ function DataCard({ categories }: { categories: Category[] }) {
         className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5 disabled:opacity-50"
       >
         <DownloadSimple aria-hidden />
-        {state.busy ? 'Preparing…' : 'Download CSV'}
+        {state.busy ? t('settings.data.preparing') : t('settings.data.download')}
       </button>
       {state.message && <p className="mt-2 text-xs text-muted">{state.message}</p>}
     </SettingsCard>
@@ -558,13 +605,13 @@ function DataCard({ categories }: { categories: Category[] }) {
 
 function HelpCard() {
   return (
-    <SettingsCard title="Help" help="A walk through every screen, one thing at a time.">
+    <SettingsCard title={t('settings.help.title')} help={t('settings.help.help')}>
       <button
         type="button"
         onClick={() => tourStore.start('/settings')}
         className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
       >
-        <Compass aria-hidden /> Take the tour
+        <Compass aria-hidden /> {t('settings.help.tour')}
       </button>
     </SettingsCard>
   )
@@ -574,15 +621,19 @@ function AccountCard() {
   const { session } = useSession()
   return (
     <SettingsCard
-      title="Account"
-      help={session?.user.email ? `Signed in as ${session.user.email}` : undefined}
+      title={t('settings.account.title')}
+      help={
+        session?.user.email
+          ? t('settings.account.signedInAs', { email: session.user.email })
+          : undefined
+      }
     >
       <button
         type="button"
         onClick={() => void supabase.auth.signOut()}
         className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
       >
-        <SignOut aria-hidden /> Sign out of this device
+        <SignOut aria-hidden /> {t('settings.account.signOut')}
       </button>
     </SettingsCard>
   )
@@ -596,7 +647,7 @@ interface GoalProps {
 }
 
 function GoalEditor({ goal, onSave }: GoalProps) {
-  const [name, setName] = useState(goal?.name ?? 'Holiday')
+  const [name, setName] = useState(goal?.name ?? t('settings.savings.defaultGoalName'))
   const [target, setTarget] = useState(String(goal?.target_amount ?? 0))
   const [current, setCurrent] = useState(String(goal?.current_amount ?? 0))
 
@@ -608,13 +659,13 @@ function GoalEditor({ goal, onSave }: GoalProps) {
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Goal name"
-        aria-label="Goal name"
+        placeholder={t('settings.savings.goalName')}
+        aria-label={t('settings.savings.goalName')}
         className="w-full rounded-xl bg-white/5 px-3 py-2.5 text-[15px] font-medium text-white outline-none ring-1 ring-white/10"
       />
       <div className="flex gap-2">
         <label className="flex-1">
-          <span className="mb-1 block text-xs text-muted">Saved</span>
+          <span className="mb-1 block text-xs text-muted">{t('settings.savings.saved')}</span>
           <input
             value={current}
             onChange={(e) => setCurrent(e.target.value.replace(/[^\d.,]/g, ''))}
@@ -623,7 +674,7 @@ function GoalEditor({ goal, onSave }: GoalProps) {
           />
         </label>
         <label className="flex-1">
-          <span className="mb-1 block text-xs text-muted">Target</span>
+          <span className="mb-1 block text-xs text-muted">{t('settings.savings.target')}</span>
           <input
             value={target}
             onChange={(e) => setTarget(e.target.value.replace(/[^\d.,]/g, ''))}
@@ -640,21 +691,25 @@ function GoalEditor({ goal, onSave }: GoalProps) {
         />
       </div>
       <p className="text-xs text-muted">
-        {formatMoney(num(current))} of {formatMoney(num(target))} · {Math.round(progress)}%
+        {t('settings.savings.progress', {
+          saved: formatMoney(num(current)),
+          target: formatMoney(num(target)),
+          percent: Math.round(progress),
+        })}
       </p>
 
       <button
         type="button"
         onClick={() =>
           onSave({
-            name: name.trim() || 'Goal',
+            name: name.trim() || t('settings.savings.goalFallback'),
             target_amount: num(target),
             current_amount: num(current),
           })
         }
         className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-semibold text-ink"
       >
-        {goal ? 'Save goal' : 'Create goal'}
+        {goal ? t('settings.savings.save') : t('settings.savings.create')}
       </button>
     </div>
   )

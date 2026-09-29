@@ -41,17 +41,25 @@ import { SpendDonut } from '../charts/SpendDonut'
 import { ForecastCard } from '../ForecastCard'
 import type { Widget } from './WidgetCarousel'
 import { personColor, personIds, personLabel } from '../../lib/people'
+import { dateFormat, t } from '../../i18n'
 
 /** Every widget the Add screen can show, in order; each can be switched off in Settings. */
+const widget = <Id extends string>(id: Id) => ({
+  id,
+  label: () => t(`widgets.${id as AddWidgetKey}.label`),
+  help: () => t(`widgets.${id as AddWidgetKey}.help`),
+})
+type AddWidgetKey = 'donut' | 'pace' | 'alerts' | 'delta' | 'forecast' | 'people' | 'goals' | 'week'
+
 export const ADD_WIDGETS = [
-  { id: 'donut', label: 'Where it goes', help: 'This month by category.' },
-  { id: 'pace', label: 'Pace', help: 'Spending so far against an even spread of the limits.' },
-  { id: 'alerts', label: 'Warnings', help: 'Categories close to or over their limit.' },
-  { id: 'delta', label: 'Vs last month', help: 'Categories up or down on the same days last month.' },
-  { id: 'forecast', label: 'Forecast', help: 'What’s left of the income at the end of the month.' },
-  { id: 'people', label: 'Who paid', help: 'This month split between everyone in the budget.' },
-  { id: 'goals', label: 'Goals', help: 'How far each savings goal is.' },
-  { id: 'week', label: 'Last 7 days', help: 'Spending day by day.' },
+  widget('donut'),
+  widget('pace'),
+  widget('alerts'),
+  widget('delta'),
+  widget('forecast'),
+  widget('people'),
+  widget('goals'),
+  widget('week'),
 ] as const
 
 export type AddWidgetId = (typeof ADD_WIDGETS)[number]['id']
@@ -125,7 +133,7 @@ export function useAddWidgets({
           <AlertList alerts={alerts} onDismiss={dismiss} />
         </div>
       ) : (
-        <Empty>All good: nothing close to a limit.</Empty>
+        <Empty>{t('widgets.alerts.empty')}</Empty>
       ),
     delta: () => (
       <DeltaWidget
@@ -153,7 +161,7 @@ export function useAddWidgets({
     (w) => !prefs.hiddenWidgets.includes(w.id) && !(solo && w.id === 'people'),
   ).map((w) => ({
     id: w.id,
-    label: w.label,
+    label: w.label(),
     badge: w.id === 'alerts' ? alerts.length : undefined,
     content: all[w.id](),
   }))
@@ -163,7 +171,7 @@ export function useAddWidgets({
 
 function DonutWidget({ expenses, categories }: { expenses: Expense[]; categories: Category[] }) {
   const slices = categorySlices(expenses, categories)
-  if (slices.length === 0) return <Empty>Nothing spent yet this month.</Empty>
+  if (slices.length === 0) return <Empty>{t('widgets.nothingSpent')}</Empty>
   const spent = new Map<string, number>()
   for (const e of expenses) spent.set(e.category_id, (spent.get(e.category_id) ?? 0) + e.amount)
   // switched out of the donut in Settings (rent and the like), but spent on this month
@@ -173,10 +181,11 @@ function DonutWidget({ expenses, categories }: { expenses: Expense[]; categories
       <SpendDonut slices={slices} />
       {leftOut.length > 0 && (
         <p className="mt-2 truncate text-xs text-muted">
-          Not in the chart:{' '}
-          {leftOut
-            .map((c) => `${c.name} ${formatMoneyCompact(Math.round(spent.get(c.id)!))}`)
-            .join(' · ')}
+          {t('widgets.donut.leftOut', {
+            list: leftOut
+              .map((c) => `${c.name} ${formatMoneyCompact(Math.round(spent.get(c.id)!))}`)
+              .join(' · '),
+          })}
         </p>
       )}
     </>
@@ -196,15 +205,17 @@ function DeltaWidget({
   const prev = shiftMonth(month, -1)
   const cutoff = Math.min(elapsedDays(month), daysInMonth(prev))
   const deltas = categoryDeltas(expenses, categories, month, cutoff)
-  if (!deltas.some((d) => d.previous > 0)) return <Empty>Nothing from last month to compare with.</Empty>
+  if (!deltas.some((d) => d.previous > 0)) return <Empty>{t('widgets.delta.empty')}</Empty>
   const change = roundMoney(deltas.reduce((a, d) => a + d.delta, 0))
   const span = ` 1–${cutoff}`
   return (
     <>
       <p className="mb-2 text-sm leading-snug text-slate-200">
-        {change === 0
-          ? `Same as the first ${cutoff} days of ${formatMonthShort(prev)}.`
-          : `${formatMoneyWhole(Math.abs(change))} ${change > 0 ? 'more' : 'less'} than the first ${cutoff} days of ${formatMonthShort(prev)}.`}
+        {t(change === 0 ? 'widgets.delta.same' : change > 0 ? 'widgets.delta.more' : 'widgets.delta.less', {
+          amount: formatMoneyWhole(Math.abs(change)),
+          count: cutoff,
+          month: formatMonthShort(prev),
+        })}
       </p>
       <CategoryDeltaBars
         deltas={deltas.slice(0, DELTA_ROWS)}
@@ -220,7 +231,7 @@ function PeopleWidget({ expenses }: { expenses: Expense[] }) {
     personIds().map((p) => [p, roundMoney(sumExpenses(expenses.filter((e) => e.person === p)))]),
   ) as Record<Person, number>
   const total = personIds().reduce((a, p) => a + by[p], 0)
-  if (total <= 0) return <Empty>Nothing spent yet this month.</Empty>
+  if (total <= 0) return <Empty>{t('widgets.nothingSpent')}</Empty>
   return (
     <div className="space-y-3 pt-1">
       <div className="flex h-3 overflow-hidden rounded-full" aria-hidden>
@@ -252,7 +263,7 @@ function PeopleWidget({ expenses }: { expenses: Expense[] }) {
 }
 
 function GoalsWidget({ goals }: { goals: ReturnType<typeof useSavingsOverview>['goals'] }) {
-  if (goals.length === 0) return <Empty>No goals yet. Add one in the Savings tab.</Empty>
+  if (goals.length === 0) return <Empty>{t('widgets.goals.empty')}</Empty>
   return (
     <ul className="grid max-h-48 gap-1 overflow-y-auto">
       {goals.map(({ goal, saved, progress }) => (
@@ -286,8 +297,8 @@ function GoalsWidget({ goals }: { goals: ReturnType<typeof useSavingsOverview>['
   )
 }
 
-const weekday = new Intl.DateTimeFormat('en-GB', { weekday: 'short' })
-const dayLong = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })
+const weekday = () => dateFormat({ weekday: 'short' })
+const dayLong = () => dateFormat({ weekday: 'long', day: 'numeric', month: 'short' })
 
 function WeekWidget({ expenses, dailyLimit }: { expenses: Expense[]; dailyLimit: number }) {
   const [y, m, d] = todayKey().split('-').map(Number)
@@ -302,22 +313,26 @@ function WeekWidget({ expenses, dailyLimit }: { expenses: Expense[]; dailyLimit:
   return (
     <>
       <p className="text-sm leading-snug text-slate-200">
-        {formatMoneyWhole(week)} in the last 7 days
-        {dailyLimit > 0 && `, ${formatMoneyWhole(dailyLimit * 7)} would be the limits' share.`}
+        {dailyLimit > 0
+          ? t('widgets.week.summaryWithLimit', {
+              amount: formatMoneyWhole(week),
+              share: formatMoneyWhole(dailyLimit * 7),
+            })
+          : t('widgets.week.summary', { amount: formatMoneyWhole(week) })}
       </p>
       <ColumnChart
-        ariaLabel="Spending per day, last 7 days"
+        ariaLabel={t('widgets.week.chartLabel')}
         emphasize={days[6].key}
         plotHeight={PLOT}
-        reference={dailyLimit > 0 ? { value: dailyLimit, label: 'a day' } : undefined}
+        reference={dailyLimit > 0 ? { value: dailyLimit, label: t('common.perDay') } : undefined}
         columns={days.map(({ key, date }) => ({
           key,
-          label: weekday.format(date),
+          label: weekday().format(date),
           value: roundMoney(total.get(key) ?? 0),
           tooltip: (
             <>
-              <p className="mb-1 text-slate-400">{dayLong.format(date)}</p>
-              <TooltipRow label="Spent" value={formatMoney(total.get(key) ?? 0)} />
+              <p className="mb-1 text-slate-400">{dayLong().format(date)}</p>
+              <TooltipRow label={t('common.spent')} value={formatMoney(total.get(key) ?? 0)} />
             </>
           ),
         }))}
@@ -328,9 +343,13 @@ function WeekWidget({ expenses, dailyLimit }: { expenses: Expense[]; dailyLimit:
 
 /** The month's pace in a sentence: where the total is heading against the limits. */
 function paceLine(spent: number, projected: number | null, limit: number): string {
-  if (projected === null || limit <= 0) return `Spent ${formatMoneyCompact(spent)} so far.`
+  if (projected === null || limit <= 0)
+    return t('widgets.pace.soFar', { amount: formatMoneyCompact(spent) })
   const diff = projected - limit
   return diff > 0
-    ? `At this rate about ${formatMoneyCompact(diff)} over the limits by the end of the month.`
-    : `On course for ${formatMoneyCompact(projected)}, ${formatMoneyCompact(-diff)} under the limits.`
+    ? t('widgets.pace.over', { amount: formatMoneyCompact(diff) })
+    : t('widgets.pace.under', {
+        projected: formatMoneyCompact(projected),
+        amount: formatMoneyCompact(-diff),
+      })
 }

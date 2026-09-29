@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { CHART } from './theme'
+import { t } from '../../i18n'
 
 export interface ChartTable {
   head: string[]
@@ -52,7 +53,7 @@ export function ChartCard({ title, headline, legend, table, bare = false, childr
           aria-expanded={showTable}
           className="mt-2 text-xs font-medium text-muted underline-offset-2 active:text-white"
         >
-          {showTable ? 'Hide numbers' : 'Show numbers'}
+          {showTable ? t('charts.hideNumbers') : t('charts.showNumbers')}
         </button>
       )}
 

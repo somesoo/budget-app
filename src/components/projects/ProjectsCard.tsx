@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { formatMoneyWhole } from '../../lib/calculations'
 import type { ProjectSummary } from '../../lib/projects'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 /** Goals spent from, like trips, on the Budget tab: outside the month, so shown on their own. */
 export function ProjectsCard({ projects }: { projects: ProjectSummary[] }) {
@@ -10,7 +11,7 @@ export function ProjectsCard({ projects }: { projects: ProjectSummary[] }) {
   return (
     <section className="mt-6" aria-labelledby="projects-card">
       <h2 id="projects-card" className="mb-3 text-base font-semibold text-white">
-        Spent from goals
+        {t('project.spentFromGoals')}
       </h2>
       <ul className="grid gap-2">
         {projects.map(({ project, spent, budget, left }) => (

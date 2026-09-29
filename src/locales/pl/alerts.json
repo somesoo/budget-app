@@ -1,0 +1,79 @@
+{
+  "category": {
+    "overTitle": {
+      "message": "{name}: limit przekroczony",
+      "context": "Budget warning title (Budget tab, Add screen): a spending category went over its monthly limit. {name} is the category's name as the user typed it (e.g. Food), so avoid grammar that depends on its gender or case."
+    },
+    "paceTitle": {
+      "message": "{name}: w tym tempie limit zostanie przekroczony",
+      "context": "Budget warning title: at the current pace of spending, the category {name} will go over its monthly limit by the end of the month."
+    },
+    "nearTitle": {
+      "message": "{name}: wykorzystano {percent}% limitu",
+      "context": "Budget warning title: the category {name} has used {percent}% (e.g. 85) of its monthly limit."
+    }
+  },
+  "month": {
+    "overTitle": {
+      "message": "Budżet miesiąca przekroczony",
+      "context": "Budget warning title: the whole month's spending, all categories together, is over the total budget."
+    },
+    "paceTitle": {
+      "message": "W tym tempie budżet miesiąca zostanie przekroczony",
+      "context": "Budget warning title: at this pace, the whole month's spending will go over the total budget by the end of the month."
+    },
+    "nearTitle": {
+      "message": "Wykorzystano {percent}% budżetu miesiąca",
+      "context": "Budget warning title: the whole month has used {percent}% of the total budget."
+    }
+  },
+  "overDetail": {
+    "message": "{spent} z {limit}, {over} ponad limit.",
+    "context": "Budget warning detail under an 'over the limit' title, on the last day of the month. {spent}, {limit}, {over} are amounts with currency, e.g. '1,250 zł of 1,000 zł, 250 zł over.'"
+  },
+  "overDetailDaysLeft": {
+    "one": "{spent} z {limit}, {over} ponad limit, a do końca miesiąca został {count} dzień.",
+    "few": "{spent} z {limit}, {over} ponad limit, a do końca miesiąca zostały {count} dni.",
+    "many": "{spent} z {limit}, {over} ponad limit, a do końca miesiąca zostało {count} dni.",
+    "other": "{spent} z {limit}, {over} ponad limit, a do końca miesiąca zostało {count} dnia.",
+    "context": "Budget warning detail under an 'over the limit' title. {spent}, {limit}, {over} are amounts with currency; {count} is the number of days left in the month."
+  },
+  "paceDetail": {
+    "one": "W tym tempie ok. {projected} na koniec miesiąca przy limicie {limit}. Do {perDay} dziennie przez {count} dzień utrzyma limit.",
+    "few": "W tym tempie ok. {projected} na koniec miesiąca przy limicie {limit}. Do {perDay} dziennie przez {count} dni utrzyma limit.",
+    "many": "W tym tempie ok. {projected} na koniec miesiąca przy limicie {limit}. Do {perDay} dziennie przez {count} dni utrzyma limit.",
+    "other": "W tym tempie ok. {projected} na koniec miesiąca przy limicie {limit}. Do {perDay} dziennie przez {count} dnia utrzyma limit.",
+    "context": "Budget warning detail under a 'heading over' title. {projected} is the projected month-end spending, {limit} the limit, {perDay} how much can be spent per day to stay within it, {count} the days left. All amounts include the currency."
+  },
+  "nearDetail": {
+    "message": "Zostało {left}.",
+    "context": "Budget warning detail under an 'at 85% of its limit' title, on the last day of the month. {left} is the amount still available, with currency."
+  },
+  "nearDetailDaysLeft": {
+    "one": "Zostało {left} na {count} dzień, ok. {perDay} dziennie.",
+    "few": "Zostało {left} na {count} dni, ok. {perDay} dziennie.",
+    "many": "Zostało {left} na {count} dni, ok. {perDay} dziennie.",
+    "other": "Zostało {left} na {count} dnia, ok. {perDay} dziennie.",
+    "context": "Budget warning detail under an 'at 85% of its limit' title. {left} is the amount still available, {count} days left in the month, {perDay} the amount per day. Amounts include the currency."
+  },
+  "someone": {
+    "message": "Ktoś",
+    "context": "Used as {who} in 'privateOverTitle' when the owner of a personal allowance isn't known."
+  },
+  "privateOverTitle": {
+    "message": "{who}: kieszonkowe przekroczone",
+    "context": "Budget warning title about another household member's personal allowance (pocket money category). {who} is the person's name. Deliberately shows no amounts: the allowance is private."
+  },
+  "privateOverDetail": {
+    "message": "{name}: wydano więcej, niż planowano w tym miesiącu.",
+    "context": "Budget warning detail about another person's private allowance. {name} is the allowance category's name. No amounts on purpose."
+  },
+  "crossedOver": {
+    "message": "{name}: teraz {over} ponad limit",
+    "context": "Short message right after saving an expense that pushed the category {name} over its monthly limit. {over} is the amount over, with currency."
+  },
+  "crossedNear": {
+    "message": "{name}: teraz {percent}% limitu",
+    "context": "Short message right after saving an expense that brought the category {name} close to its monthly limit. {percent} is e.g. 83."
+  }
+}

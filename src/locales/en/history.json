@@ -1,0 +1,118 @@
+{
+  "whereAll": {
+    "message": "across all months",
+    "context": "History: after the entry count when searching, e.g. '12 entries across all months'. Lowercase."
+  },
+  "whereDay": {
+    "message": "on {day}",
+    "context": "History: after the entry count when a calendar day is picked; {day} is e.g. 'Mon, 22 Sep'. Lowercase."
+  },
+  "whereMonth": {
+    "message": "in {month}",
+    "context": "History: after the entry count; {month} is the month name alone. Lowercase."
+  },
+  "searchPlaceholder": {
+    "message": "Search title, category or amount",
+    "context": "History: placeholder of the search field."
+  },
+  "searchLabel": {
+    "message": "Search all transactions",
+    "context": "History: accessible label of the search field."
+  },
+  "clearSearch": {
+    "message": "Clear search",
+    "context": "History: accessible label of the × in the search field."
+  },
+  "filters": {
+    "message": "Filters and sorting",
+    "context": "History: button and sheet heading."
+  },
+  "calendarView": {
+    "message": "Calendar view",
+    "context": "History: button that shows the calendar heatmap."
+  },
+  "biggestFirst": {
+    "message": "Biggest first",
+    "context": "History: sort option (by amount)."
+  },
+  "newestFirst": {
+    "message": "Newest first",
+    "context": "History: sort option (by date)."
+  },
+  "clearAll": {
+    "message": "Clear all",
+    "context": "History: removes every applied filter."
+  },
+  "net": {
+    "message": "Net",
+    "context": "History totals: income minus spending."
+  },
+  "entries": {
+    "one": "{count} entry",
+    "other": "{count} entries",
+    "context": "History: number of entries shown; followed by 'in September' etc."
+  },
+  "newest": {
+    "one": "newest {count}",
+    "other": "newest {count}",
+    "context": "History search: only the newest {count} results are shown. Lowercase."
+  },
+  "noMatchFilters": {
+    "message": "Nothing matches these filters",
+    "context": "History: empty with filters on."
+  },
+  "empty": {
+    "message": "Nothing logged in {month} yet",
+    "context": "History: empty month."
+  },
+  "clearFilters": {
+    "message": "Clear filters",
+    "context": "History: button in the empty state."
+  },
+  "calendar": {
+    "message": "Calendar",
+    "context": "History (laptop): panel heading."
+  },
+  "filterAndSort": {
+    "message": "Filter and sort",
+    "context": "History (laptop): panel heading."
+  },
+  "showEntries": {
+    "one": "Show {count} entry",
+    "other": "Show {count} entries",
+    "context": "History filters sheet: button that closes it."
+  },
+  "show": {
+    "message": "Show",
+    "context": "History filters: label above All / Spent / Income."
+  },
+  "all": {
+    "message": "All",
+    "context": "History filters: everything / everyone."
+  },
+  "who": {
+    "message": "Who",
+    "context": "History filters: label above the people."
+  },
+  "both": {
+    "message": "Both",
+    "context": "History filters: both people (budget of two)."
+  },
+  "order": {
+    "message": "Order",
+    "context": "History filters: label above the sort options."
+  },
+  "noSpending": {
+    "message": "No spending in this view.",
+    "context": "History (laptop) > Where it went: empty."
+  },
+  "andMore": {
+    "one": "and {count} more",
+    "other": "and {count} more",
+    "context": "History (laptop) > Where it went: more categories not shown."
+  },
+  "removeFilter": {
+    "message": "Remove filter: {name}",
+    "context": "History: accessible label of the × on an applied filter chip."
+  }
+}

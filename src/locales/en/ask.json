@@ -1,0 +1,70 @@
+{
+  "link": {
+    "message": "Ask AI",
+    "context": "Button on many screens that opens the AI chat with a question about that screen ready. Short (it's a small pill; on narrow phones only the icon shows)."
+  },
+  "starter1": {
+    "message": "Are we on track with our savings goals?",
+    "context": "Ask tab: a ready question button on an empty conversation."
+  },
+  "starter2": {
+    "message": "Where can we cut back for the rest of this month?",
+    "context": "Ask tab: a ready question button."
+  },
+  "starter3": {
+    "message": "How much should we put aside next month?",
+    "context": "Ask tab: a ready question button."
+  },
+  "starter4": {
+    "message": "What did we spend the most on lately, and was it worth it?",
+    "context": "Ask tab: a ready question button."
+  },
+  "setup": {
+    "message": "Conversations are saved in the tables from <code>{file}</code>. Paste it into the SQL Editor and run it, as with the earlier ones.",
+    "context": "Ask tab before the database update. Keep the <code> tags."
+  },
+  "intro": {
+    "message": "It sees your budget, plans, recent expenses, savings and goals, and answers with your numbers. Ask in any language.",
+    "context": "Ask tab: explanation on an empty conversation. The AI answers in the language of the question."
+  },
+  "thinking": {
+    "message": "Looking at your numbers…",
+    "context": "Ask tab: while the AI answers."
+  },
+  "failed": {
+    "message": "Couldn’t get an answer: {error}",
+    "context": "Ask tab: error; {error} is technical."
+  },
+  "followUp": {
+    "message": "Ask a follow-up",
+    "context": "Ask tab: input placeholder inside a conversation."
+  },
+  "placeholder": {
+    "message": "Ask anything about your money",
+    "context": "Ask tab: input placeholder on a new conversation."
+  },
+  "question": {
+    "message": "Your question",
+    "context": "Ask tab: accessible label of the input."
+  },
+  "send": {
+    "message": "Send",
+    "context": "Ask tab: accessible label of the send button."
+  },
+  "sent": {
+    "message": "Sent to Gemini with each question: this month and the plans, a year of monthly totals, the last 3 months of expenses with their notes, income, savings accounts and goals.",
+    "context": "Ask tab: privacy footnote."
+  },
+  "conversations": {
+    "message": "Conversations",
+    "context": "Ask tab: list of saved conversations (sheet heading, button label)."
+  },
+  "new": {
+    "message": "New conversation",
+    "context": "Ask tab: starts a new conversation."
+  },
+  "deleteThread": {
+    "message": "Delete conversation: {title}",
+    "context": "Ask tab: accessible label of the bin button on a conversation."
+  }
+}

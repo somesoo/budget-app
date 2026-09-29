@@ -3,6 +3,8 @@ import { useState, type FormEvent } from 'react'
 import { usePeopleActions } from '../hooks/usePeople'
 import { MAX_PEOPLE, PERSON_COLORS } from '../lib/people'
 import type { Person } from '../types'
+import { t } from '../i18n'
+import { LanguagePicker } from './LanguagePicker'
 
 /**
  * A fresh install's first screen: who's in the budget (one to four people,
@@ -46,11 +48,12 @@ export function HouseholdSetup({ onDone }: { onDone: (me: Person) => void }) {
     <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-6 py-10">
       <form onSubmit={submit} className="grid gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Who’s in this budget?</h1>
+          <div className="mb-4 flex justify-end">
+            <LanguagePicker />
+          </div>
+          <h1 className="text-3xl font-bold text-white">{t('setup.title')}</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Just you, or up to four people sharing it: a couple, a family, flatmates.
-            Everyone logs from their own phone and sees the same numbers. Names can change later
-            in Settings.
+            {t('setup.intro')}
           </p>
         </div>
 
@@ -68,15 +71,17 @@ export function HouseholdSetup({ onDone }: { onDone: (me: Person) => void }) {
                 maxLength={30}
                 autoFocus={i === names.length - 1}
                 autoComplete="off"
-                placeholder={i === 0 ? 'Your name' : `Person ${i + 1}`}
-                aria-label={`Person ${i + 1}`}
+                placeholder={i === 0 ? t('setup.yourName') : t('setup.person', { n: i + 1 })}
+                aria-label={t('setup.person', { n: i + 1 })}
                 className="min-w-0 flex-1 rounded-xl bg-white/5 px-3 py-3 text-lg text-white outline-none ring-1 ring-white/10 placeholder:text-muted/60 focus:ring-white/40"
               />
               {names.length > 1 && (
                 <button
                   type="button"
                   onClick={() => remove(i)}
-                  aria-label={`Remove ${name.trim() || `person ${i + 1}`}`}
+                  aria-label={t('settings.people.remove', {
+                    name: name.trim() || t('setup.person', { n: i + 1 }),
+                  })}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg text-muted hover:bg-white/5 hover:text-white"
                 >
                   <X />
@@ -92,13 +97,13 @@ export function HouseholdSetup({ onDone }: { onDone: (me: Person) => void }) {
             onClick={add}
             className="-mt-3 flex items-center gap-1.5 self-start rounded-full px-3 py-2 text-sm font-semibold text-accent-soft hover:bg-accent/10"
           >
-            <Plus weight="bold" aria-hidden /> Add a person
+            <Plus weight="bold" aria-hidden /> {t('settings.people.addPlaceholder')}
           </button>
         )}
 
         {names.length > 1 && (
           <fieldset>
-            <legend className="mb-2 text-sm text-muted">Which one of you is holding this phone?</legend>
+            <legend className="mb-2 text-sm text-muted">{t('setup.whichPhone')}</legend>
             <div className="flex flex-wrap gap-2">
               {names.map((name, i) => (
                 <button
@@ -112,7 +117,7 @@ export function HouseholdSetup({ onDone }: { onDone: (me: Person) => void }) {
                       : 'text-slate-300 ring-white/15 hover:bg-white/5'
                   }`}
                 >
-                  {name.trim() || `Person ${i + 1}`}
+                  {name.trim() || t('setup.person', { n: i + 1 })}
                 </button>
               ))}
             </div>
@@ -120,16 +125,16 @@ export function HouseholdSetup({ onDone }: { onDone: (me: Person) => void }) {
         )}
 
         {duplicate && (
-          <p className="text-sm text-amber-200">Two people have the same name: tell them apart.</p>
+          <p className="text-sm text-amber-200">{t('setup.duplicate')}</p>
         )}
-        {error && <p className="text-sm text-red-300">Not saved: {error}</p>}
+        {error && <p className="text-sm text-red-300">{t('entry.notSaved', { error })}</p>}
 
         <button
           type="submit"
           disabled={!valid || setup.isPending}
           className="h-14 rounded-2xl bg-slate-50 text-lg font-bold text-ink transition active:scale-[0.99] disabled:opacity-40"
         >
-          {setup.isPending ? 'Setting up…' : 'Start'}
+          {setup.isPending ? t('setup.settingUp') : t('setup.start')}
         </button>
       </form>
     </div>

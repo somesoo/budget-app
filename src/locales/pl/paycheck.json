@@ -1,0 +1,86 @@
+{
+  "title": {
+    "message": "Z wypłaty",
+    "context": "Budget tab: heading of the card listing what the month's plan sends to savings goals, IKE accounts and loan repayments, each with a 'Pay in' button."
+  },
+  "done": {
+    "message": "{done} z {total} zrobione",
+    "context": "From the paycheck card: progress in the corner."
+  },
+  "payBack": {
+    "message": "Spłata: {note}",
+    "context": "From the paycheck: a loan instalment line; {note} is what was borrowed for."
+  },
+  "aLoan": {
+    "message": "pożyczka",
+    "context": "From the paycheck: used as {note} when the loan has no description."
+  },
+  "to": {
+    "message": "na: {name}",
+    "context": "From the paycheck: under a loan instalment, which goal or account it goes back to. Lowercase."
+  },
+  "savings": {
+    "message": "oszczędności",
+    "context": "From the paycheck: used as {name} in 'to {name}' when the goal or account is gone. Lowercase."
+  },
+  "paidBackNote": {
+    "message": "Spłacono: {note}",
+    "context": "Note saved on the deposit made when an instalment is paid in; shows in the savings history."
+  },
+  "closed": {
+    "message": "Zamknięte",
+    "context": "From the paycheck: name shown for a line whose goal or account was deleted."
+  },
+  "onto": {
+    "message": "na konto {name}",
+    "context": "From the paycheck: which account the money goes onto. Lowercase fragment."
+  },
+  "noAccount": {
+    "message": "nie wybrano konta",
+    "context": "From the paycheck: the goal has no account chosen yet. Lowercase fragment."
+  },
+  "account": {
+    "message": "konto",
+    "context": "From the paycheck: small label for a line paid straight into an account. Lowercase."
+  },
+  "planNote": {
+    "message": "Plan: {month}",
+    "context": "Note saved on a savings deposit made from the month's plan, e.g. 'October plan'; shows in the savings history."
+  },
+  "unspent": {
+    "message": "niewydane w miesiącu {month}",
+    "context": "From the paycheck: a line with the previous month's leftover; {month} is its name. Lowercase fragment."
+  },
+  "shareUnspent": {
+    "message": "{share}% niewydanych w miesiącu {month}",
+    "context": "From the paycheck: this goal's percentage of the previous month's leftover. Lowercase fragment."
+  },
+  "atEndOf": {
+    "message": "na koniec miesiąca {month}",
+    "context": "From the paycheck: the leftover can only be paid in once the month {month} is over. Lowercase fragment."
+  },
+  "paidOf": {
+    "message": "{paid} z {planned}",
+    "context": "From the paycheck: how much of a line is paid in."
+  },
+  "paidIn": {
+    "message": "Wpłacone",
+    "context": "From the paycheck: the line is fully paid in."
+  },
+  "payIn": {
+    "message": "Wpłać {amount}",
+    "context": "From the paycheck: button that records the deposit (first tap)."
+  },
+  "confirm": {
+    "message": "Potwierdź {amount}",
+    "context": "From the paycheck: the same button asking for a second tap to confirm."
+  },
+  "other": {
+    "message": "Do tego {amount} innych oszczędności, gdzie chcesz.",
+    "context": "From the paycheck: savings in the plan not tied to a goal or account."
+  },
+  "failed": {
+    "message": "Nie wpłacono: {error}",
+    "context": "From the paycheck: error; {error} is technical."
+  }
+}

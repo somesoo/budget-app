@@ -1,0 +1,10 @@
+{
+  "yesterdayShort": {
+    "message": "Yest.",
+    "context": "Date chip: short for 'Yesterday'; the chip is small."
+  },
+  "pick": {
+    "message": "Pick a date",
+    "context": "Date chip: accessible label of the calendar button."
+  }
+}

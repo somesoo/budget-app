@@ -1,0 +1,9 @@
+{
+  "add": { "message": "Add", "context": "Navigation tab (bottom bar on the phone, side bar on a laptop): the main screen for logging an expense or income. One short word." },
+  "history": { "message": "History", "context": "Navigation tab: the list of every logged expense and income. One short word." },
+  "budget": { "message": "Budget", "context": "Navigation tab: this month's limits per category and the plan for the month. One short word." },
+  "savings": { "message": "Savings", "context": "Navigation tab: savings accounts and goals. One short word." },
+  "insights": { "message": "Insights", "context": "Navigation tab: charts comparing the last months. One short word." },
+  "ask": { "message": "Ask", "context": "Navigation tab: chat with the AI assistant about the budget. One short word." },
+  "settings": { "message": "Settings", "context": "Navigation tab and the gear button's accessible label: the settings screen. One short word." }
+}

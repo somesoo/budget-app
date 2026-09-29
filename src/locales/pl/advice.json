@@ -1,0 +1,76 @@
+{
+  "area": {
+    "spending": {
+      "message": "Wydatki",
+      "context": "AI recommendations card (Insights tab): small label above a recommendation about spending."
+    },
+    "savings": {
+      "message": "Oszczędności",
+      "context": "AI recommendations card: label above a recommendation about savings."
+    },
+    "goals": {
+      "message": "Cele",
+      "context": "AI recommendations card: label above a recommendation about a savings goal."
+    },
+    "income": {
+      "message": "Dochód",
+      "context": "AI recommendations card: label above a recommendation about income."
+    },
+    "other": {
+      "message": "Wskazówka",
+      "context": "AI recommendations card: label above any other recommendation."
+    }
+  },
+  "justNow": {
+    "message": "przed chwilą",
+    "context": "AI recommendations card: when they were generated, under the heading (after the model name)."
+  },
+  "failed": {
+    "message": "Nie udało się pobrać rekomendacji: {error}",
+    "context": "AI recommendations card: error; {error} is a technical message."
+  },
+  "title": {
+    "message": "Rekomendacje",
+    "context": "AI recommendations card (Insights tab): heading."
+  },
+  "thinking": {
+    "message": "Myślę…",
+    "context": "AI recommendations card: button while the AI is working."
+  },
+  "refresh": {
+    "message": "Odśwież",
+    "context": "AI recommendations card: button that asks for new recommendations."
+  },
+  "get": {
+    "message": "Pobierz rekomendacje",
+    "context": "AI recommendations card: button that asks for the first recommendations of the month."
+  },
+  "intro": {
+    "message": "Gemini przegląda ten miesiąc, oszczędności i cele i podpowiada, co warto zmienić.",
+    "context": "AI recommendations card: explanation before any are generated. Gemini is Google's AI model; keep the name."
+  },
+  "whatsSent": {
+    "message": "Co jest wysyłane do Gemini?",
+    "context": "AI recommendations card: small link that explains which data goes to the AI."
+  },
+  "hideSent": {
+    "message": "Ukryj, co jest wysyłane",
+    "context": "AI recommendations card: the same link once the explanation is open."
+  },
+  "sentDetail": {
+    "message": "Dochód na osobę, wydatki w każdej kategorii z limitem i typowym miesiącem, podział między osoby, ostrzeżenia aplikacji, największe wydatki miesiąca z notatkami, konta i cele oszczędnościowe oraz wyjazdy. Bez e-maila i numerów kont. W darmowym planie API Google przesłane dane mogą służyć do ulepszania ich produktów i być czytane przez ludzi; płatny plan to wyklucza. To sugestie, a nie porada finansowa.",
+    "context": "AI recommendations card: privacy note listing the data sent to Google's Gemini. Keep it accurate."
+  },
+  "impact": {
+    "message": "~{amount} {currency}/mies.",
+    "context": "AI recommendation: small badge with the rough monthly amount it could save, e.g. '~200 zł/mo'. Very short."
+  },
+  "askMore": {
+    "message": "Powiedz mi więcej o tym: {title}",
+    "context": "Question pre-filled in the Ask (AI chat) tab when opening a recommendation; {title} is the recommendation's title."
+  },
+  "askAbout": {
+    "message": "Zapytaj o to",
+    "context": "AI recommendation: link that opens the AI chat with a question about it."
+  }
+}

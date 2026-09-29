@@ -1,0 +1,34 @@
+{
+  "of": {
+    "message": "z {amount}",
+    "context": "Goal card: after the saved amount, the target. Lowercase fragment."
+  },
+  "by": {
+    "message": "do: {month}",
+    "context": "Goal card: the target date; {month} is month and year. Lowercase fragment."
+  },
+  "saveFor": {
+    "message": "Odłóż na cel {name}",
+    "context": "Goal card: accessible label of the Save button."
+  },
+  "save": {
+    "message": "Odłóż",
+    "context": "Goal card: small button that opens 'Save money' for this goal (to save = put money aside, not to store data)."
+  },
+  "allThere": {
+    "message": "Wszystko jest",
+    "context": "Goal card: the saved bar is full."
+  },
+  "on": {
+    "message": "Na: {list}",
+    "context": "Goal card: which accounts hold its money, e.g. 'On mBank 2,000 zł, Revolut 500 zł'."
+  },
+  "leftToUse": {
+    "message": "Zostało do wydania",
+    "context": "Goal card: second bar, what can still be spent from the goal."
+  },
+  "overspent": {
+    "message": "wydano o {amount} więcej, niż odłożono",
+    "context": "Goal card: more was spent from the goal than saved."
+  }
+}

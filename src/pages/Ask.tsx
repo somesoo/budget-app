@@ -15,12 +15,14 @@ import { useDeviceUser } from '../hooks/useDeviceUser'
 import { plainDashes } from '../lib/calculations'
 import type { ChatThread } from '../types'
 import { personIds, personLabel } from '../lib/people'
+import { t } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
-const STARTERS = [
-  'Are we on track with our savings goals?',
-  'Where can we cut back for the rest of this month?',
-  'How much should we put aside next month?',
-  'What did we spend the most on lately, and was it worth it?',
+const starters = () => [
+  t('ask.starter1'),
+  t('ask.starter2'),
+  t('ask.starter3'),
+  t('ask.starter4'),
 ]
 
 /**
@@ -82,11 +84,13 @@ export function Ask() {
       <Shell onThreads={() => undefined} hasThreads={false}>
         <section className="m-auto max-w-lg rounded-3xl bg-white/5 p-5 ring-1 ring-white/10">
           <ChatCircleDots aria-hidden className="text-3xl text-accent-soft" />
-          <h2 className="mt-3 text-lg font-semibold text-white">One step in Supabase first</h2>
+          <h2 className="mt-3 text-lg font-semibold text-white">{t('savingsPage.setupTitle')}</h2>
           <p className="mt-1 text-sm leading-relaxed text-slate-300">
-            Conversations are saved in the tables from{' '}
-            <code className="rounded bg-white/10 px-1">supabase/migrations/0008_ai_chat.sql</code>.
-            Paste it into the SQL Editor and run it, as with the earlier ones.
+            <Trans
+              k="ask.setup"
+              values={{ file: 'supabase/migrations/0008_ai_chat.sql' }}
+              tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
+            />
           </p>
         </section>
       </Shell>
@@ -133,13 +137,12 @@ export function Ask() {
         {shown.length === 0 ? (
           <div className="flex min-h-full flex-col justify-end pb-4 lg:justify-center">
             <Sparkle weight="fill" aria-hidden className="text-2xl text-accent-soft" />
-            <h2 className="mt-2 text-xl font-semibold text-white">Ask about your money</h2>
+            <h2 className="mt-2 text-xl font-semibold text-white">{t('tour.ask.title')}</h2>
             <p className="mt-1 max-w-md text-sm text-slate-300">
-              It sees your budget, plans, recent expenses, savings and goals, and answers with your
-              numbers. Ask in Polish or English.
+              {t('ask.intro')}
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {STARTERS.map((s) => (
+              {starters().map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -177,7 +180,7 @@ export function Ask() {
               <li className="flex gap-3" aria-live="polite">
                 <Sparkle weight="fill" aria-hidden className="mt-1 shrink-0 text-accent-soft" />
                 <span className="text-sm text-muted motion-safe:animate-pulse">
-                  Looking at your numbers…
+                  {t('ask.thinking')}
                 </span>
               </li>
             )}
@@ -191,7 +194,7 @@ export function Ask() {
           <p role="alert" className="mb-2 rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-300">
             {ask.error instanceof ChatUnavailableError
               ? ask.error.message
-              : `Couldn’t get an answer: ${(ask.error as Error).message}`}
+              : t('ask.failed', { error: (ask.error as Error).message })}
           </p>
         )}
         {followUps.length > 0 && (
@@ -221,27 +224,26 @@ export function Ask() {
             }}
             rows={1}
             maxLength={4000}
-            placeholder={threadId ? 'Ask a follow-up' : 'Ask anything about your money'}
-            aria-label="Your question"
+            placeholder={threadId ? t('ask.followUp') : t('ask.placeholder')}
+            aria-label={t('ask.question')}
             className="max-h-40 min-h-[48px] flex-1 resize-none rounded-2xl bg-white/5 px-4 py-3 text-base text-white outline-none ring-1 ring-white/10 [field-sizing:content] placeholder:text-muted focus:ring-white/40"
           />
           <button
             type="submit"
             disabled={!draft.trim() || ask.isPending || !context.ready}
-            aria-label="Send"
+            aria-label={t('ask.send')}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-xl text-ink hover:bg-slate-50 disabled:opacity-40"
           >
             <PaperPlaneRight weight="fill" aria-hidden />
           </button>
         </form>
         <p className="mt-2 text-[11px] leading-snug text-muted">
-          Sent to Gemini with each question: this month and the plans, a year of monthly totals, the
-          last 3 months of expenses with their notes, income, savings accounts and goals.
+          {t('ask.sent')}
         </p>
       </div>
 
       {threadsOpen && (
-        <BottomSheet title="Conversations" onClose={() => setThreadsOpen(false)}>
+        <BottomSheet title={t('ask.conversations')} onClose={() => setThreadsOpen(false)}>
           <ThreadList
             threads={threads}
             current={threadId}
@@ -273,13 +275,13 @@ function Shell({
       {sidebar && <aside className="hidden w-64 shrink-0 flex-col lg:flex">{sidebar}</aside>}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="mb-4 flex shrink-0 items-center justify-between gap-3 px-4 lg:mb-6 lg:px-0">
-          <h1 className="text-2xl font-bold text-white lg:text-3xl lg:tracking-tight">Ask</h1>
+          <h1 className="text-2xl font-bold text-white lg:text-3xl lg:tracking-tight">{t('nav.ask')}</h1>
           <div className="flex items-center gap-1 lg:hidden">
             {hasThreads && (
               <button
                 type="button"
                 onClick={onThreads}
-                aria-label="Conversations"
+                aria-label={t('ask.conversations')}
                 className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-muted hover:bg-white/5"
               >
                 <List aria-hidden />
@@ -312,24 +314,24 @@ function ThreadList({
         onClick={() => onOpen(null)}
         className="flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2.5 text-sm font-bold text-ink hover:bg-slate-50"
       >
-        <Plus weight="bold" aria-hidden /> New conversation
+        <Plus weight="bold" aria-hidden /> {t('ask.new')}
       </button>
       <ul className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
-        {threads.map((t) => (
-          <li key={t.id} className="group relative">
+        {threads.map((thread) => (
+          <li key={thread.id} className="group relative">
             <button
               type="button"
-              onClick={() => onOpen(t.id)}
+              onClick={() => onOpen(thread.id)}
               className={`w-full truncate rounded-xl py-2.5 pl-3 pr-9 text-left text-sm transition ${
-                t.id === current ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5'
+                thread.id === current ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5'
               }`}
             >
-              {t.title}
+              {thread.title}
             </button>
             <button
               type="button"
-              onClick={() => onDelete(t.id)}
-              aria-label={`Delete conversation: ${t.title}`}
+              onClick={() => onDelete(thread.id)}
+              aria-label={t('ask.deleteThread', { title: thread.title })}
               className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
             >
               <Trash aria-hidden />

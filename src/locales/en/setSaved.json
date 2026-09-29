@@ -1,0 +1,54 @@
+{
+  "everyday": {
+    "message": "Everyday account",
+    "context": "Default name of a new account created when correcting a goal's saved amount."
+  },
+  "note": {
+    "message": "{name}: saved amount corrected",
+    "context": "Note saved on the balance correction for goal {name}."
+  },
+  "title": {
+    "message": "How much {name} has",
+    "context": "Sheet heading: correct how much is saved for goal {name}."
+  },
+  "intro": {
+    "message": "For money that’s already there but the app doesn’t know about. It’s booked as a correction of the account’s balance, not as saving or spending, so this month’s numbers stay as they are.",
+    "context": "Correct saved amount sheet: explanation."
+  },
+  "saved": {
+    "message": "Saved for it",
+    "context": "Correct saved amount sheet: amount field label."
+  },
+  "savedHelp": {
+    "message": "The app has {amount} now.",
+    "context": "Correct saved amount sheet: current amount."
+  },
+  "where": {
+    "message": "Where the money is",
+    "context": "Correct saved amount sheet: account field label."
+  },
+  "newAccountHelp": {
+    "message": "Adds this account to Savings, holding only what you say is set aside.",
+    "context": "Correct saved amount sheet: hint when choosing a new account."
+  },
+  "elsewhere": {
+    "message": "Somewhere else, e.g. my everyday account…",
+    "context": "Correct saved amount sheet: option to add a new account."
+  },
+  "callIt": {
+    "message": "Call it",
+    "context": "Correct saved amount sheet: name of the new account."
+  },
+  "more": {
+    "message": "{amount} more for {name}, on {account}.",
+    "context": "Correct saved amount sheet: summary of the change."
+  },
+  "less": {
+    "message": "{amount} less for {name}, off {account}.",
+    "context": "Correct saved amount sheet: summary of the change."
+  },
+  "tooMuch": {
+    "message": "{name} only has {amount} on this account. Pick the account its money is on.",
+    "context": "Correct saved amount sheet: error."
+  }
+}

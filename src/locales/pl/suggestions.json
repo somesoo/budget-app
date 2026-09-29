@@ -1,0 +1,104 @@
+{
+  "raiseTitle": {
+    "message": "Podnieś limit „{name}” do {amount}",
+    "context": "Budget tab > planning a month: suggestion to raise the monthly limit of category {name} to {amount} (with currency), because it kept running over."
+  },
+  "raiseDetail": {
+    "one": "Ponad {limit} w ostatnim miesiącu ({months}). Limit, który da się utrzymać, to limit, który jest przestrzegany.",
+    "few": "Ponad {limit} w każdym z ostatnich {count} miesięcy ({months}). Limit, który da się utrzymać, to limit, który jest przestrzegany.",
+    "many": "Ponad {limit} w każdym z ostatnich {count} miesięcy ({months}). Limit, który da się utrzymać, to limit, który jest przestrzegany.",
+    "other": "Ponad {limit} w każdym z ostatnich {count} miesięcy ({months}). Limit, który da się utrzymać, to limit, który jest przestrzegany.",
+    "context": "Explanation under 'Raise … to …'. {limit} is the current limit with currency, {count} the number of months looked at, {months} a list like 'Jul 1,200 zł, Aug 1,350 zł'."
+  },
+  "lowerTitle": {
+    "message": "Obniż limit „{name}” do {amount}",
+    "context": "Budget tab > planning a month: suggestion to lower the monthly limit of category {name} to {amount}, because it stayed well under."
+  },
+  "lowerDetail": {
+    "one": "Poniżej {percent}% limitu przez {count} miesiąc, najwyżej {most}. To uwalnia {freed} na oszczędności.",
+    "few": "Poniżej {percent}% limitu przez {count} miesiące, najwyżej {most}. To uwalnia {freed} na oszczędności.",
+    "many": "Poniżej {percent}% limitu przez {count} miesięcy, najwyżej {most}. To uwalnia {freed} na oszczędności.",
+    "other": "Poniżej {percent}% limitu przez {count} miesiąca, najwyżej {most}. To uwalnia {freed} na oszczędności.",
+    "context": "Explanation under 'Lower … to …'. {percent} e.g. 80, {count} months looked at, {most} the most spent in one of them, {freed} how much lowering frees up. Amounts with currency."
+  },
+  "annualTitle": {
+    "message": "{note}: {amount} rok temu ({month})",
+    "context": "Budget tab > planning: a yearly bill paid in this calendar month last year. {note} is the note the user typed on that expense (e.g. 'Car insurance'), {amount} the amount, {month} the month name alone (e.g. 'September')."
+  },
+  "annualDetail": {
+    "message": "Zapłacone: {month}, w kategorii „{name}”, i od tamtej pory ani razu. Zaplanuj to: „{name}” na {amount}.",
+    "context": "Explanation under a yearly bill suggestion. {month} is month and year (e.g. 'September 2025'), {name} the category, {amount} the proposed limit with currency."
+  },
+  "annualNoteLine": {
+    "message": "{note} ~{amount}",
+    "context": "A line added to the month's plan note when a yearly bill suggestion is applied: the bill's note and its approximate amount. '~' means 'about'."
+  },
+  "seasonalTitle": {
+    "message": "{month}: „{name}” kosztuje więcej",
+    "context": "Budget tab > planning: the planned month (e.g. 'December', month name alone) was clearly more expensive in category {name} last year."
+  },
+  "seasonalDetail": {
+    "message": "Rok temu ({month}) {lastYear}, a typowo {typical}. Plan na {amount} odpowiada zeszłemu rokowi.",
+    "context": "Explanation under the seasonal suggestion. {lastYear} spent in this month last year, {month} the month name alone, {typical} a typical month, {amount} the proposed limit. Amounts with currency."
+  },
+  "bufferTitle": {
+    "message": "Daj „{name}” trochę zapasu: {amount}",
+    "context": "Budget tab > planning: category {name} swings a lot from month to month; suggests a limit of {amount} with some slack."
+  },
+  "bufferDetail": {
+    "message": "Waha się od {low} do {high} miesięcznie. {amount} pokryłoby 3 miesiące na 4.",
+    "context": "Explanation under 'Give … some room'. {low} and {high} are the lowest and highest month, {amount} the proposed limit, all with currency."
+  },
+  "checkNoIncome": {
+    "message": "Brak zaplanowanego dochodu, więc nie ma czego bilansować.",
+    "context": "Budget tab > planning: check of the draft plan, shown in a list with ticks and warnings. The plan has no income."
+  },
+  "checkBalanced": {
+    "message": "Dochód, wydatki i oszczędności się bilansują.",
+    "context": "Plan check: every złoty of the planned income is assigned to spending or savings."
+  },
+  "checkUnassigned": {
+    "message": "{amount} dochodu nie ma jeszcze przeznaczenia.",
+    "context": "Plan check: {amount} (with currency) of the planned income is not yet assigned to a category or to savings."
+  },
+  "checkOverplanned": {
+    "message": "Plan przekracza dochód o {amount}.",
+    "context": "Plan check: the limits and savings add up to {amount} more than the planned income."
+  },
+  "checkTightOne": {
+    "one": "„{names}” ma limit niższy, niż kosztowało w ostatnim miesiącu.",
+    "few": "„{names}” ma limit niższy, niż kosztowało w każdym z ostatnich {count} miesięcy.",
+    "many": "„{names}” ma limit niższy, niż kosztowało w każdym z ostatnich {count} miesięcy.",
+    "other": "„{names}” ma limit niższy, niż kosztowało w każdym z ostatnich {count} miesięcy.",
+    "context": "Plan check: one category, {names}, has a limit lower than it cost in every one of the last {count} months."
+  },
+  "checkTightMany": {
+    "one": "{names} mają limity niższe, niż kosztowały w ostatnim miesiącu.",
+    "few": "{names} mają limity niższe, niż kosztowały w każdym z ostatnich {count} miesięcy.",
+    "many": "{names} mają limity niższe, niż kosztowały w każdym z ostatnich {count} miesięcy.",
+    "other": "{names} mają limity niższe, niż kosztowały w każdym z ostatnich {count} miesięcy.",
+    "context": "Plan check: several categories, {names} (a list like 'Food, Fun and Car'), have limits lower than they cost in every one of the last {count} months."
+  },
+  "checkRealistic": {
+    "one": "Każdy limit mieści się w tym, ile kosztował ostatni miesiąc.",
+    "few": "Każdy limit mieści się w tym, ile kosztowały ostatnie {count} miesiące.",
+    "many": "Każdy limit mieści się w tym, ile kosztowało ostatnich {count} miesięcy.",
+    "other": "Każdy limit mieści się w tym, ile kosztowało ostatnich {count} miesiąca.",
+    "context": "Plan check: no limit is below what its category cost in the last {count} months."
+  },
+  "checkSaving": {
+    "message": "Oszczędzasz {percent}% dochodu.",
+    "context": "Plan check: the share of planned income going to savings, {percent} e.g. 10."
+  },
+  "checkNoSavings": {
+    "message": "Nic nie jest odkładane na oszczędności.",
+    "context": "Plan check: the plan puts nothing into savings."
+  },
+  "checkGoal": {
+    "one": "„{name}” za ok. {count} miesiąc w tym tempie.",
+    "few": "„{name}” za ok. {count} miesiące w tym tempie.",
+    "many": "„{name}” za ok. {count} miesięcy w tym tempie.",
+    "other": "„{name}” za ok. {count} miesiąca w tym tempie.",
+    "context": "Plan check: at this month's savings, the savings goal {name} (typed by the user, e.g. 'Holiday') is reached in about {count} months."
+  }
+}

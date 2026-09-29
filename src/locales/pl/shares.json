@@ -1,0 +1,26 @@
+{
+  "title": {
+    "message": "Popraw udziały na koncie {name}",
+    "context": "Sheet heading: correct how much of account {name} belongs to each goal."
+  },
+  "intro": {
+    "message": "Wskaż, ile z {amount} na tym koncie ma każdy cel. Saldo się nie zmienia i nic nie przechodzi w banku: to tylko poprawia, na który cel są pieniądze.",
+    "context": "Fix shares sheet: explanation."
+  },
+  "shareOf": {
+    "message": "Udział celu {name}",
+    "context": "Fix shares sheet: accessible label of a goal's amount field."
+  },
+  "over": {
+    "message": "Więcej niż saldo o",
+    "context": "Fix shares sheet: the shares exceed the balance; followed by the amount."
+  },
+  "unassigned": {
+    "message": "Nieprzypisane po zmianie",
+    "context": "Fix shares sheet: what stays unassigned; followed by the amount."
+  },
+  "save": {
+    "message": "Zapisz udziały",
+    "context": "Fix shares sheet: submit button."
+  }
+}

@@ -7,6 +7,7 @@ import { DateChip, PersonToggle } from './HeaderControls'
 import { useState } from 'react'
 import { currentMonthKey, monthKeyOfDate, readableTextColor, todayKey } from '../lib/calculations'
 import type { Category, Person } from '../types'
+import { t } from '../i18n'
 
 interface Props {
   category: Category
@@ -48,7 +49,7 @@ export function AmountPad({
           type="button"
           onClick={onCancel}
           className="-ml-2 shrink-0 rounded-full px-2 py-2 text-2xl leading-none text-muted active:bg-white/10"
-          aria-label="Back to categories"
+          aria-label={t('entry.backToCategories')}
         >
           <ArrowLeft />
         </button>
@@ -69,13 +70,13 @@ export function AmountPad({
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Title (optional)"
-          aria-label="Title"
+          placeholder={t('entry.titlePlaceholder')}
+          aria-label={t('entry.title')}
           maxLength={120}
           className="w-full rounded-2xl bg-white/5 px-4 py-3.5 text-base text-white outline-none ring-1 ring-white/10 placeholder:text-muted focus:ring-white/30"
         />
 
-        <AmountField value={entry.text} onChange={entry.type} label="Amount" />
+        <AmountField value={entry.text} onChange={entry.type} label={t('entry.amount')} />
 
         <QuickAmountButtons onAdd={entry.add} onClear={entry.reset} amount={amount} />
 
@@ -97,7 +98,7 @@ export function AmountPad({
           className="h-16 w-full rounded-3xl text-xl font-bold transition active:scale-[0.99] disabled:opacity-40"
           style={{ backgroundColor: category.color, color: readableTextColor(category.color) }}
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? t('common.saving') : t('common.save')}
         </button>
       </div>
     </div>

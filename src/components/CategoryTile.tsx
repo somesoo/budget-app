@@ -9,6 +9,7 @@ import {
   withAlpha,
 } from '../lib/calculations'
 import type { Category } from '../types'
+import { t } from '../i18n'
 
 interface Props {
   category: Category
@@ -77,7 +78,7 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
           {category.name}
         </span>
         {over && (
-          <span aria-label="over limit" className="text-xs leading-none">
+          <span aria-label={t('tile.overLimit')} className="text-xs leading-none">
             <Warning weight="fill" aria-hidden />
           </span>
         )}
@@ -94,7 +95,7 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
               {left < 0 ? '−' : ''}
               {formatAmount(Math.abs(left))} {CURRENCY_SUFFIX}{' '}
               <span className="text-[11px] font-semibold opacity-90">
-                {left < 0 ? 'over' : 'left'}
+                {left < 0 ? t('tile.over') : t('tile.left')}
               </span>
             </>
           ) : (
@@ -106,8 +107,12 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
           style={{ color: subLineColor }}
         >
           {hasLimit
-            ? `spent ${formatAmount(Math.round(spent))} of ${formatAmount(category.monthly_limit)} · ${Math.round(ratio * 100)}%`
-            : 'spent · no limit'}
+            ? t('tile.spentOf', {
+                spent: formatAmount(Math.round(spent)),
+                limit: formatAmount(category.monthly_limit),
+                percent: Math.round(ratio * 100),
+              })
+            : t('tile.noLimit')}
         </div>
       </div>
     </button>

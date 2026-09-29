@@ -178,6 +178,6 @@ describe('moving and correcting', () => {
       { goalId: 'trip', delta: -500 },
       { goalId: 'home', delta: 500 },
     ])
-    expect(() => shareChanges(s, { trip: 900, car: 200 })).toThrow(/only has 1000/)
+    expect(() => shareChanges(s, { trip: 900, car: 200 })).toThrow(/only has 1,000/)
   })
 })

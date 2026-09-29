@@ -1,0 +1,185 @@
+{
+  "gone": {
+    "message": "This category doesn’t exist any more.",
+    "context": "Category page: the category was deleted."
+  },
+  "othersAllowance": {
+    "message": "{name} is someone else’s allowance: only they see what’s in it.",
+    "context": "Category page: the category {name} is another person's private allowance."
+  },
+  "history": {
+    "message": "History",
+    "context": "Category page: heading of the pane with the category's past months."
+  },
+  "historyEmpty": {
+    "one": "Nothing logged in {name} over the last month.",
+    "other": "Nothing logged in {name} over the last {count} months.",
+    "context": "Category page > History: nothing was spent in category {name}."
+  },
+  "lastMonths": {
+    "one": "last month",
+    "other": "last {count} months",
+    "context": "Category page > History: small note next to the heading, the period shown. Lowercase."
+  },
+  "typicalMonth": {
+    "message": "Typical month",
+    "context": "Category page > History: stat label, what the category usually costs a month."
+  },
+  "noData": {
+    "message": "No data",
+    "context": "Category page: a stat without enough data."
+  },
+  "last3": {
+    "message": "last 3 complete",
+    "context": "Category page > History: small line under 'Typical month': averaged over the last 3 complete months. Lowercase, short."
+  },
+  "lastMonth": {
+    "message": "Last month",
+    "context": "Category page > History: stat label when last month's name isn't known."
+  },
+  "highest": {
+    "message": "Highest",
+    "context": "Category page > History: stat label, the most expensive month."
+  },
+  "chartLabel": {
+    "message": "{name} spending per month",
+    "context": "Category page: accessible label of the monthly bar chart."
+  },
+  "monthLimit": {
+    "message": "{month} limit",
+    "context": "Category page: chart legend for the dashed limit line; {month} is the month name alone."
+  },
+  "showAll": {
+    "message": "Show all {count} months",
+    "context": "Category page > History: button that lists every month instead of the last three."
+  },
+  "limitFor": {
+    "message": "Limit for {month}",
+    "context": "Budget planner, one category opened: label of the limit field; {month} is the name alone."
+  },
+  "lastYear": {
+    "message": "{month} last yr",
+    "context": "Category page, planning ahead: chart column for the same month last year, e.g. 'Dec last yr'. Very short."
+  },
+  "plan": {
+    "message": "Plan",
+    "context": "Category page, planning ahead: chart column for the planned limit."
+  },
+  "planFor": {
+    "message": "Plan for {month}",
+    "context": "Category page, planning ahead: pane heading; {month} is the name alone."
+  },
+  "planChartLabel": {
+    "message": "{name}: the plan against past months",
+    "context": "Category page, planning ahead: accessible label of the chart."
+  },
+  "forecastFor": {
+    "message": "Forecast for {month}",
+    "context": "Category page: pane heading for the current month."
+  },
+  "projected": {
+    "message": "Projected",
+    "context": "Category page: stat label, projected month-end spending."
+  },
+  "none": {
+    "message": "None",
+    "context": "Category page: stat value when there's no limit."
+  },
+  "perDay": {
+    "message": "Up to {amount} a day keeps it on the limit.",
+    "context": "Category page: how much can be spent per day to stay within the limit."
+  },
+  "endedAt": {
+    "message": "{month} ended at {amount}.",
+    "context": "Category page, past month without a limit."
+  },
+  "endedOver": {
+    "message": "Ended {amount} over the limit.",
+    "context": "Category page, past month."
+  },
+  "endedUnder": {
+    "message": "Ended {amount} under the limit.",
+    "context": "Category page, past month."
+  },
+  "nothingYet": {
+    "message": "Nothing spent here yet this month.",
+    "context": "Category page, current month."
+  },
+  "paceAbout": {
+    "message": "At this pace, about {amount} by the end of the month.",
+    "context": "Category page, current month without a limit."
+  },
+  "paceOver": {
+    "message": "At this pace it ends about {amount} over the limit.",
+    "context": "Category page, current month."
+  },
+  "paceUnder": {
+    "message": "At this pace it ends about {amount} under the limit.",
+    "context": "Category page, current month."
+  },
+  "plannedNoHistory": {
+    "message": "Planned at {amount}. No complete month to compare with yet.",
+    "context": "Category page, planning ahead."
+  },
+  "plannedTypical": {
+    "message": "Planned right at a typical month, {amount}.",
+    "context": "Category page, planning ahead."
+  },
+  "plannedAbove": {
+    "message": "Planned {amount} above a typical month, so there’s room to spare.",
+    "context": "Category page, planning ahead."
+  },
+  "plannedBelow": {
+    "message": "Planned {amount} below a typical month, so it asks for cutting back.",
+    "context": "Category page, planning ahead."
+  },
+  "shareOfPlan": {
+    "message": "Share of the plan",
+    "context": "Category page: pane heading, the category's share of the month's planned spending."
+  },
+  "shareOfSpending": {
+    "message": "Share of spending",
+    "context": "Category page: pane heading, the category's share of the month's spending."
+  },
+  "noLimits": {
+    "message": "No limits planned yet.",
+    "context": "Category page > Share of the plan: empty state."
+  },
+  "nothingSpent": {
+    "message": "Nothing spent in {month}.",
+    "context": "Category page > Share of spending: empty state for a past month."
+  },
+  "nothingSpentYet": {
+    "message": "Nothing spent in {month} yet.",
+    "context": "Category page > Share of spending: empty state for the current month."
+  },
+  "shareOfPlanLine": {
+    "message": "<b>{percent}</b> of what {month} plans to spend.",
+    "context": "Category page > Share of the plan: e.g. '12% of what October plans to spend.' Keep the <b> tags."
+  },
+  "shareOfSpendingLine": {
+    "message": "<b>{percent}</b> of {month}’s spending.",
+    "context": "Category page > Share of spending: e.g. '12% of September’s spending.' Keep the <b> tags."
+  },
+  "nothingPlannedIn": {
+    "message": "Nothing in {name} planned for {month}.",
+    "context": "Category page > Share of the plan: the category has no limit this month."
+  },
+  "nothingSpentIn": {
+    "message": "Nothing in {name} spent for {month}.",
+    "context": "Category page > Share of spending: the category has no spending this month."
+  },
+  "usually": {
+    "message": "Usually {percent}.",
+    "context": "Category page > Share: the usual share over recent months."
+  },
+  "hiddenSmaller": {
+    "one": "{count} smaller not shown.",
+    "other": "{count} smaller not shown.",
+    "context": "Category page > Share: how many small categories are left out of the list."
+  },
+  "leftOut": {
+    "message": "Left out, as in Where it goes: {names}.",
+    "context": "Category page > Share: categories left out of the comparison, like in the 'Where it goes' donut. {names} is a comma-separated list."
+  }
+}

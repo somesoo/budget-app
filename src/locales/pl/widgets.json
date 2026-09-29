@@ -1,0 +1,147 @@
+{
+  "donut": {
+    "label": {
+      "message": "Na co idzie",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): donut chart of this month's spending by category."
+    },
+    "help": {
+      "message": "Ten miesiąc według kategorii.",
+      "context": "Settings > Widgets: description under the 'Where it goes' switch."
+    },
+    "leftOut": {
+      "message": "Poza wykresem: {list}",
+      "context": "Add screen > 'Where it goes' widget: categories left out of the chart (like rent) with what they cost, e.g. 'Rent 2,500 zł · Bills 300 zł'."
+    }
+  },
+  "pace": {
+    "label": {
+      "message": "Tempo",
+      "context": "Name of an Add screen widget: spending so far against an even spread of the month's limits."
+    },
+    "help": {
+      "message": "Dotychczasowe wydatki na tle limitów rozłożonych równo na miesiąc.",
+      "context": "Settings > Widgets: description under the 'Pace' switch."
+    },
+    "soFar": {
+      "message": "Dotąd wydano {amount}.",
+      "context": "Add screen > Pace widget: sentence above the chart when there's no projection yet."
+    },
+    "over": {
+      "message": "W tym tempie ok. {amount} ponad limity na koniec miesiąca.",
+      "context": "Add screen > Pace widget: the month is projected to go over the limits by {amount}."
+    },
+    "under": {
+      "message": "Zmierza do {projected}, {amount} poniżej limitów.",
+      "context": "Add screen > Pace widget: the month is projected to end at {projected}, {amount} below the limits."
+    }
+  },
+  "alerts": {
+    "label": {
+      "message": "Ostrzeżenia",
+      "context": "Name of an Add screen widget: the list of budget warnings."
+    },
+    "help": {
+      "message": "Kategorie blisko limitu lub ponad nim.",
+      "context": "Settings > Widgets: description under the 'Warnings' switch."
+    },
+    "empty": {
+      "message": "Wszystko w porządku: nic nie jest blisko limitu.",
+      "context": "Add screen > Warnings widget when there are no warnings."
+    }
+  },
+  "delta": {
+    "label": {
+      "message": "Vs poprzedni miesiąc",
+      "context": "Name of an Add screen widget: categories up or down compared with the same days of last month. Short."
+    },
+    "help": {
+      "message": "Kategorie w górę lub w dół względem tych samych dni poprzedniego miesiąca.",
+      "context": "Settings > Widgets: description under the 'Vs last month' switch."
+    },
+    "empty": {
+      "message": "Brak danych z poprzedniego miesiąca do porównania.",
+      "context": "Add screen > Vs last month widget when last month has no spending."
+    },
+    "same": {
+      "one": "Tyle samo co pierwszy dzień ({month}).",
+      "few": "Tyle samo co pierwsze {count} dni ({month}).",
+      "many": "Tyle samo co pierwszych {count} dni ({month}).",
+      "other": "Tyle samo co pierwsze {count} dnia ({month}).",
+      "context": "Add screen > Vs last month widget: spending equals the same days of last month. {count} days, {month} short month name (e.g. 'Aug')."
+    },
+    "more": {
+      "one": "{amount} więcej niż pierwszy dzień ({month}).",
+      "few": "{amount} więcej niż pierwsze {count} dni ({month}).",
+      "many": "{amount} więcej niż pierwszych {count} dni ({month}).",
+      "other": "{amount} więcej niż pierwsze {count} dnia ({month}).",
+      "context": "Add screen > Vs last month widget: this month so far costs {amount} more than the same {count} days of last month ({month}, short name)."
+    },
+    "less": {
+      "one": "{amount} mniej niż pierwszy dzień ({month}).",
+      "few": "{amount} mniej niż pierwsze {count} dni ({month}).",
+      "many": "{amount} mniej niż pierwszych {count} dni ({month}).",
+      "other": "{amount} mniej niż pierwsze {count} dnia ({month}).",
+      "context": "Add screen > Vs last month widget: this month so far costs {amount} less than the same {count} days of last month ({month}, short name)."
+    }
+  },
+  "forecast": {
+    "label": {
+      "message": "Prognoza",
+      "context": "Name of an Add screen widget: what's left of the income at the end of the month."
+    },
+    "help": {
+      "message": "Co zostanie z dochodu na koniec miesiąca.",
+      "context": "Settings > Widgets: description under the 'Forecast' switch."
+    }
+  },
+  "people": {
+    "label": {
+      "message": "Kto płacił",
+      "context": "Name of an Add screen widget: this month's spending split between the people."
+    },
+    "help": {
+      "message": "Ten miesiąc w podziale na osoby w budżecie.",
+      "context": "Settings > Widgets: description under the 'Who paid' switch."
+    }
+  },
+  "goals": {
+    "label": {
+      "message": "Cele",
+      "context": "Name of an Add screen widget: progress of each savings goal."
+    },
+    "help": {
+      "message": "Postęp każdego celu oszczędnościowego.",
+      "context": "Settings > Widgets: description under the 'Goals' switch."
+    },
+    "empty": {
+      "message": "Nie ma jeszcze celów. Dodaj cel na karcie Oszczędności.",
+      "context": "Add screen > Goals widget when there are no savings goals."
+    }
+  },
+  "week": {
+    "label": {
+      "message": "Ostatnie 7 dni",
+      "context": "Name of an Add screen widget: spending day by day over the last week."
+    },
+    "help": {
+      "message": "Wydatki dzień po dniu.",
+      "context": "Settings > Widgets: description under the 'Last 7 days' switch."
+    },
+    "summary": {
+      "message": "{amount} w ostatnich 7 dniach",
+      "context": "Add screen > Last 7 days widget: total spent over the week."
+    },
+    "summaryWithLimit": {
+      "message": "{amount} w ostatnich 7 dniach, a limity przewidują na tydzień {share}.",
+      "context": "Add screen > Last 7 days widget: {amount} spent over the week; {share} is what the monthly limits allow for 7 days."
+    },
+    "chartLabel": {
+      "message": "Wydatki dziennie, ostatnie 7 dni",
+      "context": "Accessible label of the bar chart in the Last 7 days widget."
+    }
+  },
+  "nothingSpent": {
+    "message": "W tym miesiącu jeszcze nic nie wydano.",
+    "context": "Add screen widgets (donut, who paid) when nothing has been spent this month."
+  }
+}

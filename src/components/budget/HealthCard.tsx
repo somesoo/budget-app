@@ -40,6 +40,7 @@ export function HealthCard({ month, categories }: { month: MonthKey; categories:
 
   return (
     <section
+      data-tour="health"
       aria-labelledby="health"
       className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10"
     >

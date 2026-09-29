@@ -254,7 +254,7 @@ export function DesktopAdd() {
       <header className="mb-6 flex shrink-0 items-center justify-between gap-6">
         <div className="min-w-0">
           <h1 className="text-3xl font-bold tracking-tight text-white">Add</h1>
-          <p className="mt-1 text-sm text-muted">
+          <p data-tour="safe" className="mt-1 text-sm text-muted">
             This month: <span className="font-semibold text-white">{formatMoney(monthTotal)}</span>
             {monthLimit > 0 && (
               <span className={left < 0 ? 'text-red-300' : ''}>
@@ -286,7 +286,7 @@ export function DesktopAdd() {
 
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_24rem] gap-6 wide:grid-cols-[minmax(0,1fr)_24rem_21rem]">
         {/* ---------- categories ---------- */}
-        <section aria-label="Categories" className="flex min-h-0 flex-col">
+        <section aria-label="Categories" data-tour="tiles" className="flex min-h-0 flex-col">
           {alerts.length > 0 && (
             <div className="mb-3 shrink-0">
               <AlertStrip alerts={alerts} />
@@ -330,7 +330,10 @@ export function DesktopAdd() {
           className="flex min-h-0 flex-col overflow-y-auto rounded-3xl p-5 ring-1 ring-white/10"
           style={{ backgroundColor: CHART.surface }}
         >
-          <div className="mb-4 grid shrink-0 grid-cols-2 rounded-full bg-white/5 p-1 ring-1 ring-white/10">
+          <div
+            data-tour="income"
+            className="mb-4 grid shrink-0 grid-cols-2 rounded-full bg-white/5 p-1 ring-1 ring-white/10"
+          >
             {(['expense', 'income'] as const).map((m) => (
               <button
                 key={m}

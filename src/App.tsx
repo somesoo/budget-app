@@ -1,9 +1,12 @@
+import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { BottomNav } from './components/BottomNav'
 import { SideNav } from './components/SideNav'
 import { Login } from './components/Login'
 import { PersonOnboarding } from './components/PersonOnboarding'
 import { SetupNotice } from './components/SetupNotice'
+import { Tour } from './components/tour/Tour'
+import { tourSeen, tourStore } from './lib/tour'
 import { useDeviceUser } from './hooks/useDeviceUser'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { useSession } from './hooks/useSession'
@@ -23,6 +26,11 @@ export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
   const { session, loading } = useSession()
   useRealtimeSync()
+  const signedIn = !!session && isChosen
+  // a new device gets the tour once, right after saying whose it is
+  useEffect(() => {
+    if (signedIn && !tourSeen() && tourStore.get().step === null) tourStore.start('/')
+  }, [signedIn])
 
   if (!isSupabaseConfigured) return <SetupNotice />
   // first paint restores the stored session — don't flash the login screen
@@ -53,6 +61,7 @@ export default function App() {
         </Routes>
       </main>
       <BottomNav />
+      <Tour />
     </>
   )
 }

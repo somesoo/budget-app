@@ -128,6 +128,7 @@ export function Budget() {
           {month === current && (
             <button
               type="button"
+              data-tour="plan"
               onClick={() => setPlanning(next)}
               className="mb-6 flex w-full items-center gap-3 rounded-3xl bg-accent/10 p-4 text-left ring-1 ring-accent/25 transition hover:ring-accent/45 active:scale-[0.99]"
             >
@@ -205,7 +206,10 @@ function MonthStatus({
     <TwoColumns
       side={
         <>
-          <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+          <section
+            data-tour="budget-month"
+            className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10"
+          >
             <div className="flex items-baseline justify-between gap-3">
               <p className="text-sm text-muted">Spent</p>
               <PlanBadge plan={plan} onPlan={onPlan} />
@@ -289,7 +293,7 @@ function MonthStatus({
         </>
       }
       main={
-        <section className="mb-6">
+        <section data-tour="budget-categories" className="mb-6">
           <SectionTitle>Categories</SectionTitle>
           <SummaryBars
             categories={ownCategories(shown, me)}

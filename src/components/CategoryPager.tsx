@@ -47,7 +47,7 @@ export function CategoryPager({ categories, spentByCategory, onSelect, trailing 
     viewport.current?.scrollTo({ left: index * size.width, behavior: 'smooth' })
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div data-tour="tiles" className="flex min-h-0 flex-1 flex-col">
       <div
         ref={viewport}
         onScroll={(e) => {

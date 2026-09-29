@@ -1,6 +1,7 @@
 import {
   CaretRight,
   ChartDonut,
+  Compass,
   DownloadSimple,
   Plus,
   SignOut,
@@ -36,6 +37,7 @@ import {
 import { downloadCsv } from '../lib/exportCsv'
 import { monthsEndingAt, windowRange } from '../lib/insights'
 import { supabase } from '../lib/supabaseClient'
+import { tourStore } from '../lib/tour'
 import type { Category } from '../types'
 
 /** Months averaged for the "typical" figure next to each limit. */
@@ -83,6 +85,7 @@ export function Settings() {
             accounts={savings.accounts.length}
             goals={savings.goals.length}
           />
+          <HelpCard />
           <DataCard categories={categories} />
           <AccountCard />
         </div>
@@ -416,6 +419,20 @@ function DataCard({ categories }: { categories: Category[] }) {
         {state.busy ? 'Preparing…' : 'Download CSV'}
       </button>
       {state.message && <p className="mt-2 text-xs text-muted">{state.message}</p>}
+    </SettingsCard>
+  )
+}
+
+function HelpCard() {
+  return (
+    <SettingsCard title="Help" help="A walk through every screen, one thing at a time.">
+      <button
+        type="button"
+        onClick={() => tourStore.start('/settings')}
+        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+      >
+        <Compass aria-hidden /> Take the tour
+      </button>
     </SettingsCard>
   )
 }

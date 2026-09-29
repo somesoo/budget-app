@@ -71,6 +71,7 @@ export function AdviceCard({ month, isCurrent, buildRequest }: Props) {
 
   return (
     <section
+      data-tour="insights-advice"
       aria-labelledby="advice-title"
       className="rounded-3xl p-4 ring-1 ring-white/10 lg:p-6"
       style={{ backgroundColor: CHART.surface }}

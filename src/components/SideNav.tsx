@@ -33,6 +33,7 @@ export function SideNav() {
             <NavLink
               to={tab.to}
               end={tab.to === '/'}
+              data-tour={`nav-${tab.label.toLowerCase()}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition ${
                   isActive

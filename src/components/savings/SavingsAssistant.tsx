@@ -41,7 +41,7 @@ export function SavingsAssistant({ overview }: { overview: SavingsOverview }) {
       : setStep({ kind: 'pick', then })
 
   return (
-    <section aria-labelledby="assistant" className="mb-6">
+    <section aria-labelledby="assistant" data-tour="savings-assistant" className="mb-6">
       <h2 id="assistant" className="mb-2 text-base font-semibold text-white">
         What do you want to do?
       </h2>

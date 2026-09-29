@@ -105,7 +105,10 @@ export function Savings() {
       }
     >
       {/* ---------- the totals ---------- */}
-      <section className="mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5">
+      <section
+        data-tour="savings-totals"
+        className="mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5"
+      >
         <Figure label="Saved in all" value={formatMoneyWhole(s.total)} big />
         <Figure
           label={`Put aside in ${formatMonthName(month)}`}
@@ -161,7 +164,7 @@ export function Savings() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         {/* ---------- goals ---------- */}
-        <section aria-labelledby="goals">
+        <section aria-labelledby="goals" data-tour="savings-goals">
           <SectionHead
             id="goals"
             title="Goals"

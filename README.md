@@ -322,6 +322,14 @@ last three months averaged; three to six). A goal is marked as the emergency
 fund in its Edit sheet. While it's short, a new plan sends last month's
 leftover there, and borrowing from it warns when it would take a large part.
 
+### The tour
+
+A new device gets a guided tour right after choosing whose phone it is: every
+screen, one element at a time, with Skip, Back and Next (Escape and the arrow
+keys on a laptop). Settings → Help → Take the tour runs it again. The steps
+live in `src/lib/tour.ts`; each points at an element by a `data-tour`
+attribute, and one whose element isn't on screen shows as a card in the middle.
+
 ### Allowances
 
 A category can be one person's allowance (Settings → the category → Whose):

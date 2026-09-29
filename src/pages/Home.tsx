@@ -192,6 +192,7 @@ export function Home() {
       <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
         {/* what's free to spend, coloured by how the flexible spending keeps pace */}
         <p
+          data-tour="safe"
           aria-label={`${safe ? 'Safe to spend' : 'Left this month'}: ${free < 0 ? 'minus ' : ''}${formatMoney(Math.abs(free))}${pace ? `, ${PACE_LABEL[pace]}` : ''}`}
           className={`min-w-0 truncate text-xl font-bold tabular-nums ${pace ? PACE_COLOR[pace] : 'text-white'}`}
         >
@@ -199,13 +200,16 @@ export function Home() {
           {formatMoneyCompact(Math.abs(free))}
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
-          <AskLink question="How are we doing this month, and how much can we still spend?" />
+          <span data-tour="ask" className="flex">
+            <AskLink question="How are we doing this month, and how much can we still spend?" />
+          </span>
           <button
             type="button"
             onClick={() => {
               setEntryPerson(devicePerson ?? 'bubs')
               setIncomeOpen(true)
             }}
+            data-tour="income"
             aria-label="Add income"
             title="Add income"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-soft ring-1 ring-accent/25 hover:bg-accent/20 active:bg-accent/25"
@@ -224,7 +228,7 @@ export function Home() {
 
       {/* all switched off in Settings: the tiles get the room */}
       {widgets.length > 0 && (
-        <div className="mb-3 shrink-0">
+        <div data-tour="widgets" className="mb-3 shrink-0">
           <WidgetCarousel widgets={widgets} />
         </div>
       )}

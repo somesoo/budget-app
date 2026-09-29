@@ -168,7 +168,7 @@ export function History() {
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
         <div className="min-w-0">
           {/* ---------- search, filters, calendar ---------- */}
-          <div className="mb-3 flex gap-2">
+          <div data-tour="history-tools" className="mb-3 flex gap-2">
             <div className="relative min-w-0 flex-1">
               <MagnifyingGlass
                 aria-hidden

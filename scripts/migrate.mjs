@@ -1,34 +1,38 @@
 #!/usr/bin/env node
 /*
- * Brings the database up to date: runs every file in supabase/migrations that
- * hasn't run yet, in order, each in a transaction. `npm run build` calls it
- * first, so on Vercel every deploy migrates the database before the new app
- * goes live, and a migration that fails stops the deploy.
+ * Brings the database up to date. `npm run build` calls it first, so on Vercel
+ * every production deploy migrates the database before the new app goes
+ * live, and a migration that fails stops the deploy.
  *
  *   npm run migrate
+ *
+ * A new, empty database gets supabase/schema.sql: the whole database of
+ * version 1.0.0 in one go. After that, and on every deploy, it runs the files
+ * in supabase/migrations that haven't run yet, in order, each in a
+ * transaction. What has run is recorded in app_meta.migrations (a schema the
+ * app's API doesn't expose).
+ *
+ * A database set up before 1.0.0, with the files now in supabase/archive, is
+ * taken as 1.0.0 when it has everything up to 0018. Otherwise it stops and
+ * says so: set MIGRATIONS_BASELINE to the last archived migration it has
+ * (e.g. 0015) and the ones after it run first. Mind 0017 before you do.
  *
  * Connects with the first of these that is set (the Supabase integration on
  * Vercel sets the first; anywhere else, paste the connection string from
  * Supabase → Connect → Session pooler into DATABASE_URL):
  *   POSTGRES_URL_NON_POOLING, DATABASE_URL, POSTGRES_URL
- * With none of them it does nothing, and the migrations are run by hand in the
- * SQL Editor as before. Preview deploys on Vercel skip it too.
- *
- * What has run is recorded in app_meta.migrations (a schema the app's API
- * doesn't expose). A fresh database also gets supabase/seed.sql, right after
- * 0001, like the manual setup.
- *
- * A database set up by hand before this existed has tables but no record.
- * If it has the people table (0015) it's taken as up to 0015; otherwise set
- * MIGRATIONS_BASELINE to the last migration you ran by hand, e.g. 0012, and
- * everything after it runs.
+ * With none of them it does nothing. Preview deploys on Vercel skip it too.
  */
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import postgres from 'postgres'
 
-const DIR = fileURLToPath(new URL('../supabase/migrations/', import.meta.url))
-const SEED = fileURLToPath(new URL('../supabase/seed.sql', import.meta.url))
+const at = (path) => fileURLToPath(new URL(`../supabase/${path}`, import.meta.url))
+const SCHEMA = at('schema.sql')
+const MIGRATIONS = at('migrations/')
+const ARCHIVE = at('archive/')
+/** What app_meta.migrations calls schema.sql. */
+const BASELINE = 'schema-1.0.0'
 // any fixed number; keeps two deploys building at once from migrating twice
 const LOCK_ID = 7_310_202_601
 
@@ -45,10 +49,11 @@ if (env.VERCEL_ENV === 'preview' && env.MIGRATE_PREVIEWS !== '1') {
   process.exit(0)
 }
 
-const files = readdirSync(DIR)
-  .filter((f) => /^\d{4}_.+\.sql$/.test(f))
-  .sort()
-const number = (name) => name.slice(0, 4)
+const sqlFiles = (dir) =>
+  readdirSync(dir)
+    .filter((f) => /^\d{4}_.+\.sql$/.test(f))
+    .sort()
+const version = (file) => file.replace(/\.sql$/, '')
 
 /**
  * Supabase's certificate isn't in Node's trust store, and `sslmode=require`
@@ -72,6 +77,45 @@ function connect(raw) {
 
 const sql = connect(url)
 
+/** Runs one file in a transaction and records it. */
+async function run(path, name) {
+  await sql.begin(async (tx) => {
+    await tx.unsafe(readFileSync(path, 'utf8'))
+    await tx`insert into app_meta.migrations (version) values (${name})`
+  })
+}
+
+/** A database from before 1.0.0: bring it up to 1.0.0 with the archived files. */
+async function catchUp() {
+  const [{ secrets, spending }] = await sql`
+    select to_regclass('public.app_secrets') is not null as secrets,
+           exists (select 1 from information_schema.columns
+                   where table_schema = 'public' and table_name = 'savings_movements'
+                     and column_name = 'expense_id') as spending`
+  const baseline = env.MIGRATIONS_BASELINE?.trim()
+
+  if (!baseline) {
+    if (!(secrets && spending)) {
+      throw new Error(
+        'This database was set up before 1.0.0 and lacks some of supabase/archive. ' +
+          'Set MIGRATIONS_BASELINE to the last archived migration it has (e.g. 0015) ' +
+          'and deploy again; the ones after it run first. Read 0017 before you do.',
+      )
+    }
+    await sql`insert into app_meta.migrations (version) values (${BASELINE})`
+    console.log('migrate: set up before 1.0.0 and complete, recorded as 1.0.0')
+    return
+  }
+
+  if (!/^\d{4}$/.test(baseline)) throw new Error(`MIGRATIONS_BASELINE=${baseline}: expected e.g. 0015`)
+  for (const file of sqlFiles(ARCHIVE).filter((f) => f.slice(0, 4) > baseline)) {
+    await run(ARCHIVE + file, version(file))
+    console.log(`migrate: ran archive/${file}`)
+  }
+  await sql`insert into app_meta.migrations (version) values (${BASELINE})`
+  console.log(`migrate: caught up from ${baseline} to 1.0.0`)
+}
+
 async function main() {
   await sql`select pg_advisory_lock(${LOCK_ID})`
 
@@ -83,39 +127,21 @@ async function main() {
     )`
 
   const done = new Set((await sql`select version from app_meta.migrations`).map((r) => r.version))
-  const [{ existing, people }] = await sql`
-    select to_regclass('public.categories') is not null as existing,
-           to_regclass('public.people') is not null as people`
 
-  if (done.size === 0 && existing) {
-    const baseline = env.MIGRATIONS_BASELINE?.trim() || (people ? '0015' : '')
-    if (!/^\d{4}$/.test(baseline)) {
-      throw new Error(
-        'This database was set up by hand and has no record of which migrations ran. ' +
-          'Set MIGRATIONS_BASELINE to the last one you ran (e.g. 0012) and deploy again.',
-      )
+  if (!done.has(BASELINE)) {
+    const [{ existing }] = await sql`select to_regclass('public.categories') is not null as existing`
+    if (existing) {
+      await catchUp()
+    } else {
+      await run(SCHEMA, BASELINE)
+      console.log('migrate: new database, created from schema.sql (1.0.0)')
     }
-    const skipped = files.filter((f) => number(f) <= baseline).map((f) => f.replace(/\.sql$/, ''))
-    for (const version of skipped) {
-      await sql`insert into app_meta.migrations (version) values (${version})`
-      done.add(version)
-    }
-    console.log(`migrate: set up by hand up to ${baseline}, recorded as done`)
   }
 
-  const fresh = !existing
   let ran = 0
-  for (const file of files) {
-    const version = file.replace(/\.sql$/, '')
-    if (done.has(version)) continue
-    const body = readFileSync(DIR + file, 'utf8')
-    await sql.begin(async (tx) => {
-      await tx.unsafe(body)
-      if (fresh && number(file) === '0001' && existsSync(SEED)) {
-        await tx.unsafe(readFileSync(SEED, 'utf8'))
-      }
-      await tx`insert into app_meta.migrations (version) values (${version})`
-    })
+  for (const file of sqlFiles(MIGRATIONS)) {
+    if (done.has(version(file))) continue
+    await run(MIGRATIONS + file, version(file))
     console.log(`migrate: ran ${file}`)
     ran++
   }

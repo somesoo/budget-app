@@ -150,7 +150,7 @@ function PeopleCard() {
           <Trans
             k="settings.people.migration"
             values={{
-              file: 'supabase/migrations/0015_people.sql',
+              file: 'supabase/archive/0015_people.sql',
               names: formatList(people.map((p) => p.name)),
             }}
             tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}

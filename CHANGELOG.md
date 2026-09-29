@@ -7,12 +7,15 @@ The first release meant for other people to install.
 - **One-button install.** *Deploy with Vercel* copies the app, creates a
   Supabase database through the Vercel integration and fills in every
   setting. No SQL to paste, no environment variables to copy.
-- **Migrations run on deploy.** `npm run build` brings the database up to
-  date (`scripts/migrate.mjs`) before the new version goes live; an install
-  set up by hand is recognised and only gets what it's missing.
+- **The database in one file.** `supabase/schema.sql` is the whole database
+  of 1.0.0; migrations 0001–0018 that built it step by step are in
+  `supabase/archive`. A new install gets the schema on its first deploy, and
+  every deploy after runs new files from `supabase/migrations`
+  (`scripts/migrate.mjs`) before the new version goes live. An install from
+  before 1.0.0 is recognised and caught up.
 - **Account made in the app.** A new install opens on *Welcome*: email and
   password for the shared account, then the people's names. The database
-  then refuses any other account (migration 0018), so public sign-ups can't
+  then refuses any other account, so public sign-ups can't
   let a stranger in.
 - **Gemini key in Settings → AI.** Checked with Google and kept on the
   server; `GEMINI_API_KEY` still works and wins. Without a key the AI

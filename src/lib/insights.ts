@@ -1,7 +1,9 @@
+import { t } from '../i18n'
 import type { Category, Expense, Person } from '../types'
 import {
   categoryById,
   daysInMonth,
+  formatAmount,
   monthKeyOfDate,
   monthRange,
   roundMoney,
@@ -211,7 +213,7 @@ export function niceScale(max: number, targetTicks = 4): { max: number; step: nu
 export function compactAmount(value: number): string {
   if (Math.abs(value) >= 1000) {
     const k = value / 1000
-    return `${Number.isInteger(k) ? k : k.toFixed(1)}k`
+    return t('insights.thousands', { value: formatAmount(Number.isInteger(k) ? k : Number(k.toFixed(1))) })
   }
   return String(Math.round(value))
 }
@@ -272,7 +274,7 @@ export function categorySlices(
     const amount = roundMoney(tail.reduce((acc, row) => acc + row.amount, 0))
     slices.push({
       id: REST_SLICE_ID,
-      name: `Everything else (${tail.length})`,
+      name: t('insights.everythingElse', { count: tail.length }),
       color: null,
       amount,
       share: amount / total,

@@ -1,0 +1,10 @@
+{
+  "previous": {
+    "message": "Previous month",
+    "context": "Accessible label of the left arrow of the month switcher."
+  },
+  "next": {
+    "message": "Next month",
+    "context": "Accessible label of the right arrow of the month switcher."
+  }
+}

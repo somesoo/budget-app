@@ -1,0 +1,66 @@
+{
+  "title": {
+    "message": "Save more",
+    "context": "Savings: sheet heading for putting extra money aside this month."
+  },
+  "note": {
+    "message": "Extra savings",
+    "context": "Note saved on the deposit made from the 'Save more' sheet."
+  },
+  "noAccount": {
+    "message": "Add a savings account first.",
+    "context": "Save more sheet when there are no accounts."
+  },
+  "quarter": {
+    "message": "a quarter",
+    "context": "Save more sheet: chip label after an amount, a quarter of what's free. Lowercase."
+  },
+  "half": {
+    "message": "half",
+    "context": "Save more sheet: chip label, half of what's free. Lowercase."
+  },
+  "all": {
+    "message": "all of it",
+    "context": "Save more sheet: chip label, everything that's free. Lowercase."
+  },
+  "needs": {
+    "message": "needs {amount}/mo",
+    "context": "Save more sheet: after a goal in the list, what it needs per month. Lowercase."
+  },
+  "safe": {
+    "message": "Safe to spend this month",
+    "context": "Save more sheet: label of the figure of what's still free this month. Same term as on the Add screen."
+  },
+  "noIncome": {
+    "message": "No income logged or planned this month, so there’s nothing to go on: save what you know you can.",
+    "context": "Save more sheet: explanation when there's no income."
+  },
+  "nothingFree": {
+    "message": "Nothing is free this month. Saving more now would come out of money that’s already needed.",
+    "context": "Save more sheet: nothing is free."
+  },
+  "safeHelp": {
+    "message": "What’s left of this month’s income after the planned savings and what’s been spent. Keep some for the rest of the month.",
+    "context": "Save more sheet: explanation of the figure."
+  },
+  "onto": {
+    "message": "Onto",
+    "context": "Save more sheet: which account the money goes onto."
+  },
+  "bank": {
+    "message": "<b>In the bank:</b> transfer {amount} from your everyday account to {account}. Then save it here.",
+    "context": "Save more sheet: what to do in the actual bank. Keep the <b> tags."
+  },
+  "bankGoal": {
+    "message": "<b>In the bank:</b> transfer {amount} from your everyday account to {account} (title: {goal}). Then save it here.",
+    "context": "Save more sheet: what to do in the bank, with the goal's name as the transfer title. Keep the <b> tags."
+  },
+  "moreThanFree": {
+    "message": "That’s {amount} more than is free this month.",
+    "context": "Save more sheet: warning."
+  },
+  "submit": {
+    "message": "Save {amount}",
+    "context": "Save more sheet: submit button."
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "appName": {
+    "message": "Budget",
+    "context": "The app's name, shown on the sign-in screen and at the top of the side navigation on a laptop."
+  },
+  "today": {
+    "message": "Today",
+    "context": "Day heading in lists and the date picker: the current day."
+  },
+  "yesterday": {
+    "message": "Yesterday",
+    "context": "Day heading in lists and the date picker: the day before today."
+  },
+  "back": {
+    "message": "Back",
+    "context": "Generic button: go to the previous step (tour, multi-step forms)."
+  },
+  "next": {
+    "message": "Next",
+    "context": "Generic button: go to the next step (tour, multi-step forms)."
+  },
+  "add": {
+    "message": "Add",
+    "context": "Generic accessible label of a '+' button that adds the typed item (a person, a line)."
+  },
+  "perDay": {
+    "message": "a day",
+    "context": "Short label of a dashed reference line on bar charts: the limit per day. Very short."
+  },
+  "spent": {
+    "message": "Spent",
+    "context": "Chart tooltip row label: the amount spent that day or month."
+  },
+  "amountOver": {
+    "message": "{amount} over",
+    "context": "Short status next to a total: {amount} (with currency) over the limit."
+  },
+  "amountLeft": {
+    "message": "{amount} left",
+    "context": "Short status next to a total: {amount} (with currency) still available."
+  },
+  "save": {
+    "message": "Save",
+    "context": "Generic save button."
+  },
+  "saving": {
+    "message": "Saving…",
+    "context": "Generic save button while saving."
+  },
+  "cancel": {
+    "message": "Cancel",
+    "context": "Generic cancel button."
+  },
+  "close": {
+    "message": "Close",
+    "context": "Generic accessible label of a close (×) button."
+  },
+  "delete": {
+    "message": "Delete",
+    "context": "Generic delete button."
+  },
+  "color": {
+    "message": "Color",
+    "context": "Label above the colour swatches (category, goal, account, trip)."
+  },
+  "deleting": {
+    "message": "Deleting…",
+    "context": "Generic delete button while deleting."
+  },
+  "notDeleted": {
+    "message": "Not deleted: {error}",
+    "context": "Generic error after a failed delete; {error} is technical."
+  },
+  "choose": {
+    "message": "Choose…",
+    "context": "Placeholder of a dropdown with nothing picked."
+  },
+  "backToBudget": {
+    "message": "Back to Budget",
+    "context": "Accessible label of the back arrow on pages opened from the Budget tab."
+  },
+  "edit": {
+    "message": "Edit",
+    "context": "Generic edit button."
+  },
+  "loading": {
+    "message": "Loading",
+    "context": "Accessible label of a loading placeholder."
+  }
+}

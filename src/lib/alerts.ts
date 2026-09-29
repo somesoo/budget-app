@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import type { Category, Expense, Person } from '../types'
 import { isOthersAllowance } from './allowance'
 import {
@@ -185,26 +186,33 @@ function describe(args: {
   daysLeft: number
 }): BudgetAlert {
   const { month, kind, category, spent, limit, projected, daysLeft } = args
-  const name = category ? category.name : 'The month'
-  const its = category ? 'its limit' : 'the budget'
-  const days = `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`
   const perDay = daysLeft > 0 ? Math.max(limit - spent, 0) / daysLeft : 0
+  const values = {
+    name: category?.name ?? '',
+    spent: formatMoneyWhole(spent),
+    limit: formatMoneyWhole(limit),
+    over: formatMoneyWhole(spent - limit),
+    left: formatMoneyWhole(limit - spent),
+    projected: formatMoneyWhole(projected ?? spent),
+    perDay: formatMoneyWhole(Math.floor(perDay)),
+    percent: Math.round((spent / limit) * 100),
+    count: daysLeft,
+  }
+  const scope = category ? 'category' : 'month'
 
   let title: string
   let detail: string
   if (kind === 'over') {
-    title = `${name} is over ${its}`
-    detail = `${formatMoneyWhole(spent)} of ${formatMoneyWhole(limit)}, ${formatMoneyWhole(spent - limit)} over${
-      daysLeft > 0 ? ` with ${days} to go` : ''
-    }.`
+    title = t(`alerts.${scope}.overTitle`, values)
+    detail =
+      daysLeft > 0 ? t('alerts.overDetailDaysLeft', values) : t('alerts.overDetail', values)
   } else if (kind === 'pace') {
-    title = `${name} is heading over ${its}`
-    detail = `At this pace about ${formatMoneyWhole(projected ?? spent)} by the end of the month, against ${formatMoneyWhole(limit)}. Up to ${formatMoneyWhole(Math.floor(perDay))} a day for ${days} keeps it within.`
+    title = t(`alerts.${scope}.paceTitle`, values)
+    detail = t('alerts.paceDetail', values)
   } else {
-    title = `${name} is at ${Math.round((spent / limit) * 100)}% of ${its}`
-    detail = `${formatMoneyWhole(limit - spent)} left${
-      daysLeft > 0 ? ` for ${days}, about ${formatMoneyWhole(Math.floor(perDay))} a day` : ''
-    }.`
+    title = t(`alerts.${scope}.nearTitle`, values)
+    detail =
+      daysLeft > 0 ? t('alerts.nearDetailDaysLeft', values) : t('alerts.nearDetail', values)
   }
 
   return {
@@ -229,7 +237,7 @@ function privateOver(args: {
   daysLeft: number
 }): BudgetAlert {
   const { month, category, spent, limit, daysLeft } = args
-  const who = category.owner ? personLabel(category.owner) : 'Someone'
+  const who = category.owner ? personLabel(category.owner) : t('alerts.someone')
   return {
     id: `${month}:${category.id}:over`,
     kind: 'over',
@@ -238,8 +246,8 @@ function privateOver(args: {
     limit,
     projected: null,
     daysLeft,
-    title: `${who} went over their allowance`,
-    detail: `${category.name} has spent more than planned this month.`,
+    title: t('alerts.privateOverTitle', { who }),
+    detail: t('alerts.privateOverDetail', { name: category.name }),
     private: true,
   }
 }
@@ -251,6 +259,9 @@ function privateOver(args: {
 export function crossingNote(category: Category, impact: LimitImpact): string | null {
   if (impact.levelAfter === impact.levelBefore || impact.levelAfter === 'ok') return null
   return impact.levelAfter === 'over'
-    ? `${category.name} is now ${formatMoneyWhole(impact.overBy)} over its limit`
-    : `${category.name} is now at ${Math.round((impact.after / impact.limit) * 100)}% of its limit`
+    ? t('alerts.crossedOver', { name: category.name, over: formatMoneyWhole(impact.overBy) })
+    : t('alerts.crossedNear', {
+        name: category.name,
+        percent: Math.round((impact.after / impact.limit) * 100),
+      })
 }

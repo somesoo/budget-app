@@ -1,6 +1,7 @@
+import { t } from '../i18n'
 import type { AccountSummary, GoalSummary } from './savings'
 import type { PlanAllocation, SavingsLoan, SavingsMovement } from '../types'
-import { monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
+import { formatMoney, formatMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
 import { roundUpPlan } from './planning'
 
 /*
@@ -92,7 +93,7 @@ export function borrowSources(
           account: a.account,
           goal: null,
           available: a.unassigned,
-          reason: 'not set aside for any goal',
+          reason: t('loans.reasonUnassigned'),
           neededAfter: null,
         },
         rank: 0,
@@ -114,7 +115,9 @@ export function borrowSources(
           account: a.account,
           goal: g,
           available: share,
-          reason: dated ? `due ${g.goal.target_date!.slice(0, 7)}` : 'no deadline',
+          reason: dated
+            ? t('loans.reasonDue', { month: formatMonth(g.goal.target_date!.slice(0, 7)) })
+            : t('loans.reasonNoDeadline'),
           neededAfter,
         },
         rank: dated ? 2 : 1,
@@ -171,7 +174,7 @@ export function shareChanges(
   const total = roundMoney(Object.values(target).reduce((s, v) => s + Math.max(v, 0), 0))
   if (total > summary.balance + 0.001) {
     throw new Error(
-      `That sets aside ${total} but the account only has ${summary.balance}. Lower a goal's share.`,
+      t('loans.sharesTooHigh', { total: formatMoney(total), balance: formatMoney(summary.balance) }),
     )
   }
   const ids = new Set([...Object.keys(summary.byGoal), ...Object.keys(target)])

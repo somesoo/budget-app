@@ -1,0 +1,10 @@
+{
+  "dismiss": {
+    "message": "Odrzuć",
+    "context": "Budget warning: tooltip of the × button that hides the warning."
+  },
+  "dismissLabel": {
+    "message": "Odrzuć: {title}",
+    "context": "Budget warning: accessible label of the × button; {title} is the warning's title."
+  }
+}

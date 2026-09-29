@@ -4,18 +4,13 @@ import { useSavingsActions } from '../../hooks/useSavings'
 import { formatDayShort, formatMoney, formatMonth, monthKeyOfDate } from '../../lib/calculations'
 import type { Goal, SavingsAccount, SavingsMovement } from '../../types'
 import { personLabel } from '../../lib/people'
+import { t } from '../../i18n'
+import { movementNoteLabel } from '../../lib/allocations'
 
 /** Months listed before "Show all". */
 const MONTHS_SHOWN = 3
 
-const KIND_LABEL: Record<SavingsMovement['kind'], string> = {
-  deposit: 'Saved',
-  withdrawal: 'Taken out',
-  interest: 'Interest',
-  adjustment: 'Balance corrected',
-  transfer: 'Moved',
-  spending: 'Spent',
-}
+const kindLabel = (kind: SavingsMovement['kind']) => t(`movement.${kind}`)
 
 /**
  * Movements by month, newest first. Deleting asks once more: it can shrink
@@ -36,11 +31,12 @@ export function MovementList({
   const { deleteMovement } = useSavingsActions()
   const [confirming, setConfirming] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
-  const accountName = (id: string) => accounts.find((a) => a.id === id)?.name ?? 'Account'
+  const accountName = (id: string) =>
+    accounts.find((a) => a.id === id)?.name ?? t('money.account')
   const goalName = (id: string | null) => (id ? goals.find((g) => g.id === id)?.name : undefined)
 
   if (movements.length === 0) {
-    return <p className="py-6 text-center text-sm text-muted">Nothing here yet.</p>
+    return <p className="py-6 text-center text-sm text-muted">{t('movement.empty')}</p>
   }
 
   const groups: { month: string; items: SavingsMovement[] }[] = []
@@ -61,9 +57,10 @@ export function MovementList({
           <ul className="divide-y divide-white/5 overflow-hidden rounded-2xl bg-white/[0.04] ring-1 ring-white/5">
             {g.items.map((m) => {
               const goal = goalName(m.goal_id)
+              const note = movementNoteLabel(m.note)
               const detail = [
                 showAccount ? accountName(m.account_id) : null,
-                goal ? `for ${goal}` : null,
+                goal ? t('movement.forGoal', { name: goal }) : null,
                 m.person ? personLabel(m.person) : null,
                 formatDayShort(m.movement_date),
               ]
@@ -73,10 +70,10 @@ export function MovementList({
                 <li key={m.id} className="flex items-center gap-3 px-3 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px] font-medium text-white">
-                      {m.note ?? KIND_LABEL[m.kind]}
+                      {note ?? kindLabel(m.kind)}
                     </p>
                     <p className="truncate text-[13px] text-muted">
-                      {m.note ? `${KIND_LABEL[m.kind]} · ` : ''}
+                      {note ? `${kindLabel(m.kind)} · ` : ''}
                       {detail}
                     </p>
                   </div>
@@ -99,21 +96,24 @@ export function MovementList({
                         }
                         className="rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-semibold text-red-300 hover:bg-red-500/25"
                       >
-                        Delete{m.transfer_id ? ' both' : ''}
+                        {m.transfer_id ? t('movement.deleteBoth') : t('common.delete')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirming(null)}
                         className="rounded-full px-2 py-1 text-xs text-muted hover:text-white"
                       >
-                        Keep
+                        {t('movement.keep')}
                       </button>
                     </span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => setConfirming(m.id)}
-                      aria-label={`Delete: ${m.note ?? KIND_LABEL[m.kind]}, ${formatMoney(Math.abs(m.amount))}`}
+                      aria-label={t('movement.deleteLabel', {
+                        what: note ?? kindLabel(m.kind),
+                        amount: formatMoney(Math.abs(m.amount)),
+                      })}
                       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted hover:bg-white/10 hover:text-white"
                     >
                       <Trash aria-hidden />
@@ -131,7 +131,7 @@ export function MovementList({
           onClick={() => setShowAll(true)}
           className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 ring-1 ring-white/10 hover:bg-white/5"
         >
-          Show all {groups.length} months
+          {t('category.showAll', { count: groups.length })}
         </button>
       )}
     </div>

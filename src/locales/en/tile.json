@@ -1,0 +1,30 @@
+{
+  "overLimit": {
+    "message": "over limit",
+    "context": "Accessible label of the warning icon on a category tile."
+  },
+  "over": {
+    "message": "over",
+    "context": "Category tile: small word after the amount over the limit, e.g. '−120 zł over'. Very short."
+  },
+  "left": {
+    "message": "left",
+    "context": "Category tile: small word after the amount still available, e.g. '380 zł left'. Very short."
+  },
+  "spentOf": {
+    "message": "spent {spent} of {limit} · {percent}%",
+    "context": "Category tile: tiny line, e.g. 'spent 620 of 1,000 · 62%'. Must be very short: the tile is a third of a phone's width."
+  },
+  "noLimit": {
+    "message": "spent · no limit",
+    "context": "Category tile: tiny line under the amount spent for a category without a limit."
+  },
+  "page": {
+    "message": "Categories, page {n} of {total}",
+    "context": "Accessible label of one page of category tiles (swiped sideways)."
+  },
+  "pageDot": {
+    "message": "Page {n}",
+    "context": "Accessible label of a page dot under the category tiles."
+  }
+}

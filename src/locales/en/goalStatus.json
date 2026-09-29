@@ -1,0 +1,26 @@
+{
+  "lately": {
+    "message": "{amount} a month lately",
+    "context": "Goal status: how much has gone into the goal per month recently. Lowercase fragment, follows 'Keeps growing, '."
+  },
+  "eta": {
+    "message": "At this pace, there by {month}",
+    "context": "Goal status for a goal without a date: when it's reached at the recent pace; {month} is month and year."
+  },
+  "nothingLately": {
+    "message": "Nothing put in lately",
+    "context": "Goal status: no recent deposits."
+  },
+  "onTrack": {
+    "message": "On track: {amount} a month does it",
+    "context": "Goal status: on track for its date."
+  },
+  "behind": {
+    "message": "Needs {amount} a month; at this pace {short} short",
+    "context": "Goal status: behind for its date."
+  },
+  "overdue": {
+    "message": "Its date has passed, {amount} to go",
+    "context": "Goal status: past its date and not reached."
+  }
+}

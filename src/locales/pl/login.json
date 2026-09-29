@@ -1,0 +1,38 @@
+{
+  "intro": {
+    "message": "Zaloguj się raz. Potem ten telefon zostaje zalogowany.",
+    "context": "Sign-in screen: line under the app name. The whole household shares one account."
+  },
+  "account": {
+    "message": "Konto",
+    "context": "Sign-in screen: label above the email field of the shared account."
+  },
+  "password": {
+    "message": "Hasło",
+    "context": "Sign-in screen: label above the password field."
+  },
+  "showPassword": {
+    "message": "Pokaż",
+    "context": "Sign-in screen: button inside the password field that reveals the typed password. Keep it short."
+  },
+  "hidePassword": {
+    "message": "Ukryj",
+    "context": "Sign-in screen: the same button once the password is visible; hides it again. Keep it short."
+  },
+  "signIn": {
+    "message": "Zaloguj się",
+    "context": "Sign-in screen: the big submit button."
+  },
+  "signingIn": {
+    "message": "Logowanie…",
+    "context": "Sign-in screen: the submit button while the sign-in is in progress."
+  },
+  "wrongPassword": {
+    "message": "Nieprawidłowe hasło. Spróbuj jeszcze raz.",
+    "context": "Sign-in screen: error under the password field when the password doesn't match."
+  },
+  "offline": {
+    "message": "Brak połączenia z serwerem. Sprawdź internet.",
+    "context": "Sign-in screen: error under the password field when there's no network."
+  }
+}

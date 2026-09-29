@@ -1,0 +1,92 @@
+{
+  "title": {
+    "message": "Prognoza",
+    "context": "Card heading (Add screen widget, Budget and Insights): what's left of the month's income at its end."
+  },
+  "noIncomeCurrent": {
+    "message": "Zapisuj wypłaty przyciskiem „+ Dochód” na karcie Dodaj, a tu pojawi się prognoza tego, co zostanie na koniec miesiąca.",
+    "context": "Forecast card when this month has no income logged. '+ Income' is the button on the Add tab (use its translated name)."
+  },
+  "noIncomePast": {
+    "message": "W tym miesiącu nie zapisano dochodu.",
+    "context": "Forecast card for a past month without income."
+  },
+  "expected": {
+    "message": "{name} ~{amount} spodziewane",
+    "context": "Forecast card, under Income: a person's typical pay, used until this month's paycheck is logged. '~' means about."
+  },
+  "onCourseSave": {
+    "message": "Zmierza do odłożenia <b>{amount}</b> w tym miesiącu.",
+    "context": "Forecast card headline (current month). Keep the <b> tags."
+  },
+  "onCourseSaveRate": {
+    "message": "Zmierza do odłożenia <b>{amount}</b> w tym miesiącu, {percent}% dochodu.",
+    "context": "Forecast card headline (current month) with the share of income saved. Keep the <b> tags."
+  },
+  "onCourseOverspend": {
+    "message": "Zmierza do wydania <b>{amount} więcej</b>, niż zarabiacie w tym miesiącu.",
+    "context": "Forecast card headline (current month) when spending is projected above income. Keep the <b> tags."
+  },
+  "saved": {
+    "message": "Odłożono <b>{amount}</b>.",
+    "context": "Forecast card headline for a past month. Keep the <b> tags."
+  },
+  "savedRate": {
+    "message": "Odłożono <b>{amount}</b>, {percent}% dochodu.",
+    "context": "Forecast card headline for a past month with the share of income saved. Keep the <b> tags."
+  },
+  "overspent": {
+    "message": "Wydano <b>{amount} więcej</b>, niż zarobiono.",
+    "context": "Forecast card headline for a past month that spent more than it earned. Keep the <b> tags."
+  },
+  "stillToSpend": {
+    "message": "Jeszcze do wydania (prognoza)",
+    "context": "Forecast card: legend of the lighter bar segment, spending projected for the rest of the month."
+  },
+  "leftOver": {
+    "message": "Zostaje",
+    "context": "Forecast card: legend and label, income minus spending at the month's end."
+  },
+  "shortfall": {
+    "message": "Niedobór",
+    "context": "Forecast card table: spending above income."
+  },
+  "spentSoFar": {
+    "message": "Wydano dotąd",
+    "context": "Forecast card table row."
+  },
+  "projected": {
+    "message": "Prognozowane wydatki",
+    "context": "Forecast card: the whole month's spending, projected."
+  },
+  "soFar": {
+    "message": "{amount} dotąd",
+    "context": "Forecast card: under projected spending, what's been spent so far."
+  },
+  "breakEven": {
+    "message": "Żeby wyjść na zero",
+    "context": "Forecast card: label of what can be spent per day without spending more than the income."
+  },
+  "breakEvenDetail": {
+    "one": "do <b>{amount}</b> dziennie przez pozostały {count} dzień",
+    "few": "do <b>{amount}</b> dziennie przez pozostałe {count} dni",
+    "many": "do <b>{amount}</b> dziennie przez pozostałych {count} dni",
+    "other": "do <b>{amount}</b> dziennie przez pozostałe {count} dnia",
+    "context": "Forecast card, under 'To break even'. Keep the <b> tags."
+  },
+  "goal": {
+    "message": "Cel: {name}",
+    "context": "Forecast card: label with the main savings goal's name."
+  },
+  "goalDetail": {
+    "one": "ok. <b>{count} miesiąc</b>, gdyby taka nadwyżka szła na niego co miesiąc",
+    "few": "ok. <b>{count} miesiące</b>, gdyby taka nadwyżka szła na niego co miesiąc",
+    "many": "ok. <b>{count} miesięcy</b>, gdyby taka nadwyżka szła na niego co miesiąc",
+    "other": "ok. <b>{count} miesiąca</b>, gdyby taka nadwyżka szła na niego co miesiąc",
+    "context": "Forecast card, under 'Goal: …': how long the goal takes at this month's surplus. Keep the <b> tags."
+  },
+  "expectedNote": {
+    "message": "„Spodziewane” to typowy miesiąc tej osoby, liczony, dopóki nie zostanie zapisana tegomiesięczna wypłata.",
+    "context": "Forecast card: footnote explaining 'expected' income."
+  }
+}

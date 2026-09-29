@@ -1,0 +1,46 @@
+{
+  "deposit": {
+    "message": "Odłożono",
+    "context": "Savings history: a deposit (money put onto an account)."
+  },
+  "withdrawal": {
+    "message": "Wypłacono",
+    "context": "Savings history: a withdrawal."
+  },
+  "interest": {
+    "message": "Odsetki",
+    "context": "Savings history: interest paid by the bank."
+  },
+  "adjustment": {
+    "message": "Korekta salda",
+    "context": "Savings history: a correction to match the bank's balance."
+  },
+  "transfer": {
+    "message": "Przeniesiono",
+    "context": "Savings history: money moved between accounts."
+  },
+  "spending": {
+    "message": "Wydano",
+    "context": "Savings history: money spent from a goal, taken off the account it was on."
+  },
+  "empty": {
+    "message": "Jeszcze nic tu nie ma.",
+    "context": "Savings history: empty state."
+  },
+  "forGoal": {
+    "message": "na cel {name}",
+    "context": "Savings history: which goal a movement was for. Lowercase fragment."
+  },
+  "deleteBoth": {
+    "message": "Usuń obie",
+    "context": "Savings history: confirm deleting a transfer, which removes both of its sides."
+  },
+  "keep": {
+    "message": "Zostaw",
+    "context": "Savings history: cancel the delete."
+  },
+  "deleteLabel": {
+    "message": "Usuń: {what}, {amount}",
+    "context": "Savings history: accessible label of the bin button."
+  }
+}

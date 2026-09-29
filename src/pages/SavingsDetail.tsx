@@ -8,7 +8,7 @@ import { ColumnChart } from '../components/charts/ColumnChart'
 import { CHART } from '../components/charts/theme'
 import { EntryDialogs } from '../components/history/EntryDialogs'
 import { TripSpendingCard, WhereItWent } from '../components/projects/TripSpending'
-import { AccountSheet, ACCOUNT_KINDS, ownerLabel } from '../components/savings/AccountSheet'
+import { AccountSheet, accountKindLabel, ownerLabel } from '../components/savings/AccountSheet'
 import { LeftToUse, StatusLine } from '../components/savings/cards'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
@@ -23,6 +23,7 @@ import { useSavingsOverview } from '../hooks/useSavings'
 import {
   categoryById,
   currentMonthKey,
+  formatAmount,
   formatDayLong,
   formatMoney,
   formatMoneyWhole,
@@ -35,6 +36,8 @@ import {
 import { toEntries } from '../lib/history'
 import { monthsEndingAt } from '../lib/insights'
 import { accountGain, balanceHistory, projectBalance } from '../lib/savings'
+import { t } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
 type Sheet =
   | { kind: 'money'; mode: MoneyMode; goalId?: string }
@@ -52,11 +55,11 @@ export function SavingsAccountPage() {
   const navigate = useNavigate()
   const summary = s.accounts.find((a) => a.account.id === id)
 
-  if (s.isLoading) return <Frame back="/savings" title="Account" loading />
+  if (s.isLoading) return <Frame back="/savings" title={t('money.account')} loading />
   if (!summary)
     return (
-      <Frame back="/savings" title="Account">
-        Nothing here: the account may have been removed.
+      <Frame back="/savings" title={t('money.account')}>
+        {t('savingsDetail.accountGone')}
       </Frame>
     )
 
@@ -98,8 +101,10 @@ export function SavingsAccountPage() {
       back="/savings"
       title={account.name}
       color={account.color}
-      subtitle={`${ACCOUNT_KINDS[account.kind]} · ${ownerLabel(account.owner)}${
-        account.interest_rate != null ? ` · ${account.interest_rate}% a year` : ''
+      subtitle={`${accountKindLabel(account.kind)} · ${ownerLabel(account.owner)}${
+        account.interest_rate != null
+          ? ` · ${t('savingsDetail.rate', { rate: formatAmount(account.interest_rate) })}`
+          : ''
       }`}
       onEdit={() => setSheet({ kind: 'edit' })}
       actions={
@@ -112,9 +117,9 @@ export function SavingsAccountPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="grid grid-cols-3 gap-3 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-            <Stat label="Balance" value={formatMoneyWhole(balance)} />
-            <Stat label="Set aside" value={formatMoneyWhole(allocated)} />
-            <Stat label="Unassigned" value={formatMoneyWhole(unassigned)} />
+            <Stat label={t('savingsDetail.balance')} value={formatMoneyWhole(balance)} />
+            <Stat label={t('savingsDetail.setAside')} value={formatMoneyWhole(allocated)} />
+            <Stat label={t('savingsPage.unassigned')} value={formatMoneyWhole(unassigned)} />
           </section>
 
           {INVESTED.has(account.kind) && (
@@ -130,15 +135,15 @@ export function SavingsAccountPage() {
               className="rounded-3xl p-4 ring-1 ring-white/10"
               style={{ backgroundColor: CHART.surface }}
             >
-              <h2 className="text-base font-semibold text-white">Balance at month end</h2>
+              <h2 className="text-base font-semibold text-white">{t('savingsDetail.monthEnd')}</h2>
               {interest > 0 && (
                 <p className="mt-0.5 text-sm text-slate-300">
-                  {formatMoneyWhole(interest)} of it is interest.
+                  {t('savingsDetail.interestPart', { amount: formatMoneyWhole(interest) })}
                 </p>
               )}
               <div className="mt-3">
                 <ColumnChart
-                  ariaLabel={`${account.name} balance at the end of each month`}
+                  ariaLabel={t('savingsDetail.chartLabel', { name: account.name })}
                   emphasize={month}
                   columns={history.map((p) => ({
                     key: p.month,
@@ -147,9 +152,12 @@ export function SavingsAccountPage() {
                     tooltip: (
                       <>
                         <p className="mb-1 text-slate-400">{formatMonth(p.month)}</p>
-                        <TooltipRow label="Balance" value={formatMoney(p.balance)} />
+                        <TooltipRow label={t('savingsDetail.balance')} value={formatMoney(p.balance)} />
                         {p.interest > 0 && (
-                          <TooltipRow label="Interest so far" value={formatMoney(p.interest)} />
+                          <TooltipRow
+                            label={t('savingsDetail.interestSoFar')}
+                            value={formatMoney(p.interest)}
+                          />
                         )}
                       </>
                     ),
@@ -160,7 +168,7 @@ export function SavingsAccountPage() {
           )}
 
           <section>
-            <h2 className="mb-2 text-base font-semibold text-white">Movements</h2>
+            <h2 className="mb-2 text-base font-semibold text-white">{t('savingsDetail.movements')}</h2>
             <MovementList
               movements={mine}
               accounts={s.accounts.map((a) => a.account)}
@@ -172,26 +180,26 @@ export function SavingsAccountPage() {
         <div className="space-y-6">
           <section>
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">Set aside for</h2>
+              <h2 className="text-base font-semibold text-white">{t('savingsDetail.setAsideFor')}</h2>
               <div className="flex items-center">
                 <button
                   type="button"
                   onClick={() => setSheet({ kind: 'money', mode: 'allocate' })}
                   className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
                 >
-                  Assign
+                  {t('money.assign')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSheet({ kind: 'shares' })}
                   className="rounded-full px-3 py-1.5 text-sm font-semibold text-accent-soft hover:bg-accent/10"
                 >
-                  Fix shares
+                  {t('savingsDetail.fixShares')}
                 </button>
               </div>
             </div>
             {goalShares.length === 0 ? (
-              <p className="text-sm text-muted">No goal has money on this account yet.</p>
+              <p className="text-sm text-muted">{t('savingsDetail.noShares')}</p>
             ) : (
               <ul className="grid gap-1.5">
                 {goalShares.map(({ goal, amount }) => (
@@ -219,17 +227,25 @@ export function SavingsAccountPage() {
           </section>
 
           <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-            <h2 className="text-base font-semibold text-white">In a year</h2>
+            <h2 className="text-base font-semibold text-white">{t('savingsDetail.inAYear')}</h2>
             <p className="mt-1 text-2xl font-bold tabular-nums text-white">
               {formatMoneyWhole(inAYear)}
             </p>
             <p className="mt-1 text-sm leading-snug text-slate-300">
-              {recent > 0
-                ? `If ${formatMoneyWhole(recent)} a month keeps going in, as lately`
-                : 'With nothing more put in'}
-              {account.interest_rate
-                ? `, plus about ${formatMoneyWhole(Math.max(earned, 0))} interest at ${account.interest_rate}% before the 19% tax.`
-                : '. Add its interest rate to see what it earns.'}
+              {t(
+                recent > 0
+                  ? account.interest_rate
+                    ? 'savingsDetail.projectionKeepRate'
+                    : 'savingsDetail.projectionKeep'
+                  : account.interest_rate
+                    ? 'savingsDetail.projectionNothingRate'
+                    : 'savingsDetail.projectionNothing',
+                {
+                  recent: formatMoneyWhole(recent),
+                  earned: formatMoneyWhole(Math.max(earned, 0)),
+                  rate: formatAmount(account.interest_rate ?? 0),
+                },
+              )}
             </p>
           </section>
         </div>
@@ -272,11 +288,11 @@ export function SavingsGoalPage() {
   const [sheet, setSheet] = useState<Sheet>(null)
   const summary = s.goals.find((g) => g.goal.id === id)
 
-  if (s.isLoading) return <Frame back="/savings" title="Goal" loading />
+  if (s.isLoading) return <Frame back="/savings" title={t('split.goal')} loading />
   if (!summary)
     return (
-      <Frame back="/savings" title="Goal">
-        Nothing here: the goal may have been removed.
+      <Frame back="/savings" title={t('split.goal')}>
+        {t('savingsDetail.goalGone')}
       </Frame>
     )
 
@@ -294,10 +310,13 @@ export function SavingsGoalPage() {
       subtitle={
         [
           goal.target_amount > 0
-            ? `Target ${formatMoneyWhole(goal.target_amount)}${
-                goal.target_date ? ` by ${formatMonth(goal.target_date.slice(0, 7))}` : ''
-              }`
-            : 'No finish line',
+            ? goal.target_date
+              ? t('savingsDetail.targetBy', {
+                  amount: formatMoneyWhole(goal.target_amount),
+                  month: formatMonth(goal.target_date.slice(0, 7)),
+                })
+              : t('savingsDetail.target', { amount: formatMoneyWhole(goal.target_amount) })
+            : t('savingsDetail.noFinish'),
           tripDates,
         ]
           .filter(Boolean)
@@ -315,16 +334,16 @@ export function SavingsGoalPage() {
             onClick={() => setSheet({ kind: 'setSaved' })}
             className="h-10 shrink-0 rounded-full px-4 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
           >
-            Set saved amount
+            {t('savingsDetail.setSaved')}
           </button>
-          <AskLink question={`How do we get to ${goal.name} in time, and what would it take?`} />
+          <AskLink question={t('savingsDetail.askQuestion', { name: goal.name })} />
         </div>
       }
     >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-6">
           <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
-            <p className="text-sm text-muted">Saved</p>
+            <p className="text-sm text-muted">{t('settings.savings.saved')}</p>
             <p className="text-3xl font-bold tabular-nums text-white">{formatMoneyWhole(putAside)}</p>
             {progress !== null && (
               <>
@@ -336,7 +355,8 @@ export function SavingsGoalPage() {
                 </div>
                 <p className="mt-2 text-sm text-slate-300">
                   {Math.round(progress * 100)}%
-                  {remaining > 0 && `, ${formatMoneyWhole(remaining)} to go`}
+                  {remaining > 0 &&
+                    `, ${t('carryover.toGo', { amount: formatMoneyWhole(remaining) })}`}
                 </p>
               </>
             )}
@@ -353,12 +373,11 @@ export function SavingsGoalPage() {
 
           {trip && (
             <section>
-              <h2 className="mb-2 text-base font-semibold text-white">Spent from it</h2>
+              <h2 className="mb-2 text-base font-semibold text-white">{t('savingsDetail.spentFrom')}</h2>
               {spending.length > 0 && <TripSpendingCard summary={trip} />}
               {spending.length === 0 ? (
                 <p className="text-sm text-muted">
-                  Nothing yet. Add what it costs from the Goals tile on the Add tab: it stays out
-                  of the monthly budget.
+                  {t('savingsDetail.spentEmpty')}
                 </p>
               ) : (
                 <div className="mt-3">
@@ -373,7 +392,7 @@ export function SavingsGoalPage() {
           )}
 
           <section>
-            <h2 className="mb-2 text-base font-semibold text-white">Put in and taken out</h2>
+            <h2 className="mb-2 text-base font-semibold text-white">{t('savingsDetail.inAndOut')}</h2>
             <MovementList
               movements={mine}
               accounts={s.accounts.map((a) => a.account)}
@@ -385,9 +404,9 @@ export function SavingsGoalPage() {
 
         <div className="space-y-6">
           <section>
-            <h2 className="mb-2 text-base font-semibold text-white">Where the money is</h2>
+            <h2 className="mb-2 text-base font-semibold text-white">{t('setSaved.where')}</h2>
             {funding.length === 0 ? (
-              <p className="text-sm text-muted">Nothing set aside for it on any account yet.</p>
+              <p className="text-sm text-muted">{t('savingsDetail.noFunding')}</p>
             ) : (
               <ul className="grid gap-1.5">
                 {funding.map((f) => (
@@ -460,10 +479,10 @@ function InvestedCard({
   return (
     <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
       <div className="grid grid-cols-3 gap-3">
-        <Stat label="Put in" value={formatMoneyWhole(putIn)} />
-        <Stat label="Worth now" value={formatMoneyWhole(balance)} />
+        <Stat label={t('savingsDetail.putIn')} value={formatMoneyWhole(putIn)} />
+        <Stat label={t('savingsDetail.worthNow')} value={formatMoneyWhole(balance)} />
         <div className="min-w-0">
-          <p className="truncate text-xs text-muted">{gain >= 0 ? 'Gained' : 'Lost'}</p>
+          <p className="truncate text-xs text-muted">{gain >= 0 ? t('savingsDetail.gained') : t('savingsDetail.lost')}</p>
           <p
             className={`truncate text-base font-bold tabular-nums sm:text-lg ${gain >= 0 ? 'text-positive' : 'text-red-300'}`}
           >
@@ -479,25 +498,30 @@ function InvestedCard({
         </div>
       </div>
       <p className="mt-3 text-xs leading-snug text-slate-300">
-        Its value goes up and down by itself. Once a month or a quarter,{' '}
-        <button
-          type="button"
-          onClick={onUpdate}
-          className="font-semibold text-accent-soft hover:underline"
-        >
-          update the balance
-        </button>{' '}
-        to what your provider shows: the difference is the gain or loss, and doesn’t count as
-        saving or against the yearly limit.
+        <Trans
+          k="savingsDetail.investedHelp"
+          tags={{
+            link: (s) => (
+              <button
+                type="button"
+                onClick={onUpdate}
+                className="font-semibold text-accent-soft hover:underline"
+              >
+                {s}
+              </button>
+            ),
+          }}
+        />
       </p>
     </section>
   )
 }
 
 function datesOf(from: string | null, to: string | null): string | null {
-  if (from && to) return `${formatDayLong(from)} to ${formatDayLong(to)}`
-  if (from) return `From ${formatDayLong(from)}`
-  if (to) return `Until ${formatDayLong(to)}`
+  if (from && to)
+    return t('project.datesBoth', { from: formatDayLong(from), to: formatDayLong(to) })
+  if (from) return t('project.datesFrom', { from: formatDayLong(from) })
+  if (to) return t('project.datesTo', { to: formatDayLong(to) })
   return null
 }
 
@@ -525,7 +549,7 @@ function Frame({
       <header className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-3">
         <Link
           to={back}
-          aria-label="Back to Savings"
+          aria-label={t('savingsDetail.back')}
           className="-ml-2 rounded-full p-2 text-2xl text-muted hover:bg-white/5"
         >
           <ArrowLeft />
@@ -549,7 +573,7 @@ function Frame({
             onClick={onEdit}
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
           >
-            <PencilSimple aria-hidden /> Edit
+            <PencilSimple aria-hidden /> {t('common.edit')}
           </button>
         )}
         {actions && <div className="w-full">{actions}</div>}
@@ -559,14 +583,15 @@ function Frame({
   )
 }
 
-const ACTION_LABEL: Record<MoneyMode, string> = {
-  deposit: 'Save money',
-  withdraw: 'Take out',
-  interest: 'Interest',
-  balance: 'Update balance',
-  allocate: 'Assign',
-  transfer: 'Move',
-}
+const actionLabel = (mode: MoneyMode) =>
+  ({
+    deposit: t('money.title.deposit'),
+    withdraw: t('savingsPage.takeOut'),
+    interest: t('movement.interest'),
+    balance: t('savingsPage.updateBalance'),
+    allocate: t('money.assign'),
+    transfer: t('savingsPage.move'),
+  })[mode]
 
 function Actions({ modes, onPick }: { modes: MoneyMode[]; onPick: (m: MoneyMode) => void }) {
   return (
@@ -583,7 +608,7 @@ function Actions({ modes, onPick }: { modes: MoneyMode[]; onPick: (m: MoneyMode)
           }
         >
           {i === 0 && <Plus weight="bold" aria-hidden />}
-          {ACTION_LABEL[m]}
+          {actionLabel(m)}
         </button>
       ))}
     </div>

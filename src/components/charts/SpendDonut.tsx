@@ -3,6 +3,7 @@ import { CURRENCY_SUFFIX } from '../../config'
 import { formatAmount } from '../../lib/calculations'
 import type { CategorySlice } from '../../lib/insights'
 import { CHART } from './theme'
+import { t } from '../../i18n'
 
 interface Props {
   /** Biggest first — see categorySlices(). */
@@ -103,7 +104,7 @@ export function SpendDonut({ slices }: Props) {
         </div>
       </div>
 
-      <ul className="min-w-0 flex-1" aria-label="Categories, biggest first">
+      <ul className="min-w-0 flex-1" aria-label={t('charts.donutList')}>
         {arcs.map(({ slice, color }) => (
           <li key={slice.id}>
             <button

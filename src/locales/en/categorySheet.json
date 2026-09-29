@@ -1,0 +1,103 @@
+{
+  "new": {
+    "message": "New category",
+    "context": "Settings > category sheet heading when creating one."
+  },
+  "namePlaceholder": {
+    "message": "e.g. Gifts",
+    "context": "Category sheet: placeholder of the name field."
+  },
+  "limit": {
+    "message": "Default monthly limit",
+    "context": "Category sheet: label of the limit field."
+  },
+  "limitHelp": {
+    "message": "Months without a plan use it.",
+    "context": "Category sheet: hint under the limit field."
+  },
+  "limitHelpTypical": {
+    "message": "Months without a plan use it. The last 3 months averaged {amount}.",
+    "context": "Category sheet: hint under the limit field; {amount} is a tappable amount that fills in the average."
+  },
+  "inChart": {
+    "message": "In the “Where it goes” chart",
+    "context": "Category sheet: switch label; 'Where it goes' is the spending donut's name."
+  },
+  "inChartHelp": {
+    "message": "Turn off for fixed costs like rent; they still count everywhere else.",
+    "context": "Category sheet: hint under the chart switch."
+  },
+  "whose": {
+    "message": "Whose",
+    "context": "Category sheet: label of the choice between shared and one person's allowance."
+  },
+  "allowanceHelp": {
+    "message": "{name}'s allowance: money nobody has to explain. Only {name} sees its tile, spending and entries; everyone else just hears when it goes over its limit. It still counts in the plan and every total.",
+    "context": "Category sheet: explanation when the category is {name}'s personal allowance (pocket money)."
+  },
+  "sharedHelp": {
+    "message": "Shared by everyone. Make it one person’s to use it as their allowance.",
+    "context": "Category sheet: explanation when the category is shared."
+  },
+  "shared": {
+    "message": "Shared",
+    "context": "Category sheet: option, the category belongs to everyone."
+  },
+  "allowanceOf": {
+    "message": "{name}'s allowance",
+    "context": "Category sheet: option, the category is {name}'s personal allowance."
+  },
+  "add": {
+    "message": "Add category",
+    "context": "Category sheet: button that creates the category."
+  },
+  "moveUp": {
+    "message": "Move up",
+    "context": "Category sheet: moves the category one place up in the order."
+  },
+  "moveDown": {
+    "message": "Move down",
+    "context": "Category sheet: moves the category one place down."
+  },
+  "hide": {
+    "message": "Hide it",
+    "context": "Category sheet: hides (archives) the category."
+  },
+  "unhide": {
+    "message": "Show it again",
+    "context": "Category sheet: brings a hidden category back."
+  },
+  "hideHelp": {
+    "message": "Hiding takes it off the Add screen and out of planning; old expenses keep it.",
+    "context": "Category sheet: explanation of hiding."
+  },
+  "delete": {
+    "message": "Delete category",
+    "context": "Category sheet: opens the delete confirmation."
+  },
+  "checking": {
+    "message": "Checking its expenses…",
+    "context": "Category sheet > delete: while counting the category's expenses."
+  },
+  "moveTo": {
+    "one": "{count} expense is in {name}. Move it to",
+    "other": "{count} expenses are in {name}. Move them to",
+    "context": "Category sheet > delete: label above choosing where the expenses go; followed by a list of categories."
+  },
+  "hiddenSuffix": {
+    "message": "(hidden)",
+    "context": "Category sheet > delete: after a hidden category's name in the list."
+  },
+  "confirmEmpty": {
+    "message": "No expenses in {name}. Delete it for good?",
+    "context": "Category sheet > delete: confirmation for a category without expenses."
+  },
+  "keep": {
+    "message": "Keep it",
+    "context": "Category sheet > delete: cancels the deletion."
+  },
+  "moveAndDelete": {
+    "message": "Move and delete",
+    "context": "Category sheet > delete: moves the expenses, then deletes."
+  }
+}

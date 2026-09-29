@@ -4,6 +4,7 @@ import { CURRENCY_SUFFIX } from '../../config'
 import type { GoalTrip } from '../../hooks/useGoalTrips'
 import { formatAmount, withAlpha } from '../../lib/calculations'
 import { BottomSheet } from '../history/BottomSheet'
+import { t } from '../../i18n'
 
 const GOALS_COLOR = '#22c55e'
 
@@ -30,13 +31,17 @@ export function GoalsTile({
       style={{ height, backgroundColor: withAlpha(GOALS_COLOR, 0.18) }}
     >
       <div className="flex items-start justify-between gap-1">
-        <span className="truncate text-[12px] font-semibold leading-[15px] text-white">Goals</span>
+        <span className="truncate text-[12px] font-semibold leading-[15px] text-white">
+          {t('add.goals')}
+        </span>
         <PiggyBank weight="fill" aria-hidden className="shrink-0" style={{ color: GOALS_COLOR }} />
       </div>
       <div>
-        <div className="truncate text-[15px] font-bold leading-5 text-white">Spend from one</div>
+        <div className="truncate text-[15px] font-bold leading-5 text-white">
+          {t('add.goalsTile.spend')}
+        </div>
         <div className="truncate text-[10.5px] font-medium leading-[14px] text-white/90">
-          {goals.length} {goals.length === 1 ? 'goal' : 'goals'} · from savings
+          {t('add.goalsTile.count', { count: goals.length })}
         </div>
       </div>
     </button>
@@ -69,14 +74,13 @@ export function GoalPicker({
   }
 
   return (
-    <BottomSheet title="Spent from a goal" onClose={onClose}>
+    <BottomSheet title={t('add.goalPicker.title')} onClose={onClose}>
       <p className="-mt-2 mb-3 text-sm text-muted">
-        Paid from savings: it comes off the account the goal’s money is on, not this month’s
-        budget.
+        {t('add.goalPicker.help')}
       </p>
       {goals.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted">
-          No goals yet. Add one in the Savings tab.
+          {t('widgets.goals.empty')}
         </p>
       ) : (
         <ul className="grid gap-2 pb-2">
@@ -102,8 +106,16 @@ export function GoalPicker({
                       {g.goal.name}
                     </span>
                     <span className="block text-xs tabular-nums text-slate-300">
-                      {formatAmount(Math.round(spent))}
-                      {target > 0 ? ` of ${formatAmount(target)}` : ''} {CURRENCY_SUFFIX} spent
+                      {target > 0
+                        ? t('add.goalPicker.spentOf', {
+                            spent: formatAmount(Math.round(spent)),
+                            target: formatAmount(target),
+                            currency: CURRENCY_SUFFIX,
+                          })
+                        : t('add.goalPicker.spent', {
+                            spent: formatAmount(Math.round(spent)),
+                            currency: CURRENCY_SUFFIX,
+                          })}
                     </span>
                   </span>
                   <CaretRight aria-hidden className="shrink-0 text-muted" />

@@ -1,0 +1,34 @@
+{
+  "title": {
+    "message": "Who’s in this budget?",
+    "context": "First-run screen (setting up the household): heading."
+  },
+  "intro": {
+    "message": "Just you, or up to four people sharing it: a couple, a family, flatmates. Everyone logs from their own phone and sees the same numbers. Names can change later in Settings.",
+    "context": "First-run screen: explanation under the heading."
+  },
+  "yourName": {
+    "message": "Your name",
+    "context": "First-run screen: placeholder of the first name field."
+  },
+  "person": {
+    "message": "Person {n}",
+    "context": "First-run screen: placeholder and label of the other name fields, and the fallback name on buttons; {n} is 2 to 4."
+  },
+  "whichPhone": {
+    "message": "Which one of you is holding this phone?",
+    "context": "First-run screen: question above the list of names, to pick whose phone this is."
+  },
+  "duplicate": {
+    "message": "Two people have the same name: tell them apart.",
+    "context": "First-run screen: warning when two names are the same."
+  },
+  "settingUp": {
+    "message": "Setting up…",
+    "context": "First-run screen: the start button while saving."
+  },
+  "start": {
+    "message": "Start",
+    "context": "First-run screen: the main button."
+  }
+}

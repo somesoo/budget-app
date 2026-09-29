@@ -1,0 +1,141 @@
+{
+  "donut": {
+    "label": {
+      "message": "Where it goes",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): donut chart of this month's spending by category."
+    },
+    "help": {
+      "message": "This month by category.",
+      "context": "Settings > Widgets: description under the 'Where it goes' switch."
+    },
+    "leftOut": {
+      "message": "Not in the chart: {list}",
+      "context": "Add screen > 'Where it goes' widget: categories left out of the chart (like rent) with what they cost, e.g. 'Rent 2,500 zł · Bills 300 zł'."
+    }
+  },
+  "pace": {
+    "label": {
+      "message": "Pace",
+      "context": "Name of an Add screen widget: spending so far against an even spread of the month's limits."
+    },
+    "help": {
+      "message": "Spending so far against an even spread of the limits.",
+      "context": "Settings > Widgets: description under the 'Pace' switch."
+    },
+    "soFar": {
+      "message": "Spent {amount} so far.",
+      "context": "Add screen > Pace widget: sentence above the chart when there's no projection yet."
+    },
+    "over": {
+      "message": "At this rate about {amount} over the limits by the end of the month.",
+      "context": "Add screen > Pace widget: the month is projected to go over the limits by {amount}."
+    },
+    "under": {
+      "message": "On course for {projected}, {amount} under the limits.",
+      "context": "Add screen > Pace widget: the month is projected to end at {projected}, {amount} below the limits."
+    }
+  },
+  "alerts": {
+    "label": {
+      "message": "Warnings",
+      "context": "Name of an Add screen widget: the list of budget warnings."
+    },
+    "help": {
+      "message": "Categories close to or over their limit.",
+      "context": "Settings > Widgets: description under the 'Warnings' switch."
+    },
+    "empty": {
+      "message": "All good: nothing close to a limit.",
+      "context": "Add screen > Warnings widget when there are no warnings."
+    }
+  },
+  "delta": {
+    "label": {
+      "message": "Vs last month",
+      "context": "Name of an Add screen widget: categories up or down compared with the same days of last month. Short."
+    },
+    "help": {
+      "message": "Categories up or down on the same days last month.",
+      "context": "Settings > Widgets: description under the 'Vs last month' switch."
+    },
+    "empty": {
+      "message": "Nothing from last month to compare with.",
+      "context": "Add screen > Vs last month widget when last month has no spending."
+    },
+    "same": {
+      "one": "Same as the first day of {month}.",
+      "other": "Same as the first {count} days of {month}.",
+      "context": "Add screen > Vs last month widget: spending equals the same days of last month. {count} days, {month} short month name (e.g. 'Aug')."
+    },
+    "more": {
+      "one": "{amount} more than the first day of {month}.",
+      "other": "{amount} more than the first {count} days of {month}.",
+      "context": "Add screen > Vs last month widget: this month so far costs {amount} more than the same {count} days of last month ({month}, short name)."
+    },
+    "less": {
+      "one": "{amount} less than the first day of {month}.",
+      "other": "{amount} less than the first {count} days of {month}.",
+      "context": "Add screen > Vs last month widget: this month so far costs {amount} less than the same {count} days of last month ({month}, short name)."
+    }
+  },
+  "forecast": {
+    "label": {
+      "message": "Forecast",
+      "context": "Name of an Add screen widget: what's left of the income at the end of the month."
+    },
+    "help": {
+      "message": "What’s left of the income at the end of the month.",
+      "context": "Settings > Widgets: description under the 'Forecast' switch."
+    }
+  },
+  "people": {
+    "label": {
+      "message": "Who paid",
+      "context": "Name of an Add screen widget: this month's spending split between the people."
+    },
+    "help": {
+      "message": "This month split between everyone in the budget.",
+      "context": "Settings > Widgets: description under the 'Who paid' switch."
+    }
+  },
+  "goals": {
+    "label": {
+      "message": "Goals",
+      "context": "Name of an Add screen widget: progress of each savings goal."
+    },
+    "help": {
+      "message": "How far each savings goal is.",
+      "context": "Settings > Widgets: description under the 'Goals' switch."
+    },
+    "empty": {
+      "message": "No goals yet. Add one in the Savings tab.",
+      "context": "Add screen > Goals widget when there are no savings goals."
+    }
+  },
+  "week": {
+    "label": {
+      "message": "Last 7 days",
+      "context": "Name of an Add screen widget: spending day by day over the last week."
+    },
+    "help": {
+      "message": "Spending day by day.",
+      "context": "Settings > Widgets: description under the 'Last 7 days' switch."
+    },
+    "summary": {
+      "message": "{amount} in the last 7 days",
+      "context": "Add screen > Last 7 days widget: total spent over the week."
+    },
+    "summaryWithLimit": {
+      "message": "{amount} in the last 7 days, {share} would be the limits' share.",
+      "context": "Add screen > Last 7 days widget: {amount} spent over the week; {share} is what the monthly limits allow for 7 days."
+    },
+    "chartLabel": {
+      "message": "Spending per day, last 7 days",
+      "context": "Accessible label of the bar chart in the Last 7 days widget."
+    }
+  },
+  "nothingSpent": {
+    "message": "Nothing spent yet this month.",
+    "context": "Add screen widgets (donut, who paid) when nothing has been spent this month."
+  }
+}

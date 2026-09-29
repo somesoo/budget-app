@@ -4,6 +4,7 @@ import { usePrefs } from '../../hooks/usePrefs'
 import { limitImpact } from '../../lib/alerts'
 import type { Category } from '../../types'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 interface Props {
   category: Category
@@ -31,8 +32,14 @@ export function LimitPreview({ category, spent, amount, project = false }: Props
     <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="min-w-0 truncate text-slate-300">
-          {category.name}
-          {amount > 0 ? ' after this' : project ? ' so far' : ' this month'}
+          {t(
+            amount > 0
+              ? 'entry.preview.afterThis'
+              : project
+                ? 'entry.preview.soFar'
+                : 'entry.preview.thisMonth',
+            { name: category.name },
+          )}
         </span>
         <span className="shrink-0 tabular-nums text-white">
           {formatMoneyWhole(amount > 0 ? impact.after : impact.before)}{' '}
@@ -64,10 +71,18 @@ export function LimitPreview({ category, spent, amount, project = false }: Props
       >
         {warn && <Warning weight="fill" aria-hidden className="shrink-0" />}
         {impact.levelAfter === 'over'
-          ? `${formatMoneyWhole(impact.overBy)} over the ${project ? 'budget' : 'limit'}`
+          ? t(project ? 'entry.preview.overBudget' : 'entry.preview.overLimit', {
+              amount: formatMoneyWhole(impact.overBy),
+            })
           : impact.levelAfter === 'near'
-            ? `${Math.round((impact.after / limit) * 100)}% of the ${project ? 'budget' : 'limit'}, ${formatMoneyWhole(impact.left)} left`
-            : `${formatMoneyWhole(impact.left)} left in ${category.name}`}
+            ? t(project ? 'entry.preview.nearBudget' : 'entry.preview.nearLimit', {
+                percent: Math.round((impact.after / limit) * 100),
+                left: formatMoneyWhole(impact.left),
+              })
+            : t('entry.preview.left', {
+                amount: formatMoneyWhole(impact.left),
+                name: category.name,
+              })}
       </p>
     </div>
   )

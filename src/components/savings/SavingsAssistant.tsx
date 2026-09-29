@@ -17,6 +17,7 @@ import { BorrowSheet } from './BorrowSheet'
 import { MoneySheet } from './MoneySheet'
 import { SaveMoreSheet } from './SaveMoreSheet'
 import { SharesSheet } from './SharesSheet'
+import { t } from '../../i18n'
 
 type Step =
   | { kind: 'save' }
@@ -43,40 +44,40 @@ export function SavingsAssistant({ overview }: { overview: SavingsOverview }) {
   return (
     <section aria-labelledby="assistant" data-tour="savings-assistant" className="mb-6">
       <h2 id="assistant" className="mb-2 text-base font-semibold text-white">
-        What do you want to do?
+        {t('assistant.title')}
       </h2>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <Action
           icon={<PiggyBank aria-hidden />}
-          title="Save more"
-          text="Put some of this month aside"
+          title={t('saveMore.title')}
+          text={t('assistant.saveText')}
           onClick={() => setStep({ kind: 'save' })}
           primary
         />
         <Action
           icon={<HandCoins aria-hidden />}
-          title="I need money"
-          text="Borrow from savings, pay it back"
+          title={t('borrow.title')}
+          text={t('assistant.borrowText')}
           onClick={() => setStep({ kind: 'borrow' })}
         />
         <Action
           icon={<ArrowsLeftRight aria-hidden />}
-          title="Move money"
-          text="From one account to another"
+          title={t('assistant.move')}
+          text={t('assistant.moveText')}
           onClick={() => setStep({ kind: 'move' })}
           disabled={open.length < 2}
         />
         <Action
           icon={<SlidersHorizontal aria-hidden />}
-          title="Fix goal shares"
-          text="Correct what each goal holds"
+          title={t('assistant.shares')}
+          text={t('assistant.sharesText')}
           onClick={() => pickAccount('shares')}
           disabled={open.length === 0}
         />
         <Action
           icon={<Trash aria-hidden />}
-          title="Close an account"
-          text="Move its money, then delete it"
+          title={t('assistant.close')}
+          text={t('assistant.closeText')}
           onClick={() => pickAccount('close')}
           disabled={open.length === 0}
         />
@@ -94,7 +95,7 @@ export function SavingsAssistant({ overview }: { overview: SavingsOverview }) {
       )}
       {step?.kind === 'pick' && (
         <BottomSheet
-          title={step.then === 'shares' ? 'Which account?' : 'Close which account?'}
+          title={step.then === 'shares' ? t('assistant.whichAccount') : t('assistant.closeWhich')}
           onClose={() => setStep(null)}
         >
           <ul className="grid gap-1.5 pb-2">
@@ -173,9 +174,9 @@ export function LoansCard({ overview }: { overview: SavingsOverview }) {
   return (
     <section className="mb-6 rounded-3xl bg-amber-400/10 p-4 ring-1 ring-amber-300/25">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-semibold text-white">Borrowed from savings</h2>
+        <h2 className="text-base font-semibold text-white">{t('loansCard.title')}</h2>
         <span className="text-sm tabular-nums text-amber-200">
-          {formatMoneyCompact(owed)} to pay back
+          {t('loansCard.owed', { amount: formatMoneyCompact(owed) })}
         </span>
       </div>
       <ul className="divide-y divide-white/5">
@@ -184,7 +185,7 @@ export function LoansCard({ overview }: { overview: SavingsOverview }) {
         ))}
       </ul>
       <p className="mt-2 text-xs text-muted">
-        Each month’s plan puts the instalment aside first; you can also pay a part back now.
+        {t('loansCard.help')}
       </p>
     </section>
   )
@@ -216,8 +217,12 @@ function LoanRow({ summary, overview }: { summary: LoanSummary; overview: Saving
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] text-white">{loan.note}</p>
           <p className="truncate text-xs tabular-nums text-muted">
-            {formatMoneyCompact(repaid)} of {formatMoneyCompact(loan.amount)} back ·{' '}
-            {formatMoneyCompact(loan.monthly)}/mo to {goal?.goal.name ?? account?.name ?? 'savings'}
+            {t('loansCard.progress', {
+              repaid: formatMoneyCompact(repaid),
+              amount: formatMoneyCompact(loan.amount),
+              monthly: formatMoneyCompact(loan.monthly),
+              name: goal?.goal.name ?? account?.name ?? t('paycheck.savings'),
+            })}
           </p>
         </div>
         <button
@@ -231,14 +236,17 @@ function LoanRow({ summary, overview }: { summary: LoanSummary; overview: Saving
           }`}
         >
           {confirming
-            ? `Confirm ${formatMoneyCompact(nextInstalment)}`
-            : `Pay back ${formatMoneyCompact(nextInstalment)}`}
+            ? t('paycheck.confirm', { amount: formatMoneyCompact(nextInstalment) })
+            : t('loansCard.payBack', { amount: formatMoneyCompact(nextInstalment) })}
         </button>
       </div>
       {confirming && account && (
         <p className="mt-1.5 text-xs text-slate-300">
-          In the bank: transfer {formatMoneyCompact(nextInstalment)} from your everyday account to{' '}
-          {account.name}. {formatMoneyCompact(remaining - nextInstalment)} will be left to pay back.
+          {t('loansCard.bank', {
+            amount: formatMoneyCompact(nextInstalment),
+            account: account.name,
+            left: formatMoneyCompact(remaining - nextInstalment),
+          })}
         </p>
       )}
       {error && <p className="mt-1 text-sm text-red-300">{error}</p>}

@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { t } from '../../i18n'
 
 /** Label above, the control, optional help below: the form pattern of the savings sheets. */
 export function Field({
@@ -193,7 +194,7 @@ export function Select({
         }
       >
         <span className={`min-w-0 flex-1 truncate ${selected ? '' : 'text-muted'}`}>
-          {selected?.label ?? 'Choose…'}
+          {selected?.label ?? t('common.choose')}
         </span>
         <CaretDown
           aria-hidden
@@ -298,7 +299,7 @@ export function SubmitRow({
         disabled={disabled || pending}
         className="h-12 rounded-2xl bg-slate-100 text-base font-bold text-ink transition hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40"
       >
-        {pending ? 'Saving…' : label}
+        {pending ? t('common.saving') : label}
       </button>
     </div>
   )

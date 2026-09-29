@@ -2,6 +2,8 @@ import { CaretRight } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import type { SavingsOverview } from '../../hooks/useSavings'
 import { formatMoneyWhole, formatMonthName, currentMonthKey } from '../../lib/calculations'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 const GOALS_SHOWN = 3
 
@@ -16,17 +18,24 @@ export function SavingsSummaryCard({ overview }: { overview: SavingsOverview }) 
         className="group mb-3 flex items-center gap-1 text-base font-semibold text-white"
         id="savings-summary"
       >
-        Savings
+        {t('nav.savings')}
         <CaretRight aria-hidden className="text-muted transition group-hover:translate-x-0.5" />
       </Link>
       <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
         <p className="text-sm text-slate-300">
-          Put aside in {formatMonthName(currentMonthKey())}:{' '}
-          <span className="font-semibold text-white">
-            {formatMoneyWhole(overview.savedThisMonth)}
+          <Trans
+            k={planned !== null && planned > 0 ? 'savingsSummary.putAsidePlanned' : 'savingsSummary.putAside'}
+            values={{
+              month: formatMonthName(currentMonthKey()),
+              amount: formatMoneyWhole(overview.savedThisMonth),
+              planned: formatMoneyWhole(planned ?? 0),
+            }}
+            tags={{ b: (s) => <span className="font-semibold text-white">{s}</span> }}
+          />
+          <span className="text-muted">
+            {' '}
+            · {t('savingsSummary.inAll', { amount: formatMoneyWhole(overview.total) })}
           </span>
-          {planned !== null && planned > 0 && ` of ${formatMoneyWhole(planned)} planned`}
-          <span className="text-muted"> · {formatMoneyWhole(overview.total)} in all</span>
         </p>
         {goals.length > 0 && (
           <ul className="mt-3 grid gap-2.5">

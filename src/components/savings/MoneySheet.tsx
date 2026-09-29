@@ -10,17 +10,11 @@ import { BottomSheet } from '../history/BottomSheet'
 import { UserSwitcher } from '../UserSwitcher'
 import { Field, Segments, Select, SubmitRow, inputClass } from './fields'
 import { personIds } from '../../lib/people'
+import { t } from '../../i18n'
 
 export type MoneyMode = 'deposit' | 'withdraw' | 'interest' | 'balance' | 'allocate' | 'transfer'
 
-const TITLES: Record<MoneyMode, string> = {
-  deposit: 'Save money',
-  withdraw: 'Take money out',
-  interest: 'Add interest',
-  balance: 'Update the balance',
-  allocate: 'Assign to a goal',
-  transfer: 'Move between accounts',
-}
+const title = (mode: MoneyMode) => t(`money.title.${mode}`)
 
 const UNASSIGNED = ''
 
@@ -61,7 +55,8 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
 
   const summary = open.find((a) => a.account.id === account)
   const share = (id: string) => summary?.byGoal[id] ?? 0
-  const goalName = (id: string) => goals.find((g) => g.goal.id === id)?.goal.name ?? 'Goal'
+  const goalName = (id: string) =>
+    goals.find((g) => g.goal.id === id)?.goal.name ?? t('split.goal')
 
   // where money can come from on this account: unassigned, or a goal's share
   const available = goal === UNASSIGNED ? Math.max(summary?.unassigned ?? 0, 0) : share(goal)
@@ -97,9 +92,9 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
 
   if (open.length === 0) {
     return (
-      <BottomSheet title={TITLES[mode]} onClose={onClose}>
+      <BottomSheet title={title(mode)} onClose={onClose}>
         <p className="pb-4 text-sm text-muted">
-          Add an account first: money needs somewhere to be.
+          {t('money.noAccount')}
         </p>
       </BottomSheet>
     )
@@ -131,18 +126,22 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
     (mode === 'allocate' && goal === UNASSIGNED)
 
   return (
-    <BottomSheet title={TITLES[mode]} onClose={onClose}>
+    <BottomSheet title={title(mode)} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
-        {accountSelect(mode === 'transfer' ? 'From' : 'Account', account, setAccount)}
-        {mode === 'transfer' && accountSelect('To', target, setTarget, account)}
+        {accountSelect(
+          mode === 'transfer' ? t('money.from') : t('money.account'),
+          account,
+          setAccount,
+        )}
+        {mode === 'transfer' && accountSelect(t('money.to'), target, setTarget, account)}
 
         {mode === 'allocate' && (
           <Segments
             value={direction}
             onChange={setDirection}
             options={[
-              { value: 'assign', label: 'Assign' },
-              { value: 'release', label: 'Give back' },
+              { value: 'assign', label: t('money.assign') },
+              { value: 'release', label: t('money.giveBack') },
             ]}
           />
         )}
@@ -152,31 +151,41 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
           mode === 'transfer' ||
           mode === 'allocate') && (
           <Field
-            label={mode === 'deposit' ? 'For' : mode === 'allocate' ? 'Goal' : 'Take from'}
+            label={
+              mode === 'deposit'
+                ? t('money.for')
+                : mode === 'allocate'
+                  ? t('split.goal')
+                  : t('money.takeFrom')
+            }
             help={
               mode === 'deposit'
                 ? undefined
                 : mode === 'allocate'
                   ? direction === 'assign'
-                    ? `${formatMoneyCompact(Math.max(summary?.unassigned ?? 0, 0))} unassigned on this account`
-                    : `${formatMoneyCompact(share(goal))} of it on this account`
-                  : `${formatMoneyCompact(available)} available`
+                    ? t('money.unassignedHere', {
+                        amount: formatMoneyCompact(Math.max(summary?.unassigned ?? 0, 0)),
+                      })
+                    : t('money.shareHere', { amount: formatMoneyCompact(share(goal)) })
+                  : t('money.available', { amount: formatMoneyCompact(available) })
             }
           >
             <Select value={goal} onChange={setGoal}>
               {mode !== 'allocate' && (
                 <option value={UNASSIGNED}>
-                  {mode === 'deposit' ? 'No goal (unassigned)' : 'Unassigned money'}
+                  {mode === 'deposit' ? t('money.noGoal') : t('borrow.unassigned')}
                 </option>
               )}
-              {mode === 'allocate' && goal === UNASSIGNED && <option value="">Pick a goal</option>}
+              {mode === 'allocate' && goal === UNASSIGNED && (
+                <option value="">{t('money.pickGoal')}</option>
+              )}
               {openGoals
                 .filter((g) => mode === 'deposit' || mode === 'allocate' || share(g.goal.id) > 0)
                 .map((g) => (
                   <option key={g.goal.id} value={g.goal.id}>
                     {g.goal.name}
                     {mode !== 'deposit' && share(g.goal.id) > 0
-                      ? ` · ${formatMoneyCompact(share(g.goal.id))} here`
+                      ? ` · ${t('money.here', { amount: formatMoneyCompact(share(g.goal.id)) })}`
                       : ''}
                   </option>
                 ))}
@@ -185,21 +194,20 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
         )}
 
         <Field
-          label={mode === 'balance' ? 'Balance the bank shows' : 'Amount'}
+          label={mode === 'balance' ? t('money.bankBalance') : t('entry.amount')}
           help={
             mode === 'balance' && summary
-              ? `The app has ${formatMoneyCompact(summary.balance)}; the difference is booked as a correction.${
-                  summary.allocated > 0
-                    ? ` Goals hold ${formatMoneyCompact(summary.allocated)} of it.`
-                    : ''
-                }`
+              ? t(summary.allocated > 0 ? 'money.balanceHelpGoals' : 'money.balanceHelp', {
+                  amount: formatMoneyCompact(summary.balance),
+                  goals: formatMoneyCompact(summary.allocated),
+                })
               : undefined
           }
         >
           <MoneyInput
             value={amount}
             onChange={(v) => setAmount(roundMoney(v))}
-            label="Amount"
+            label={t('entry.amount')}
             size="lg"
           />
         </Field>
@@ -214,12 +222,12 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
         )}
 
         {mode !== 'allocate' && (
-          <Field label="Note (optional)">
+          <Field label={t('goalSheet.note')}>
             <input
               value={note}
               onChange={(e) => setNote(e.target.value)}
               maxLength={120}
-              placeholder={mode === 'deposit' ? 'e.g. September savings' : undefined}
+              placeholder={mode === 'deposit' ? t('money.notePlaceholder') : undefined}
               className={inputClass}
             />
           </Field>
@@ -229,9 +237,9 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
           label={
             mode === 'allocate'
               ? direction === 'assign'
-                ? `Assign to ${goal ? goalName(goal) : 'goal'}`
-                : 'Give back'
-              : TITLES[mode]
+                ? t('money.assignTo', { name: goal ? goalName(goal) : t('split.goal') })
+                : t('money.giveBack')
+              : title(mode)
           }
           disabled={invalid}
           pending={pending}

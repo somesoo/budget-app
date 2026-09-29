@@ -1,0 +1,42 @@
+{
+  "notSignedIn": {
+    "message": "Nie zalogowano",
+    "context": "Error when the session has expired."
+  },
+  "requestFailed": {
+    "message": "Żądanie nie powiodło się ({status})",
+    "context": "Generic server error with its HTTP status code."
+  },
+  "aiUnavailable": {
+    "message": "Serwer AI tu nie działa. Działa na Vercelu albo lokalnie przez `vercel dev`.",
+    "context": "Error for the developer: the AI functions run on Vercel only. Keep `vercel dev` as is."
+  },
+  "migration": {
+    "message": "{what}: potrzebna migracja {file}",
+    "context": "Error when a feature needs a database update; {what} is one of the feature descriptions below, {file} the migration file."
+  },
+  "featureKeep": {
+    "message": "Zostawianie części nadwyżki na koncie",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureSplit": {
+    "message": "Dzielenie oszczędności między cele i IKE",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureForMonth": {
+    "message": "Liczenie wypłaty do innego miesiąca",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "featureOneOff": {
+    "message": "Oznaczanie dochodu jako jednorazowego",
+    "context": "Feature description used as {what} in the migration error."
+  },
+  "maxPeople": {
+    "message": "Maksymalnie {count} osoby.",
+    "context": "Settings > People: error when adding more than the maximum."
+  },
+  "personHasEntries": {
+    "message": "Ta osoba ma zapisane wpisy, więc zostaje. Zmień jej imię.",
+    "context": "Settings > People: a person with logged entries can't be removed."
+  }
+}

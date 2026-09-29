@@ -3,6 +3,7 @@ import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import type { PlanCheck, Recurring, Suggestion } from '../../lib/suggestions'
 import type { Category } from '../../types'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 /** What the history suggests for the draft, each one click from applied. */
 export function SuggestionList({
@@ -32,7 +33,7 @@ export function SuggestionList({
             onClick={() => onApply(s)}
             className="h-8 shrink-0 self-center rounded-full bg-accent/15 px-3 text-sm font-semibold text-accent-soft ring-1 ring-accent/30 hover:bg-accent/25"
           >
-            Apply
+            {t('planner.apply')}
           </button>
         </li>
       ))}
@@ -52,7 +53,7 @@ export function RecurringList({
   return (
     <div>
       <p className="text-sm text-slate-300">
-        {formatMoneyWhole(total)} comes every month for about the same amount:
+        {t('planner.recurringIntro', { amount: formatMoneyWhole(total) })}
       </p>
       <ul className="mt-2 grid gap-1">
         {items.map((r) => (
@@ -61,7 +62,9 @@ export function RecurringList({
               {r.note}
               <span className="text-muted">
                 {' '}
-                in {categories[r.categoryId]?.name ?? 'a hidden category'}
+                {t('planner.inCategory', {
+                  name: categories[r.categoryId]?.name ?? t('planner.hiddenCategory'),
+                })}
               </span>
             </span>
             <span className="shrink-0 tabular-nums text-slate-200">

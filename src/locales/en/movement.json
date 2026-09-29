@@ -1,0 +1,46 @@
+{
+  "deposit": {
+    "message": "Saved",
+    "context": "Savings history: a deposit (money put onto an account)."
+  },
+  "withdrawal": {
+    "message": "Taken out",
+    "context": "Savings history: a withdrawal."
+  },
+  "interest": {
+    "message": "Interest",
+    "context": "Savings history: interest paid by the bank."
+  },
+  "adjustment": {
+    "message": "Balance corrected",
+    "context": "Savings history: a correction to match the bank's balance."
+  },
+  "transfer": {
+    "message": "Moved",
+    "context": "Savings history: money moved between accounts."
+  },
+  "spending": {
+    "message": "Spent",
+    "context": "Savings history: money spent from a goal, taken off the account it was on."
+  },
+  "empty": {
+    "message": "Nothing here yet.",
+    "context": "Savings history: empty state."
+  },
+  "forGoal": {
+    "message": "for {name}",
+    "context": "Savings history: which goal a movement was for. Lowercase fragment."
+  },
+  "deleteBoth": {
+    "message": "Delete both",
+    "context": "Savings history: confirm deleting a transfer, which removes both of its sides."
+  },
+  "keep": {
+    "message": "Keep",
+    "context": "Savings history: cancel the delete."
+  },
+  "deleteLabel": {
+    "message": "Delete: {what}, {amount}",
+    "context": "Savings history: accessible label of the bin button."
+  }
+}

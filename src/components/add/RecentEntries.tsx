@@ -2,6 +2,7 @@ import { formatMoney } from '../../lib/calculations'
 import { dayHeading, groupByDay, type Entry } from '../../lib/history'
 import type { Category } from '../../types'
 import { EntryRow } from '../history/EntryRow'
+import { t } from '../../i18n'
 
 interface Props {
   entries: Entry[]
@@ -12,7 +13,7 @@ interface Props {
 /** The last few things logged, so a slip shows up at once and is one click from fixing. */
 export function RecentEntries({ entries, categories, onOpen }: Props) {
   if (entries.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted">Nothing logged this month yet.</p>
+    return <p className="py-8 text-center text-sm text-muted">{t('add.recentEmpty')}</p>
   }
   return (
     <div className="space-y-3">

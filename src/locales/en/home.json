@@ -1,0 +1,48 @@
+{
+  "pace": {
+    "under": {
+      "message": "spending below pace",
+      "context": "Add screen: accessible description of the colour of the 'safe to spend' figure (green)."
+    },
+    "on": {
+      "message": "spending on pace",
+      "context": "Add screen: accessible description of the figure's colour (grey)."
+    },
+    "over": {
+      "message": "spending above pace",
+      "context": "Add screen: accessible description of the figure's colour (red)."
+    }
+  },
+  "incomeSaved": {
+    "message": "Income saved",
+    "context": "Toast after saving an income on the phone; a date may follow."
+  },
+  "saved": {
+    "message": "Saved",
+    "context": "Toast after saving an expense on the phone; a date may follow."
+  },
+  "title": {
+    "message": "What for?",
+    "context": "Add screen (phone): hidden heading for screen readers, asking what the money was spent on."
+  },
+  "safeLabel": {
+    "message": "Safe to spend: {amount}",
+    "context": "Add screen: accessible label of the big figure at the top."
+  },
+  "leftLabel": {
+    "message": "Left this month: {amount}",
+    "context": "Add screen: accessible label of the big figure when there's no plan."
+  },
+  "askQuestion": {
+    "message": "How are we doing this month, and how much can we still spend?",
+    "context": "Question pre-filled in the AI chat from the Add screen's Ask button."
+  },
+  "addIncome": {
+    "message": "Add income",
+    "context": "Add screen: the button (arrow up) that logs an income."
+  },
+  "payOutHelp": {
+    "message": "Straight to the goals and IKE, before it gets spent.",
+    "context": "Sheet shown right after logging a paycheck: explanation under 'From the paycheck'."
+  }
+}

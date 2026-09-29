@@ -13,6 +13,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { Person } from '../types'
 import { categoriesKey } from './useCategories'
 import { isMissingTable, savingsKey } from './useSavings'
+import { t } from '../i18n'
 
 export const peopleKey = ['people'] as const
 
@@ -93,7 +94,7 @@ export function usePeopleActions() {
 
   const add = useMutation({
     mutationFn: async ({ name, people }: { name: string; people: PersonInfo[] }) => {
-      if (people.length >= MAX_PEOPLE) throw new Error(`Up to ${MAX_PEOPLE} people.`)
+      if (people.length >= MAX_PEOPLE) throw new Error(t('errors.maxPeople', { count: MAX_PEOPLE }))
       const used = new Set(people.map((p) => p.color))
       const row: PersonInfo = {
         id: personIdFor(name.trim(), people.map((p) => p.id)),
@@ -129,7 +130,7 @@ export function usePeopleActions() {
           .eq('person', id)
         if (error) throw error
         if ((count ?? 0) > 0)
-          throw new Error('They have entries logged, so they stay. Rename them instead.')
+          throw new Error(t('errors.personHasEntries'))
       }
       const cleared = await supabase.from('categories').update({ owner: null }).eq('owner', id)
       if (cleared.error && !/owner/.test(cleared.error.message)) throw cleared.error

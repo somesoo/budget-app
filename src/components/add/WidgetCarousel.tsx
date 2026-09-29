@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 export interface Widget {
   id: string
@@ -78,7 +79,7 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
             key={w.id}
             role="group"
             aria-roledescription="slide"
-            aria-label={`${w.label}, ${i + 1} of ${widgets.length}`}
+            aria-label={t('add.widgetSlide', { label: w.label, n: i + 1, total: widgets.length })}
             aria-hidden={i !== active}
             className="min-w-0 snap-start snap-always px-4"
           >

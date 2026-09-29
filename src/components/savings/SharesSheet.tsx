@@ -6,6 +6,7 @@ import type { AccountSummary, GoalSummary } from '../../lib/savings'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { SubmitRow } from './fields'
+import { t } from '../../i18n'
 
 /**
  * Correcting which goal holds how much of an account, when an assignment went
@@ -52,12 +53,10 @@ export function SharesSheet({
   }
 
   return (
-    <BottomSheet title={`Fix shares on ${summary.account.name}`} onClose={onClose}>
+    <BottomSheet title={t('shares.title', { name: summary.account.name })} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
         <p className="text-sm leading-snug text-slate-300">
-          Say how much of the {formatMoneyCompact(summary.balance)} on this account each goal
-          holds. The balance doesn’t change and nothing moves in the bank: this only corrects
-          which goal the money is for.
+          {t('shares.intro', { amount: formatMoneyCompact(summary.balance) })}
         </p>
 
         <ul className="grid gap-2">
@@ -75,12 +74,12 @@ export function SharesSheet({
                   onClick={() => setShares({ ...shares, [g.goal.id]: 0 })}
                   className="shrink-0 rounded-full px-2 py-0.5 text-xs text-muted ring-1 ring-white/10 hover:text-white"
                 >
-                  Clear
+                  {t('entry.clear')}
                 </button>
               )}
               <div className="w-32 shrink-0">
                 <MoneyInput
-                  label={`${g.goal.name}'s share`}
+                  label={t('shares.shareOf', { name: g.goal.name })}
                   value={shares[g.goal.id] ?? 0}
                   onChange={(v) => setShares({ ...shares, [g.goal.id]: v })}
                 />
@@ -94,13 +93,18 @@ export function SharesSheet({
             over ? 'bg-red-500/15 text-red-300' : 'bg-white/5 text-slate-300'
           }`}
         >
-          <span>{over ? 'More than the balance by' : 'Unassigned after this'}</span>
+          <span>{over ? t('shares.over') : t('shares.unassigned')}</span>
           <span className="font-semibold tabular-nums">
             {formatMoneyCompact(Math.abs(unassigned))}
           </span>
         </div>
 
-        <SubmitRow label="Save the shares" disabled={over} pending={pending} error={error} />
+        <SubmitRow
+          label={t('shares.save')}
+          disabled={over}
+          pending={pending}
+          error={error}
+        />
       </form>
     </BottomSheet>
   )

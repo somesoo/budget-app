@@ -4,6 +4,7 @@ import { formatDayShort, formatMoney, type MonthKey } from '../../lib/calculatio
 import { compactAmount, niceScale, type PacePoint } from '../../lib/insights'
 import { ChartTooltip, TooltipRow } from './ChartCard'
 import { AXIS_FONT, CHART } from './theme'
+import { t } from '../../i18n'
 
 interface Props {
   month: MonthKey
@@ -78,7 +79,7 @@ export function PaceChart({ month, points, showPace, plotHeight = PLOT_H }: Prop
           width={width}
           height={height}
           role="img"
-          aria-label="Cumulative spending this month against the budget pace"
+          aria-label={t('charts.paceLabel')}
           tabIndex={0}
           className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           onPointerDown={pick}
@@ -229,14 +230,18 @@ export function PaceChart({ month, points, showPace, plotHeight = PLOT_H }: Prop
           </p>
           <TooltipRow
             color={CHART.accent}
-            label="Spent"
-            value={activePoint.cumulative !== null ? formatMoney(activePoint.cumulative) : 'Not yet'}
+            label={t('common.spent')}
+            value={
+              activePoint.cumulative !== null
+                ? formatMoney(activePoint.cumulative)
+                : t('charts.notYet')
+            }
           />
           {showPace && (
             <TooltipRow
               color={CHART.textMuted}
               dashed
-              label="Pace"
+              label={t('charts.pace')}
               value={formatMoney(activePoint.pace)}
             />
           )}

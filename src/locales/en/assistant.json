@@ -1,0 +1,46 @@
+{
+  "title": {
+    "message": "What do you want to do?",
+    "context": "Savings tab: heading of the guided actions."
+  },
+  "saveText": {
+    "message": "Put some of this month aside",
+    "context": "Savings assistant: under 'Save more'."
+  },
+  "borrowText": {
+    "message": "Borrow from savings, pay it back",
+    "context": "Savings assistant: under 'I need money'."
+  },
+  "move": {
+    "message": "Move money",
+    "context": "Savings assistant: action title."
+  },
+  "moveText": {
+    "message": "From one account to another",
+    "context": "Savings assistant: under 'Move money'."
+  },
+  "shares": {
+    "message": "Fix goal shares",
+    "context": "Savings assistant: action title, correct how much of an account belongs to each goal."
+  },
+  "sharesText": {
+    "message": "Correct what each goal holds",
+    "context": "Savings assistant: under 'Fix goal shares'."
+  },
+  "close": {
+    "message": "Close an account",
+    "context": "Savings assistant: action title."
+  },
+  "closeText": {
+    "message": "Move its money, then delete it",
+    "context": "Savings assistant: under 'Close an account'."
+  },
+  "whichAccount": {
+    "message": "Which account?",
+    "context": "Savings assistant: sheet heading, pick the account to fix shares on."
+  },
+  "closeWhich": {
+    "message": "Close which account?",
+    "context": "Savings assistant: sheet heading, pick the account to close."
+  }
+}

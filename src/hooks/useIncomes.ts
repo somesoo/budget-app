@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
 import { incomeMonth, monthRange, shiftMonth } from '../lib/calculations'
 import type { Income, NewIncome } from '../types'
+import { t } from '../i18n'
 
 // '*': for_month and one_off arrive with migrations 0013 and 0014
 const COLUMNS = '*'
@@ -95,12 +96,14 @@ const OPTIONAL_COLUMNS = [
   {
     column: 'for_month',
     isSet: (i: Partial<NewIncome>) => !!i.for_month,
-    needs: 'Counting pay for another month needs migration 0013_money_health.sql',
+    needs: () =>
+      t('errors.migration', { file: '0013_money_health.sql', what: t('errors.featureForMonth') }),
   },
   {
     column: 'one_off',
     isSet: (i: Partial<NewIncome>) => i.one_off === true,
-    needs: 'Marking income as one-off needs migration 0014_one_off_income.sql',
+    needs: () =>
+      t('errors.migration', { file: '0014_one_off_income.sql', what: t('errors.featureOneOff') }),
   },
 ] as const
 
@@ -117,7 +120,7 @@ async function withOptionalColumns<T extends Partial<NewIncome>>(
       (c) => c.column in current && (error.message ?? '').includes(c.column),
     )
     if (!missing) throw error
-    if (missing.isSet(current)) throw new Error(missing.needs)
+    if (missing.isSet(current)) throw new Error(missing.needs())
     const rest = { ...current }
     delete rest[missing.column]
     current = rest

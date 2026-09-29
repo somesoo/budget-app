@@ -1,0 +1,26 @@
+{
+  "title": {
+    "message": "Fix shares on {name}",
+    "context": "Sheet heading: correct how much of account {name} belongs to each goal."
+  },
+  "intro": {
+    "message": "Say how much of the {amount} on this account each goal holds. The balance doesn’t change and nothing moves in the bank: this only corrects which goal the money is for.",
+    "context": "Fix shares sheet: explanation."
+  },
+  "shareOf": {
+    "message": "{name}'s share",
+    "context": "Fix shares sheet: accessible label of a goal's amount field."
+  },
+  "over": {
+    "message": "More than the balance by",
+    "context": "Fix shares sheet: the shares exceed the balance; followed by the amount."
+  },
+  "unassigned": {
+    "message": "Unassigned after this",
+    "context": "Fix shares sheet: what stays unassigned; followed by the amount."
+  },
+  "save": {
+    "message": "Save the shares",
+    "context": "Fix shares sheet: submit button."
+  }
+}

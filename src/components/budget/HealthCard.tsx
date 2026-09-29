@@ -4,8 +4,9 @@ import { useMonthMoney } from '../../hooks/useMonthMoney'
 import { useSavingsOverview } from '../../hooks/useSavings'
 import { useTypicalSpending } from '../../hooks/useTypicalSpending'
 import { moneyHealth, type Health } from '../../lib/allocations'
-import type { MonthKey } from '../../lib/calculations'
+import { formatAmount, type MonthKey } from '../../lib/calculations'
 import type { Category } from '../../types'
+import { t } from '../../i18n'
 
 const TONE: Record<Health, string> = {
   good: 'text-positive',
@@ -45,42 +46,45 @@ export function HealthCard({ month, categories }: { month: MonthKey; categories:
       className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10"
     >
       <h2 id="health" className="mb-3 text-base font-semibold text-white">
-        How healthy it is
+        {t('health.title')}
       </h2>
       <dl className="grid gap-3">
         <Row
-          label="Savings rate"
+          label={t('health.savingsRate')}
           value={h.savingsRate ? percent(h.savingsRate.value) : '–'}
           health={h.savingsRate?.health}
-          rule="of income put aside; 20% or more is the usual aim"
+          rule={t('health.savingsRateRule')}
         />
         <Row
-          label="Fixed costs"
+          label={t('health.fixedCosts')}
           value={h.fixedShare ? percent(h.fixedShare.value) : '–'}
           health={h.fixedShare?.health}
           rule={
             fixedCosts > 0
-              ? 'of income on rent and bills; under 50% leaves room'
-              : 'take rent and bills out of the chart in Settings to count them as fixed'
+              ? t('health.fixedCostsRule')
+              : t('health.fixedCostsHint')
           }
         />
         <Row
-          label="Emergency fund"
+          label={t('health.emergency')}
           value={
             h.emergencyMonths
-              ? `${h.emergencyMonths.value.toFixed(1)} ${h.emergencyMonths.value === 1 ? 'month' : 'months'}`
+              ? t('health.months', {
+                  count: Number(h.emergencyMonths.value.toFixed(1)),
+                  months: formatAmount(Number(h.emergencyMonths.value.toFixed(1))),
+                })
               : '–'
           }
           health={h.emergencyMonths?.health}
           rule={
             emergency
-              ? `of spending ${emergency.goal.name} would cover; 3 to 6 months is the usual aim`
+              ? t('health.emergencyRule', { name: emergency.goal.name })
               : undefined
           }
         >
           {!emergency && (
             <Link to="/savings" className="text-xs font-semibold text-accent-soft hover:underline">
-              Mark a goal as your emergency fund (goal → Edit)
+              {t('health.markEmergency')}
             </Link>
           )}
         </Row>

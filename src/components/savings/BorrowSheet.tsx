@@ -6,6 +6,8 @@ import { borrowSources, instalment } from '../../lib/loans'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { Field, SubmitRow, inputClass } from './fields'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 const REPAY_MONTHS = [1, 3, 6, 12]
 
@@ -59,45 +61,49 @@ export function BorrowSheet({
 
   if (!overview.loansAvailable) {
     return (
-      <BottomSheet title="I need money" onClose={onClose}>
+      <BottomSheet title={t('borrow.title')} onClose={onClose}>
         <p className="pb-4 text-sm leading-relaxed text-slate-300">
-          Borrowing from savings needs{' '}
-          <code className="rounded bg-white/10 px-1">supabase/migrations/0011_savings_loans.sql</code>.
-          Run it in the SQL Editor, as with the earlier ones.
+          <Trans
+            k="borrow.migration"
+            values={{ file: 'supabase/migrations/0011_savings_loans.sql' }}
+            tags={{ code: (s) => <code className="rounded bg-white/10 px-1">{s}</code> }}
+          />
         </p>
       </BottomSheet>
     )
   }
 
   return (
-    <BottomSheet title="I need money" onClose={onClose}>
+    <BottomSheet title={t('borrow.title')} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
         <p className="text-sm leading-snug text-slate-300">
-          Borrow it from your savings and pay it back in instalments: the coming months’ plans
-          put each one aside first, until the goal is whole again.
+          {t('borrow.intro')}
         </p>
 
-        <Field label="How much">
-          <MoneyInput value={amount} onChange={setAmount} label="Amount" size="lg" />
+        <Field label={t('borrow.howMuch')}>
+          <MoneyInput value={amount} onChange={setAmount} label={t('entry.amount')} size="lg" />
         </Field>
-        <Field label="What for">
+        <Field label={t('borrow.whatFor')}>
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             maxLength={120}
-            placeholder="e.g. car repair"
+            placeholder={t('borrow.whatForPlaceholder')}
             className={inputClass}
           />
         </Field>
 
         {amount > 0 && (
           <section>
-            <p className="mb-1.5 text-sm text-muted">Take it from</p>
+            <p className="mb-1.5 text-sm text-muted">{t('borrow.from')}</p>
             {covering.length === 0 ? (
               <p className="rounded-xl bg-red-500/10 px-3 py-2.5 text-sm text-red-300">
-                No single place has {formatMoneyCompact(amount)}
-                {total > 0 ? ` (there’s ${formatMoneyCompact(total)} saved in all)` : ''}. Borrow
-                less, or twice from two places.
+                {total > 0
+                  ? t('borrow.noPlaceTotal', {
+                      amount: formatMoneyCompact(amount),
+                      total: formatMoneyCompact(total),
+                    })
+                  : t('borrow.noPlace', { amount: formatMoneyCompact(amount) })}
               </p>
             ) : (
               <ul className="grid gap-1.5">
@@ -117,10 +123,10 @@ export function BorrowSheet({
                       >
                         <span className="flex items-baseline justify-between gap-2">
                           <span className="truncate text-[15px] text-white">
-                            {s.goal ? s.goal.goal.name : 'Unassigned money'}
+                            {s.goal ? s.goal.goal.name : t('borrow.unassigned')}
                             {i === 0 && (
                               <span className="ml-1.5 text-xs font-semibold text-accent-soft">
-                                suggested
+                                {t('borrow.suggested')}
                               </span>
                             )}
                           </span>
@@ -129,9 +135,11 @@ export function BorrowSheet({
                           </span>
                         </span>
                         <span className="block text-xs text-muted">
-                          on {s.account.name} · {s.reason}
+                          {t('borrow.on', { name: s.account.name })} · {s.reason}
                           {s.neededAfter !== null &&
-                            ` · until paid back it needs ${formatMoneyCompact(Math.round(s.neededAfter))}/mo to stay on time`}
+                            ` · ${t('borrow.neededAfter', {
+                              amount: formatMoneyCompact(Math.round(s.neededAfter)),
+                            })}`}
                         </span>
                       </button>
                     </li>
@@ -150,17 +158,17 @@ export function BorrowSheet({
                 : 'bg-amber-400/10 text-amber-100 ring-amber-300/25'
             }`}
           >
-            That’s {Math.round((amount / chosen.goal.saved) * 100)}% of {chosen.goal.goal.name}, your
-            emergency fund.{' '}
-            {amount > chosen.goal.saved / 2
-              ? 'More than half: only for something that really can’t wait, and pay it back first.'
-              : 'Fine for a real emergency; pay it back before the next one.'}
+            {t('borrow.emergencyShare', {
+              percent: Math.round((amount / chosen.goal.saved) * 100),
+              name: chosen.goal.goal.name,
+            })}{' '}
+            {amount > chosen.goal.saved / 2 ? t('borrow.emergencyMost') : t('borrow.emergencySome')}
           </p>
         )}
 
         {amount > 0 && chosen && (
           <>
-            <Field label="Pay it back over">
+            <Field label={t('borrow.repayOver')}>
               <div className="flex flex-wrap gap-1.5">
                 {REPAY_MONTHS.map((m) => (
                   <button
@@ -174,22 +182,32 @@ export function BorrowSheet({
                         : 'text-slate-300 ring-white/10'
                     }`}
                   >
-                    {m} {m === 1 ? 'month' : 'months'}
+                    {t('borrow.months', { count: m })}
                   </button>
                 ))}
               </div>
             </Field>
             <p className="rounded-xl bg-accent/10 px-3 py-2.5 text-sm leading-snug text-slate-200 ring-1 ring-accent/25">
-              <span className="font-semibold text-white">In the bank:</span> transfer{' '}
-              {formatMoneyCompact(amount)} from {chosen.account.name} to your everyday account.
-              From next month’s plan, {formatMoneyCompact(monthly)} a month goes back
-              {chosen.goal ? ` to ${chosen.goal.goal.name}` : ''}.
+              <Trans
+                k={chosen.goal ? 'borrow.bankGoal' : 'borrow.bank'}
+                values={{
+                  amount: formatMoneyCompact(amount),
+                  account: chosen.account.name,
+                  monthly: formatMoneyCompact(monthly),
+                  goal: chosen.goal?.goal.name ?? '',
+                }}
+                tags={{ b: (s) => <span className="font-semibold text-white">{s}</span> }}
+              />
             </p>
           </>
         )}
 
         <SubmitRow
-          label={amount > 0 ? `Borrow ${formatMoneyCompact(amount)}` : 'Borrow'}
+          label={
+            amount > 0
+              ? t('borrow.submitAmount', { amount: formatMoneyCompact(amount) })
+              : t('borrow.submit')
+          }
           disabled={amount <= 0 || !chosen || !note.trim()}
           pending={borrow.isPending}
           error={error}

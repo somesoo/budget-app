@@ -1,0 +1,86 @@
+{
+  "title": {
+    "message": "From the paycheck",
+    "context": "Budget tab: heading of the card listing what the month's plan sends to savings goals, IKE accounts and loan repayments, each with a 'Pay in' button."
+  },
+  "done": {
+    "message": "{done} of {total} done",
+    "context": "From the paycheck card: progress in the corner."
+  },
+  "payBack": {
+    "message": "Pay back: {note}",
+    "context": "From the paycheck: a loan instalment line; {note} is what was borrowed for."
+  },
+  "aLoan": {
+    "message": "a loan",
+    "context": "From the paycheck: used as {note} when the loan has no description."
+  },
+  "to": {
+    "message": "to {name}",
+    "context": "From the paycheck: under a loan instalment, which goal or account it goes back to. Lowercase."
+  },
+  "savings": {
+    "message": "savings",
+    "context": "From the paycheck: used as {name} in 'to {name}' when the goal or account is gone. Lowercase."
+  },
+  "paidBackNote": {
+    "message": "Paid back: {note}",
+    "context": "Note saved on the deposit made when an instalment is paid in; shows in the savings history."
+  },
+  "closed": {
+    "message": "Closed",
+    "context": "From the paycheck: name shown for a line whose goal or account was deleted."
+  },
+  "onto": {
+    "message": "onto {name}",
+    "context": "From the paycheck: which account the money goes onto. Lowercase fragment."
+  },
+  "noAccount": {
+    "message": "no account chosen",
+    "context": "From the paycheck: the goal has no account chosen yet. Lowercase fragment."
+  },
+  "account": {
+    "message": "account",
+    "context": "From the paycheck: small label for a line paid straight into an account. Lowercase."
+  },
+  "planNote": {
+    "message": "{month} plan",
+    "context": "Note saved on a savings deposit made from the month's plan, e.g. 'October plan'; shows in the savings history."
+  },
+  "unspent": {
+    "message": "unspent in {month}",
+    "context": "From the paycheck: a line with the previous month's leftover; {month} is its name. Lowercase fragment."
+  },
+  "shareUnspent": {
+    "message": "{share}% of unspent in {month}",
+    "context": "From the paycheck: this goal's percentage of the previous month's leftover. Lowercase fragment."
+  },
+  "atEndOf": {
+    "message": "at the end of {month}",
+    "context": "From the paycheck: the leftover can only be paid in once the month {month} is over. Lowercase fragment."
+  },
+  "paidOf": {
+    "message": "{paid} of {planned}",
+    "context": "From the paycheck: how much of a line is paid in."
+  },
+  "paidIn": {
+    "message": "Paid in",
+    "context": "From the paycheck: the line is fully paid in."
+  },
+  "payIn": {
+    "message": "Pay in {amount}",
+    "context": "From the paycheck: button that records the deposit (first tap)."
+  },
+  "confirm": {
+    "message": "Confirm {amount}",
+    "context": "From the paycheck: the same button asking for a second tap to confirm."
+  },
+  "other": {
+    "message": "Plus {amount} of other savings, anywhere you like.",
+    "context": "From the paycheck: savings in the plan not tied to a goal or account."
+  },
+  "failed": {
+    "message": "Not paid in: {error}",
+    "context": "From the paycheck: error; {error} is technical."
+  }
+}

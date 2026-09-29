@@ -5,6 +5,7 @@ import type { GoalSummary } from '../../lib/savings'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { Field, Select, SubmitRow, inputClass } from './fields'
+import { t } from '../../i18n'
 
 const NEW_ACCOUNT = '__new__'
 
@@ -32,7 +33,7 @@ export function SetSavedSheet({
   const [accountId, setAccountId] = useState(
     summary.funding[0]?.account.id ?? open[0]?.account.id ?? NEW_ACCOUNT,
   )
-  const [newName, setNewName] = useState('Everyday account')
+  const [newName, setNewName] = useState(() => t('setSaved.everyday'))
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
@@ -58,7 +59,7 @@ export function SetSavedSheet({
         })
         balance = 0
       }
-      const note = `${goal.name}: saved amount corrected`
+      const note = t('setSaved.note', { name: goal.name })
       if (diff > 0) {
         // the money was there already: the account grows by it, and it's the goal's
         await setBalance.mutateAsync({ account: id, balance: roundMoney(balance + diff), note })
@@ -76,28 +77,31 @@ export function SetSavedSheet({
   }
 
   return (
-    <BottomSheet title={`How much ${goal.name} has`} onClose={onClose}>
+    <BottomSheet title={t('setSaved.title', { name: goal.name })} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
         <p className="text-sm leading-snug text-slate-300">
-          For money that’s already there but the app doesn’t know about. It’s booked as a
-          correction of the account’s balance, not as saving or spending, so this month’s
-          numbers stay as they are.
+          {t('setSaved.intro')}
         </p>
 
         <Field
-          label="Saved for it"
-          help={`The app has ${formatMoneyCompact(saved)} on the accounts now${
-            summary.spent > 0 ? `, after ${formatMoneyCompact(summary.spent)} spent from it` : ''
-          }.`}
+          label={t('setSaved.saved')}
+          help={
+            summary.spent > 0
+              ? t('setSaved.savedHelpSpent', {
+                  amount: formatMoneyCompact(saved),
+                  spent: formatMoneyCompact(summary.spent),
+                })
+              : t('setSaved.savedHelp', { amount: formatMoneyCompact(saved) })
+          }
         >
-          <MoneyInput value={amount} onChange={setAmount} label="Saved for it" size="lg" />
+          <MoneyInput value={amount} onChange={setAmount} label={t('setSaved.saved')} size="lg" />
         </Field>
 
         <Field
-          label="Where the money is"
+          label={t('setSaved.where')}
           help={
             accountId === NEW_ACCOUNT
-              ? 'Adds this account to Savings, holding only what you say is set aside.'
+              ? t('setSaved.newAccountHelp')
               : undefined
           }
         >
@@ -107,11 +111,11 @@ export function SetSavedSheet({
                 {a.account.name} · {formatMoneyCompact(a.balance)}
               </option>
             ))}
-            <option value={NEW_ACCOUNT}>Somewhere else, e.g. my everyday account…</option>
+            <option value={NEW_ACCOUNT}>{t('setSaved.elsewhere')}</option>
           </Select>
         </Field>
         {accountId === NEW_ACCOUNT && (
-          <Field label="Call it">
+          <Field label={t('setSaved.callIt')}>
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -124,19 +128,26 @@ export function SetSavedSheet({
         {diff !== 0 && !tooMuchOff && (
           <p className="rounded-xl bg-white/5 px-3 py-2.5 text-sm text-slate-300">
             {diff > 0
-              ? `${formatMoneyCompact(diff)} more for ${goal.name}, on ${account?.account.name ?? newName.trim()}.`
-              : `${formatMoneyCompact(-diff)} less for ${goal.name}, off ${account?.account.name}.`}
+              ? t('setSaved.more', {
+                  amount: formatMoneyCompact(diff),
+                  name: goal.name,
+                  account: account?.account.name ?? newName.trim(),
+                })
+              : t('setSaved.less', {
+                  amount: formatMoneyCompact(-diff),
+                  name: goal.name,
+                  account: account?.account.name ?? '',
+                })}
           </p>
         )}
         {tooMuchOff && (
           <p className="rounded-xl bg-red-500/10 px-3 py-2.5 text-sm text-red-300">
-            {goal.name} only has {formatMoneyCompact(shareHere)} on this account. Pick the account
-            its money is on.
+            {t('setSaved.tooMuch', { name: goal.name, amount: formatMoneyCompact(shareHere) })}
           </p>
         )}
 
         <SubmitRow
-          label="Save"
+          label={t('common.save')}
           disabled={
             diff === 0 || tooMuchOff || amount < 0 || (accountId === NEW_ACCOUNT && !newName.trim())
           }

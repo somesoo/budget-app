@@ -37,17 +37,14 @@ import { ownCategories } from '../lib/allowance'
 import { elapsedDays, paceStatus, type PaceStatus } from '../lib/insights'
 import type { Category, Person } from '../types'
 import { personIds } from '../lib/people'
+import { t } from '../i18n'
 
 const PACE_COLOR: Record<PaceStatus, string> = {
   under: 'text-positive',
   on: 'text-slate-300',
   over: 'text-red-300',
 }
-const PACE_LABEL: Record<PaceStatus, string> = {
-  under: 'spending below pace',
-  on: 'spending on pace',
-  over: 'spending above pace',
-}
+const paceLabel = (pace: PaceStatus) => t(`home.pace.${pace}`)
 
 export function Home() {
   const month = currentMonthKey()
@@ -127,7 +124,7 @@ export function Home() {
         onSave={({ amount, person, note, date, forMonth, oneOff }) => {
           addIncome.mutate(
             { amount, person, note, income_date: date, for_month: forMonth, one_off: oneOff },
-            { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
+            { onError: (err) => setToast(t('entry.notSaved', { error: (err as Error).message })) },
           )
           setIncomeOpen(false)
           // pay the plan's savings out straight away, while the money is there;
@@ -141,7 +138,11 @@ export function Home() {
           ) {
             setPayOutOpen(true)
           }
-          setToast(date === todayKey() ? 'Income saved' : `Income saved · ${formatDayLong(date)}`)
+          setToast(
+            date === todayKey()
+              ? t('home.incomeSaved')
+              : `${t('home.incomeSaved')} · ${formatDayLong(date)}`,
+          )
         }}
       />
     )
@@ -165,7 +166,7 @@ export function Home() {
               note,
               expense_date: date,
             },
-            { onError: (err) => setToast(`Not saved: ${(err as Error).message}`) },
+            { onError: (err) => setToast(t('entry.notSaved', { error: (err as Error).message })) },
           )
           setSelected(null)
           // a backdated expense lands in another month, whose limits aren't on screen
@@ -178,10 +179,10 @@ export function Home() {
               : null
           setToast(
             crossed
-              ? `Saved. ${crossed}`
+              ? t('entry.savedCrossed', { note: crossed })
               : date === todayKey()
-                ? 'Saved'
-                : `Saved · ${formatDayLong(date)}`,
+                ? t('home.saved')
+                : `${t('home.saved')} · ${formatDayLong(date)}`,
           )
         }}
       />
@@ -189,12 +190,19 @@ export function Home() {
   }
 
   return (
-    <Screen title="What for?" hideTitle fill>
+    <Screen title={t('home.title')} hideTitle fill>
       <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
         {/* what's free to spend, coloured by how the flexible spending keeps pace */}
         <p
           data-tour="safe"
-          aria-label={`${safe ? 'Safe to spend' : 'Left this month'}: ${free < 0 ? 'minus ' : ''}${formatMoney(Math.abs(free))}${pace ? `, ${PACE_LABEL[pace]}` : ''}`}
+          aria-label={[
+            t(safe ? 'home.safeLabel' : 'home.leftLabel', {
+              amount: `${free < 0 ? '−' : ''}${formatMoney(Math.abs(free))}`,
+            }),
+            pace ? paceLabel(pace) : null,
+          ]
+            .filter(Boolean)
+            .join(', ')}
           className={`min-w-0 truncate text-xl font-bold tabular-nums ${pace ? PACE_COLOR[pace] : 'text-white'}`}
         >
           {free < 0 ? '−' : ''}
@@ -202,7 +210,7 @@ export function Home() {
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
           <span data-tour="ask" className="flex">
-            <AskLink question="How are we doing this month, and how much can we still spend?" />
+            <AskLink question={t('home.askQuestion')} />
           </span>
           <button
             type="button"
@@ -211,8 +219,8 @@ export function Home() {
               setIncomeOpen(true)
             }}
             data-tour="income"
-            aria-label="Add income"
-            title="Add income"
+            aria-label={t('home.addIncome')}
+            title={t('home.addIncome')}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-soft ring-1 ring-accent/25 hover:bg-accent/20 active:bg-accent/25"
           >
             <ArrowUp weight="bold" aria-hidden />
@@ -223,7 +231,7 @@ export function Home() {
 
       {error && (
         <p className="mb-3 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
-          Could not load categories: {(error as Error).message}
+          {t('add.loadFailed', { error: (error as Error).message })}
         </p>
       )}
 
@@ -256,9 +264,9 @@ export function Home() {
       )}
 
       {payOutOpen && money.plan && (
-        <BottomSheet title="From the paycheck" onClose={() => setPayOutOpen(false)}>
+        <BottomSheet title={t('paycheck.title')} onClose={() => setPayOutOpen(false)}>
           <p className="mb-2 text-sm text-slate-300">
-            Straight to the goals and IKE, before it gets spent.
+            {t('home.payOutHelp')}
           </p>
           <PaycheckCard month={month} plan={money.plan} overview={savings} bare />
         </BottomSheet>

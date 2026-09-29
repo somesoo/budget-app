@@ -33,6 +33,8 @@ import { ColumnChart } from '../charts/ColumnChart'
 import { PaceChart } from '../charts/PaceChart'
 import { CHART } from '../charts/theme'
 import { EntryRow } from '../history/EntryRow'
+import { t } from '../../i18n'
+import { Trans } from '../../i18n/Trans'
 
 interface Props {
   categoryId: string
@@ -75,9 +77,9 @@ export function CategoryDetail({
       )
     : monthCategories
   const category = categories.find((c) => c.id === categoryId)
-  if (!category) return <Notice>This category doesn’t exist any more.</Notice>
+  if (!category) return <Notice>{t('category.gone')}</Notice>
   if (isOthersAllowance(category, me))
-    return <Notice>{category.name} is someone else’s allowance: only they see what’s in it.</Notice>
+    return <Notice>{t('category.othersAllowance', { name: category.name })}</Notice>
 
   const history = categoryHistory(expenses, categoryId, month)
 
@@ -131,9 +133,9 @@ function HistoryPane({
 
   if (history.months.length === 0 || history.expenses.length === 0) {
     return (
-      <Pane title="History" className="order-last lg:order-none lg:row-span-2">
+      <Pane title={t('category.history')} className="order-last lg:order-none lg:row-span-2">
         <Empty>
-          Nothing logged in {category.name} over the last {history.months.length || 12} months.
+          {t('category.historyEmpty', { name: category.name, count: history.months.length || 12 })}
         </Empty>
       </Pane>
     )
@@ -141,35 +143,39 @@ function HistoryPane({
 
   return (
     <Pane
-      title="History"
-      aside={`last ${history.months.length} ${history.months.length === 1 ? 'month' : 'months'}`}
+      title={t('category.history')}
+      aside={t('category.lastMonths', { count: history.months.length })}
       className="order-last lg:order-none lg:row-span-2"
       scroll={false}
     >
       <div className="grid grid-cols-3 gap-3">
         <Stat
-          label="Typical month"
-          value={history.typical === null ? 'No data' : formatMoneyWhole(history.typical)}
-          sub="last 3 complete"
+          label={t('category.typicalMonth')}
+          value={history.typical === null ? t('category.noData') : formatMoneyWhole(history.typical)}
+          sub={t('category.last3')}
         />
         <Stat
-          label={history.previous ? formatMonthName(history.previous.month) : 'Last month'}
-          value={history.previous ? formatMoneyWhole(history.previous.total) : 'No data'}
+          label={
+            history.previous ? formatMonthName(history.previous.month) : t('category.lastMonth')
+          }
+          value={
+            history.previous ? formatMoneyWhole(history.previous.total) : t('category.noData')
+          }
         />
         <Stat
-          label="Highest"
-          value={history.peak ? formatMoneyWhole(history.peak.total) : 'No data'}
+          label={t('category.highest')}
+          value={history.peak ? formatMoneyWhole(history.peak.total) : t('category.noData')}
           sub={history.peak ? formatMonth(history.peak.month) : undefined}
         />
       </div>
 
       <div className="mt-4">
         <ColumnChart
-          ariaLabel={`${category.name} spending per month`}
+          ariaLabel={t('category.chartLabel', { name: category.name })}
           emphasize={history.months.includes(month) ? month : undefined}
           reference={
             category.monthly_limit > 0
-              ? { value: category.monthly_limit, label: 'Limit' }
+              ? { value: category.monthly_limit, label: t('settings.categories.limit') }
               : undefined
           }
           columns={history.months.map((m, i) => ({
@@ -180,9 +186,9 @@ function HistoryPane({
               <>
                 <p className="mb-1 text-slate-400">
                   {formatMonth(m)}
-                  {m === current ? ', so far' : ''}
+                  {m === current ? `, ${t('charts.soFar')}` : ''}
                 </p>
-                <TooltipRow label="Spent" value={formatMoney(history.totals[i])} />
+                <TooltipRow label={t('common.spent')} value={formatMoney(history.totals[i])} />
               </>
             ),
           }))}
@@ -192,7 +198,7 @@ function HistoryPane({
             <LegendItem color={CHART.accent} label={formatMonthName(month)} shape="rect" />
             <LegendItem
               color={CHART.textMuted}
-              label={`${formatMonthName(month)} limit`}
+              label={t('category.monthLimit', { month: formatMonthName(month) })}
               shape="dashed"
             />
           </div>
@@ -221,7 +227,7 @@ function HistoryPane({
             onClick={() => setShowAll(true)}
             className="mx-3 mb-2 rounded-full px-4 py-2 text-sm font-medium text-slate-300 ring-1 ring-white/10 hover:bg-white/5 active:bg-white/10"
           >
-            Show all {groups.length} months
+            {t('category.showAll', { count: groups.length })}
           </button>
         )}
       </div>
@@ -263,7 +269,9 @@ function ForecastPane({
   const limit = category.monthly_limit
   const editor = limitEditor && (
     <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-      <span className="text-sm font-medium text-white">Limit for {formatMonthName(month)}</span>
+      <span className="text-sm font-medium text-white">
+        {t('category.limitFor', { month: formatMonthName(month) })}
+      </span>
       <div className="w-36 shrink-0">{limitEditor}</div>
     </div>
   )
@@ -279,7 +287,7 @@ function ForecastPane({
       history.sameMonthLastYear !== null && history.sameMonthLastYear > 0
         ? {
             key: 'ly',
-            label: `${formatMonthShort(month)} last yr`,
+            label: t('category.lastYear', { month: formatMonthShort(month) }),
             value: history.sameMonthLastYear,
           }
         : null,
@@ -291,20 +299,20 @@ function ForecastPane({
           }
         : null,
       history.typical !== null
-        ? { key: 'typical', label: 'Typical', value: history.typical }
+        ? { key: 'typical', label: t('planner.fillTypical'), value: history.typical }
         : null,
-      { key: 'plan', label: 'Plan', value: limit },
+      { key: 'plan', label: t('category.plan'), value: limit },
     ].filter((c): c is { key: string; label: string; value: number } => c !== null)
 
     return (
-      <Pane title={`Plan for ${formatMonthName(month)}`}>
+      <Pane title={t('category.planFor', { month: formatMonthName(month) })}>
         {planned}
         <p className="text-[15px] leading-snug text-white">
           {planHeadline(limit, history.typical)}
         </p>
         <div className="mt-3">
           <ColumnChart
-            ariaLabel={`${category.name}: the plan against past months`}
+            ariaLabel={t('category.planChartLabel', { name: category.name })}
             emphasize="plan"
             columns={columns.map((c) => ({
               ...c,
@@ -326,20 +334,28 @@ function ForecastPane({
   return (
     <Pane
       title={
-        isCurrent ? `Forecast for ${formatMonthName(month)}` : `How ${formatMonthName(month)} went`
+        isCurrent
+          ? t('category.forecastFor', { month: formatMonthName(month) })
+          : t('review.title', { month: formatMonthName(month) })
       }
     >
       {planned}
       <div className="grid grid-cols-3 gap-3">
-        <Stat label={isCurrent ? 'Spent so far' : 'Spent'} value={formatMoneyWhole(spent)} />
+        <Stat
+          label={isCurrent ? t('forecast.spentSoFar') : t('common.spent')}
+          value={formatMoneyWhole(spent)}
+        />
         {isCurrent && (
           <Stat
-            label="Projected"
+            label={t('category.projected')}
             value={formatMoneyWhole(projected)}
             tone={limit > 0 && projected > limit ? 'warning' : undefined}
           />
         )}
-        <Stat label="Limit" value={limit > 0 ? formatMoneyWhole(limit) : 'None'} />
+        <Stat
+          label={t('settings.categories.limit')}
+          value={limit > 0 ? formatMoneyWhole(limit) : t('category.none')}
+        />
       </div>
       <p className="mt-3 text-[15px] leading-snug text-white">
         {forecastHeadline({
@@ -352,7 +368,9 @@ function ForecastPane({
         {perDay !== null && (
           <span className="text-slate-300">
             {' '}
-            Up to {formatAmount(Math.floor(perDay))} {CURRENCY_SUFFIX} a day keeps it on the limit.
+            {t('category.perDay', {
+              amount: `${formatAmount(Math.floor(perDay))} ${CURRENCY_SUFFIX}`,
+            })}
           </span>
         )}
       </p>
@@ -372,29 +390,27 @@ function forecastHeadline(args: {
 }): string {
   const { spent, projected, limit, isCurrent, monthName } = args
   if (!isCurrent) {
-    if (limit <= 0) return `${monthName} ended at ${formatMoneyWhole(spent)}.`
+    if (limit <= 0) return t('category.endedAt', { month: monthName, amount: formatMoneyWhole(spent) })
     const diff = spent - limit
     return diff > 0
-      ? `Ended ${formatMoneyWhole(diff)} over the limit.`
-      : `Ended ${formatMoneyWhole(-diff)} under the limit.`
+      ? t('category.endedOver', { amount: formatMoneyWhole(diff) })
+      : t('category.endedUnder', { amount: formatMoneyWhole(-diff) })
   }
-  if (spent === 0) return 'Nothing spent here yet this month.'
-  if (limit <= 0)
-    return `At this pace, about ${formatMoneyWhole(projected)} by the end of the month.`
+  if (spent === 0) return t('category.nothingYet')
+  if (limit <= 0) return t('category.paceAbout', { amount: formatMoneyWhole(projected) })
   const diff = projected - limit
   return diff > 0
-    ? `At this pace it ends about ${formatMoneyWhole(diff)} over the limit.`
-    : `At this pace it ends about ${formatMoneyWhole(-diff)} under the limit.`
+    ? t('category.paceOver', { amount: formatMoneyWhole(diff) })
+    : t('category.paceUnder', { amount: formatMoneyWhole(-diff) })
 }
 
 function planHeadline(limit: number, typical: number | null): string {
-  if (typical === null)
-    return `Planned at ${formatMoneyWhole(limit)}. No complete month to compare with yet.`
+  if (typical === null) return t('category.plannedNoHistory', { amount: formatMoneyWhole(limit) })
   const diff = limit - typical
-  if (Math.abs(diff) < 1) return `Planned right at a typical month, ${formatMoneyWhole(limit)}.`
+  if (Math.abs(diff) < 1) return t('category.plannedTypical', { amount: formatMoneyWhole(limit) })
   return diff > 0
-    ? `Planned ${formatMoneyWhole(diff)} above a typical month, so there’s room to spare.`
-    : `Planned ${formatMoneyWhole(-diff)} below a typical month, so it asks for cutting back.`
+    ? t('category.plannedAbove', { amount: formatMoneyWhole(diff) })
+    : t('category.plannedBelow', { amount: formatMoneyWhole(-diff) })
 }
 
 /* ---------- right, bottom: how big a piece of the whole ---------- */
@@ -438,15 +454,17 @@ function SharePane({
   const hiddenCount = rows.length - shown.length
   const maxShare = rows[0]?.share ?? 1
 
-  const title = isFuture ? 'Share of the plan' : 'Share of spending'
+  const title = isFuture ? t('category.shareOfPlan') : t('category.shareOfSpending')
 
   if (rows.length === 0) {
     return (
       <Pane title={title}>
         <Empty>
           {isFuture
-            ? 'No limits planned yet.'
-            : `Nothing spent in ${formatMonthName(month)}${month === current ? ' yet' : ''}.`}
+            ? t('category.noLimits')
+            : t(month === current ? 'category.nothingSpentYet' : 'category.nothingSpent', {
+                month: formatMonthName(month),
+              })}
         </Empty>
       </Pane>
     )
@@ -456,20 +474,23 @@ function SharePane({
     <Pane title={title}>
       <p className="text-[15px] leading-snug text-white">
         {focus ? (
-          <>
-            <strong className="font-semibold">{percent(focus.share)}</strong> of{' '}
-            {isFuture
-              ? `what ${formatMonthName(month)} plans to spend`
-              : `${formatMonthName(month)}’s spending`}
-            .
-          </>
+          <Trans
+            k={isFuture ? 'category.shareOfPlanLine' : 'category.shareOfSpendingLine'}
+            values={{ percent: percent(focus.share), month: formatMonthName(month) }}
+            tags={{ b: (s) => <strong className="font-semibold">{s}</strong> }}
+          />
         ) : (
-          <>
-            Nothing in {category.name} {isFuture ? 'planned' : 'spent'} for {formatMonthName(month)}
-            .
-          </>
+          t(isFuture ? 'category.nothingPlannedIn' : 'category.nothingSpentIn', {
+            name: category.name,
+            month: formatMonthName(month),
+          })
         )}
-        {usual && <span className="text-slate-300"> Usually {percent(usual.share)}.</span>}
+        {usual && (
+          <span className="text-slate-300">
+            {' '}
+            {t('category.usually', { percent: percent(usual.share) })}
+          </span>
+        )}
       </p>
 
       <ul className="mt-3 grid gap-0.5">
@@ -520,9 +541,9 @@ function SharePane({
       </ul>
       {(hiddenCount > 0 || leftOut.length > 0) && (
         <p className="mt-2 px-2 text-xs text-muted">
-          {hiddenCount > 0 && `${hiddenCount} smaller not shown. `}
+          {hiddenCount > 0 && `${t('category.hiddenSmaller', { count: hiddenCount })} `}
           {leftOut.length > 0 &&
-            `Left out, as in Where it goes: ${leftOut.map((c) => c.name).join(', ')}.`}
+            t('category.leftOut', { names: leftOut.map((c) => c.name).join(', ') })}
         </p>
       )}
     </Pane>

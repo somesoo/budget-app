@@ -19,8 +19,6 @@ import {
   CURRENCY_SUFFIX,
   INSIGHTS_MONTHS,
   WEEKDAY_EXCLUDE_FROM,
-  WEEKDAY_LABELS,
-  WEEKDAY_NAMES,
 } from '../config'
 import { useMonthCategories } from '../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
@@ -40,6 +38,7 @@ import {
   monthKeyOfDate,
   shiftMonth,
   sumExpenses,
+  weekdayNames,
   type MonthKey,
 } from '../lib/calculations'
 import {
@@ -56,6 +55,8 @@ import {
 } from '../lib/insights'
 import { type Expense, type Goal, type Income, type Person } from '../types'
 import { personColor, personIds, personLabel } from '../lib/people'
+import { t } from '../i18n'
+import { Trans } from '../i18n/Trans'
 
 export function Insights() {
   const [month, setMonth] = useState<MonthKey>(currentMonthKey())
@@ -78,17 +79,17 @@ export function Insights() {
 
   return (
     <Screen
-      title="Insights"
+      title={t('nav.insights')}
       wide
       action={
         <div className="flex items-center gap-2">
-          <AskLink question={`What stands out in ${formatMonthName(month)}'s spending?`} />
+          <AskLink question={t('insights.askQuestion', { month: formatMonthName(month) })} />
           <MonthSwitcher month={month} onChange={setMonth} />
         </div>
       }
     >
       {error ? (
-        <Notice>Could not load expenses: {(error as Error).message}</Notice>
+        <Notice>{t('insights.loadFailed', { error: (error as Error).message })}</Notice>
       ) : isLoading || !expenses ? (
         <div className="space-y-4">
           {[0, 1, 2].map((i) => (
@@ -145,7 +146,7 @@ function InsightsBody({
   const { person: me } = useDeviceUser()
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
-    return <Notice>Nothing to chart yet. Add a few expenses and come back.</Notice>
+    return <Notice>{t('insights.empty')}</Notice>
   }
 
   const isCurrent = month === currentMonthKey()
@@ -204,26 +205,26 @@ function InsightsBody({
           <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
 
           <ChartCard
-            title={isCurrent ? 'Pace this month' : `Pace through ${monthName}`}
+            title={isCurrent ? t('insights.paceTitle') : t('insights.paceThrough', { month: monthName })}
             headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
             legend={
               totalLimit > 0 && (
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
                   <LegendItem
                     color={CHART.accent}
-                    label={isCurrent ? 'Spent so far' : 'Spent'}
+                    label={isCurrent ? t('forecast.spentSoFar') : t('common.spent')}
                     shape="line"
                   />
                   <LegendItem
                     color={CHART.textMuted}
-                    label="Even spread of limits"
+                    label={t('insights.evenSpread')}
                     shape="dashed"
                   />
                 </div>
               )
             }
             table={{
-              head: ['Day', 'Spent to date', 'Pace'],
+              head: [t('insights.day'), t('insights.spentToDate'), t('charts.pace')],
               rows: points
                 .filter((p) => p.cumulative !== null)
                 .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
@@ -294,10 +295,12 @@ function KpiRow({
         className="rounded-2xl p-3 ring-1 ring-white/10"
         style={{ backgroundColor: CHART.surface }}
       >
-        <p className="text-xs text-muted">{isCurrent ? 'Projected month end' : 'Spent'}</p>
+        <p className="text-xs text-muted">
+          {isCurrent ? t('insights.projectedEnd') : t('common.spent')}
+        </p>
         <p className="mt-0.5 text-xl font-bold text-white">
           {headlineValue === null
-            ? 'No data'
+            ? t('category.noData')
             : isCurrent
               ? formatMoneyWhole(headlineValue)
               : formatMoney(headlineValue)}
@@ -310,12 +313,14 @@ function KpiRow({
             {over ? (
               <>
                 <Warning weight="fill" aria-hidden className="inline-block align-[-0.125em]" />{' '}
-                {formatAmount(Math.round(headlineValue - totalLimit))} over limits
+                {t('insights.overLimits', {
+                  amount: formatAmount(Math.round(headlineValue - totalLimit)),
+                })}
               </>
             ) : (
               <>
-                <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" /> within{' '}
-                {formatAmount(totalLimit)} limits
+                <Check weight="bold" aria-hidden className="inline-block align-[-0.125em]" />{' '}
+                {t('insights.withinLimits', { amount: formatAmount(totalLimit) })}
               </>
             )}
           </p>
@@ -327,11 +332,12 @@ function KpiRow({
         style={{ backgroundColor: CHART.surface }}
       >
         <p className="text-xs text-muted">
-          vs {prevName}
-          {sameSpan ? ', same days' : ''}
+          {sameSpan
+            ? t('insights.vsSameDays', { month: prevName })
+            : t('insights.vs', { month: prevName })}
         </p>
         {change === null ? (
-          <p className="mt-0.5 text-sm text-muted">No data for {prevName}</p>
+          <p className="mt-0.5 text-sm text-muted">{t('insights.noDataFor', { month: prevName })}</p>
         ) : (
           <>
             <p
@@ -350,7 +356,11 @@ function KpiRow({
               {Math.abs(Math.round(change * 100))}%
             </p>
             <p className="mt-0.5 text-xs text-muted">
-              {change > 0 ? 'more' : change < 0 ? 'less' : 'the same'} than last month
+              {change > 0
+                ? t('insights.moreThanLast')
+                : change < 0
+                  ? t('insights.lessThanLast')
+                  : t('insights.sameAsLast')}
             </p>
           </>
         )}
@@ -368,32 +378,21 @@ function paceHeadline(
 ): ReactNode {
   if (!isCurrent) {
     if (totalLimit <= 0)
-      return (
-        <>
-          You spent {formatMoney(spent)} in {monthName}.
-        </>
-      )
+      return t('insights.youSpent', { amount: formatMoney(spent), month: monthName })
     const diff = spent - totalLimit
-    return diff > 0 ? (
-      <>
-        {monthName} ended {formatMoney(diff)} over your limits.
-      </>
-    ) : (
-      <>
-        {monthName} ended {formatMoney(-diff)} under your limits.
-      </>
-    )
+    return diff > 0
+      ? t('insights.endedOver', { month: monthName, amount: formatMoney(diff) })
+      : t('insights.endedUnder', { month: monthName, amount: formatMoney(-diff) })
   }
-  if (projected === null || totalLimit <= 0) return <>Spent {formatMoney(spent)} so far.</>
+  if (projected === null || totalLimit <= 0)
+    return t('widgets.pace.soFar', { amount: formatMoney(spent) })
   const diff = projected - totalLimit
-  return diff > 0 ? (
-    <>
-      At this rate you'll finish about <strong>{formatMoneyWhole(diff)} over</strong> your limits.
-    </>
-  ) : (
-    <>
-      At this rate you'll finish about <strong>{formatMoneyWhole(-diff)} under</strong> your limits.
-    </>
+  return (
+    <Trans
+      k={diff > 0 ? 'insights.finishOver' : 'insights.finishUnder'}
+      values={{ amount: formatMoneyWhole(Math.abs(diff)) }}
+      tags={{ b: (s) => <strong>{s}</strong> }}
+    />
   )
 }
 
@@ -417,63 +416,71 @@ function MonthlyCard({
 
   if (totals.length < 2) {
     return (
-      <ChartCard title="Month by month">
+      <ChartCard title={t('insights.monthByMonth')}>
         <p className="text-sm text-muted">
-          Shows up once you have two months of expenses. A single month is just the number above.
+          {t('insights.monthByMonthEmpty')}
         </p>
       </ChartCard>
     )
   }
 
-  const selected = totals.find((t) => t.month === month)!
-  const others = totals.filter((t) => t.month !== month && t.total > 0)
-  const average = others.length ? others.reduce((a, t) => a + t.total, 0) / others.length : 0
+  const selected = totals.find((row) => row.month === month)!
+  const others = totals.filter((row) => row.month !== month && row.total > 0)
+  const average = others.length ? others.reduce((a, row) => a + row.total, 0) / others.length : 0
   const comparable = projected ?? selected.total
   const vsAvg = average > 0 ? (comparable - average) / average : null
 
   return (
     <ChartCard
-      title="Month by month"
+      title={t('insights.monthByMonth')}
       headline={
         vsAvg === null ? undefined : (
-          <>
-            {formatMonthName(month)} {projected !== null ? 'is on course to finish' : 'was'}{' '}
-            <strong>
-              {Math.abs(Math.round(vsAvg * 100))}% {vsAvg >= 0 ? 'above' : 'below'}
-            </strong>{' '}
-            your average month.
-          </>
+          <Trans
+            k={
+              projected !== null
+                ? vsAvg >= 0
+                  ? 'insights.onCourseAbove'
+                  : 'insights.onCourseBelow'
+                : vsAvg >= 0
+                  ? 'insights.wasAbove'
+                  : 'insights.wasBelow'
+            }
+            values={{ month: formatMonthName(month), percent: Math.abs(Math.round(vsAvg * 100)) }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         )
       }
       legend={
         totalLimit > 0 && (
-          <LegendItem color={CHART.textMuted} label="Monthly limits" shape="dashed" />
+          <LegendItem color={CHART.textMuted} label={t('insights.monthlyLimits')} shape="dashed" />
         )
       }
       table={{
-        head: ['Month', 'Spent'],
-        rows: totals.map((t) => [formatMonthName(t.month), formatAmount(t.total)]),
+        head: [t('insights.month'), t('common.spent')],
+        rows: totals.map((row) => [formatMonthName(row.month), formatAmount(row.total)]),
       }}
     >
       <ColumnChart
-        ariaLabel="Total spending per month"
+        ariaLabel={t('insights.totalChartLabel')}
         emphasize={month}
-        reference={totalLimit > 0 ? { value: totalLimit, label: 'limits' } : undefined}
-        columns={totals.map((t) => ({
-          key: t.month,
-          label: formatMonthShort(t.month),
-          value: t.total,
+        reference={totalLimit > 0 ? { value: totalLimit, label: t('insights.limitsShort') } : undefined}
+        columns={totals.map((row) => ({
+          key: row.month,
+          label: formatMonthShort(row.month),
+          value: row.total,
           tooltip: (
             <>
-              <p className="mb-1 text-slate-400">{formatMonthName(t.month)}</p>
+              <p className="mb-1 text-slate-400">{formatMonthName(row.month)}</p>
               <TooltipRow
-                label={t.month === month && projected !== null ? 'So far' : 'Spent'}
-                value={formatMoney(t.total)}
+                label={row.month === month && projected !== null ? t('insights.soFar') : t('common.spent')}
+                value={formatMoney(row.total)}
               />
-              {t.month === month && projected !== null && (
-                <TooltipRow label="Projected" value={formatMoneyWhole(projected)} />
+              {row.month === month && projected !== null && (
+                <TooltipRow label={t('category.projected')} value={formatMoneyWhole(projected)} />
               )}
-              {totalLimit > 0 && <TooltipRow label="Limits" value={formatMoney(totalLimit)} />}
+              {totalLimit > 0 && (
+                <TooltipRow label={t('planner.limits')} value={formatMoney(totalLimit)} />
+              )}
             </>
           ),
         }))}
@@ -506,9 +513,9 @@ function CategoryCard({
 
   if (!hasPrevMonth) {
     return (
-      <ChartCard title="Change by category">
+      <ChartCard title={t('insights.changeByCategory')}>
         <p className="text-sm text-muted">
-          Compares each category with the month before. Nothing logged in {prevName} yet.
+          {t('insights.changeEmpty', { month: prevName })}
         </p>
       </ChartCard>
     )
@@ -519,28 +526,43 @@ function CategoryCard({
 
   return (
     <ChartCard
-      title="Change by category"
+      title={t('insights.changeByCategory')}
       headline={
         biggestUp ? (
-          <>
-            Biggest jump: <strong>{biggestUp.category.name}</strong>, +
-            {formatMoney(biggestUp.delta)}{' '}
-            {dayCutoff !== undefined ? `vs the same days of ${prevName}` : `vs ${prevName}`}.
-          </>
+          <Trans
+            k={dayCutoff !== undefined ? 'insights.biggestJumpSameDays' : 'insights.biggestJump'}
+            values={{
+              name: biggestUp.category.name,
+              amount: formatMoney(biggestUp.delta),
+              month: prevName,
+            }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         ) : biggestDown ? (
-          <>
-            Every category is down, most of all <strong>{biggestDown.category.name}</strong>.
-          </>
+          <Trans
+            k="insights.allDown"
+            values={{ name: biggestDown.category.name }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         ) : undefined
       }
       legend={
         <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <LegendItem color={CHART.more} label={`More than ${prevShort}${span}`} shape="rect" />
-          <LegendItem color={CHART.less} label="Less" shape="rect" />
+          <LegendItem
+            color={CHART.more}
+            label={t('insights.moreThan', { month: `${prevShort}${span}` })}
+            shape="rect"
+          />
+          <LegendItem color={CHART.less} label={t('insights.less')} shape="rect" />
         </div>
       }
       table={{
-        head: ['Category', `${curShort}${span}`, `${prevShort}${span}`, 'Change'],
+        head: [
+          t('entry.category'),
+          `${curShort}${span}`,
+          `${prevShort}${span}`,
+          t('insights.change'),
+        ],
         rows: deltas.map((d) => [
           d.category.name,
           formatAmount(d.current),
@@ -583,7 +605,7 @@ function PeopleCard({
         <LegendItem key={p} color={personColor(p)} label={personLabel(p)} shape="line" />
       ))}
       {partialLast && rows.length > 1 && (
-        <LegendItem color={CHART.textMuted} label="Month in progress" shape="dashed" />
+        <LegendItem color={CHART.textMuted} label={t('insights.inProgress')} shape="dashed" />
       )}
     </div>
   )
@@ -602,14 +624,19 @@ function PeopleCard({
     ) : undefined
 
   const table = {
-    head: ['Month', ...personIds().map((p) => personLabel(p))],
+    head: [t('insights.month'), ...personIds().map((p) => personLabel(p))],
     rows: rows.map((r) => [formatMonthName(r.month), ...personIds().map((p) => formatAmount((r.by[p] ?? 0)))]),
   }
 
   if (rows.length < 2) {
     // a single month isn't a trend — show the split as a meter instead of a two-point line
     return (
-      <ChartCard title="Who spent what" headline={headline} legend={legend} table={table}>
+      <ChartCard
+        title={t('insights.whoSpent')}
+        headline={headline}
+        legend={legend}
+        table={table}
+      >
         <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full">
           {personIds().map((p) => (
             <span
@@ -619,13 +646,18 @@ function PeopleCard({
             />
           ))}
         </div>
-        <p className="mt-2 text-xs text-muted">The trend line appears after a second month.</p>
+        <p className="mt-2 text-xs text-muted">{t('insights.trendLater')}</p>
       </ChartCard>
     )
   }
 
   return (
-    <ChartCard title="Who spent what" headline={headline} legend={legend} table={table}>
+    <ChartCard
+        title={t('insights.whoSpent')}
+        headline={headline}
+        legend={legend}
+        table={table}
+      >
       <PersonLines rows={rows} monthLabel={formatMonthShort} partialLast={partialLast} />
     </ChartCard>
   )
@@ -640,44 +672,48 @@ function WeekdayCard({ expenses, months }: { expenses: Expense[]; months: MonthK
   const excluded = expenses.length - everyday.length
   const averages = weekdayAverages(everyday, months)
   const top = averages.reduce((a, b) => (b.average > a.average ? b : a))
+  const shortNames = weekdayNames('short')
+  const longNames = weekdayNames('long')
 
   return (
     <ChartCard
-      title="Everyday spending by weekday"
+      title={t('insights.weekdayTitle')}
       headline={
         top.average > 0 ? (
-          <>
-            Your priciest day is <strong>{WEEKDAY_NAMES[top.weekday]}</strong>, about{' '}
-            {formatMoneyWhole(top.average)} on average.
-          </>
+          <Trans
+            k="insights.priciestDay"
+            values={{ day: longNames[top.weekday], amount: formatMoneyWhole(top.average) }}
+            tags={{ b: (s) => <strong>{s}</strong> }}
+          />
         ) : undefined
       }
       table={{
-        head: ['Day', 'Average'],
-        rows: averages.map((a) => [WEEKDAY_NAMES[a.weekday], formatAmount(a.average)]),
+        head: [t('insights.day'), t('insights.average')],
+        rows: averages.map((a) => [longNames[a.weekday], formatAmount(a.average)]),
       }}
     >
       <ColumnChart
-        ariaLabel="Average spending per weekday"
+        ariaLabel={t('insights.weekdayChartLabel')}
         emphasize={String(top.weekday)}
         columns={averages.map((a) => ({
           key: String(a.weekday),
-          label: WEEKDAY_LABELS[a.weekday],
+          label: shortNames[a.weekday],
           value: a.average,
           tooltip: (
             <>
-              <p className="mb-1 text-slate-400">{WEEKDAY_NAMES[a.weekday]}s</p>
-              <TooltipRow label="Average" value={formatMoneyWhole(a.average)} />
+              <p className="mb-1 text-slate-400">{longNames[a.weekday]}</p>
+              <TooltipRow label={t('insights.average')} value={formatMoneyWhole(a.average)} />
             </>
           ),
         }))}
       />
       <p className="mt-1 text-xs text-muted">
-        Average per day since your first expense, over the last {months.length} months.
+        {t('insights.weekdayNote', { count: months.length })}
         {excluded > 0 &&
-          ` Leaves out ${excluded} ${excluded === 1 ? 'expense' : 'expenses'} of ${formatAmount(
-            WEEKDAY_EXCLUDE_FROM,
-          )} ${CURRENCY_SUFFIX} or more, like rent.`}
+          ` ${t('insights.weekdayExcluded', {
+            count: excluded,
+            amount: `${formatAmount(WEEKDAY_EXCLUDE_FROM)} ${CURRENCY_SUFFIX}`,
+          })}`}
       </p>
     </ChartCard>
   )

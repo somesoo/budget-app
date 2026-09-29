@@ -7,6 +7,7 @@ import { useCategories } from '../hooks/useCategories'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { ownCategories } from '../lib/allowance'
 import { currentMonthKey, shiftMonth } from '../lib/calculations'
+import { t } from '../i18n'
 
 /**
  * `/category/:id?month=YYYY-MM`: one category's history, forecast and share,
@@ -40,7 +41,7 @@ export function CategoryPage() {
       <header className="mb-4 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           to="/budget"
-          aria-label="Back to Budget"
+          aria-label={t('common.backToBudget')}
           className="-ml-2 rounded-full px-2 py-1 text-2xl leading-none text-muted hover:bg-white/5 active:bg-white/10"
         >
           <ArrowLeft />
@@ -53,14 +54,14 @@ export function CategoryPage() {
               style={{ backgroundColor: category.color }}
             />
           )}
-          <span className="truncate">{category?.name ?? 'Category'}</span>
+          <span className="truncate">{category?.name ?? t('entry.category')}</span>
         </h1>
         <div className="flex w-full items-center justify-between gap-2 lg:w-auto">
           {prev && next && active.length > 1 && (
-            <nav aria-label="Other categories" className="flex items-center gap-1 text-sm">
+            <nav aria-label={t('planner.otherCategories')} className="flex items-center gap-1 text-sm">
               <Link
                 to={withMonth(`/category/${prev.id}`)}
-                aria-label={`Previous category: ${prev.name}`}
+                aria-label={t('planner.previousCategory', { name: prev.name })}
                 className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
               >
                 <CaretLeft aria-hidden className="inline-block align-[-0.125em]" />
@@ -68,7 +69,7 @@ export function CategoryPage() {
               </Link>
               <Link
                 to={withMonth(`/category/${next.id}`)}
-                aria-label={`Next category: ${next.name}`}
+                aria-label={t('planner.nextCategory', { name: next.name })}
                 className="rounded-full px-3 py-1.5 text-muted ring-1 ring-white/10 hover:bg-white/5 hover:text-white"
               >
                 <span className="mr-1.5 hidden lg:inline">{next.name}</span>

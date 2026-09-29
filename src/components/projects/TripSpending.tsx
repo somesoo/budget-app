@@ -3,6 +3,7 @@ import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import type { ProjectSummary } from '../../lib/projects'
 import type { Expense } from '../../types'
 import { CHART } from '../charts/theme'
+import { t } from '../../i18n'
 
 /** Items listed by what they were (their notes), biggest first. */
 const TOP_ITEMS = 5
@@ -15,11 +16,14 @@ export function TripSpendingCard({ summary }: { summary: ProjectSummary }) {
   return (
     <section className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 lg:p-5">
       <div className="grid grid-cols-3 gap-3">
-        <Stat label="Spent" value={formatMoneyWhole(spent)} />
-        <Stat label="Budget" value={budget ? formatMoneyWhole(budget) : 'None'} />
+        <Stat label={t('common.spent')} value={formatMoneyWhole(spent)} />
         <Stat
-          label={over ? 'Over by' : 'Left'}
-          value={left === null ? 'No budget' : formatMoneyWhole(Math.abs(left))}
+          label={t('project.budget')}
+          value={budget ? formatMoneyWhole(budget) : t('category.none')}
+        />
+        <Stat
+          label={over ? t('project.overBy') : t('project.left')}
+          value={left === null ? t('project.noBudget') : formatMoneyWhole(Math.abs(left))}
           warn={over}
         />
       </div>
@@ -48,7 +52,7 @@ export function TripSpendingCard({ summary }: { summary: ProjectSummary }) {
 export function WhereItWent({ expenses }: { expenses: Expense[] }) {
   const byNote = new Map<string, number>()
   for (const e of expenses) {
-    const key = e.note?.trim() || 'Untitled'
+    const key = e.note?.trim() || t('project.untitled')
     byNote.set(key, (byNote.get(key) ?? 0) + e.amount)
   }
   const items = [...byNote.entries()]
@@ -58,7 +62,7 @@ export function WhereItWent({ expenses }: { expenses: Expense[] }) {
   if (items.length === 0) return null
   return (
     <section>
-      <h2 className="mb-2 text-base font-semibold text-white">Where it went</h2>
+      <h2 className="mb-2 text-base font-semibold text-white">{t('project.whereItWent')}</h2>
       <ul className="grid gap-1.5">
         {items.map((it) => (
           <li key={it.note} className="flex items-baseline gap-3 text-sm">
@@ -74,24 +78,27 @@ export function WhereItWent({ expenses }: { expenses: Expense[] }) {
 }
 
 function phaseLine(s: ProjectSummary): string {
-  const days = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`
+  const count = s.days ?? 0
   switch (s.phase) {
     case 'upcoming':
-      return `Starts in ${days(s.days ?? 0)}.${
-        s.spent > 0 ? ` ${formatMoneyWhole(s.spent)} already paid ahead.` : ''
-      }`
+      return s.spent > 0
+        ? t('project.startsInPaid', { count, amount: formatMoneyWhole(s.spent) })
+        : t('project.startsIn', { count })
     case 'running':
       return s.perDayLeft !== null
-        ? `${days(s.days ?? 0)} to go, today included: about ${formatMoneyWhole(Math.floor(s.perDayLeft))} a day keeps it within budget.`
-        : `${days(s.days ?? 0)} to go, today included.`
+        ? t('project.runningPerDay', {
+            count,
+            amount: formatMoneyWhole(Math.floor(s.perDayLeft)),
+          })
+        : t('project.running', { count })
     case 'finished':
       return s.left !== null
         ? s.left >= 0
-          ? `Finished ${formatMoneyWhole(s.left)} under budget.`
-          : `Finished ${formatMoneyWhole(-s.left)} over budget.`
-        : 'Finished.'
+          ? t('project.finishedUnder', { amount: formatMoneyWhole(s.left) })
+          : t('project.finishedOver', { amount: formatMoneyWhole(-s.left) })
+        : t('project.finished')
     default:
-      return 'Paid from savings, outside the monthly budget. Add trip dates in Edit to see a daily amount while it runs.'
+      return t('project.undated')
   }
 }
 

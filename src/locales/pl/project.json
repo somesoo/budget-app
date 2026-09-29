@@ -1,0 +1,150 @@
+{
+  "edit": {
+    "message": "Edytuj: {name}",
+    "context": "Trip/project sheet heading when editing; {name} is the trip's name."
+  },
+  "new": {
+    "message": "Nowy wyjazd lub projekt",
+    "context": "Trip/project sheet heading when creating one. A trip or project has its own budget, paid from savings, outside the monthly limits."
+  },
+  "namePlaceholder": {
+    "message": "np. Japonia 2027, Kuchnia",
+    "context": "Trip/project sheet: placeholder of the name field."
+  },
+  "budgetLabel": {
+    "message": "Budżet na całość (opcjonalnie)",
+    "context": "Trip/project sheet: label of the total budget field."
+  },
+  "budget": {
+    "message": "Budżet",
+    "context": "Trip/project: its total budget (field label and stat)."
+  },
+  "from": {
+    "message": "Od (opcjonalnie)",
+    "context": "Trip/project sheet: start date field."
+  },
+  "until": {
+    "message": "Do (opcjonalnie)",
+    "context": "Trip/project sheet: end date field."
+  },
+  "badDates": {
+    "message": "Kończy się przed rozpoczęciem",
+    "context": "Trip/project sheet: error, the end date is before the start date."
+  },
+  "goal": {
+    "message": "Płacone z celu oszczędnościowego (opcjonalnie)",
+    "context": "Trip/project sheet: which savings goal pays for it."
+  },
+  "goalHelp": {
+    "message": "Wydatki i tak nie wchodzą do budżetu miesiąca; to pokazuje je na tle tego, co odłożono.",
+    "context": "Trip/project sheet: hint under the goal choice."
+  },
+  "unarchive": {
+    "message": "Przywróć na ekran Dodaj",
+    "context": "Trip/project sheet: button that shows a finished trip on the Add screen again."
+  },
+  "archive": {
+    "message": "Zakończ: usuń z ekranu Dodaj",
+    "context": "Trip/project sheet: button that marks the trip as finished."
+  },
+  "spentFromGoals": {
+    "message": "Wydane z celów",
+    "context": "Budget tab: heading of the list of trips and goals that were spent from (outside the monthly budget)."
+  },
+  "overBy": {
+    "message": "Ponad o",
+    "context": "Trip card: stat label, how much the trip went over its budget."
+  },
+  "left": {
+    "message": "Zostało",
+    "context": "Trip card: stat label, what's left of its budget."
+  },
+  "noBudget": {
+    "message": "Bez budżetu",
+    "context": "Trip card: stat value when there's no budget."
+  },
+  "untitled": {
+    "message": "Bez tytułu",
+    "context": "Trip card > Where it went: expenses without a note are grouped under this."
+  },
+  "whereItWent": {
+    "message": "Na co poszło",
+    "context": "Trip card: heading of the biggest things the trip's money went on."
+  },
+  "startsIn": {
+    "one": "Zaczyna się za {count} dzień.",
+    "few": "Zaczyna się za {count} dni.",
+    "many": "Zaczyna się za {count} dni.",
+    "other": "Zaczyna się za {count} dnia.",
+    "context": "Trip card: the trip hasn't started yet."
+  },
+  "startsInPaid": {
+    "one": "Zaczyna się za {count} dzień. {amount} już zapłacone z góry.",
+    "few": "Zaczyna się za {count} dni. {amount} już zapłacone z góry.",
+    "many": "Zaczyna się za {count} dni. {amount} już zapłacone z góry.",
+    "other": "Zaczyna się za {count} dnia. {amount} już zapłacone z góry.",
+    "context": "Trip card: the trip hasn't started, and {amount} was already spent on it (tickets etc.)."
+  },
+  "running": {
+    "one": "Został {count} dzień, licząc dzisiaj.",
+    "few": "Zostały {count} dni, licząc dzisiaj.",
+    "many": "Zostało {count} dni, licząc dzisiaj.",
+    "other": "Zostało {count} dnia, licząc dzisiaj.",
+    "context": "Trip card: the trip is running."
+  },
+  "runningPerDay": {
+    "one": "Został {count} dzień, licząc dzisiaj: ok. {amount} dziennie utrzyma budżet.",
+    "few": "Zostały {count} dni, licząc dzisiaj: ok. {amount} dziennie utrzyma budżet.",
+    "many": "Zostało {count} dni, licząc dzisiaj: ok. {amount} dziennie utrzyma budżet.",
+    "other": "Zostało {count} dnia, licząc dzisiaj: ok. {amount} dziennie utrzyma budżet.",
+    "context": "Trip card: the trip is running, with what can be spent per day."
+  },
+  "finishedUnder": {
+    "message": "Zakończony {amount} poniżej budżetu.",
+    "context": "Trip card: the trip is over."
+  },
+  "finishedOver": {
+    "message": "Zakończony {amount} ponad budżetem.",
+    "context": "Trip card: the trip is over."
+  },
+  "finished": {
+    "message": "Zakończony.",
+    "context": "Trip card: the trip is over (no budget)."
+  },
+  "undated": {
+    "message": "Płacone z oszczędności, poza budżetem miesiąca. Dodaj daty wyjazdu w Edycji, żeby widzieć kwotę dzienną w jego trakcie.",
+    "context": "Trip card: the trip has no dates."
+  },
+  "title": {
+    "message": "Projekt",
+    "context": "Trip/project page heading while loading or when missing."
+  },
+  "gone": {
+    "message": "Nic tu nie ma: mogło zostać usunięte.",
+    "context": "Trip/project page: it no longer exists."
+  },
+  "everyExpense": {
+    "message": "Wszystkie wydatki",
+    "context": "Trip/project page: heading of the list of its expenses."
+  },
+  "empty": {
+    "message": "Jeszcze nic. Powiąż go z celem oszczędnościowym w Edycji, a potem dodawaj wydatki z kafelka Cele na karcie Dodaj.",
+    "context": "Trip/project page: no expenses yet."
+  },
+  "datesBoth": {
+    "message": "{from} – {to}",
+    "context": "Trip/project page: its dates, e.g. '5 May 2027 to 19 May 2027'."
+  },
+  "datesFrom": {
+    "message": "Od {from}",
+    "context": "Trip/project page: start date only."
+  },
+  "datesTo": {
+    "message": "Do {to}",
+    "context": "Trip/project page: end date only."
+  },
+  "kind": {
+    "message": "Wyjazd lub projekt",
+    "context": "Trip/project page: subtitle when it has no dates."
+  }
+}

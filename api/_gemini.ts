@@ -23,6 +23,11 @@ const RETRY_DELAY_MS = 1000
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+/** The app's languages by code, as the prompt names them; English unless it's one of these. */
+const LANGUAGE_NAMES: Record<string, string> = { en: 'English', pl: 'Polish' }
+export const writtenLanguage = (code: unknown) =>
+  (typeof code === 'string' && LANGUAGE_NAMES[code]) || 'English'
+
 export const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
 export const isNumOrNull = (v: unknown) => v === null || isNum(v)
 export const isName = (v: unknown) => typeof v === 'string' && v.length > 0 && v.length <= 60

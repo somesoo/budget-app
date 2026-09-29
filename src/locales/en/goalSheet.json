@@ -1,0 +1,62 @@
+{
+  "new": {
+    "message": "New goal",
+    "context": "Savings goal sheet heading when creating one."
+  },
+  "name": {
+    "message": "What it's for",
+    "context": "Goal sheet: name field label."
+  },
+  "namePlaceholder": {
+    "message": "e.g. Japan 2027, Emergency fund",
+    "context": "Goal sheet: placeholder of the name field."
+  },
+  "hasTarget": {
+    "message": "Has a target",
+    "context": "Goal sheet: option, the goal has a target amount."
+  },
+  "open": {
+    "message": "Keeps growing",
+    "context": "Goal sheet: option, the goal has no target and just grows."
+  },
+  "emergencyHint": {
+    "message": "{amount} is 3 months of your typical spending.",
+    "context": "Goal sheet: hint under the target for an emergency fund."
+  },
+  "by": {
+    "message": "By (optional)",
+    "context": "Goal sheet: target date field."
+  },
+  "openHelp": {
+    "message": "No finish line: good for an emergency fund or a general cushion.",
+    "context": "Goal sheet: explanation for a goal without a target."
+  },
+  "tripFrom": {
+    "message": "Trip from (optional)",
+    "context": "Goal sheet: start date of the trip the goal pays for."
+  },
+  "emergency": {
+    "message": "This is our emergency fund",
+    "context": "Goal sheet: switch label."
+  },
+  "emergencyHelp": {
+    "message": "The Budget tab says how many months of spending it covers, last month's leftover goes here first while it's short, and borrowing warns before emptying it.",
+    "context": "Goal sheet: explanation under the emergency fund switch."
+  },
+  "note": {
+    "message": "Note (optional)",
+    "context": "Goal sheet: note field label."
+  },
+  "add": {
+    "message": "Add goal",
+    "context": "Goal sheet: button that creates the goal."
+  },
+  "archive": {
+    "message": "Close this goal",
+    "context": "Goal sheet: archives the goal."
+  },
+  "unarchive": {
+    "message": "Bring it back",
+    "context": "Goal sheet: restores a closed goal."
+  }
+}

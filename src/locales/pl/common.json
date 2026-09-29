@@ -1,0 +1,90 @@
+{
+  "appName": {
+    "message": "Budżet",
+    "context": "The app's name, shown on the sign-in screen and at the top of the side navigation on a laptop."
+  },
+  "today": {
+    "message": "Dzisiaj",
+    "context": "Day heading in lists and the date picker: the current day."
+  },
+  "yesterday": {
+    "message": "Wczoraj",
+    "context": "Day heading in lists and the date picker: the day before today."
+  },
+  "back": {
+    "message": "Wstecz",
+    "context": "Generic button: go to the previous step (tour, multi-step forms)."
+  },
+  "next": {
+    "message": "Dalej",
+    "context": "Generic button: go to the next step (tour, multi-step forms)."
+  },
+  "add": {
+    "message": "Dodaj",
+    "context": "Generic accessible label of a '+' button that adds the typed item (a person, a line)."
+  },
+  "perDay": {
+    "message": "dziennie",
+    "context": "Short label of a dashed reference line on bar charts: the limit per day. Very short."
+  },
+  "spent": {
+    "message": "Wydano",
+    "context": "Chart tooltip row label: the amount spent that day or month."
+  },
+  "amountOver": {
+    "message": "{amount} ponad",
+    "context": "Short status next to a total: {amount} (with currency) over the limit."
+  },
+  "amountLeft": {
+    "message": "zostało {amount}",
+    "context": "Short status next to a total: {amount} (with currency) still available."
+  },
+  "save": {
+    "message": "Zapisz",
+    "context": "Generic save button."
+  },
+  "saving": {
+    "message": "Zapisywanie…",
+    "context": "Generic save button while saving."
+  },
+  "cancel": {
+    "message": "Anuluj",
+    "context": "Generic cancel button."
+  },
+  "close": {
+    "message": "Zamknij",
+    "context": "Generic accessible label of a close (×) button."
+  },
+  "delete": {
+    "message": "Usuń",
+    "context": "Generic delete button."
+  },
+  "color": {
+    "message": "Kolor",
+    "context": "Label above the colour swatches (category, goal, account, trip)."
+  },
+  "deleting": {
+    "message": "Usuwanie…",
+    "context": "Generic delete button while deleting."
+  },
+  "notDeleted": {
+    "message": "Nie usunięto: {error}",
+    "context": "Generic error after a failed delete; {error} is technical."
+  },
+  "choose": {
+    "message": "Wybierz…",
+    "context": "Placeholder of a dropdown with nothing picked."
+  },
+  "backToBudget": {
+    "message": "Wróć do Budżetu",
+    "context": "Accessible label of the back arrow on pages opened from the Budget tab."
+  },
+  "edit": {
+    "message": "Edytuj",
+    "context": "Generic edit button."
+  },
+  "loading": {
+    "message": "Wczytywanie",
+    "context": "Accessible label of a loading placeholder."
+  }
+}

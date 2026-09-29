@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { APP_NAME, AUTH_EMAIL } from '../config'
+import { AUTH_EMAIL } from '../config'
+import { t } from '../i18n'
 import { supabase } from '../lib/supabaseClient'
+import { LanguagePicker } from './LanguagePicker'
 
 /** The four tiles from public/icon.svg, drawn large as the screen's mark. */
 const MARK_TILES = ['#22c55e', '#f97316', '#38bdf8', '#a855f7']
@@ -35,6 +37,9 @@ export function Login() {
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-between px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+3.5rem)]">
       <header>
+        <div className="-mt-10 mb-4 flex justify-end">
+          <LanguagePicker />
+        </div>
         <div aria-hidden className="grid w-20 grid-cols-2 gap-1.5">
           {MARK_TILES.map((color, i) => (
             <span
@@ -45,9 +50,9 @@ export function Login() {
           ))}
         </div>
 
-        <h1 className="mt-8 text-4xl font-bold tracking-tight text-white">{APP_NAME}</h1>
+        <h1 className="mt-8 text-4xl font-bold tracking-tight text-white">{t('common.appName')}</h1>
         <p className="mt-2 max-w-[28ch] text-base leading-relaxed text-muted">
-          Sign in once. This phone stays signed in after that.
+          {t('login.intro')}
         </p>
       </header>
 
@@ -56,7 +61,7 @@ export function Login() {
         className="mt-12 grid gap-4 motion-safe:animate-rise-in motion-safe:opacity-0 motion-safe:[animation-delay:200ms]"
       >
         <label className="grid gap-2">
-          <span className="text-sm text-muted">Account</span>
+          <span className="text-sm text-muted">{t('login.account')}</span>
           <input
             type="email"
             name="username"
@@ -71,7 +76,7 @@ export function Login() {
 
         <div className="grid gap-2">
           <label htmlFor="login-password" className="text-sm text-muted">
-            Password
+            {t('login.password')}
           </label>
           <div className="relative">
             <input
@@ -98,7 +103,7 @@ export function Login() {
               aria-pressed={showPassword}
               className="absolute inset-y-1.5 right-1.5 rounded-xl px-3 text-sm font-medium text-slate-300 active:bg-white/10"
             >
-              {showPassword ? 'Hide' : 'Show'}
+              {showPassword ? t('login.hidePassword') : t('login.showPassword')}
             </button>
           </div>
           <p id="login-error" role="alert" className="min-h-5 text-sm text-red-300">
@@ -111,7 +116,7 @@ export function Login() {
           disabled={busy || !password}
           className="h-16 rounded-3xl bg-slate-50 text-xl font-bold text-ink transition active:scale-[0.98] disabled:opacity-40"
         >
-          {busy ? 'Signing in…' : 'Sign in'}
+          {busy ? t('login.signingIn') : t('login.signIn')}
         </button>
       </form>
     </div>
@@ -119,7 +124,7 @@ export function Login() {
 }
 
 function describeError(message: string): string {
-  if (message === 'Invalid login credentials') return 'That password is wrong. Try again.'
-  if (/fetch|network/i.test(message)) return "Can't reach the server. Check your connection."
+  if (message === 'Invalid login credentials') return t('login.wrongPassword')
+  if (/fetch|network/i.test(message)) return t('login.offline')
   return message
 }

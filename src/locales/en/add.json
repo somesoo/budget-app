@@ -1,0 +1,92 @@
+{
+  "findCategory": {
+    "message": "Find a category",
+    "context": "Add screen (laptop layout): placeholder of the search field above the category tiles."
+  },
+  "findCategoryLabel": {
+    "message": "Find a category, Enter picks the first match",
+    "context": "Add screen (laptop): accessible label of the category search; pressing Enter selects the first result."
+  },
+  "noMatch": {
+    "message": "No category matches “{query}”.",
+    "context": "Add screen (laptop): no category matches the typed search {query}."
+  },
+  "goals": {
+    "message": "Goals",
+    "context": "Add screen: heading of the savings goals that can be spent from (a tile, and a heading in search results)."
+  },
+  "goalsTile": {
+    "spend": {
+      "message": "Spend from one",
+      "context": "Add screen: the Goals tile's main line; tapping it lets you log an expense paid from a savings goal. Very short (fits a small tile)."
+    },
+    "count": {
+      "one": "{count} goal · from savings",
+      "other": "{count} goals · from savings",
+      "context": "Add screen: small line on the Goals tile, e.g. '3 goals · from savings'. Very short."
+    }
+  },
+  "goalPicker": {
+    "title": {
+      "message": "Spent from a goal",
+      "context": "Add screen > bottom sheet heading: pick which savings goal an expense is paid from."
+    },
+    "help": {
+      "message": "Paid from savings: it comes off the account the goal’s money is on, not this month’s budget.",
+      "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
+    },
+    "spentOf": {
+      "message": "{spent} of {target} {currency} spent",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much of its target has been spent. {currency} is 'zł'."
+    },
+    "spent": {
+      "message": "{spent} {currency} spent",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal without a target, how much has been spent. {currency} is 'zł'."
+    }
+  },
+  "recentEmpty": {
+    "message": "Nothing logged this month yet.",
+    "context": "Add screen (laptop): the Recent list when nothing has been logged this month."
+  },
+  "widgetSlide": {
+    "message": "{label}, {n} of {total}",
+    "context": "Accessible label of one widget card in the swipeable carousel on the Add screen, e.g. 'Pace, 2 of 8'."
+  },
+  "thisMonth": {
+    "message": "This month: <b>{amount}</b>",
+    "context": "Add screen (laptop): line under the heading, total spent this month; keep the <b> tags around {amount}."
+  },
+  "loadFailed": {
+    "message": "Could not load categories: {error}",
+    "context": "Add screen: error when categories fail to load; {error} is a technical message."
+  },
+  "categories": {
+    "message": "Categories",
+    "context": "Add screen (laptop): accessible label of the category tiles section."
+  },
+  "newEntry": {
+    "message": "New entry",
+    "context": "Add screen (laptop): accessible label of the panel where a new expense or income is typed."
+  },
+  "pickFirst": {
+    "message": "Pick a category first",
+    "context": "Add screen (laptop): hint in the entry panel before a category is chosen."
+  },
+  "keys": {
+    "message": "<kbd>Enter</kbd> saves · <kbd>Esc</kbd> clears",
+    "context": "Add screen (laptop): keyboard hint under the save button. Keep the <kbd> tags; key names are usually left untranslated."
+  },
+  "recent": {
+    "message": "Recent",
+    "context": "Add screen (laptop, wide): heading of the list of the last entries."
+  },
+  "perDayLeft": {
+    "one": "About {amount} a day for the {count} day left.",
+    "other": "About {amount} a day for the {count} days left.",
+    "context": "Add screen (laptop): what can be spent per day for the rest of the month."
+  },
+  "noMatchSearch": {
+    "message": "Nothing matches “{query}”",
+    "context": "History search: no results for {query}."
+  }
+}

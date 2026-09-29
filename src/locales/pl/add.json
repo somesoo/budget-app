@@ -1,0 +1,96 @@
+{
+  "findCategory": {
+    "message": "Znajdź kategorię",
+    "context": "Add screen (laptop layout): placeholder of the search field above the category tiles."
+  },
+  "findCategoryLabel": {
+    "message": "Znajdź kategorię, Enter wybiera pierwszą pasującą",
+    "context": "Add screen (laptop): accessible label of the category search; pressing Enter selects the first result."
+  },
+  "noMatch": {
+    "message": "Żadna kategoria nie pasuje do „{query}”.",
+    "context": "Add screen (laptop): no category matches the typed search {query}."
+  },
+  "goals": {
+    "message": "Cele",
+    "context": "Add screen: heading of the savings goals that can be spent from (a tile, and a heading in search results)."
+  },
+  "goalsTile": {
+    "spend": {
+      "message": "Wydaj z celu",
+      "context": "Add screen: the Goals tile's main line; tapping it lets you log an expense paid from a savings goal. Very short (fits a small tile)."
+    },
+    "count": {
+      "one": "{count} cel · z oszczędności",
+      "few": "{count} cele · z oszczędności",
+      "many": "{count} celów · z oszczędności",
+      "other": "{count} celu · z oszczędności",
+      "context": "Add screen: small line on the Goals tile, e.g. '3 goals · from savings'. Very short."
+    }
+  },
+  "goalPicker": {
+    "title": {
+      "message": "Wydatek z celu",
+      "context": "Add screen > bottom sheet heading: pick which savings goal an expense is paid from."
+    },
+    "help": {
+      "message": "Płacone z oszczędności: schodzi z konta, na którym leżą pieniądze celu, a nie z budżetu miesiąca.",
+      "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
+    },
+    "spentOf": {
+      "message": "wydano {spent} z {target} {currency}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much of its target has been spent. {currency} is 'zł'."
+    },
+    "spent": {
+      "message": "wydano {spent} {currency}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal without a target, how much has been spent. {currency} is 'zł'."
+    }
+  },
+  "recentEmpty": {
+    "message": "W tym miesiącu jeszcze nic nie zapisano.",
+    "context": "Add screen (laptop): the Recent list when nothing has been logged this month."
+  },
+  "widgetSlide": {
+    "message": "{label}, {n} z {total}",
+    "context": "Accessible label of one widget card in the swipeable carousel on the Add screen, e.g. 'Pace, 2 of 8'."
+  },
+  "thisMonth": {
+    "message": "Ten miesiąc: <b>{amount}</b>",
+    "context": "Add screen (laptop): line under the heading, total spent this month; keep the <b> tags around {amount}."
+  },
+  "loadFailed": {
+    "message": "Nie udało się wczytać kategorii: {error}",
+    "context": "Add screen: error when categories fail to load; {error} is a technical message."
+  },
+  "categories": {
+    "message": "Kategorie",
+    "context": "Add screen (laptop): accessible label of the category tiles section."
+  },
+  "newEntry": {
+    "message": "Nowy wpis",
+    "context": "Add screen (laptop): accessible label of the panel where a new expense or income is typed."
+  },
+  "pickFirst": {
+    "message": "Najpierw wybierz kategorię",
+    "context": "Add screen (laptop): hint in the entry panel before a category is chosen."
+  },
+  "keys": {
+    "message": "<kbd>Enter</kbd> zapisuje · <kbd>Esc</kbd> czyści",
+    "context": "Add screen (laptop): keyboard hint under the save button. Keep the <kbd> tags; key names are usually left untranslated."
+  },
+  "recent": {
+    "message": "Ostatnie",
+    "context": "Add screen (laptop, wide): heading of the list of the last entries."
+  },
+  "perDayLeft": {
+    "one": "Ok. {amount} dziennie na pozostały {count} dzień.",
+    "few": "Ok. {amount} dziennie na pozostałe {count} dni.",
+    "many": "Ok. {amount} dziennie na pozostałych {count} dni.",
+    "other": "Ok. {amount} dziennie na pozostałe {count} dnia.",
+    "context": "Add screen (laptop): what can be spent per day for the rest of the month."
+  },
+  "noMatchSearch": {
+    "message": "Nic nie pasuje do „{query}”",
+    "context": "History search: no results for {query}."
+  }
+}

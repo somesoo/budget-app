@@ -1,3 +1,5 @@
+import { t } from '../../i18n'
+
 /**
  * Pay or one-off: pay repeats, so the planner and the forecast count on it;
  * a one-off (a returned deposit, something sold) is only this month's.
@@ -21,12 +23,11 @@ export function IncomeKind({
             oneOff === value ? 'bg-slate-50 text-ink' : 'text-muted'
           }`}
         >
-          {value ? 'One-off' : 'Pay'}
+          {value ? t('entry.oneOff') : t('entry.pay')}
         </button>
       ))}
     </div>
   )
 }
 
-export const ONE_OFF_HELP =
-  'Counted in this month, left out of the typical income the next plan and the forecast expect.'
+export const oneOffHelp = () => t('entry.oneOffHelp')

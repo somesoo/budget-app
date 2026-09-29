@@ -1,0 +1,46 @@
+{
+  "title": {
+    "message": "Co chcesz zrobić?",
+    "context": "Savings tab: heading of the guided actions."
+  },
+  "saveText": {
+    "message": "Odłóż część tego miesiąca",
+    "context": "Savings assistant: under 'Save more'."
+  },
+  "borrowText": {
+    "message": "Pożycz z oszczędności, spłać później",
+    "context": "Savings assistant: under 'I need money'."
+  },
+  "move": {
+    "message": "Przenieś pieniądze",
+    "context": "Savings assistant: action title."
+  },
+  "moveText": {
+    "message": "Z jednego konta na drugie",
+    "context": "Savings assistant: under 'Move money'."
+  },
+  "shares": {
+    "message": "Popraw udziały celów",
+    "context": "Savings assistant: action title, correct how much of an account belongs to each goal."
+  },
+  "sharesText": {
+    "message": "Skoryguj, ile ma każdy cel",
+    "context": "Savings assistant: under 'Fix goal shares'."
+  },
+  "close": {
+    "message": "Zamknij konto",
+    "context": "Savings assistant: action title."
+  },
+  "closeText": {
+    "message": "Przenieś pieniądze, potem usuń",
+    "context": "Savings assistant: under 'Close an account'."
+  },
+  "whichAccount": {
+    "message": "Które konto?",
+    "context": "Savings assistant: sheet heading, pick the account to fix shares on."
+  },
+  "closeWhich": {
+    "message": "Które konto zamknąć?",
+    "context": "Savings assistant: sheet heading, pick the account to close."
+  }
+}

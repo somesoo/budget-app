@@ -1,0 +1,43 @@
+{
+  "title": {
+    "message": "How healthy it is",
+    "context": "Budget tab: heading of the money health card (three key ratios)."
+  },
+  "savingsRate": {
+    "message": "Savings rate",
+    "context": "Money health card: share of income saved."
+  },
+  "savingsRateRule": {
+    "message": "of income put aside; 20% or more is the usual aim",
+    "context": "Money health card: explanation under the savings rate figure. Lowercase fragment continuing the figure (e.g. '18% of income put aside…')."
+  },
+  "fixedCosts": {
+    "message": "Fixed costs",
+    "context": "Money health card: share of income going to rent and bills."
+  },
+  "fixedCostsRule": {
+    "message": "of income on rent and bills; under 50% leaves room",
+    "context": "Money health card: explanation under the fixed costs figure. Lowercase fragment continuing the figure."
+  },
+  "fixedCostsHint": {
+    "message": "take rent and bills out of the chart in Settings to count them as fixed",
+    "context": "Money health card: hint when no category counts as a fixed cost. In Settings, categories can be left out of the Home chart; those count as fixed costs."
+  },
+  "emergency": {
+    "message": "Emergency fund",
+    "context": "Money health card: how many months of spending the emergency fund covers."
+  },
+  "months": {
+    "one": "{months} month",
+    "other": "{months} months",
+    "context": "Money health card: the emergency fund in months of spending, e.g. '2.5 months'. {months} is the formatted number."
+  },
+  "emergencyRule": {
+    "message": "of spending {name} would cover; 3 to 6 months is the usual aim",
+    "context": "Money health card: explanation under the emergency fund figure; {name} is the goal's name. Lowercase fragment continuing the figure."
+  },
+  "markEmergency": {
+    "message": "Mark a goal as your emergency fund (goal → Edit)",
+    "context": "Money health card: link to Savings when no goal is the emergency fund."
+  }
+}

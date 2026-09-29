@@ -1,0 +1,126 @@
+{
+  "toGo": {
+    "message": "{amount} to go",
+    "context": "Budget planner > leftover card: how much a goal still needs. Joined with other fragments by ' · '."
+  },
+  "inPlan": {
+    "message": "the plan puts {amount} a month aside",
+    "context": "Budget planner > leftover card: what this month's plan already pays into the goal. Lowercase fragment."
+  },
+  "reached": {
+    "message": "Reached",
+    "context": "Budget planner > leftover card: the goal is reached."
+  },
+  "open": {
+    "message": "No target: an open-ended fund",
+    "context": "Budget planner > leftover card: goal without a target amount."
+  },
+  "enough": {
+    "message": "the plan puts {planned} a month aside, enough to make it by {by} ✓",
+    "context": "Budget planner > leftover card: the plan's monthly payment is enough to reach the goal by its date. {by} is month and year, e.g. 'Mar 2027'."
+  },
+  "shortPlanned": {
+    "message": "needs {need}/mo by {by}; the plan puts {planned}, {short} short",
+    "context": "Budget planner > leftover card: the goal needs {need} a month to make its date {by}; the plan gives {planned}, missing {short}."
+  },
+  "shortNone": {
+    "message": "needs {need}/mo by {by}; none in the plan, {short} short",
+    "context": "Budget planner > leftover card: the goal needs {need} a month to make its date {by}, and the plan gives nothing."
+  },
+  "overdue": {
+    "message": "the date has passed",
+    "context": "Budget planner > leftover card: the goal's target date is in the past. Lowercase fragment."
+  },
+  "noDate": {
+    "message": "no date: add one in Edit to see what it needs",
+    "context": "Budget planner > leftover card: the goal has no target date. 'Edit' is the goal's edit button. Lowercase fragment."
+  },
+  "noIncome": {
+    "message": "No income logged in {month} yet, so nothing to go on.",
+    "context": "Budget planner > leftover card: the previous month ({month}, name alone) has no income logged."
+  },
+  "nothingLeft": {
+    "message": "{month} has nothing left.",
+    "context": "Budget planner > leftover card: the previous month ended with nothing unspent."
+  },
+  "nothingLeftSoFar": {
+    "message": "{month} has nothing left so far.",
+    "context": "Budget planner > leftover card: the previous month has nothing unspent yet (still running)."
+  },
+  "nothingLeftOver": {
+    "message": "{month} has nothing left ({over} over).",
+    "context": "Budget planner > leftover card: the previous month overspent its income by {over}."
+  },
+  "nothingLeftOverSoFar": {
+    "message": "{month} has nothing left so far ({over} over).",
+    "context": "Budget planner > leftover card: the previous month is overspent by {over} so far."
+  },
+  "left": {
+    "message": "{amount} left.",
+    "context": "Budget planner > leftover card: what the previous month left unspent."
+  },
+  "leftSoFar": {
+    "message": "{amount} left so far; the final amount is known at the end of the month.",
+    "context": "Budget planner > leftover card: the previous month is still running."
+  },
+  "title": {
+    "message": "What {month} doesn’t spend goes to",
+    "context": "Budget planner: heading of the card choosing which savings goals get the previous month's unspent money. {month} is the month name alone."
+  },
+  "intro": {
+    "message": "Income, minus what was saved, minus spending. {status} Pick one goal or several, and give each a percentage or a set amount in złoty.",
+    "context": "Budget planner > leftover card: explanation; {status} is a sentence like '420 zł left.'"
+  },
+  "noGoals": {
+    "message": "No goals yet: add one on the Savings tab.",
+    "context": "Budget planner > leftover card: there are no savings goals."
+  },
+  "modeLabel": {
+    "message": "{name}: percentage or set amount",
+    "context": "Budget planner > leftover card: accessible label of the %/zł switch for goal {name}."
+  },
+  "shareLabel": {
+    "message": "{name}: share in percent",
+    "context": "Budget planner > leftover card: accessible label of the percentage field."
+  },
+  "fixedLabel": {
+    "message": "{name}: amount in złoty",
+    "context": "Budget planner > leftover card: accessible label of the set amount field."
+  },
+  "useShort": {
+    "message": "use the {amount} short",
+    "context": "Budget planner > leftover card: chip that sets the goal's amount to what it's missing this month. Lowercase, short."
+  },
+  "keep": {
+    "message": "Keep on the account",
+    "context": "Budget planner > leftover card: how much of the leftover stays on the account before the goals get theirs."
+  },
+  "keepHelp": {
+    "message": "A cushion for the start of the month; the goals share what’s above it.",
+    "context": "Budget planner > leftover card: explanation under 'Keep on the account'."
+  },
+  "keepHelpAmount": {
+    "message": "A cushion for the start of the month; the goals share what’s above it: {amount}.",
+    "context": "Budget planner > leftover card: explanation with the amount the goals share."
+  },
+  "fixedTooMuch": {
+    "message": "The set amounts come to {fixed}, more than the {amount} to share; they’re filled in order until it runs out.",
+    "context": "Budget planner > leftover card: warning when the set amounts exceed the leftover."
+  },
+  "restStays": {
+    "message": "{amount} more stays on the account; give one goal a percentage to take the rest.",
+    "context": "Budget planner > leftover card: set amounts leave some money unassigned."
+  },
+  "percentages": {
+    "message": "The percentages add up to {total}%, not 100%.",
+    "context": "Budget planner > leftover card: warning."
+  },
+  "splitEvenly": {
+    "message": "Split evenly",
+    "context": "Budget planner > leftover card: button that makes the percentages equal."
+  },
+  "nonePicked": {
+    "message": "None picked: whatever’s left stays on the account and is easy to spend.",
+    "context": "Budget planner > leftover card: warning when no goal is chosen."
+  }
+}

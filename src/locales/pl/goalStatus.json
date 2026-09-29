@@ -1,0 +1,26 @@
+{
+  "lately": {
+    "message": "ostatnio {amount} miesięcznie",
+    "context": "Goal status: how much has gone into the goal per month recently. Lowercase fragment, follows 'Keeps growing, '."
+  },
+  "eta": {
+    "message": "W tym tempie osiągnięty w: {month}",
+    "context": "Goal status for a goal without a date: when it's reached at the recent pace; {month} is month and year."
+  },
+  "nothingLately": {
+    "message": "Ostatnio nic nie wpłacano",
+    "context": "Goal status: no recent deposits."
+  },
+  "onTrack": {
+    "message": "Zgodnie z planem: wystarczy {amount} miesięcznie",
+    "context": "Goal status: on track for its date."
+  },
+  "behind": {
+    "message": "Potrzebuje {amount} miesięcznie; w tym tempie zabraknie {short}",
+    "context": "Goal status: behind for its date."
+  },
+  "overdue": {
+    "message": "Termin minął, brakuje {amount}",
+    "context": "Goal status: past its date and not reached."
+  }
+}

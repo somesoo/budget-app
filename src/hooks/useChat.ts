@@ -12,6 +12,7 @@ import { useProjects } from './useCategories'
 import { useExpensesBetween } from './useExpenses'
 import { useIncomesBetween } from './useIncomes'
 import { useSavingsOverview } from './useSavings'
+import { t } from '../i18n'
 
 export const chatKey = ['chat'] as const
 
@@ -147,7 +148,7 @@ export function useAsk() {
 
       const { data: session } = await supabase.auth.getSession()
       const token = session.session?.access_token
-      if (!token) throw new Error('Not signed in')
+      if (!token) throw new Error(t('errors.notSignedIn'))
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
@@ -155,11 +156,11 @@ export function useAsk() {
       })
       if (res.status === 404) {
         throw new ChatUnavailableError(
-          'The AI server isn’t running here. It works on Vercel, or locally with `vercel dev`.',
+          t('errors.aiUnavailable'),
         )
       }
       const body = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(body.error ?? `Request failed (${res.status})`)
+      if (!res.ok) throw new Error(body.error ?? t('errors.requestFailed', { status: res.status }))
 
       const answered = await supabase
         .from('ai_messages')

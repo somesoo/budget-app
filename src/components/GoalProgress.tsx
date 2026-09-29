@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CURRENCY_SUFFIX, GOAL_QUICK_AMOUNTS } from '../config'
 import { formatMoney, roundMoney } from '../lib/calculations'
 import type { Goal } from '../types'
+import { t } from '../i18n'
 
 interface Props {
   goal: Goal
@@ -46,7 +47,9 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
       </div>
 
       <p className="mt-2 text-xs text-muted">
-        {remaining > 0 ? `${formatMoney(remaining)} to go` : 'Goal reached'}
+        {remaining > 0
+          ? t('goal.toGo', { amount: formatMoney(remaining) })
+          : t('goal.reached')}
       </p>
 
       {open ? (
@@ -72,13 +75,13 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
               onChange={(e) => setAmountText(e.target.value.replace(/[^\d.,-]/g, ''))}
               inputMode="decimal"
               placeholder="0"
-              aria-label="Amount to add"
+              aria-label={t('goal.amountToAdd')}
               className="w-full bg-transparent py-2.5 text-lg font-semibold tabular-nums text-white outline-none placeholder:text-white/25"
             />
             <span className="text-sm text-muted">{CURRENCY_SUFFIX}</span>
           </div>
 
-          <p className="text-xs text-muted">Put a minus in front to take money back out.</p>
+          <p className="text-xs text-muted">{t('goal.minusHint')}</p>
 
           <div className="flex gap-2">
             <button
@@ -89,7 +92,7 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
               }}
               className="flex-1 rounded-xl bg-white/5 py-2.5 text-sm font-semibold text-muted"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="button"
@@ -97,7 +100,11 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
               disabled={delta === 0 || pending}
               className="flex-1 rounded-xl bg-accent py-2.5 text-sm font-bold text-ink disabled:opacity-40"
             >
-              {delta < 0 ? `Take out ${Math.abs(delta)}` : `Add ${delta || ''}`}
+              {delta < 0
+                ? t('goal.takeOut', { amount: Math.abs(delta) })
+                : delta
+                  ? t('goal.addAmount', { amount: delta })
+                  : t('common.add')}
             </button>
           </div>
         </div>
@@ -107,7 +114,7 @@ export function GoalProgress({ goal, onAdd, pending }: Props) {
           onClick={() => setOpen(true)}
           className="mt-3 w-full rounded-xl bg-accent/15 py-2.5 text-sm font-semibold text-accent-soft ring-1 ring-accent/30 active:bg-accent/25"
         >
-          Add money
+          {t('goal.addMoney')}
         </button>
       )}
     </div>

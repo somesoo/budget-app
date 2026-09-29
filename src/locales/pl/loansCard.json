@@ -1,0 +1,30 @@
+{
+  "title": {
+    "message": "Pożyczone z oszczędności",
+    "context": "Savings tab: heading of the card with loans still being repaid."
+  },
+  "owed": {
+    "message": "{amount} do spłaty",
+    "context": "Loans card: total still owed."
+  },
+  "help": {
+    "message": "Plan każdego miesiąca najpierw odkłada ratę; możesz też spłacić część już teraz.",
+    "context": "Loans card: footnote."
+  },
+  "progress": {
+    "message": "spłacono {repaid} z {amount} · {monthly}/mies. na {name}",
+    "context": "Loans card: a loan's progress and monthly instalment; {name} is the goal or account it goes back to."
+  },
+  "payBack": {
+    "message": "Spłać {amount}",
+    "context": "Loans card: button that pays the next instalment now."
+  },
+  "bank": {
+    "message": "W banku: przelej {amount} z konta codziennego na {account}. Do spłaty zostanie {left}.",
+    "context": "Loans card: what to do in the actual bank before confirming."
+  },
+  "borrowedNote": {
+    "message": "Pożyczone: {note}",
+    "context": "Note saved on the withdrawal made when borrowing from savings; {note} is what it's for."
+  }
+}

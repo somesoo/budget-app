@@ -1,0 +1,34 @@
+{
+  "title": {
+    "message": "Kto jest w tym budżecie?",
+    "context": "First-run screen (setting up the household): heading."
+  },
+  "intro": {
+    "message": "Tylko ty albo do czterech osób, które go dzielą: para, rodzina, współlokatorzy. Każdy zapisuje ze swojego telefonu i widzi te same liczby. Imiona możesz później zmienić w Ustawieniach.",
+    "context": "First-run screen: explanation under the heading."
+  },
+  "yourName": {
+    "message": "Twoje imię",
+    "context": "First-run screen: placeholder of the first name field."
+  },
+  "person": {
+    "message": "Osoba {n}",
+    "context": "First-run screen: placeholder and label of the other name fields, and the fallback name on buttons; {n} is 2 to 4."
+  },
+  "whichPhone": {
+    "message": "Kto z was trzyma ten telefon?",
+    "context": "First-run screen: question above the list of names, to pick whose phone this is."
+  },
+  "duplicate": {
+    "message": "Dwie osoby mają to samo imię: rozróżnij je.",
+    "context": "First-run screen: warning when two names are the same."
+  },
+  "settingUp": {
+    "message": "Przygotowuję…",
+    "context": "First-run screen: the start button while saving."
+  },
+  "start": {
+    "message": "Zaczynamy",
+    "context": "First-run screen: the main button."
+  }
+}

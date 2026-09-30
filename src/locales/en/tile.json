@@ -27,12 +27,8 @@
     "message": "Page {n}",
     "context": "Accessible label of a page dot under the category tiles."
   },
-  "partnerOver": {
-    "message": "Over the limit",
-    "context": "Tile of someone else's allowance, shown on the other phones only once it's over its limit. Very short: the tile is a third of a phone's width."
-  },
   "partnerOverNote": {
     "message": "{name}'s allowance",
-    "context": "Tiny line under 'Over the limit' on someone else's allowance tile. {name} is the person whose allowance it is. Very short."
+    "context": "Tiny line under the amount over the limit on someone else's allowance tile. {name} is the person whose allowance it is. Very short."
   }
 }

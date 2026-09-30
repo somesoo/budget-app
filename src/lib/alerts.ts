@@ -228,7 +228,7 @@ function describe(args: {
   }
 }
 
-/** The other one's allowance went over: that it did, not by how much or on what. */
+/** Someone else's allowance went over: by how much, but not on what. */
 function privateOver(args: {
   month: MonthKey
   category: Category
@@ -247,7 +247,11 @@ function privateOver(args: {
     projected: null,
     daysLeft,
     title: t('alerts.privateOverTitle', { who }),
-    detail: t('alerts.privateOverDetail', { name: category.name }),
+    detail: t('alerts.privateOverDetail', {
+      name: category.name,
+      over: formatMoneyWhole(spent - limit),
+      limit: formatMoneyWhole(limit),
+    }),
     private: true,
   }
 }

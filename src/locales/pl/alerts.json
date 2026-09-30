@@ -62,11 +62,11 @@
   },
   "privateOverTitle": {
     "message": "{who}: kieszonkowe przekroczone",
-    "context": "Budget warning title about another household member's personal allowance (pocket money category). {who} is the person's name. Deliberately shows no amounts: the allowance is private."
+    "context": "Budget warning title about another household member's personal allowance (pocket money category). {who} is the person's name. The detail line says by how much; what it was spent on stays private."
   },
   "privateOverDetail": {
-    "message": "{name}: wydano więcej, niż planowano w tym miesiącu.",
-    "context": "Budget warning detail about another person's private allowance. {name} is the allowance category's name. No amounts on purpose."
+    "message": "{name}: {over} ponad limit {limit} w tym miesiącu.",
+    "context": "Budget warning detail about another person's private allowance. {name} is the allowance category's name, {over} the amount over the limit and {limit} the limit, both with currency. What it was spent on stays private."
   },
   "crossedOver": {
     "message": "{name}: teraz {over} ponad limit",

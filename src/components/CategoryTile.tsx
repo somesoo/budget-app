@@ -121,15 +121,17 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
 
 /**
  * Someone else's allowance, once it's over its limit: the one thing the other
- * phones hear about it. That it's over, not by how much or on what, and
- * nothing to open.
+ * phones hear about it. By how much it's over, but not on what, and nothing
+ * to open.
  */
 export function PrivateOverTile({
   category,
+  spent,
   owner,
   height,
 }: {
   category: Category
+  spent: number
   /** The person whose allowance it is. */
   owner: string
   height: number
@@ -149,8 +151,9 @@ export function PrivateOverTile({
         </span>
       </div>
       <div className="text-white">
-        <div className="truncate text-base font-bold leading-5 drop-shadow-sm">
-          {t('tile.partnerOver')}
+        <div className="truncate text-base font-bold leading-5 tabular-nums drop-shadow-sm">
+          −{formatAmount(Math.round(spent - category.monthly_limit))} {CURRENCY_SUFFIX}{' '}
+          <span className="text-[11px] font-semibold opacity-90">{t('tile.over')}</span>
         </div>
         <div className="truncate text-[10.5px] font-medium leading-[14px] opacity-90 drop-shadow-sm">
           {t('tile.partnerOverNote', { name: owner })}

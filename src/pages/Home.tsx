@@ -265,7 +265,12 @@ export function Home() {
           leading={partnersOver.map((c) => ({
             key: c.id,
             render: (height) => (
-              <PrivateOverTile category={c} owner={personLabel(c.owner)} height={height} />
+              <PrivateOverTile
+                category={c}
+                spent={spentByCategory[c.id] ?? 0}
+                owner={personLabel(c.owner)}
+                height={height}
+              />
             ),
           }))}
           trailing={

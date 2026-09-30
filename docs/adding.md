@@ -81,9 +81,9 @@ A category can be one person's allowance (Settings → the category → Whose):
 money nobody has to explain. Only its owner's phone shows its tile, spending
 and entries (Add, History, Budget, Insights, and what the AI gets). The other
 phones see it only inside the month's totals until it goes over its limit.
-Then it shows up first among their tiles, red, saying only that it's over
-(not by how much or on what, and there's nothing to open), and in the Budget
-tab's warnings. Next month, or once it's back under, it's gone again. One shared
+Then it shows up first among their tiles, red, with how much it's over (not
+what it went on, and there's nothing to open), and in the Budget tab's
+warnings. Next month, or once it's back under, it's gone again. One shared
 sign-in means this is tact, not security.
 
 ## Spending from a goal

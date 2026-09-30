@@ -146,7 +146,7 @@ describe('the other one’s allowance', () => {
     expect(alerts).toEqual([])
   })
 
-  it('only says it went over, with no numbers', () => {
+  it('says it went over and by how much, nothing more', () => {
     at(20)
     const [alert] = budgetAlerts({
       month: '2026-09',
@@ -157,7 +157,8 @@ describe('the other one’s allowance', () => {
     expect(alert.kind).toBe('over')
     expect(alert.private).toBe(true)
     expect(alert.title).toBe('Meow went over their allowance')
-    expect(`${alert.title} ${alert.detail}`).not.toMatch(/\d/)
+    expect(alert.detail).toMatch(/50/)
+    expect(alert.detail).not.toMatch(/350/)
   })
 
   it('warns its owner as usual', () => {

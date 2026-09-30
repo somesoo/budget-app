@@ -9,8 +9,8 @@ interface Props {
   onSelect: (category: Category) => void
   /** One more tile after the categories (the Goals tile), given its height. */
   trailing?: (height: number) => ReactNode
-  /** Tiles before the categories, given their height: something to notice first. */
-  leading?: { key: string; render: (height: number) => ReactNode }[]
+  /** Tiles after the categories, just before the trailing one, given their height. */
+  extra?: { key: string; render: (height: number) => ReactNode }[]
 }
 
 const GAP = 8
@@ -30,7 +30,7 @@ export function CategoryPager({
   spentByCategory,
   onSelect,
   trailing,
-  leading = [],
+  extra = [],
 }: Props) {
   const viewport = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
@@ -46,8 +46,8 @@ export function CategoryPager({
     return () => observer.disconnect()
   }, [])
 
-  type Tile = Category | 'trailing' | (typeof leading)[number]
-  const tiles: Tile[] = [...leading, ...categories, ...(trailing ? ['trailing' as const] : [])]
+  type Tile = Category | 'trailing' | (typeof extra)[number]
+  const tiles: Tile[] = [...categories, ...extra, ...(trailing ? ['trailing' as const] : [])]
   const { cols, rows, tileHeight } = fit(size, tiles.length)
   const perPage = cols * rows
   const pages: Tile[][] = []

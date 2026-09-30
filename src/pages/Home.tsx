@@ -262,7 +262,8 @@ export function Home() {
           categories={categories}
           spentByCategory={spentByCategory}
           onSelect={openCategory}
-          leading={partnersOver.map((c) => ({
+          // next to the Goals tile, after everything this phone logs into
+          extra={partnersOver.map((c) => ({
             key: c.id,
             render: (height) => (
               <PrivateOverTile

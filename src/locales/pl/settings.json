@@ -316,8 +316,8 @@
       "context": "Settings > AI: status when GEMINI_API_KEY on the server is used; it can't be changed here. {hint} is its last four characters."
     },
     "cantStore": {
-      "message": "Żeby zapisać klucz tutaj, serwer potrzebuje SUPABASE_SERVICE_ROLE_KEY. W README jest opisane, gdzie go dodać.",
-      "context": "Settings > AI: note when the server can't store a key. Keep SUPABASE_SERVICE_ROLE_KEY and README as they are."
+      "message": "Żeby zapisać klucz tutaj, serwer potrzebuje SUPABASE_SERVICE_ROLE_KEY. W docs/install.md jest opisane, gdzie go dodać.",
+      "context": "Settings > AI: note when the server can't store a key. Keep SUPABASE_SERVICE_ROLE_KEY and docs/install.md as they are."
     },
     "placeholder": {
       "message": "Wklej klucz API Gemini",

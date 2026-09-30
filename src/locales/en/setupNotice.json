@@ -1,5 +1,5 @@
 {
   "title": { "message": "Database not configured", "context": "Screen shown to the developer when the Supabase environment variables are missing. Heading." },
   "copyEnv": { "message": "Copy <code>{example}</code> to <code>{env}</code> and fill in:", "context": "Setup screen for the developer. {example} and {env} are file names (.env.example, .env); keep the <code> tags around them. Followed by a code block with the variables." },
-  "readme": { "message": "On Vercel, add Supabase in the project's Storage tab and deploy again. The README has the rest.", "context": "Setup screen: on Vercel the Supabase integration is added under the project's Storage tab; keep Vercel, Supabase, Storage and README as they are." }
+  "readme": { "message": "On Vercel, add Supabase in the project's Storage tab and deploy again. docs/install.md has the rest.", "context": "Setup screen: on Vercel the Supabase integration is added under the project's Storage tab; keep Vercel, Supabase, Storage and docs/install.md as they are." }
 }

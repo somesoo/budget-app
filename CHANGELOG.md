@@ -23,4 +23,4 @@ The first release meant for other people to install.
 - **Sign-in remembers the email** per phone; `VITE_AUTH_EMAIL` is optional.
 
 Everything before this (one to four people, English and Polish, the guided
-tour, plans, savings, loans, insights, Ask) is in the README.
+tour, plans, savings, loans, insights, Ask) is described in [docs](docs/README.md).

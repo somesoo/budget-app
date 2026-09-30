@@ -9,6 +9,8 @@ interface Props {
   onSelect: (category: Category) => void
   /** One more tile after the categories (the Goals tile), given its height. */
   trailing?: (height: number) => ReactNode
+  /** Tiles before the categories, given their height: something to notice first. */
+  leading?: { key: string; render: (height: number) => ReactNode }[]
 }
 
 const GAP = 8
@@ -23,7 +25,13 @@ const DOTS = 22
  * never scrolls vertically. Tiles that don't fit go onto further pages,
  * swiped left and right (native scroll-snap, so it feels like the OS).
  */
-export function CategoryPager({ categories, spentByCategory, onSelect, trailing }: Props) {
+export function CategoryPager({
+  categories,
+  spentByCategory,
+  onSelect,
+  trailing,
+  leading = [],
+}: Props) {
   const viewport = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
   const [page, setPage] = useState(0)
@@ -38,10 +46,11 @@ export function CategoryPager({ categories, spentByCategory, onSelect, trailing 
     return () => observer.disconnect()
   }, [])
 
-  const tiles: (Category | 'trailing')[] = trailing ? [...categories, 'trailing'] : categories
+  type Tile = Category | 'trailing' | (typeof leading)[number]
+  const tiles: Tile[] = [...leading, ...categories, ...(trailing ? ['trailing' as const] : [])]
   const { cols, rows, tileHeight } = fit(size, tiles.length)
   const perPage = cols * rows
-  const pages: (Category | 'trailing')[][] = []
+  const pages: Tile[][] = []
   for (let i = 0; i < tiles.length; i += perPage) pages.push(tiles.slice(i, i + perPage))
 
   const goTo = (index: number) =>
@@ -72,6 +81,8 @@ export function CategoryPager({ categories, spentByCategory, onSelect, trailing 
               {pageTiles.map((category) =>
                 category === 'trailing' ? (
                   <div key="trailing">{trailing?.(tileHeight)}</div>
+                ) : 'render' in category ? (
+                  <div key={category.key}>{category.render(tileHeight)}</div>
                 ) : (
                   <CategoryTile
                     key={category.id}

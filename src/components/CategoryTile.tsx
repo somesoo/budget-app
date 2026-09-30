@@ -118,3 +118,44 @@ export function CategoryTile({ category, spent, onClick, height }: Props) {
     </button>
   )
 }
+
+/**
+ * Someone else's allowance, once it's over its limit: the one thing the other
+ * phones hear about it. That it's over, not by how much or on what, and
+ * nothing to open.
+ */
+export function PrivateOverTile({
+  category,
+  owner,
+  height,
+}: {
+  category: Category
+  /** The person whose allowance it is. */
+  owner: string
+  height: number
+}) {
+  return (
+    <div
+      role="status"
+      className="relative flex w-full flex-col justify-between overflow-hidden rounded-2xl p-2 ring-1 ring-white/10"
+      style={{ height, backgroundColor: OVER_LIMIT_COLOR }}
+    >
+      <div className="flex items-start justify-between gap-1">
+        <span className="truncate text-[12px] font-semibold leading-[15px] text-white drop-shadow-sm">
+          {category.name}
+        </span>
+        <span className="text-xs leading-none text-white">
+          <Warning weight="fill" aria-hidden />
+        </span>
+      </div>
+      <div className="text-white">
+        <div className="truncate text-base font-bold leading-5 drop-shadow-sm">
+          {t('tile.partnerOver')}
+        </div>
+        <div className="truncate text-[10.5px] font-medium leading-[14px] opacity-90 drop-shadow-sm">
+          {t('tile.partnerOverNote', { name: owner })}
+        </div>
+      </div>
+    </div>
+  )
+}

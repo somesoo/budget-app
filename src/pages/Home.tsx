@@ -4,6 +4,7 @@ import { DesktopAdd } from '../components/add/DesktopAdd'
 import { GoalPicker, GoalsTile } from '../components/add/GoalPicker'
 import { useGoalTrips } from '../hooks/useGoalTrips'
 import { CategoryPager } from '../components/CategoryPager'
+import { PrivateOverTile } from '../components/CategoryTile'
 import { AmountPad } from '../components/AmountPad'
 import { IncomePad } from '../components/IncomePad'
 import { AskLink } from '../components/AskLink'
@@ -28,15 +29,16 @@ import {
   formatMoney,
   formatMoneyCompact,
   monthKeyOfDate,
+  isOverLimit,
   sumByCategory,
   sumExpenses,
   todayKey,
 } from '../lib/calculations'
 import { crossingNote, limitImpact } from '../lib/alerts'
-import { ownCategories } from '../lib/allowance'
+import { isOthersAllowance, ownCategories } from '../lib/allowance'
 import { elapsedDays, paceStatus, type PaceStatus } from '../lib/insights'
 import type { Category, Person } from '../types'
-import { personIds } from '../lib/people'
+import { personIds, personLabel } from '../lib/people'
 import { t } from '../i18n'
 
 const PACE_COLOR: Record<PaceStatus, string> = {
@@ -57,6 +59,14 @@ export function Home() {
     devicePerson,
   )
   const { data: expenses = [] } = useMonthlyExpenses(month)
+  const spentByCategory = sumByCategory(expenses)
+  // someone else's allowance shows up only once it's over its limit, and says only that
+  const partnersOver = allCategories.filter(
+    (c) =>
+      !c.archived &&
+      isOthersAllowance(c, devicePerson) &&
+      isOverLimit(spentByCategory[c.id] ?? 0, c.monthly_limit),
+  )
   const addExpense = useAddExpense()
   const addIncome = useAddIncome()
   const [incomeOpen, setIncomeOpen] = useState(false)
@@ -74,7 +84,6 @@ export function Home() {
     return () => clearTimeout(id)
   }, [toast])
 
-  const spentByCategory = sumByCategory(expenses)
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
   const left = monthLimit - monthTotal
@@ -253,6 +262,12 @@ export function Home() {
           categories={categories}
           spentByCategory={spentByCategory}
           onSelect={openCategory}
+          leading={partnersOver.map((c) => ({
+            key: c.id,
+            render: (height) => (
+              <PrivateOverTile category={c} owner={personLabel(c.owner)} height={height} />
+            ),
+          }))}
           trailing={
             goals.open.length > 0
               ? (height) => (

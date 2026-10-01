@@ -35,13 +35,17 @@
       "message": "Paid from savings: it comes off the account the goal’s money is on, not this month’s budget.",
       "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
     },
-    "spentOf": {
-      "message": "{spent} of {target} {currency} spent",
-      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much of its target has been spent. {currency} is 'zł'."
+    "figSpent": {
+      "message": "spent {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much has been spent from it so far. {amount} includes the currency. Joined with ' · ' to the next figures."
     },
-    "spent": {
-      "message": "{spent} {currency} spent",
-      "context": "Add screen > 'Spent from a goal' sheet: under a goal without a target, how much has been spent. {currency} is 'zł'."
+    "figSaved": {
+      "message": "saved {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much is still saved for it on the accounts. {amount} includes the currency."
+    },
+    "figTarget": {
+      "message": "goal {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, the goal's target. {amount} includes the currency."
     }
   },
   "recentEmpty": {

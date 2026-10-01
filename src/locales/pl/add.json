@@ -37,13 +37,17 @@
       "message": "Płacone z oszczędności: schodzi z konta, na którym leżą pieniądze celu, a nie z budżetu miesiąca.",
       "context": "Add screen > 'Spent from a goal' sheet: explanation under the heading."
     },
-    "spentOf": {
-      "message": "wydano {spent} z {target} {currency}",
-      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much of its target has been spent. {currency} is 'zł'."
+    "figSpent": {
+      "message": "wydano {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much has been spent from it so far. {amount} includes the currency. Joined with ' · ' to the next figures."
     },
-    "spent": {
-      "message": "wydano {spent} {currency}",
-      "context": "Add screen > 'Spent from a goal' sheet: under a goal without a target, how much has been spent. {currency} is 'zł'."
+    "figSaved": {
+      "message": "odłożone {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, how much is still saved for it on the accounts. {amount} includes the currency."
+    },
+    "figTarget": {
+      "message": "cel {amount}",
+      "context": "Add screen > 'Spent from a goal' sheet: under a goal's name, the goal's target. {amount} includes the currency."
     }
   },
   "recentEmpty": {

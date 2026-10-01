@@ -13,6 +13,18 @@ export interface Widget {
 
 const STORAGE_KEY = 'add-widget'
 
+/**
+ * One height for every card, the donut's: the panel doesn't grow to the
+ * tallest card (the forecast, a long list of goals) and leaves the room to the
+ * category tiles. A taller card scrolls inside it.
+ */
+const CARD_HEIGHT = 200
+
+const FADE = {
+  maskImage: 'linear-gradient(to bottom, #000 calc(100% - 16px), transparent)',
+  WebkitMaskImage: 'linear-gradient(to bottom, #000 calc(100% - 16px), transparent)',
+}
+
 function remembered(): string | null {
   try {
     return localStorage.getItem(STORAGE_KEY)
@@ -33,6 +45,24 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
       0,
     ),
   )
+
+  // which cards don't fit the panel, measured as they render (text size, data)
+  const [tall, setTall] = useState<string[]>([])
+  useEffect(() => {
+    const el = track.current
+    if (!el) return
+    const measure = () => {
+      const slides = [...el.querySelectorAll<HTMLElement>('[data-widget-slide]')]
+      const next = slides
+        .map((slide, i) => (slide.scrollHeight > slide.clientHeight + 1 ? widgets[i]?.id : null))
+        .filter((id): id is string => !!id)
+      setTall((prev) => (prev.join() === next.join() ? prev : next))
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    for (const slide of el.querySelectorAll('[data-widget-slide] > *')) observer.observe(slide)
+    return () => observer.disconnect()
+  }, [widgets])
 
   // one switched off in Settings can leave the index past the end
   const active = Math.min(picked, widgets.length - 1)
@@ -73,6 +103,7 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
           if (index !== active) settle(index)
         }}
         className="no-scrollbar grid snap-x snap-mandatory auto-cols-[100%] grid-flow-col overflow-x-auto overscroll-x-contain"
+        style={{ height: CARD_HEIGHT }}
       >
         {widgets.map((w, i) => (
           <div
@@ -81,7 +112,10 @@ export function WidgetCarousel({ widgets }: { widgets: Widget[] }) {
             aria-roledescription="slide"
             aria-label={t('add.widgetSlide', { label: w.label, n: i + 1, total: widgets.length })}
             aria-hidden={i !== active}
-            className="min-w-0 snap-start snap-always px-4"
+            data-widget-slide
+            className="no-scrollbar min-w-0 snap-start snap-always overflow-y-auto overscroll-y-contain px-4"
+            // a card taller than the panel fades out at the bottom: there's more below
+            style={tall.includes(w.id) ? FADE : undefined}
           >
             {w.content}
           </div>

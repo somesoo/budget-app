@@ -2,6 +2,7 @@ import { CaretRight, PiggyBank } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { CURRENCY_SUFFIX } from '../../config'
 import type { GoalTrip } from '../../hooks/useGoalTrips'
+import { useSavingsOverview } from '../../hooks/useSavings'
 import { formatAmount, withAlpha } from '../../lib/calculations'
 import { BottomSheet } from '../history/BottomSheet'
 import { t } from '../../i18n'
@@ -59,6 +60,11 @@ export function GoalPicker({
   onPick: (goal: GoalTrip) => Promise<void> | void
   onClose: () => void
 }) {
+  const savings = useSavingsOverview()
+  // what's still on the accounts for it; unknown before the savings migration
+  const savedOf = (id: string) =>
+    savings.available ? (savings.goals.find((s) => s.goal.id === id)?.saved ?? 0) : null
+  const money = (amount: number) => `${formatAmount(Math.round(amount))} ${CURRENCY_SUFFIX}`
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -87,6 +93,13 @@ export function GoalPicker({
           {goals.map((g) => {
             const target = g.goal.target_amount
             const spent = g.trip?.spent ?? 0
+            const saved = savedOf(g.goal.id)
+            // spent from it · still saved for it · what it's for
+            const figures = [
+              t('add.goalPicker.figSpent', { amount: money(spent) }),
+              saved !== null && t('add.goalPicker.figSaved', { amount: money(saved) }),
+              target > 0 && t('add.goalPicker.figTarget', { amount: money(target) }),
+            ].filter(Boolean)
             return (
               <li key={g.goal.id}>
                 <button
@@ -106,16 +119,7 @@ export function GoalPicker({
                       {g.goal.name}
                     </span>
                     <span className="block text-xs tabular-nums text-slate-300">
-                      {target > 0
-                        ? t('add.goalPicker.spentOf', {
-                            spent: formatAmount(Math.round(spent)),
-                            target: formatAmount(target),
-                            currency: CURRENCY_SUFFIX,
-                          })
-                        : t('add.goalPicker.spent', {
-                            spent: formatAmount(Math.round(spent)),
-                            currency: CURRENCY_SUFFIX,
-                          })}
+                      {figures.join(' · ')}
                     </span>
                   </span>
                   <CaretRight aria-hidden className="shrink-0 text-muted" />

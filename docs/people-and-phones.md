@@ -48,6 +48,17 @@ language. Dates, numbers and plurals follow it, and so do the AI
 recommendations and plan drafts. Adding a language: see
 [Development](development.md#translations).
 
+## The guide
+
+**Settings → Help → Open the guide** explains how to use the app day to
+day, in the order you'll need it: getting started (once), every day, when
+pay comes in, the start of the month, once a week, every three months, what
+the numbers mean, and tips. Each step says exactly what to tap, with the
+buttons named as the app names them, and *Show me* opens the screen and
+makes the spot it's about pulse. The getting-started list ticks itself off
+as the app sees things done (an account added, an emergency fund marked, a
+plan saved…).
+
 ## The tour
 
 A new device gets a guided tour right after choosing whose phone it is: every

@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   CaretRight,
   ChartDonut,
   Compass,
@@ -640,7 +641,7 @@ function AiCard() {
   }
 
   return (
-    <SettingsCard title={t('settings.ai.title')} help={t('settings.ai.help')}>
+    <SettingsCard title={t('settings.ai.title')} help={t('settings.ai.help')} tour="settings-ai">
       {status.isPending ? (
         <p className="text-sm text-muted">{t('settings.ai.checking')}</p>
       ) : status.error ? (
@@ -741,14 +742,22 @@ function AiCard() {
 
 function HelpCard() {
   return (
-    <SettingsCard title={t('settings.help.title')} help={t('settings.help.help')}>
-      <button
-        type="button"
-        onClick={() => tourStore.start('/settings')}
-        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
-      >
-        <Compass aria-hidden /> {t('settings.help.tour')}
-      </button>
+    <SettingsCard title={t('settings.help.title')} help={t('settings.help.help')} tour="settings-help">
+      <div className="flex flex-wrap gap-2">
+        <Link
+          to="/guide"
+          className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-ink hover:bg-slate-50"
+        >
+          <BookOpen aria-hidden /> {t('guide.open')}
+        </Link>
+        <button
+          type="button"
+          onClick={() => tourStore.start('/settings')}
+          className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-200 ring-1 ring-white/15 hover:bg-white/5"
+        >
+          <Compass aria-hidden /> {t('settings.help.tour')}
+        </button>
+      </div>
     </SettingsCard>
   )
 }

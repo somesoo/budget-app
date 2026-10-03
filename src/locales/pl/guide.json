@@ -1,0 +1,278 @@
+{
+  "title": {
+    "message": "Poradnik",
+    "context": "The guide page: heading, and its name in Settings → Help."
+  },
+  "intro": {
+    "message": "Jak korzystać z aplikacji na co dzień, w kolejności, w jakiej będzie potrzebne. „Pokaż” otwiera ekran i wskazuje właściwe miejsce.",
+    "context": "Guide page: line under the heading. Keep \"Show me\" matching guide.show."
+  },
+  "show": {
+    "message": "Pokaż",
+    "context": "Guide: button on a step that opens its screen and highlights the element."
+  },
+  "optional": {
+    "message": "opcjonalnie",
+    "context": "Guide: marks a getting-started step that can be skipped."
+  },
+  "doneLabel": {
+    "message": "Zrobione",
+    "context": "Guide: accessible label of the check mark on a finished step."
+  },
+  "todoLabel": {
+    "message": "Jeszcze nie",
+    "context": "Guide: accessible label of an unfinished step."
+  },
+  "progress": {
+    "message": "{done} z {total} zrobione",
+    "context": "Guide: progress of the getting-started list. Both are numbers."
+  },
+  "allDone": {
+    "message": "Wszystko ustawione. Reszta to nawyki: sekcje poniżej.",
+    "context": "Guide: getting-started list complete."
+  },
+  "open": {
+    "message": "Otwórz poradnik",
+    "context": "Settings → Help: button that opens the guide."
+  },
+  "start": {
+    "title": {
+      "message": "Na start",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Raz, około 15 minut",
+      "context": "Guide section: when you do it."
+    },
+    "categories": {
+      "message": "{settings} → {categories}: zmień nazwy, dodaj ({newCat}) albo ukryj kategorie, żeby pasowały do Waszych wydatków, i ustaw każdej miesięczny limit.",
+      "context": "Guide, getting started. Placeholders are app labels, shown in bold."
+    },
+    "accounts": {
+      "message": "{savings} → {newAccount}: dodaj każde konto oszczędnościowe, lokatę, IKE/IKZE/PPK albo obligacje z polem {balanceToday}, żeby aplikacja startowała od prawdziwych liczb.",
+      "context": "Guide, getting started."
+    },
+    "emergency": {
+      "message": "{newGoal} „Poduszka finansowa” z włączoną opcją {emergency} (albo otwórz istniejący cel → Edytuj). Celuj w 3–6 miesięcy wydatków.",
+      "context": "Guide, getting started."
+    },
+    "debts": {
+      "message": "{newDebt}: każdy kredyt, kartę czy hipotekę z polem {owedToday}, oprocentowaniem i ratą. Nie macie długów? Pomiń ten krok.",
+      "context": "Guide, getting started."
+    },
+    "regular": {
+      "message": "{budget} → {regular}: dodaj subskrypcje i powracające rachunki (ubezpieczenie, przegląd auta, podatki), jak często i kiedy najbliższy termin.",
+      "context": "Guide, getting started."
+    },
+    "billsFund": {
+      "message": "Załóż cel na te rachunki (np. „Rachunki”) i włącz w nim opcję {billsFund}: aplikacja powie, czy jest w nim dość.",
+      "context": "Guide, getting started."
+    },
+    "income": {
+      "message": "Zapisz tegomiesięczną wypłatę: okrągły przycisk ↑ ({addIncome}) u góry zakładki {add}.",
+      "context": "Guide, getting started. Keep the ↑ arrow: it's how the button looks."
+    },
+    "plan": {
+      "message": "Zaplanuj ten miesiąc w zakładce {budget}: zobacz „Na początku miesiąca” niżej.",
+      "context": "Guide, getting started. The quoted name must match guide.month.title."
+    },
+    "ai": {
+      "message": "{settings} → {aiCard}: wklej darmowy klucz Gemini, żeby włączyć rekomendacje, szkice planu i {askAi}.",
+      "context": "Guide, getting started."
+    },
+    "phones": {
+      "message": "Na każdym telefonie: otwórz stronę → Udostępnij → Dodaj do ekranu głównego, zaloguj się raz i wybierz, czyj to telefon.",
+      "context": "Guide, getting started. Use the phone's own wording for Share and Add to Home Screen."
+    }
+  },
+  "daily": {
+    "title": {
+      "message": "Codziennie",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Kilka sekund na wydatek",
+      "context": "Guide section: when you do it."
+    },
+    "expense": {
+      "message": "{add}: dotknij kategorii, wpisz kwotę (albo dotknij szybkich kwot), {saveExpense}. Najłatwiej od razu po zapłacie.",
+      "context": "Guide, every day."
+    },
+    "yesterday": {
+      "message": "Zapomniałeś o czymś? Na ekranie kwoty wybierz {yest} albo datę przed zapisaniem.",
+      "context": "Guide, every day."
+    },
+    "goal": {
+      "message": "Zapłacone z oszczędności (wyjazd, naprawa z poduszki)? Dotknij kafelka {goals} i wybierz cel: wydatek nie obciąży budżetu miesiąca i zejdzie z konta celu.",
+      "context": "Guide, every day."
+    },
+    "fix": {
+      "message": "Pomyłka? {history} → dotknij wpisu, żeby zmienić kwotę, datę lub kategorię albo go usunąć.",
+      "context": "Guide, every day."
+    },
+    "borrowed": {
+      "message": "Ktoś inny zapisuje wydatek na Twoim telefonie? Dotknij imienia na ekranie kwoty, żeby zapisać go jako jego.",
+      "context": "Guide, every day."
+    }
+  },
+  "payday": {
+    "title": {
+      "message": "Gdy przychodzi wypłata",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Przy każdej wypłacie, minuta",
+      "context": "Guide section: when you do it."
+    },
+    "log": {
+      "message": "Dotknij ↑ ({addIncome}) w zakładce {add}, wpisz kwotę, {saveIncome}. Wypłata pod koniec miesiąca może liczyć się do następnego ({paysFor}).",
+      "context": "Guide, payday."
+    },
+    "oneOff": {
+      "message": "Pieniądze, które się nie powtórzą (zwrot kaucji, coś sprzedanego): oznacz jako {oneOff}, żeby nie zawyżały typowej wypłaty.",
+      "context": "Guide, payday."
+    },
+    "paycheck": {
+      "message": "Zapisanie wypłaty otwiera sekcję {paycheck}: wpłać każdą pozycję (cele, IKE, raty pożyczek), zanim zaczniesz wydawać. Jest też w zakładce {budget}.",
+      "context": "Guide, payday."
+    }
+  },
+  "month": {
+    "title": {
+      "message": "Na początku miesiąca",
+      "context": "Guide section heading. guide.start.plan quotes it."
+    },
+    "when": {
+      "message": "Raz w miesiącu, 10 minut, najlepiej razem",
+      "context": "Guide section: when you do it."
+    },
+    "review": {
+      "message": "W pierwszym tygodniu miesiąca {budget} pokazuje, jak poszedł poprzedni: co przekroczono, a co zostało. Zerknij przed planowaniem.",
+      "context": "Guide, start of the month."
+    },
+    "plan": {
+      "message": "Dotknij {planMonth} (albo plakietki przy miesiącu). Zacznij od planu z poprzedniego miesiąca albo od opcji {fillTypical}, potem popraw limity.",
+      "context": "Guide, start of the month."
+    },
+    "zero": {
+      "message": "Doprowadź do zera: dochód − oszczędności − limity = 0, żeby każda złotówka miała zadanie. Planer pokazuje, co jeszcze nieprzypisane.",
+      "context": "Guide, start of the month."
+    },
+    "savings": {
+      "message": "W oszczędnościach daj każdemu celowi jego pozycję (podpowiedzi mówią, ile potrzeba, żeby zdążyć, i ile na fundusz rachunków) i wybierz, gdzie trafi nadwyżka z poprzedniego miesiąca.",
+      "context": "Guide, start of the month."
+    },
+    "ai": {
+      "message": "Nie wiesz, od czego zacząć? {aiDraft} zaproponuje limity na podstawie roku wydatków; nic się nie zmieni, dopóki nie dotkniesz propozycji.",
+      "context": "Guide, start of the month."
+    }
+  },
+  "weekly": {
+    "title": {
+      "message": "Raz w tygodniu",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "5 minut, np. w niedzielę",
+      "context": "Guide section: when you do it."
+    },
+    "safe": {
+      "message": "{add}: liczba u góry to to, co naprawdę zostało do wydania w tym miesiącu. Poniżej zera trzeba zwolnić.",
+      "context": "Guide, weekly."
+    },
+    "warnings": {
+      "message": "{budget} pokazuje, które kategorie zbliżają się do limitu lub go przekroczyły: reaguj teraz, nie na koniec miesiąca.",
+      "context": "Guide, weekly."
+    },
+    "debt": {
+      "message": "Po zapłacie raty: {savings} → dług → {update} → {instalment}.",
+      "context": "Guide, weekly."
+    },
+    "ask": {
+      "message": "Pytania typu „czy stać nas na wakacje w lipcu?”: {askAi}.",
+      "context": "Guide, weekly."
+    }
+  },
+  "quarterly": {
+    "title": {
+      "message": "Co trzy miesiące",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Cztery razy w roku, 15 minut",
+      "context": "Guide section: when you do it."
+    },
+    "subscriptions": {
+      "message": "{budget} → {regular}: gdy pojawi się przycisk {reviewNow}, przejrzyj subskrypcje i anuluj nieużywane.",
+      "context": "Guide, quarterly."
+    },
+    "balances": {
+      "message": "IKE, IKZE, PPK, obligacje, inwestycje: {savings} → konto → {updateBalance} według wyciągu. Różnica to Wasz zysk.",
+      "context": "Guide, quarterly."
+    },
+    "debtBank": {
+      "message": "Długi: {update} → {bank} z saldem z banku, żeby szacunek był dokładny.",
+      "context": "Guide, quarterly."
+    },
+    "bigPicture": {
+      "message": "Zerknij na {netWorth} w zakładce {savings} i {fire} w zakładce {insights}: czy idą w dobrą stronę?",
+      "context": "Guide, quarterly."
+    }
+  },
+  "numbers": {
+    "title": {
+      "message": "Co znaczą liczby",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Gdy zastanawiasz się, jak Wam idzie",
+      "context": "Guide section: when it's useful."
+    },
+    "health": {
+      "message": "{health} w zakładce {budget}: stopa oszczędności (20% lub więcej), koszty stałe (poniżej połowy dochodu), poduszka (3–6 miesięcy), wiek pieniędzy (30 dni lub więcej). Czerwony wskaźnik to ten, nad którym warto popracować.",
+      "context": "Guide, the numbers."
+    },
+    "netWorth": {
+      "message": "{netWorth}: to, co macie, minus to, co jesteście winni. Z hipoteką bywa poniżej zera przez lata; ważne, żeby rósł.",
+      "context": "Guide, the numbers."
+    },
+    "debtPlan": {
+      "message": "{debtPlan}: najdroższy najpierw oszczędza najwięcej odsetek, najmniejszy najpierw daje szybkie sukcesy. Każda nadpłata go skraca.",
+      "context": "Guide, the numbers."
+    },
+    "fire": {
+      "message": "{fire}: 25-krotność rocznych wydatków pozwala żyć z oszczędności. Mniejsze wydatki pomagają podwójnie: niższy cel i więcej odłożone.",
+      "context": "Guide, the numbers."
+    }
+  },
+  "tips": {
+    "title": {
+      "message": "Dobrze wiedzieć",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Kiedykolwiek",
+      "context": "Guide section: when it's useful."
+    },
+    "allowance": {
+      "message": "Pieniądze, z których nikt się nie tłumaczy: {settings} → kategoria → {whose} → jedna osoba. Szczegóły widzi tylko jej telefon.",
+      "context": "Guide, tips."
+    },
+    "fixed": {
+      "message": "Czynsz i rachunki: wyłącz w kategorii opcję {inChart}. Przestaną zasłaniać wykres i będą liczone jako koszty stałe.",
+      "context": "Guide, tips."
+    },
+    "borrow": {
+      "message": "Coś pilnego? {savings} → {assistant} → {borrow}: weź z oszczędności i oddaj w ratach, które odłoży każdy kolejny plan.",
+      "context": "Guide, tips."
+    },
+    "together": {
+      "message": "Planujcie miesiąc razem i ustalcie limity wspólnie: budżet działa, gdy wszyscy się na niego zgadzają.",
+      "context": "Guide, tips."
+    },
+    "tour": {
+      "message": "Żeby znowu zobaczyć wszystkie ekrany: {settings} → {help} → {tour}.",
+      "context": "Guide, tips."
+    }
+  }
+}

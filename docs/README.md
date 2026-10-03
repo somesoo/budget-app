@@ -9,7 +9,7 @@
 **Using it**
 
 - [People and phones](people-and-phones.md): the shared account, who's in
-  the budget, languages, the tour
+  the budget, languages, the guide and the tour
 - [Adding expenses](adding.md): the Add tab, *Safe to spend*, income,
   categories, allowances
 - [Budget](budget.md): a plan per month, *From the paycheck*, last month's

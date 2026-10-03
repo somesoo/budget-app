@@ -26,6 +26,7 @@ import en_goal from './en/goal.json'
 import en_goalCard from './en/goalCard.json'
 import en_goalSheet from './en/goalSheet.json'
 import en_goalStatus from './en/goalStatus.json'
+import en_guide from './en/guide.json'
 import en_health from './en/health.json'
 import en_history from './en/history.json'
 import en_home from './en/home.json'
@@ -86,6 +87,7 @@ import pl_goal from './pl/goal.json'
 import pl_goalCard from './pl/goalCard.json'
 import pl_goalSheet from './pl/goalSheet.json'
 import pl_goalStatus from './pl/goalStatus.json'
+import pl_guide from './pl/guide.json'
 import pl_health from './pl/health.json'
 import pl_history from './pl/history.json'
 import pl_home from './pl/home.json'
@@ -148,6 +150,7 @@ const en = {
   goalCard: en_goalCard,
   goalSheet: en_goalSheet,
   goalStatus: en_goalStatus,
+  guide: en_guide,
   health: en_health,
   history: en_history,
   home: en_home,
@@ -210,6 +213,7 @@ const pl = {
   goalCard: pl_goalCard,
   goalSheet: pl_goalSheet,
   goalStatus: pl_goalStatus,
+  guide: pl_guide,
   health: pl_health,
   history: pl_history,
   home: pl_home,

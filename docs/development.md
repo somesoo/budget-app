@@ -97,9 +97,16 @@ appears. English is the source. See
 [src/locales/README.md](../src/locales/README.md) for translating or adding a
 language; `npm run i18n` keeps the other languages in step with English.
 
-## The tour
+## The guide and the tour
 
-The steps live in `src/lib/tour.ts`; each points at an element by a
+The guide's steps live in `src/lib/guide.ts` and its texts in
+`src/locales/*/guide.json`. A `{name}` in a text is a button or tab, filled
+from `GUIDE_LABELS` with the app's own label, so the instructions follow any
+rename or translation; `guide.test.ts` checks every one has a label. *Show
+me* navigates with the step's `data-tour` name, and `GuideHighlight` scrolls
+to that element and makes it pulse.
+
+The tour's steps live in `src/lib/tour.ts`; each points at an element by a
 `data-tour` attribute, and one whose element isn't on screen shows as a card
 in the middle.
 

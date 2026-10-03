@@ -162,7 +162,10 @@ export function Savings() {
       <SavingsAssistant overview={s} />
       <LoansCard overview={s} />
 
-      <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
+      <div
+        data-tour="savings-tools"
+        className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0"
+      >
         <button
           type="button"
           onClick={() => setSheet({ kind: 'money', mode: 'deposit' })}
@@ -247,7 +250,7 @@ export function Savings() {
         </section>
 
         {/* ---------- accounts ---------- */}
-        <section aria-labelledby="accounts">
+        <section aria-labelledby="accounts" data-tour="savings-accounts">
           <SectionHead
             id="accounts"
             title={t('savingsPage.accounts')}

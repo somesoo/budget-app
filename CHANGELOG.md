@@ -33,6 +33,9 @@ The first release meant for other people to install.
   many years away at your pace.
 - **PPK and treasury bonds** as kinds of savings account.
 - The Ask tab knows about debts, net worth and regular costs.
+- **A guide** in Settings → Help: how to use the app day to day, step by
+  step, with *Show me* taking you to each spot, and a getting-started list
+  that ticks itself off.
 
 Everything before this (one to four people, English and Polish, the guided
 tour, plans, savings, loans, insights, Ask) is described in [docs](docs/README.md).

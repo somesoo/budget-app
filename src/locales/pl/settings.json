@@ -354,8 +354,8 @@
       "context": "Settings > card heading: the guided tour."
     },
     "help": {
-      "message": "Przejście przez każdy ekran, krok po kroku.",
-      "context": "Settings > Help card: description of the guided tour."
+      "message": "Jak korzystać z aplikacji na co dzień i spacer po wszystkich ekranach.",
+      "context": "Settings > Help card: description of the guide and the guided tour."
     },
     "tour": {
       "message": "Uruchom przewodnik",

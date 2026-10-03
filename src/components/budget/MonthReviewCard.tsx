@@ -49,6 +49,7 @@ export function MonthReviewCard({
 
   return (
     <section
+      data-tour="month-review"
       className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10"
       aria-labelledby="review"
     >

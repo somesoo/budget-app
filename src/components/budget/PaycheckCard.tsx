@@ -235,7 +235,7 @@ export function PaycheckCard({
   if (bare) return list
 
   return (
-    <section className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+    <section data-tour="paycheck" className="mb-6 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h2 className="text-base font-semibold text-white">{t('paycheck.title')}</h2>
         <span className="text-xs tabular-nums text-muted">

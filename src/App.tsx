@@ -27,6 +27,8 @@ import { ProjectPage } from './pages/ProjectPage'
 import { SavingsAccountPage, SavingsGoalPage } from './pages/SavingsDetail'
 import { Insights } from './pages/Insights'
 import { DebtPage } from './pages/DebtPage'
+import { Guide } from './pages/Guide'
+import { GuideHighlight } from './components/GuideHighlight'
 
 export default function App() {
   const { isChosen, setPerson } = useDeviceUser()
@@ -82,6 +84,7 @@ export default function App() {
           <Route path="/savings/account/:id" element={<SavingsAccountPage />} />
           <Route path="/savings/goal/:id" element={<SavingsGoalPage />} />
           <Route path="/debt/:id" element={<DebtPage />} />
+          <Route path="/guide" element={<Guide />} />
           {/* old tabs, kept so a bookmarked or installed link still lands somewhere */}
           <Route path="/calendar" element={<Navigate to="/history" replace />} />
           <Route path="/summary" element={<Navigate to="/budget" replace />} />
@@ -92,6 +95,7 @@ export default function App() {
       </main>
       <BottomNav />
       <Tour />
+      <GuideHighlight />
     </>
   )
 }

@@ -1,0 +1,278 @@
+{
+  "title": {
+    "message": "Guide",
+    "context": "The guide page: heading, and its name in Settings → Help."
+  },
+  "intro": {
+    "message": "How to use the app day to day, in the order you'll need it. \"Show me\" opens the screen and points at the spot.",
+    "context": "Guide page: line under the heading. Keep \"Show me\" matching guide.show."
+  },
+  "show": {
+    "message": "Show me",
+    "context": "Guide: button on a step that opens its screen and highlights the element."
+  },
+  "optional": {
+    "message": "optional",
+    "context": "Guide: marks a getting-started step that can be skipped."
+  },
+  "doneLabel": {
+    "message": "Done",
+    "context": "Guide: accessible label of the check mark on a finished step."
+  },
+  "todoLabel": {
+    "message": "Not done yet",
+    "context": "Guide: accessible label of an unfinished step."
+  },
+  "progress": {
+    "message": "{done} of {total} done",
+    "context": "Guide: progress of the getting-started list. Both are numbers."
+  },
+  "allDone": {
+    "message": "All set up. The rest is habit: the sections below.",
+    "context": "Guide: getting-started list complete."
+  },
+  "open": {
+    "message": "Open the guide",
+    "context": "Settings → Help: button that opens the guide."
+  },
+  "start": {
+    "title": {
+      "message": "Getting started",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Once, about 15 minutes",
+      "context": "Guide section: when you do it."
+    },
+    "categories": {
+      "message": "{settings} → {categories}: rename, add ({newCat}) or hide categories so they match how you really spend, and give each a monthly limit.",
+      "context": "Guide, getting started. Placeholders are app labels, shown in bold."
+    },
+    "accounts": {
+      "message": "{savings} → {newAccount}: add every savings account, deposit, IKE/IKZE/PPK or bonds with {balanceToday}, so the app starts from real numbers.",
+      "context": "Guide, getting started."
+    },
+    "emergency": {
+      "message": "{newGoal} \"Emergency fund\" with {emergency} switched on (or open a goal you have → Edit). Aim for 3 to 6 months of spending.",
+      "context": "Guide, getting started."
+    },
+    "debts": {
+      "message": "{newDebt}: every loan, card or mortgage with {owedToday}, its interest and monthly payment. No debts? Skip it.",
+      "context": "Guide, getting started."
+    },
+    "regular": {
+      "message": "{budget} → {regular}: add the subscriptions and the bills that come back (insurance, car service, taxes) with how often and when they're next due.",
+      "context": "Guide, getting started."
+    },
+    "billsFund": {
+      "message": "Make a goal for those bills (e.g. \"Bills\") and switch {billsFund} on in it: the app then says whether it holds enough.",
+      "context": "Guide, getting started."
+    },
+    "income": {
+      "message": "Log this month's pay: the round ↑ button ({addIncome}) at the top of {add}.",
+      "context": "Guide, getting started. Keep the ↑ arrow: it's how the button looks."
+    },
+    "plan": {
+      "message": "Plan this month on {budget}: see \"At the start of the month\" below.",
+      "context": "Guide, getting started. The quoted name must match guide.month.title."
+    },
+    "ai": {
+      "message": "{settings} → {aiCard}: paste a free Gemini key to turn on the recommendations, plan drafts and {askAi}.",
+      "context": "Guide, getting started."
+    },
+    "phones": {
+      "message": "On every phone: open the site → Share → Add to Home Screen, sign in once, and say whose phone it is.",
+      "context": "Guide, getting started. Use the phone's own wording for Share and Add to Home Screen."
+    }
+  },
+  "daily": {
+    "title": {
+      "message": "Every day",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "A few seconds per expense",
+      "context": "Guide section: when you do it."
+    },
+    "expense": {
+      "message": "{add}: tap a category, type the amount (or tap the quick amounts), {saveExpense}. Right after paying is easiest.",
+      "context": "Guide, every day."
+    },
+    "yesterday": {
+      "message": "Forgot one? On the amount screen pick {yest} or a date before saving.",
+      "context": "Guide, every day."
+    },
+    "goal": {
+      "message": "Paid from savings (a trip, a repair from the emergency fund)? Tap the {goals} tile and pick the goal: it stays out of the month's budget and comes off its account.",
+      "context": "Guide, every day."
+    },
+    "fix": {
+      "message": "A mistake? {history} → tap the entry to change the amount, date or category, or to delete it.",
+      "context": "Guide, every day."
+    },
+    "borrowed": {
+      "message": "Someone else paying from your phone? Tap the name on the amount screen to log it as theirs.",
+      "context": "Guide, every day."
+    }
+  },
+  "payday": {
+    "title": {
+      "message": "When pay comes in",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Each paycheck, a minute",
+      "context": "Guide section: when you do it."
+    },
+    "log": {
+      "message": "Tap ↑ ({addIncome}) on {add}, type the amount, {saveIncome}. Pay that arrives near the month's end can count for the next month ({paysFor}).",
+      "context": "Guide, payday."
+    },
+    "oneOff": {
+      "message": "Money that won't come again (a deposit back, something sold): mark it {oneOff}, so it doesn't inflate your typical pay.",
+      "context": "Guide, payday."
+    },
+    "paycheck": {
+      "message": "Saving pay opens {paycheck}: pay in each line (goals, IKE, loan instalments) before you start spending. It's also on {budget}.",
+      "context": "Guide, payday."
+    }
+  },
+  "month": {
+    "title": {
+      "message": "At the start of the month",
+      "context": "Guide section heading. guide.start.plan quotes it."
+    },
+    "when": {
+      "message": "Once a month, 10 minutes, ideally together",
+      "context": "Guide section: when you do it."
+    },
+    "review": {
+      "message": "In the month's first week {budget} shows how last month went: what went over and what was left. Look before you plan.",
+      "context": "Guide, start of the month."
+    },
+    "plan": {
+      "message": "Tap {planMonth} (or the badge by the month). Start from last month's plan or {fillTypical} spending, then adjust each limit.",
+      "context": "Guide, start of the month."
+    },
+    "zero": {
+      "message": "Make it come to zero: income − savings − limits = 0, so every złoty has a job. The planner says what's still unassigned.",
+      "context": "Guide, start of the month."
+    },
+    "savings": {
+      "message": "In savings, give each goal its line (the chips say what it needs to be on time, and how much the bills fund needs), and pick where last month's leftover goes.",
+      "context": "Guide, start of the month."
+    },
+    "ai": {
+      "message": "Not sure? {aiDraft} suggests limits from a year of your spending; nothing changes until you tap a suggestion.",
+      "context": "Guide, start of the month."
+    }
+  },
+  "weekly": {
+    "title": {
+      "message": "Once a week",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "5 minutes, say on Sunday",
+      "context": "Guide section: when you do it."
+    },
+    "safe": {
+      "message": "{add}: the number at the top is what's really free to spend this month. Below zero means slow down.",
+      "context": "Guide, weekly."
+    },
+    "warnings": {
+      "message": "{budget} shows which categories are close to or over their limit: react now, not at the month's end.",
+      "context": "Guide, weekly."
+    },
+    "debt": {
+      "message": "After a loan instalment: {savings} → the debt → {update} → {instalment}.",
+      "context": "Guide, weekly."
+    },
+    "ask": {
+      "message": "Questions like \"can we afford a holiday in July?\": {askAi}.",
+      "context": "Guide, weekly."
+    }
+  },
+  "quarterly": {
+    "title": {
+      "message": "Every three months",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Four times a year, 15 minutes",
+      "context": "Guide section: when you do it."
+    },
+    "subscriptions": {
+      "message": "{budget} → {regular}: when it says {reviewNow}, go through the subscriptions and cancel what you don't use.",
+      "context": "Guide, quarterly."
+    },
+    "balances": {
+      "message": "IKE, IKZE, PPK, bonds, investments: {savings} → the account → {updateBalance} to what the statement shows. The difference is your gain.",
+      "context": "Guide, quarterly."
+    },
+    "debtBank": {
+      "message": "Debts: {update} → {bank} with the balance from the bank, so the estimate stays accurate.",
+      "context": "Guide, quarterly."
+    },
+    "bigPicture": {
+      "message": "Look at {netWorth} on {savings} and {fire} on {insights}: are they moving the right way?",
+      "context": "Guide, quarterly."
+    }
+  },
+  "numbers": {
+    "title": {
+      "message": "What the numbers mean",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "When you wonder how you're doing",
+      "context": "Guide section: when it's useful."
+    },
+    "health": {
+      "message": "{health} on {budget}: savings rate (20% or more), fixed costs (under half the income), emergency fund (3–6 months), age of money (30 days or more). The red one is the one to work on.",
+      "context": "Guide, the numbers."
+    },
+    "netWorth": {
+      "message": "{netWorth}: what you have minus what you owe. With a mortgage it's below zero for years; what matters is that it climbs.",
+      "context": "Guide, the numbers."
+    },
+    "debtPlan": {
+      "message": "{debtPlan}: dearest first saves the most interest, smallest first gives quick wins. Any extra a month shortens it.",
+      "context": "Guide, the numbers."
+    },
+    "fire": {
+      "message": "{fire}: 25 years of spending lets you live off your savings. Spending less helps twice: a smaller target, and more saved.",
+      "context": "Guide, the numbers."
+    }
+  },
+  "tips": {
+    "title": {
+      "message": "Good to know",
+      "context": "Guide section heading."
+    },
+    "when": {
+      "message": "Whenever",
+      "context": "Guide section: when it's useful."
+    },
+    "allowance": {
+      "message": "Money nobody has to explain: {settings} → the category → {whose} → one person. Only their phone shows what's in it.",
+      "context": "Guide, tips."
+    },
+    "fixed": {
+      "message": "Rent and bills: switch {inChart} off in the category. They stop crowding the chart and count as fixed costs.",
+      "context": "Guide, tips."
+    },
+    "borrow": {
+      "message": "Something urgent? {savings} → {assistant} → {borrow}: take it from savings and pay it back in instalments every plan puts aside.",
+      "context": "Guide, tips."
+    },
+    "together": {
+      "message": "Plan the month together and agree on the limits: a budget works when everyone in it says yes to it.",
+      "context": "Guide, tips."
+    },
+    "tour": {
+      "message": "To see every screen again: {settings} → {help} → {tour}.",
+      "context": "Guide, tips."
+    }
+  }
+}

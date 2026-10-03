@@ -37,6 +37,7 @@ const goal = (id: string, target: number, target_date: string | null = null): Go
   archived: false,
   note: null,
   is_emergency: false,
+  is_bills_fund: false,
 })
 
 let n = 0

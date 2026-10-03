@@ -39,5 +39,22 @@
   "markEmergency": {
     "message": "Mark a goal as your emergency fund (goal → Edit)",
     "context": "Money health card: link to Savings when no goal is the emergency fund."
+  },
+  "ageOfMoney": {
+    "message": "Age of money",
+    "context": "Money health card: how many days money waits between coming in and going out."
+  },
+  "ageOfMoneyRule": {
+    "message": "How long pay waits before it's spent; 30 days or more means living on last month's money.",
+    "context": "Money health card: what the age of money measures and the goal."
+  },
+  "ageOfMoneyHint": {
+    "message": "Log your pay to see it.",
+    "context": "Money health card: no income logged yet."
+  },
+  "days": {
+    "one": "{count} day",
+    "other": "{count} days",
+    "context": "Money health card: the age of money in days."
   }
 }

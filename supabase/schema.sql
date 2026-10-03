@@ -2,7 +2,7 @@
 --
 -- A new install runs this once (scripts/migrate.mjs does it on the first
 -- deploy); later changes come as files in supabase/migrations, which run on
--- top of it. It's the same database that migrations 0001–0018 (now in
+-- top of it. It's the same database that migrations 0001–0019 (now in
 -- supabase/archive) build step by step, without the detours: no anonymous
 -- access that's taken away again, no fixed Bubs and Meow, no single goal that
 -- turns into accounts.
@@ -56,6 +56,8 @@ create table public.goals (
   note           text,
   -- the emergency fund, which the Budget tab's health check looks at
   is_emergency   boolean     not null default false,
+  -- the fund the rarer regular bills are paid from (recurring_costs)
+  is_bills_fund  boolean     not null default false,
   constraint goals_pkey primary key (id),
   constraint goals_current_amount_check check (current_amount >= 0),
   constraint goals_target_amount_check check (target_amount >= 0)
@@ -157,6 +159,39 @@ create table public.budgets (
 
 
 /* ======================================================================
+   Regular costs
+   ====================================================================== */
+
+-- Subscriptions and bills that come back every 1, 2, 3, 6 or 12 months.
+-- due_on is one date it's due; the app works out the next ones from it. The
+-- rarer ones (every 2+ months) are what a bills fund (goals.is_bills_fund)
+-- puts money aside for; reviewed_on is when a subscription was last checked
+-- as still wanted.
+create table public.recurring_costs (
+  id           uuid        not null default gen_random_uuid(),
+  name         text        not null,
+  kind         text        not null default 'bill',
+  amount       numeric(12, 2) not null,
+  every_months integer     not null default 1,
+  due_on       date        not null,
+  category_id  uuid,
+  -- a person's id when it's theirs; null when it's shared
+  owner        text,
+  archived     boolean     not null default false,
+  reviewed_on  date,
+  note         text,
+  created_at   timestamptz not null default now(),
+  constraint recurring_costs_pkey primary key (id),
+  constraint recurring_costs_category_id_fkey foreign key (category_id)
+    references public.categories (id) on delete set null,
+  constraint recurring_costs_name_check check (length(name) >= 1 and length(name) <= 60),
+  constraint recurring_costs_kind_check check (kind in ('subscription', 'bill')),
+  constraint recurring_costs_amount_check check (amount > 0),
+  constraint recurring_costs_every_months_check check (every_months in (1, 2, 3, 6, 12))
+);
+
+
+/* ======================================================================
    Savings
    ====================================================================== */
 
@@ -183,7 +218,7 @@ create table public.savings_accounts (
   constraint savings_accounts_interest_rate_check
     check (interest_rate is null or (interest_rate >= 0 and interest_rate <= 100)),
   constraint savings_accounts_kind_check check (kind in
-    ('savings', 'deposit', 'investment', 'retirement', 'ike', 'ikze', 'cash', 'other')),
+    ('savings', 'deposit', 'investment', 'retirement', 'ike', 'ikze', 'ppk', 'bonds', 'cash', 'other')),
   constraint savings_accounts_name_check check (length(name) >= 1 and length(name) <= 60)
 );
 
@@ -707,6 +742,54 @@ grant execute on function public._unspend_expense(uuid) to authenticated;
 
 
 /* ======================================================================
+   Debts
+   ====================================================================== */
+
+-- A mortgage, a loan, a credit card, instalments. What's owed is the latest
+-- of its balances; each update adds one, so the app can draw how it went down
+-- and say what was owed at any month's end (net worth = savings − debts).
+-- The instalment itself is an expense like any other; the balance is updated
+-- from it, or from the bank.
+create table public.debts (
+  id              uuid        not null default gen_random_uuid(),
+  name            text        not null,
+  kind            text        not null default 'loan',
+  -- a person's id, or 'joint'
+  owner           text        not null default 'joint',
+  -- yearly, in percent; null or 0 for interest-free instalments
+  interest_rate   numeric(5, 2),
+  monthly_payment numeric(12, 2) not null default 0,
+  color           text        not null default '#d95926',
+  sort_order      integer     not null default 0,
+  archived        boolean     not null default false,
+  note            text,
+  created_at      timestamptz not null default now(),
+  constraint debts_pkey primary key (id),
+  constraint debts_name_check check (length(name) >= 1 and length(name) <= 60),
+  constraint debts_kind_check check (kind in
+    ('mortgage', 'loan', 'card', 'installments', 'private', 'other')),
+  constraint debts_interest_rate_check
+    check (interest_rate is null or (interest_rate >= 0 and interest_rate <= 100)),
+  constraint debts_monthly_payment_check check (monthly_payment >= 0)
+);
+
+create table public.debt_balances (
+  id           uuid        not null default gen_random_uuid(),
+  debt_id      uuid        not null,
+  balance_date date        not null default current_date,
+  balance      numeric(12, 2) not null,
+  note         text,
+  created_at   timestamptz not null default now(),
+  constraint debt_balances_pkey primary key (id),
+  constraint debt_balances_debt_id_fkey foreign key (debt_id)
+    references public.debts (id) on delete cascade,
+  constraint debt_balances_balance_check check (balance >= 0)
+);
+
+create index debt_balances_debt_idx on public.debt_balances (debt_id, balance_date desc);
+
+
+/* ======================================================================
    AI
    ====================================================================== */
 
@@ -835,6 +918,21 @@ create policy "signed in full access ai_messages" on public.ai_messages
   for all to authenticated using (true) with check (true);
 alter table public.ai_messages replica identity full;
 
+alter table public.recurring_costs enable row level security;
+create policy "signed in full access recurring_costs" on public.recurring_costs
+  for all to authenticated using (true) with check (true);
+alter table public.recurring_costs replica identity full;
+
+alter table public.debts enable row level security;
+create policy "signed in full access debts" on public.debts
+  for all to authenticated using (true) with check (true);
+alter table public.debts replica identity full;
+
+alter table public.debt_balances enable row level security;
+create policy "signed in full access debt_balances" on public.debt_balances
+  for all to authenticated using (true) with check (true);
+alter table public.debt_balances replica identity full;
+
 -- app_secrets: row level security with no policy at all.
 alter table public.app_secrets enable row level security;
 
@@ -842,7 +940,8 @@ alter publication supabase_realtime add table
   public.people, public.goals, public.categories, public.expenses, public.incomes,
   public.budgets, public.savings_accounts, public.savings_loans,
   public.savings_movements, public.goal_allocations,
-  public.advice, public.ai_threads, public.ai_messages;
+  public.advice, public.ai_threads, public.ai_messages,
+  public.recurring_costs, public.debts, public.debt_balances;
 
 
 /* ======================================================================

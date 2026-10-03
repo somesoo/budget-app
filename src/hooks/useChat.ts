@@ -1,10 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ownCategories, ownExpenses } from '../lib/allowance'
-import { buildChatContext, trimContext } from '../lib/chatContext'
+import { buildChatContext, trimContext, type ChatContextInput } from '../lib/chatContext'
+import { useWealth } from './useWealth'
+import { useRecurringCosts } from './useRecurring'
+import { payoff } from '../lib/debts'
+import { nextDue, regularTotals } from '../lib/recurring'
 import { currentMonthKey, shiftMonth, todayKey } from '../lib/calculations'
 import { monthsEndingAt, windowRange } from '../lib/insights'
 import { supabase } from '../lib/supabaseClient'
-import type { ChatMessage, ChatThread, Person } from '../types'
+import type { ChatMessage, ChatThread, Person, RecurringCost } from '../types'
 import { useBudgetAlerts } from './useBudgetAlerts'
 import { useBudget, useMonthCategories } from './useBudgets'
 import { useDeviceUser } from './useDeviceUser'
@@ -81,6 +85,8 @@ export function useChatContext() {
   const { all: alerts } = useBudgetAlerts()
   const savings = useSavingsOverview()
   const { person: me } = useDeviceUser()
+  const wealth = useWealth()
+  const { data: regular } = useRecurringCosts()
 
   const ready = !!categories.data && !!expenses.data && !!incomes.data && !savings.isLoading
   const build = () =>
@@ -103,6 +109,9 @@ export function useChatContext() {
           movements: savings.movements,
           savedThisMonth: savings.savedThisMonth,
         },
+        wealth: wealth.available
+          ? wealthContext(wealth, regular?.costs ?? [], month)
+          : undefined,
       }),
     )
   return { ready, build }
@@ -191,4 +200,46 @@ export function useDeleteThread() {
       void qc.invalidateQueries({ queryKey: chatKey })
     },
   })
+}
+
+/** The debts, net worth and regular costs part of what the AI sees. */
+function wealthContext(
+  wealth: ReturnType<typeof useWealth>,
+  costs: RecurringCost[],
+  month: string,
+): NonNullable<ChatContextInput['wealth']> {
+  const now = wealth.netWorth[wealth.netWorth.length - 1]
+  const open = costs.filter((c) => !c.archived)
+  const totals = regularTotals(open)
+  const today = todayKey()
+  return {
+    debts: wealth.debts
+      .filter((d) => !d.archived)
+      .map((d) => ({
+        name: d.name,
+        kind: d.kind,
+        owed: wealth.owed(d.id),
+        interestPercent: d.interest_rate,
+        monthlyPayment: d.monthly_payment,
+        paidOffBy: payoff(wealth.owed(d.id), d.interest_rate, d.monthly_payment, month).month,
+      })),
+    netWorth: {
+      now: now.net,
+      saved: now.assets,
+      owed: now.debts,
+      twelveMonthsAgo: wealth.netWorth[0].net,
+    },
+    regularCosts: {
+      perMonth: totals.monthly,
+      perYear: totals.yearly,
+      rareBillsNeedPerMonth: totals.setAside,
+      items: open.map((c) => ({
+        name: c.name,
+        kind: c.kind,
+        amount: c.amount,
+        everyMonths: c.every_months,
+        nextDue: nextDue(c, today),
+      })),
+    },
+  }
 }

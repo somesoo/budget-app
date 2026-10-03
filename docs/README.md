@@ -13,9 +13,10 @@
 - [Adding expenses](adding.md): the Add tab, *Safe to spend*, income,
   categories, allowances
 - [Budget](budget.md): a plan per month, *From the paycheck*, last month's
-  leftover, how healthy it is
-- [Savings](savings.md): accounts and goals, spending from a goal, IKE/IKZE
-- [Insights](insights.md): the forecast and the charts
+  leftover, how healthy it is, subscriptions and regular bills
+- [Savings](savings.md): accounts and goals, debts and the way out of them,
+  net worth, IKE/IKZE/PPK
+- [Insights](insights.md): the forecast, financial independence, the charts
 - [AI](ai.md): the Gemini key, what gets sent, when it's busy
 
 **Behind it**

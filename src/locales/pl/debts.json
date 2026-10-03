@@ -1,0 +1,279 @@
+{
+  "title": {
+    "message": "Długi",
+    "context": "Savings tab: heading of the debts section (loans, mortgage, cards)."
+  },
+  "new": {
+    "message": "Nowy dług",
+    "context": "Savings tab: button and sheet title for adding a debt."
+  },
+  "add": {
+    "message": "Dodaj dług",
+    "context": "New debt sheet: the submit button."
+  },
+  "empty": {
+    "message": "Kredyt hipoteczny, pożyczka, karta albo raty: dodaj je, żeby zobaczyć, kiedy się od nich uwolnisz i ile wynosi Wasz majątek netto.",
+    "context": "Savings tab: empty state of the debts section."
+  },
+  "addFirst": {
+    "message": "Dodaj dług",
+    "context": "Savings tab: button in the empty debts section."
+  },
+  "kind": {
+    "mortgage": {
+      "message": "Kredyt hipoteczny",
+      "context": "Debt kind."
+    },
+    "loan": {
+      "message": "Kredyt / pożyczka",
+      "context": "Debt kind: a cash or car loan."
+    },
+    "card": {
+      "message": "Karta kredytowa",
+      "context": "Debt kind."
+    },
+    "installments": {
+      "message": "Raty",
+      "context": "Debt kind: buying on instalments, often 0%."
+    },
+    "private": {
+      "message": "Od rodziny lub znajomych",
+      "context": "Debt kind: money borrowed privately."
+    },
+    "other": {
+      "message": "Inny",
+      "context": "Debt kind."
+    }
+  },
+  "namePlaceholder": {
+    "message": "np. Kredyt na auto",
+    "context": "New debt sheet: placeholder of the name field."
+  },
+  "owedToday": {
+    "message": "Do spłaty dziś",
+    "context": "New debt sheet: label of what's still owed."
+  },
+  "owedTodayHelp": {
+    "message": "Ile zostało do spłaty według banku.",
+    "context": "New debt sheet: help under 'Owed today'."
+  },
+  "rate": {
+    "message": "Oprocentowanie, % rocznie",
+    "context": "Debt sheet: label of the yearly interest rate."
+  },
+  "rateHelp": {
+    "message": "Oprocentowanie nominalne (albo RRSO); puste lub 0 przy ratach 0%.",
+    "context": "Debt sheet: help under the rate. RRSO is the Polish APR; keep it in Polish."
+  },
+  "payment": {
+    "message": "Rata miesięczna",
+    "context": "Debt sheet and page: the monthly instalment."
+  },
+  "paymentHelp": {
+    "message": "Rata albo ile co miesiąc spłacasz z karty.",
+    "context": "Debt sheet: help under the monthly payment."
+  },
+  "paidOff": {
+    "message": "Spłacony: schowaj",
+    "context": "Debt sheet: button that archives a debt once it's paid off."
+  },
+  "delete": {
+    "message": "Usuń dług",
+    "context": "Debt sheet: delete button."
+  },
+  "deleteConfirm": {
+    "message": "Usunąć {name} razem z historią na zawsze? Żeby zachować historię, oznacz go jako spłacony.",
+    "context": "Debt sheet: delete confirmation. {name} is the debt's name."
+  },
+  "perMonth": {
+    "message": "{amount}/mies.",
+    "context": "Debt card: the monthly payment, short. {amount} is formatted money."
+  },
+  "cleared": {
+    "message": "Spłacony",
+    "context": "Debt card/page: nothing is owed any more."
+  },
+  "until": {
+    "message": "do {month}",
+    "context": "Debt card: when it'll be paid off at its own pace. {month} is 'March 2029'."
+  },
+  "never": {
+    "message": "rata poniżej odsetek",
+    "context": "Debt card: the payment doesn't cover the interest, so it never ends."
+  },
+  "showPaidOff": {
+    "one": "Pokaż {count} spłacony",
+    "few": "Pokaż {count} spłacone",
+    "many": "Pokaż {count} spłaconych",
+    "other": "Pokaż {count} spłaconego",
+    "context": "Savings tab: toggle that shows debts marked paid off."
+  },
+  "hidePaidOff": {
+    "one": "Ukryj {count} spłacony",
+    "few": "Ukryj {count} spłacone",
+    "many": "Ukryj {count} spłaconych",
+    "other": "Ukryj {count} spłaconego",
+    "context": "Savings tab: toggle that hides debts marked paid off."
+  },
+  "planTitle": {
+    "message": "Plan wyjścia z długów",
+    "context": "Savings tab: heading of the debt payoff plan card."
+  },
+  "avalanche": {
+    "message": "Najdroższy",
+    "context": "Payoff plan: the avalanche strategy, highest interest first. Keep it short."
+  },
+  "snowball": {
+    "message": "Najmniejszy",
+    "context": "Payoff plan: the snowball strategy, smallest balance first. Keep it short."
+  },
+  "avalancheHelp": {
+    "message": "Każdy dług dostaje swoją ratę, a nadwyżka idzie na ten z najwyższym oprocentowaniem. W sumie wychodzi najtaniej.",
+    "context": "Payoff plan: what the avalanche strategy does."
+  },
+  "snowballHelp": {
+    "message": "Każdy dług dostaje swoją ratę, a nadwyżka idzie na najmniejszy. Szybkie sukcesy motywują.",
+    "context": "Payoff plan: what the snowball strategy does."
+  },
+  "extra": {
+    "message": "Nadpłata miesięcznie",
+    "context": "Payoff plan: label of the extra amount put towards debts each month."
+  },
+  "planFree": {
+    "one": "Bez długów w miesiącu {month}, za {count} miesiąc, po drodze {interest} odsetek.",
+    "few": "Bez długów w miesiącu {month}, za {count} miesiące, po drodze {interest} odsetek.",
+    "many": "Bez długów w miesiącu {month}, za {count} miesięcy, po drodze {interest} odsetek.",
+    "other": "Bez długów w miesiącu {month}, za {count} miesiąca, po drodze {interest} odsetek.",
+    "context": "Payoff plan result. {month} is 'March 2029' (nominative in Polish), {count} the months, {interest} formatted money."
+  },
+  "planBetter": {
+    "one": "{count} miesiąc szybciej i {amount} mniej odsetek niż przy spłacie każdego osobno.",
+    "few": "{count} miesiące szybciej i {amount} mniej odsetek niż przy spłacie każdego osobno.",
+    "many": "{count} miesięcy szybciej i {amount} mniej odsetek niż przy spłacie każdego osobno.",
+    "other": "{count} miesiąca szybciej i {amount} mniej odsetek niż przy spłacie każdego osobno.",
+    "context": "Payoff plan: what the plan gains over paying each debt separately."
+  },
+  "planLess": {
+    "message": "{amount} mniej odsetek niż przy spłacie każdego osobno.",
+    "context": "Payoff plan: the interest saved when it isn't sooner."
+  },
+  "planNever": {
+    "message": "Przy tych ratach część długów się nie skończy: {names}. Rata nie pokrywa odsetek; podnieś ją albo dodaj nadpłatę.",
+    "context": "Payoff plan warning. {names} lists debt names."
+  },
+  "planNote": {
+    "message": "Kolejność i kiedy każdy dług zniknie. To szacunek: odsetki liczone miesięcznie, a stopy się zmieniają. Nadpłata i wybór metody zostają na tym telefonie.",
+    "context": "Payoff plan: note under the list."
+  },
+  "update": {
+    "message": "Aktualizuj: {name}",
+    "context": "Debt update sheet title. {name} is the debt."
+  },
+  "updateShort": {
+    "message": "Aktualizuj",
+    "context": "Debt page: button that opens the update sheet."
+  },
+  "modeInstalment": {
+    "message": "Rata",
+    "context": "Debt update: mode, this month's instalment paid. Keep it short."
+  },
+  "modeOverpay": {
+    "message": "Nadpłata",
+    "context": "Debt update: mode, paid extra. Keep it short."
+  },
+  "modeBalance": {
+    "message": "Z banku",
+    "context": "Debt update: mode, type the balance the bank shows. Keep it short."
+  },
+  "instalmentPaid": {
+    "message": "Zapłacona rata",
+    "context": "Debt update: label of the instalment amount."
+  },
+  "instalmentHelp": {
+    "message": "Z tego około {interest} to odsetki za ten miesiąc, reszta zmniejsza dług. Zapisz ratę także jako wydatek, jeśli jeszcze nie.",
+    "context": "Debt update: help. {interest} is formatted money."
+  },
+  "overpaid": {
+    "message": "Nadpłacono",
+    "context": "Debt update: label of the overpayment."
+  },
+  "overpaidHelp": {
+    "message": "Cała kwota zmniejsza dług.",
+    "context": "Debt update: help under the overpayment."
+  },
+  "bankBalance": {
+    "message": "Do spłaty według banku",
+    "context": "Debt update: label of the balance typed from the bank."
+  },
+  "bankBalanceHelp": {
+    "message": "Najdokładniej: zastępuje szacunek aplikacji.",
+    "context": "Debt update: help under the bank balance."
+  },
+  "date": {
+    "message": "Data",
+    "context": "Debt update: label of the date field."
+  },
+  "willOwe": {
+    "message": "Do spłaty: {from} → {to}",
+    "context": "Debt update: the change it will make. Both are formatted money."
+  },
+  "noteInstalment": {
+    "message": "Rata",
+    "context": "Debt history: note on a balance after an instalment."
+  },
+  "noteOverpay": {
+    "message": "Nadpłata {amount}",
+    "context": "Debt history: note on a balance after an overpayment."
+  },
+  "noteBank": {
+    "message": "Saldo z banku",
+    "context": "Debt history: note on a balance typed from the bank."
+  },
+  "owed": {
+    "message": "Do spłaty",
+    "context": "Debt page: stat label."
+  },
+  "paidOffBy": {
+    "message": "Spłacony do",
+    "context": "Debt page: stat label, the month it ends."
+  },
+  "doneText": {
+    "message": "Nic już nie zostało do spłaty. Oznacz go jako spłacony w edycji, żeby go schować.",
+    "context": "Debt page: text once it's paid off."
+  },
+  "neverText": {
+    "message": "Odsetki w tym miesiącu to {interest}, a rata {payment}: w tym tempie dług się nie skończy. Podnieś ratę albo nadpłacaj.",
+    "context": "Debt page: the payment doesn't cover the interest."
+  },
+  "paceText": {
+    "one": "Przy tej racie spłacisz go w miesiącu {month}, za {count} miesiąc, płacąc jeszcze {interest} odsetek.",
+    "few": "Przy tej racie spłacisz go w miesiącu {month}, za {count} miesiące, płacąc jeszcze {interest} odsetek.",
+    "many": "Przy tej racie spłacisz go w miesiącu {month}, za {count} miesięcy, płacąc jeszcze {interest} odsetek.",
+    "other": "Przy tej racie spłacisz go w miesiącu {month}, za {count} miesiąca, płacąc jeszcze {interest} odsetek.",
+    "context": "Debt page. {month} is 'March 2029', {count} months, {interest} formatted money."
+  },
+  "interestNow": {
+    "message": "Odsetki w tym miesiącu: około {amount}. Każda nadpłata zmniejsza je od tej pory.",
+    "context": "Debt page: this month's interest."
+  },
+  "paidDown": {
+    "message": "Spłacono {amount} od {date}.",
+    "context": "Debt page: progress since the first balance. {date} is a long date."
+  },
+  "history": {
+    "message": "Historia salda",
+    "context": "Debt page: heading of the balance history."
+  },
+  "historyEmpty": {
+    "message": "Brak salda: przycisk Aktualizuj doda pierwsze.",
+    "context": "Debt page: empty history."
+  },
+  "deleteEntry": {
+    "message": "Usuń saldo z {date}",
+    "context": "Debt page: label of the delete button on a history row."
+  },
+  "gone": {
+    "message": "Tego długu już nie ma.",
+    "context": "Debt page: opened for a deleted debt."
+  }
+}

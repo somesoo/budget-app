@@ -17,8 +17,10 @@ import en_categorySheet from './en/categorySheet.json'
 import en_charts from './en/charts.json'
 import en_common from './en/common.json'
 import en_date from './en/date.json'
+import en_debts from './en/debts.json'
 import en_entry from './en/entry.json'
 import en_errors from './en/errors.json'
+import en_fire from './en/fire.json'
 import en_forecast from './en/forecast.json'
 import en_goal from './en/goal.json'
 import en_goalCard from './en/goalCard.json'
@@ -35,10 +37,12 @@ import en_money from './en/money.json'
 import en_month from './en/month.json'
 import en_movement from './en/movement.json'
 import en_nav from './en/nav.json'
+import en_netWorth from './en/netWorth.json'
 import en_onboarding from './en/onboarding.json'
 import en_paycheck from './en/paycheck.json'
 import en_planner from './en/planner.json'
 import en_project from './en/project.json'
+import en_regular from './en/regular.json'
 import en_review from './en/review.json'
 import en_saveMore from './en/saveMore.json'
 import en_savings from './en/savings.json'
@@ -73,8 +77,10 @@ import pl_categorySheet from './pl/categorySheet.json'
 import pl_charts from './pl/charts.json'
 import pl_common from './pl/common.json'
 import pl_date from './pl/date.json'
+import pl_debts from './pl/debts.json'
 import pl_entry from './pl/entry.json'
 import pl_errors from './pl/errors.json'
+import pl_fire from './pl/fire.json'
 import pl_forecast from './pl/forecast.json'
 import pl_goal from './pl/goal.json'
 import pl_goalCard from './pl/goalCard.json'
@@ -91,10 +97,12 @@ import pl_money from './pl/money.json'
 import pl_month from './pl/month.json'
 import pl_movement from './pl/movement.json'
 import pl_nav from './pl/nav.json'
+import pl_netWorth from './pl/netWorth.json'
 import pl_onboarding from './pl/onboarding.json'
 import pl_paycheck from './pl/paycheck.json'
 import pl_planner from './pl/planner.json'
 import pl_project from './pl/project.json'
+import pl_regular from './pl/regular.json'
 import pl_review from './pl/review.json'
 import pl_saveMore from './pl/saveMore.json'
 import pl_savings from './pl/savings.json'
@@ -131,8 +139,10 @@ const en = {
   charts: en_charts,
   common: en_common,
   date: en_date,
+  debts: en_debts,
   entry: en_entry,
   errors: en_errors,
+  fire: en_fire,
   forecast: en_forecast,
   goal: en_goal,
   goalCard: en_goalCard,
@@ -149,10 +159,12 @@ const en = {
   month: en_month,
   movement: en_movement,
   nav: en_nav,
+  netWorth: en_netWorth,
   onboarding: en_onboarding,
   paycheck: en_paycheck,
   planner: en_planner,
   project: en_project,
+  regular: en_regular,
   review: en_review,
   saveMore: en_saveMore,
   savings: en_savings,
@@ -189,8 +201,10 @@ const pl = {
   charts: pl_charts,
   common: pl_common,
   date: pl_date,
+  debts: pl_debts,
   entry: pl_entry,
   errors: pl_errors,
+  fire: pl_fire,
   forecast: pl_forecast,
   goal: pl_goal,
   goalCard: pl_goalCard,
@@ -207,10 +221,12 @@ const pl = {
   month: pl_month,
   movement: pl_movement,
   nav: pl_nav,
+  netWorth: pl_netWorth,
   onboarding: pl_onboarding,
   paycheck: pl_paycheck,
   planner: pl_planner,
   project: pl_project,
+  regular: pl_regular,
   review: pl_review,
   saveMore: pl_saveMore,
   savings: pl_savings,

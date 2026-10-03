@@ -16,6 +16,15 @@ At the top of Insights, plain arithmetic done in the app:
 Under it, *Get recommendations* asks the AI about the month (see
 [AI](ai.md)).
 
+## Financial independence
+
+How much would let you live off your savings: 25 times a year of your typical
+spending (the "4% rule": take out 4% a year and the money is likely to
+last). The card shows how far along your savings are, and roughly how many
+years it is at the pace you've been saving (the average of the last six
+months), assuming 4% a year growth after inflation. An estimate to steer by;
+the numbers are `FIRE_MULTIPLE` and `FIRE_REAL_RETURN` in `src/config.ts`.
+
 ## Charts
 
 Six months back from the month picked at the top:

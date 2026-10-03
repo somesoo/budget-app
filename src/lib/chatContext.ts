@@ -43,6 +43,25 @@ export interface ChatContextInput {
     movements: SavingsMovement[]
     savedThisMonth: number
   }
+  /** Debts, net worth and regular costs, where the install has them. */
+  wealth?: {
+    debts: {
+      name: string
+      kind: string
+      owed: number
+      interestPercent: number | null
+      monthlyPayment: number
+      /** At its own payment; null when the payment doesn't cover the interest. */
+      paidOffBy: MonthKey | null
+    }[]
+    netWorth: { now: number; saved: number; owed: number; twelveMonthsAgo: number }
+    regularCosts: {
+      perMonth: number
+      perYear: number
+      rareBillsNeedPerMonth: number
+      items: { name: string; kind: string; amount: number; everyMonths: number; nextDue: string }[]
+    }
+  }
 }
 
 const who = (p: string | null) => (p ? (personLabel(p) ?? p) : null)
@@ -58,6 +77,7 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
     planNextMonth,
     alerts,
     savings,
+    wealth,
   } = input
   const name = new Map(categories.map((c) => [c.id, c.name]))
   const monthly = categories.filter((c) => c.kind !== 'project')
@@ -191,6 +211,9 @@ export function buildChatContext(input: ChatContextInput): Record<string, unknow
             })),
         }
       : null,
+    ...(wealth
+      ? { debts: wealth.debts, netWorth: wealth.netWorth, regularCosts: wealth.regularCosts }
+      : {}),
   }
 }
 

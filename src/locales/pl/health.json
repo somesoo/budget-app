@@ -41,5 +41,24 @@
   "markEmergency": {
     "message": "Oznacz cel jako poduszkę finansową (cel → Edytuj)",
     "context": "Money health card: link to Savings when no goal is the emergency fund."
+  },
+  "ageOfMoney": {
+    "message": "Wiek pieniędzy",
+    "context": "Money health card: how many days money waits between coming in and going out."
+  },
+  "ageOfMoneyRule": {
+    "message": "Ile czasu wypłata czeka, zanim ją wydacie; 30 dni lub więcej to życie z pieniędzy z zeszłego miesiąca.",
+    "context": "Money health card: what the age of money measures and the goal."
+  },
+  "ageOfMoneyHint": {
+    "message": "Zapisuj wypłaty, żeby go zobaczyć.",
+    "context": "Money health card: no income logged yet."
+  },
+  "days": {
+    "one": "{count} dzień",
+    "few": "{count} dni",
+    "many": "{count} dni",
+    "other": "{count} dnia",
+    "context": "Money health card: the age of money in days."
   }
 }

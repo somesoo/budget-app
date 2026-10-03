@@ -31,6 +31,14 @@
     "other": {
       "message": "Inne",
       "context": "Savings account kind."
+    },
+    "ppk": {
+      "message": "PPK",
+      "context": "Savings account kind: Polish workplace retirement savings plan (Pracownicze Plany Kapitałowe). Keep the acronym."
+    },
+    "bonds": {
+      "message": "Obligacje skarbowe",
+      "context": "Savings account kind: Polish government savings bonds (EDO, COI, …)."
     }
   },
   "joint": {
@@ -146,5 +154,13 @@
   "delete": {
     "message": "Usuń to konto",
     "context": "Account sheet: opens the delete confirmation."
+  },
+  "ppkHelp": {
+    "message": "Wpłaty swoje i pracodawcy (oraz dopłatę roczną od państwa) zapisuj jako wpłaty, a co jakiś czas aktualizuj saldo według wyciągu z PPK.",
+    "context": "New/edit savings account sheet: hint under the kind dropdown when PPK is chosen."
+  },
+  "bondsHelp": {
+    "message": "Zakup zapisuj jako wpłatę. Obligacje indeksowane (EDO, COI) rosną z inflacją: co jakiś czas aktualizuj saldo według konta obligacji.",
+    "context": "New/edit savings account sheet: hint under the kind dropdown when treasury bonds are chosen. 'Bond office' is the government savings bonds account."
   }
 }

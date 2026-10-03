@@ -1,0 +1,174 @@
+{
+  "title": {
+    "message": "Regular costs",
+    "context": "Budget tab: heading of the card with subscriptions and recurring bills."
+  },
+  "intro": {
+    "message": "Subscriptions and bills that come back, like the car insurance: add them to see what they cost a year and what to put aside.",
+    "context": "Regular costs card: empty state."
+  },
+  "totals": {
+    "message": "{monthly} a month, {yearly} a year.",
+    "context": "Regular costs card: totals. Both formatted money."
+  },
+  "subscriptions": {
+    "message": "Subscriptions",
+    "context": "Regular costs card: group heading."
+  },
+  "bills": {
+    "message": "Bills",
+    "context": "Regular costs card: group heading."
+  },
+  "subsEmpty": {
+    "message": "+ Add a subscription (streaming, gym, phone…)",
+    "context": "Regular costs card: empty subscriptions group, tap to add."
+  },
+  "billsEmpty": {
+    "message": "+ Add a bill (insurance, car service, taxes…)",
+    "context": "Regular costs card: empty bills group, tap to add."
+  },
+  "perMonth": {
+    "message": "{amount}/mo",
+    "context": "Regular costs: a monthly amount, short."
+  },
+  "yearly": {
+    "message": "{amount} a year",
+    "context": "Subscription review: the yearly cost."
+  },
+  "dueToday": {
+    "message": "due today",
+    "context": "Regular costs list: due today."
+  },
+  "dueIn": {
+    "one": "in {count} day, {date}",
+    "other": "in {count} days, {date}",
+    "context": "Regular costs list: due soon. {date} is a short date."
+  },
+  "setAside": {
+    "message": "The rarer bills need {amount} a month put aside.",
+    "context": "Regular costs card: monthly set-aside for bills paid every 2+ months."
+  },
+  "fundOk": {
+    "message": "{name} has {saved}: enough for what's coming.",
+    "context": "Regular costs card: the bills fund is on track. {name} is a goal."
+  },
+  "fundShort": {
+    "message": "{name} has {saved}; to pay the bills on time it should have {should} by now.",
+    "context": "Regular costs card: the bills fund is behind."
+  },
+  "noFund": {
+    "message": "No goal is set as the bills fund yet.",
+    "context": "Regular costs card: no bills fund."
+  },
+  "pickFund": {
+    "message": "Pick or add one on Savings",
+    "context": "Regular costs card: link to the Savings tab to mark a goal as the bills fund."
+  },
+  "reviewDue": {
+    "one": "{count} subscription hasn't been checked for 3 months.",
+    "other": "{count} subscriptions haven't been checked for 3 months.",
+    "context": "Regular costs card: prompt for the quarterly review."
+  },
+  "reviewNow": {
+    "message": "Review",
+    "context": "Regular costs card: link that opens the review."
+  },
+  "reviewTitle": {
+    "message": "Still worth it?",
+    "context": "Subscription review sheet title."
+  },
+  "reviewIntro": {
+    "message": "For each one: do you still use it enough for what it costs a year? Cancelled ones are put away here; cancel them with the provider too.",
+    "context": "Subscription review: intro."
+  },
+  "keep": {
+    "message": "Keep",
+    "context": "Subscription review: keep this one."
+  },
+  "cancelIt": {
+    "message": "Cancel",
+    "context": "Regular costs: cancel (stop) this subscription or bill; it's put away."
+  },
+  "restore": {
+    "message": "It's back",
+    "context": "Regular cost sheet: restore a cancelled one."
+  },
+  "reviewSaves": {
+    "message": "That's {amount} a year back in the budget.",
+    "context": "Subscription review: what cancelling saves a year."
+  },
+  "reviewDone": {
+    "message": "Done",
+    "context": "Subscription review: submit."
+  },
+  "new": {
+    "message": "New regular cost",
+    "context": "Regular cost sheet title."
+  },
+  "add": {
+    "message": "Add",
+    "context": "Regular cost sheet: submit."
+  },
+  "subscription": {
+    "message": "Subscription",
+    "context": "Regular cost sheet: kind."
+  },
+  "bill": {
+    "message": "Bill",
+    "context": "Regular cost sheet: kind."
+  },
+  "subPlaceholder": {
+    "message": "e.g. Netflix",
+    "context": "Regular cost sheet: name placeholder for a subscription."
+  },
+  "billPlaceholder": {
+    "message": "e.g. Car insurance",
+    "context": "Regular cost sheet: name placeholder for a bill."
+  },
+  "amount": {
+    "message": "Amount",
+    "context": "Regular cost sheet: label of the amount paid each time."
+  },
+  "how": {
+    "message": "How often",
+    "context": "Regular cost sheet: label of the frequency."
+  },
+  "due": {
+    "message": "Next due",
+    "context": "Regular cost sheet: label of the due date."
+  },
+  "dueHelp": {
+    "message": "Any date it's due; the next ones follow from it.",
+    "context": "Regular cost sheet: help under the due date."
+  },
+  "category": {
+    "message": "Category",
+    "context": "Regular cost sheet: the spending category it's logged under."
+  },
+  "noCategory": {
+    "message": "None",
+    "context": "Regular cost sheet: no category."
+  },
+  "every": {
+    "1": {
+      "message": "Monthly",
+      "context": "Frequency option."
+    },
+    "2": {
+      "message": "Every 2 months",
+      "context": "Frequency option."
+    },
+    "3": {
+      "message": "Quarterly",
+      "context": "Frequency option."
+    },
+    "6": {
+      "message": "Every 6 months",
+      "context": "Frequency option."
+    },
+    "12": {
+      "message": "Yearly",
+      "context": "Frequency option."
+    }
+  }
+}

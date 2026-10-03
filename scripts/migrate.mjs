@@ -13,7 +13,7 @@
  * app's API doesn't expose).
  *
  * A database set up before 1.0.0, with the files now in supabase/archive, is
- * taken as 1.0.0 when it has everything up to 0018. Otherwise it stops and
+ * taken as 1.0.0 when it has everything up to 0019. Otherwise it stops and
  * says so: set MIGRATIONS_BASELINE to the last archived migration it has
  * (e.g. 0015) and the ones after it run first. Mind 0017 before you do.
  *
@@ -87,15 +87,17 @@ async function run(path, name) {
 
 /** A database from before 1.0.0: bring it up to 1.0.0 with the archived files. */
 async function catchUp() {
-  const [{ secrets, spending }] = await sql`
+  // one thing each of the last migrations made: 0016, 0018, 0019
+  const [{ secrets, spending, debts }] = await sql`
     select to_regclass('public.app_secrets') is not null as secrets,
            exists (select 1 from information_schema.columns
                    where table_schema = 'public' and table_name = 'savings_movements'
-                     and column_name = 'expense_id') as spending`
+                     and column_name = 'expense_id') as spending,
+           to_regclass('public.debts') is not null as debts`
   const baseline = env.MIGRATIONS_BASELINE?.trim()
 
   if (!baseline) {
-    if (!(secrets && spending)) {
+    if (!(secrets && spending && debts)) {
       throw new Error(
         'This database was set up before 1.0.0 and lacks some of supabase/archive. ' +
           'Set MIGRATIONS_BASELINE to the last archived migration it has (e.g. 0015) ' +

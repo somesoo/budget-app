@@ -4,6 +4,8 @@ import { MoneyInput } from './MoneyInput'
 import { ownerLabel } from '../savings/AccountSheet'
 import { Select } from '../savings/fields'
 import type { SavingsOverview } from '../../hooks/useSavings'
+import { useRecurringCosts } from '../../hooks/useRecurring'
+import { regularTotals } from '../../lib/recurring'
 import {
   allocationKey,
   defaultGoalAccount,
@@ -56,6 +58,9 @@ export function SavingsSplit({
   const goalName = new Map(overview.goals.map((g) => [g.goal.id, g.goal.name]))
   const other = otherSavings(value.savings, value.allocations)
   const year = month.slice(0, 4)
+  // what the rarer regular bills need a month, for the goal they're paid from
+  const { data: regular } = useRecurringCosts()
+  const forBills = roundUpPlan(regularTotals(regular?.costs ?? []).setAside)
 
   return (
     <div className="mt-1 border-t border-white/10 pt-3">
@@ -91,6 +96,11 @@ export function SavingsSplit({
                   {needed !== null && needed > 0 && (
                     <Chip active={amount === needed} onClick={() => set(needed)}>
                       {t('split.onTime', { amount: formatAmount(needed) })}
+                    </Chip>
+                  )}
+                  {g.goal.is_bills_fund && forBills > 0 && (
+                    <Chip active={amount === forBills} onClick={() => set(forBills)}>
+                      {t('split.forBills', { amount: formatAmount(forBills) })}
                     </Chip>
                   )}
                   {g.remaining > 0 && (

@@ -1,0 +1,30 @@
+{
+  "title": {
+    "message": "Financial independence",
+    "context": "Insights: heading of the FIRE card."
+  },
+  "target": {
+    "message": "Living off your savings takes about {amount}: {multiple} times a year of your spending ({spending}).",
+    "context": "FIRE card: the target. {multiple} is a number (25), the rest formatted money."
+  },
+  "progress": {
+    "message": "Towards financial independence",
+    "context": "FIRE card: accessible label of the progress bar."
+  },
+  "years": {
+    "message": "At {monthly} a month, as you've been saving, that's about {years} years away.",
+    "context": "FIRE card: time to get there. {years} is a number like 18.5."
+  },
+  "notAtThisPace": {
+    "message": "At the pace you've been saving, not within a lifetime: every bit more a month brings it closer.",
+    "context": "FIRE card: never at this pace."
+  },
+  "reached": {
+    "message": "You're there: your savings could cover your spending for good.",
+    "context": "FIRE card: reached."
+  },
+  "note": {
+    "message": "The \"4% rule\": take out 4% a year and it's likely to last. Assumes {rate}% a year growth after inflation; an estimate to steer by.",
+    "context": "FIRE card: note. {rate} is a number."
+  }
+}

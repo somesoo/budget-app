@@ -1,0 +1,42 @@
+{
+  "title": {
+    "message": "Net worth",
+    "context": "Savings tab: heading of the net worth card (savings minus debts)."
+  },
+  "split": {
+    "message": "{assets} saved, {debts} owed.",
+    "context": "Net worth card: under the big number. Both formatted money."
+  },
+  "up": {
+    "message": "Up {amount} since {since}.",
+    "context": "Net worth card: change since the first month with data. {since} is 'March 2026'."
+  },
+  "down": {
+    "message": "Down {amount} since {since}.",
+    "context": "Net worth card: change since the first month with data."
+  },
+  "month": {
+    "message": "Month",
+    "context": "Net worth table header."
+  },
+  "assets": {
+    "message": "Saved",
+    "context": "Net worth table header."
+  },
+  "debts": {
+    "message": "Owed",
+    "context": "Net worth table header."
+  },
+  "net": {
+    "message": "Net worth",
+    "context": "Net worth table header."
+  },
+  "chartLabel": {
+    "message": "Net worth at each month's end, last 12 months",
+    "context": "Net worth chart: accessible label."
+  },
+  "debtsFrom": {
+    "message": "Debts count from the month they were first added; before that the bars show savings only.",
+    "context": "Net worth card: note when some debt was added within the chart's year."
+  }
+}

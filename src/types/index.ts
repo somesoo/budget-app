@@ -57,6 +57,8 @@ export interface Goal {
   note: string | null
   /** The emergency fund (migration 0013): measured in months of spending, filled first. */
   is_emergency: boolean
+  /** The fund the rarer regular bills are paid from (see RecurringCost). */
+  is_bills_fund: boolean
 }
 
 export type AccountKind =
@@ -67,6 +69,10 @@ export type AccountKind =
   /** Polish tax-free retirement accounts with a yearly contribution limit (migration 0010). */
   | 'ike'
   | 'ikze'
+  /** Pracownicze Plany Kapitałowe: workplace retirement savings, with the employer's and the state's part. */
+  | 'ppk'
+  /** Polish treasury bonds (EDO, COI, …), some indexed to inflation. */
+  | 'bonds'
   | 'cash'
   | 'other'
 
@@ -253,5 +259,59 @@ export interface ChatMessage {
   content: string
   /** Who asked; null for the assistant. */
   person: Person | null
+  created_at: string
+}
+
+export type DebtKind = 'mortgage' | 'loan' | 'card' | 'installments' | 'private' | 'other'
+
+/** Money owed: a mortgage, a loan, a card. What's owed is its latest DebtBalance. */
+export interface Debt {
+  id: string
+  name: string
+  kind: DebtKind
+  owner: Person | 'joint'
+  /** Yearly, in percent; null or 0 for interest-free instalments. */
+  interest_rate: number | null
+  /** The instalment, or for a card what's paid off it each month. */
+  monthly_payment: number
+  color: string
+  sort_order: number
+  /** Paid off and put away; still counted in net worth history. */
+  archived: boolean
+  note: string | null
+  created_at: string
+}
+
+/** What a debt stood at on a day: each update of the balance adds one. */
+export interface DebtBalance {
+  id: string
+  debt_id: string
+  /** ISO YYYY-MM-DD, local time. */
+  balance_date: string
+  balance: number
+  note: string | null
+  created_at: string
+}
+
+/**
+ * A cost that comes back every `every_months`: a subscription, or a bill
+ * like the car insurance. `due_on` is one date it's due; the next ones follow
+ * from it.
+ */
+export interface RecurringCost {
+  id: string
+  name: string
+  kind: 'subscription' | 'bill'
+  amount: number
+  every_months: 1 | 2 | 3 | 6 | 12
+  /** ISO YYYY-MM-DD. */
+  due_on: string
+  category_id: string | null
+  /** One person's; null when it's shared. */
+  owner: Person | null
+  archived: boolean
+  /** When it was last checked it's still wanted (subscriptions). */
+  reviewed_on: string | null
+  note: string | null
   created_at: string
 }

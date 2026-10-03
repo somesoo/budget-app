@@ -21,6 +21,8 @@ const ACCOUNT_KINDS: AccountKind[] = [
   'investment',
   'ike',
   'ikze',
+  'ppk',
+  'bonds',
   'retirement',
   'cash',
   'other',
@@ -201,6 +203,11 @@ export function AccountSheet({
             {owner === 'joint'
               ? t('account.retirementOwner', { kind: kind.toUpperCase() })
               : t('account.retirementHelp', { kind: kind.toUpperCase() })}
+          </p>
+        )}
+        {(kind === 'ppk' || kind === 'bonds') && (
+          <p className="-mt-2 text-xs leading-snug text-muted">
+            {kind === 'ppk' ? t('account.ppkHelp') : t('account.bondsHelp')}
           </p>
         )}
         <Field

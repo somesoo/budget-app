@@ -43,6 +43,7 @@ export function GoalSheet({
   const [starts, setStarts] = useState(trip?.starts_on ?? '')
   const [ends, setEnds] = useState(trip?.ends_on ?? '')
   const [emergency, setEmergency] = useState(goal?.is_emergency ?? false)
+  const [billsFund, setBillsFund] = useState(goal?.is_bills_fund ?? false)
   const [error, setError] = useState<string | null>(null)
 
   const datesOk = !starts || !ends || starts <= ends
@@ -61,6 +62,7 @@ export function GoalSheet({
         note: note.trim() || null,
         // only sent when it changes: the column arrives with migration 0013
         ...(emergency !== (goal?.is_emergency ?? false) ? { is_emergency: emergency } : {}),
+        ...(billsFund !== (goal?.is_bills_fund ?? false) ? { is_bills_fund: billsFund } : {}),
       })
       // migration 0009 carries name, colour and target over too; the dates are only here
       if (trip) {
@@ -170,6 +172,12 @@ export function GoalSheet({
           help={t('goalSheet.emergencyHelp')}
           checked={emergency}
           onChange={setEmergency}
+        />
+        <Switch
+          label={t('goalSheet.billsFund')}
+          help={t('goalSheet.billsFundHelp')}
+          checked={billsFund}
+          onChange={setBillsFund}
         />
         <Field label={t('goalSheet.note')}>
           <input

@@ -1,0 +1,30 @@
+{
+  "title": {
+    "message": "Niezależność finansowa",
+    "context": "Insights: heading of the FIRE card."
+  },
+  "target": {
+    "message": "Życie z oszczędności wymaga około {amount}: {multiple} razy tyle, ile wydajecie w rok ({spending}).",
+    "context": "FIRE card: the target. {multiple} is a number (25), the rest formatted money."
+  },
+  "progress": {
+    "message": "Postęp do niezależności finansowej",
+    "context": "FIRE card: accessible label of the progress bar."
+  },
+  "years": {
+    "message": "Odkładając {monthly} miesięcznie, jak dotąd, to około {years} lat.",
+    "context": "FIRE card: time to get there. {years} is a number like 18.5."
+  },
+  "notAtThisPace": {
+    "message": "W obecnym tempie oszczędzania nie w ciągu życia: każda złotówka więcej miesięcznie przybliża ten cel.",
+    "context": "FIRE card: never at this pace."
+  },
+  "reached": {
+    "message": "Jesteście u celu: oszczędności mogłyby pokrywać wydatki na zawsze.",
+    "context": "FIRE card: reached."
+  },
+  "note": {
+    "message": "„Zasada 4%”: wypłacając 4% rocznie, pieniądze najpewniej wystarczą. Zakłada {rate}% wzrostu rocznie ponad inflację; to szacunek orientacyjny.",
+    "context": "FIRE card: note. {rate} is a number."
+  }
+}

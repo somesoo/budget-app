@@ -1,0 +1,269 @@
+{
+  "title": {
+    "message": "Debts",
+    "context": "Savings tab: heading of the debts section (loans, mortgage, cards)."
+  },
+  "new": {
+    "message": "New debt",
+    "context": "Savings tab: button and sheet title for adding a debt."
+  },
+  "add": {
+    "message": "Add debt",
+    "context": "New debt sheet: the submit button."
+  },
+  "empty": {
+    "message": "A mortgage, a loan, a card or instalments: add them to see when you'll be free of them and what's left of your net worth.",
+    "context": "Savings tab: empty state of the debts section."
+  },
+  "addFirst": {
+    "message": "Add a debt",
+    "context": "Savings tab: button in the empty debts section."
+  },
+  "kind": {
+    "mortgage": {
+      "message": "Mortgage",
+      "context": "Debt kind."
+    },
+    "loan": {
+      "message": "Loan",
+      "context": "Debt kind: a cash or car loan."
+    },
+    "card": {
+      "message": "Credit card",
+      "context": "Debt kind."
+    },
+    "installments": {
+      "message": "Instalments",
+      "context": "Debt kind: buying on instalments, often 0%."
+    },
+    "private": {
+      "message": "From family or friends",
+      "context": "Debt kind: money borrowed privately."
+    },
+    "other": {
+      "message": "Other",
+      "context": "Debt kind."
+    }
+  },
+  "namePlaceholder": {
+    "message": "e.g. Car loan",
+    "context": "New debt sheet: placeholder of the name field."
+  },
+  "owedToday": {
+    "message": "Owed today",
+    "context": "New debt sheet: label of what's still owed."
+  },
+  "owedTodayHelp": {
+    "message": "What's left to pay back, as the bank shows it.",
+    "context": "New debt sheet: help under 'Owed today'."
+  },
+  "rate": {
+    "message": "Interest, % a year",
+    "context": "Debt sheet: label of the yearly interest rate."
+  },
+  "rateHelp": {
+    "message": "The actual rate (or RRSO); empty or 0 for 0% instalments.",
+    "context": "Debt sheet: help under the rate. RRSO is the Polish APR; keep it in Polish."
+  },
+  "payment": {
+    "message": "Monthly payment",
+    "context": "Debt sheet and page: the monthly instalment."
+  },
+  "paymentHelp": {
+    "message": "The instalment, or what you pay off a card each month.",
+    "context": "Debt sheet: help under the monthly payment."
+  },
+  "paidOff": {
+    "message": "Paid off: put it away",
+    "context": "Debt sheet: button that archives a debt once it's paid off."
+  },
+  "delete": {
+    "message": "Delete debt",
+    "context": "Debt sheet: delete button."
+  },
+  "deleteConfirm": {
+    "message": "Delete {name} and its history for good? To keep the history, mark it paid off instead.",
+    "context": "Debt sheet: delete confirmation. {name} is the debt's name."
+  },
+  "perMonth": {
+    "message": "{amount}/mo",
+    "context": "Debt card: the monthly payment, short. {amount} is formatted money."
+  },
+  "cleared": {
+    "message": "Paid off",
+    "context": "Debt card/page: nothing is owed any more."
+  },
+  "until": {
+    "message": "until {month}",
+    "context": "Debt card: when it'll be paid off at its own pace. {month} is 'March 2029'."
+  },
+  "never": {
+    "message": "payment below interest",
+    "context": "Debt card: the payment doesn't cover the interest, so it never ends."
+  },
+  "showPaidOff": {
+    "one": "Show {count} paid off",
+    "other": "Show {count} paid off",
+    "context": "Savings tab: toggle that shows debts marked paid off."
+  },
+  "hidePaidOff": {
+    "one": "Hide {count} paid off",
+    "other": "Hide {count} paid off",
+    "context": "Savings tab: toggle that hides debts marked paid off."
+  },
+  "planTitle": {
+    "message": "The way out of debt",
+    "context": "Savings tab: heading of the debt payoff plan card."
+  },
+  "avalanche": {
+    "message": "Dearest first",
+    "context": "Payoff plan: the avalanche strategy, highest interest first. Keep it short."
+  },
+  "snowball": {
+    "message": "Smallest first",
+    "context": "Payoff plan: the snowball strategy, smallest balance first. Keep it short."
+  },
+  "avalancheHelp": {
+    "message": "Every debt gets its payment; the extra goes to the one with the highest interest. It costs the least overall.",
+    "context": "Payoff plan: what the avalanche strategy does."
+  },
+  "snowballHelp": {
+    "message": "Every debt gets its payment; the extra goes to the smallest one. Quick wins keep you going.",
+    "context": "Payoff plan: what the snowball strategy does."
+  },
+  "extra": {
+    "message": "Extra a month",
+    "context": "Payoff plan: label of the extra amount put towards debts each month."
+  },
+  "planFree": {
+    "one": "Debt-free in {month}, in {count} month, with {interest} of interest on the way.",
+    "other": "Debt-free in {month}, in {count} months, with {interest} of interest on the way.",
+    "context": "Payoff plan result. {month} is 'March 2029' (nominative in Polish), {count} the months, {interest} formatted money."
+  },
+  "planBetter": {
+    "one": "{count} month sooner and {amount} less interest than paying each on its own.",
+    "other": "{count} months sooner and {amount} less interest than paying each on its own.",
+    "context": "Payoff plan: what the plan gains over paying each debt separately."
+  },
+  "planLess": {
+    "message": "{amount} less interest than paying each on its own.",
+    "context": "Payoff plan: the interest saved when it isn't sooner."
+  },
+  "planNever": {
+    "message": "At these payments some debts never end: {names}. Their payment doesn't cover the interest; raise it or add extra.",
+    "context": "Payoff plan warning. {names} lists debt names."
+  },
+  "planNote": {
+    "message": "The order, and when each one is paid off. An estimate: interest is worked out monthly and rates change. The extra and the choice stay on this phone.",
+    "context": "Payoff plan: note under the list."
+  },
+  "update": {
+    "message": "Update {name}",
+    "context": "Debt update sheet title. {name} is the debt."
+  },
+  "updateShort": {
+    "message": "Update",
+    "context": "Debt page: button that opens the update sheet."
+  },
+  "modeInstalment": {
+    "message": "Instalment",
+    "context": "Debt update: mode, this month's instalment paid. Keep it short."
+  },
+  "modeOverpay": {
+    "message": "Overpaid",
+    "context": "Debt update: mode, paid extra. Keep it short."
+  },
+  "modeBalance": {
+    "message": "Bank",
+    "context": "Debt update: mode, type the balance the bank shows. Keep it short."
+  },
+  "instalmentPaid": {
+    "message": "Instalment paid",
+    "context": "Debt update: label of the instalment amount."
+  },
+  "instalmentHelp": {
+    "message": "Of it, about {interest} is this month's interest; the rest comes off what's owed. Log the instalment as an expense too, if you haven't.",
+    "context": "Debt update: help. {interest} is formatted money."
+  },
+  "overpaid": {
+    "message": "Overpaid",
+    "context": "Debt update: label of the overpayment."
+  },
+  "overpaidHelp": {
+    "message": "All of it comes off what's owed.",
+    "context": "Debt update: help under the overpayment."
+  },
+  "bankBalance": {
+    "message": "Owed, per the bank",
+    "context": "Debt update: label of the balance typed from the bank."
+  },
+  "bankBalanceHelp": {
+    "message": "The most accurate: the app's estimate is replaced by it.",
+    "context": "Debt update: help under the bank balance."
+  },
+  "date": {
+    "message": "Date",
+    "context": "Debt update: label of the date field."
+  },
+  "willOwe": {
+    "message": "Owed: {from} → {to}",
+    "context": "Debt update: the change it will make. Both are formatted money."
+  },
+  "noteInstalment": {
+    "message": "Instalment",
+    "context": "Debt history: note on a balance after an instalment."
+  },
+  "noteOverpay": {
+    "message": "Overpaid {amount}",
+    "context": "Debt history: note on a balance after an overpayment."
+  },
+  "noteBank": {
+    "message": "Balance from the bank",
+    "context": "Debt history: note on a balance typed from the bank."
+  },
+  "owed": {
+    "message": "Owed",
+    "context": "Debt page: stat label."
+  },
+  "paidOffBy": {
+    "message": "Paid off by",
+    "context": "Debt page: stat label, the month it ends."
+  },
+  "doneText": {
+    "message": "Nothing owed any more. Mark it paid off in Edit to put it away.",
+    "context": "Debt page: text once it's paid off."
+  },
+  "neverText": {
+    "message": "This month's interest is {interest} and the payment {payment}: at this pace it never ends. Raise the payment or overpay.",
+    "context": "Debt page: the payment doesn't cover the interest."
+  },
+  "paceText": {
+    "one": "At this payment it's paid off in {month}, in {count} month, with {interest} of interest still to pay.",
+    "other": "At this payment it's paid off in {month}, in {count} months, with {interest} of interest still to pay.",
+    "context": "Debt page. {month} is 'March 2029', {count} months, {interest} formatted money."
+  },
+  "interestNow": {
+    "message": "Interest this month: about {amount}. Every overpayment saves it from then on.",
+    "context": "Debt page: this month's interest."
+  },
+  "paidDown": {
+    "message": "{amount} paid down since {date}.",
+    "context": "Debt page: progress since the first balance. {date} is a long date."
+  },
+  "history": {
+    "message": "Balances",
+    "context": "Debt page: heading of the balance history."
+  },
+  "historyEmpty": {
+    "message": "No balance yet: Update adds the first one.",
+    "context": "Debt page: empty history."
+  },
+  "deleteEntry": {
+    "message": "Delete the balance from {date}",
+    "context": "Debt page: label of the delete button on a history row."
+  },
+  "gone": {
+    "message": "This debt isn't here any more.",
+    "context": "Debt page: opened for a deleted debt."
+  }
+}

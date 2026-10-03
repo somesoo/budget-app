@@ -2,6 +2,7 @@ import {
   ArrowsLeftRight,
   ArrowUp,
   Bank,
+  CreditCard,
   Coins,
   PiggyBank,
   Plus,
@@ -18,6 +19,12 @@ import { AccountCard, GoalCard } from '../components/savings/cards'
 import { LoansCard, SavingsAssistant } from '../components/savings/SavingsAssistant'
 import { GoalSheet } from '../components/savings/GoalSheet'
 import { MoneySheet, type MoneyMode } from '../components/savings/MoneySheet'
+import { DebtCard } from '../components/debts/DebtCard'
+import { DebtSheet } from '../components/debts/DebtSheet'
+import { NetWorthCard } from '../components/debts/NetWorthCard'
+import { PayoffPlanCard } from '../components/debts/PayoffPlanCard'
+import { useWealth } from '../hooks/useWealth'
+import { payoff } from '../lib/debts'
 import { useGoalTrips } from '../hooks/useGoalTrips'
 import { useTypicalSpending } from '../hooks/useTypicalSpending'
 import { useSavingsOverview } from '../hooks/useSavings'
@@ -31,6 +38,7 @@ type Sheet =
   | { kind: 'money'; mode: MoneyMode; goalId?: string }
   | { kind: 'account' }
   | { kind: 'goal' }
+  | { kind: 'debt' }
   | null
 
 /**
@@ -45,6 +53,10 @@ export function Savings() {
   const trips = useGoalTrips()
   const spentFrom = (goalId: string) => trips.tripOf(goalId)?.spent ?? 0
   const emergency = useEmergencyHint()
+  const wealth = useWealth()
+  const [showPaidOff, setShowPaidOff] = useState(false)
+  const openDebts = wealth.debts.filter((d) => !d.archived)
+  const paidOff = wealth.debts.filter((d) => d.archived)
 
   const month = currentMonthKey()
   const openGoals = s.goals.filter((g) => !g.goal.archived)
@@ -274,6 +286,70 @@ export function Savings() {
         </section>
       </div>
 
+      {/* ---------- debts and net worth ---------- */}
+      {wealth.available && (
+        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+          <section aria-labelledby="debts" data-tour="savings-debts" className="space-y-4">
+            <div>
+              <SectionHead
+                id="debts"
+                title={t('debts.title')}
+                onAdd={() => setSheet({ kind: 'debt' })}
+                addLabel={t('debts.new')}
+              />
+              {openDebts.length === 0 ? (
+                <Empty
+                  icon={<CreditCard aria-hidden />}
+                  text={t('debts.empty')}
+                  cta={t('debts.addFirst')}
+                  onClick={() => setSheet({ kind: 'debt' })}
+                />
+              ) : (
+                <ul className="grid gap-2">
+                  {openDebts.map((d) => (
+                    <DebtCard
+                      key={d.id}
+                      debt={d}
+                      owed={wealth.owed(d.id)}
+                      payoff={payoff(wealth.owed(d.id), d.interest_rate, d.monthly_payment, month)}
+                      history={wealth.history(d.id)}
+                    />
+                  ))}
+                </ul>
+              )}
+              {paidOff.length > 0 && (
+                <Toggle
+                  open={showPaidOff}
+                  onClick={() => setShowPaidOff((v) => !v)}
+                  showLabel={t('debts.showPaidOff', { count: paidOff.length })}
+                  hideLabel={t('debts.hidePaidOff', { count: paidOff.length })}
+                />
+              )}
+              {showPaidOff && (
+                <ul className="mt-2 grid gap-2 opacity-70">
+                  {paidOff.map((d) => (
+                    <DebtCard
+                      key={d.id}
+                      debt={d}
+                      owed={wealth.owed(d.id)}
+                      payoff={payoff(wealth.owed(d.id), d.interest_rate, d.monthly_payment, month)}
+                      history={wealth.history(d.id)}
+                    />
+                  ))}
+                </ul>
+              )}
+            </div>
+            {wealth.planInput.length > 0 && (
+              <PayoffPlanCard debts={wealth.debts} input={wealth.planInput} />
+            )}
+          </section>
+          <div data-tour="net-worth">
+            <NetWorthCard points={wealth.netWorth} debtsKnownFrom={wealth.debtsKnownFrom} />
+          </div>
+        </div>
+      )}
+
+      {sheet?.kind === 'debt' && <DebtSheet onClose={() => setSheet(null)} />}
       {sheet?.kind === 'money' && (
         <MoneySheet
           mode={sheet.mode}

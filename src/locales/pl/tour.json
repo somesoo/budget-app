@@ -125,7 +125,7 @@
       "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
     },
     "body": {
-      "message": "Trzy liczby warte obserwowania: ile dochodu odkładacie, ile idzie na czynsz i rachunki i na ile miesięcy wystarczy poduszka finansowa.",
+      "message": "Cztery liczby warte obserwowania: ile dochodu odkładacie, ile idzie na czynsz i rachunki, na ile miesięcy wystarczy poduszka finansowa i ile wypłata czeka, zanim ją wydacie.",
       "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
     }
   },
@@ -239,6 +239,50 @@
     "finish": {
       "message": "Zaczynamy",
       "context": "Guided tour: the main button on the last card; ends the tour."
+    }
+  },
+  "regular-costs": {
+    "title": {
+      "message": "Stałe koszty",
+      "context": "Guided tour, step 'regular-costs' on the Budget screen (pointing at the regular costs card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Subskrypcje i powracające rachunki. Widać, ile kosztują rocznie, co wkrótce do zapłaty i ile miesięcznie odkładać na te rzadsze (jak OC auta).",
+      "context": "Guided tour, step 'regular-costs' on the Budget screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Co trzy miesiące zapyta, czy każda subskrypcja jest nadal warta swojej ceny.",
+      "context": "Guided tour, step 'regular-costs': smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "savings-debts": {
+    "title": {
+      "message": "Długi",
+      "context": "Guided tour, step 'savings-debts' on the Savings screen (pointing at the debts section): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Kredyt, pożyczki, karty: kiedy każdy dług zniknie, i plan, który kieruje nadpłatę na najmniejszy albo najdroższy najpierw.",
+      "context": "Guided tour, step 'savings-debts' on the Savings screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "net-worth": {
+    "title": {
+      "message": "Majątek netto",
+      "context": "Guided tour, step 'net-worth' on the Savings screen (pointing at the net worth card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "To, co macie, minus to, co jesteście winni, miesiąc po miesiącu. Jedna liczba, która podsumowuje wszystko: powinna rosnąć.",
+      "context": "Guided tour, step 'net-worth' on the Savings screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "fire": {
+    "title": {
+      "message": "Niezależność finansowa",
+      "context": "Guided tour, step 'fire' on the Insights screen (pointing at the FIRE card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Ile potrzeba, żeby żyć z oszczędności, jak daleko już jesteście i za ile lat w obecnym tempie.",
+      "context": "Guided tour, step 'fire' on the Insights screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
     }
   }
 }

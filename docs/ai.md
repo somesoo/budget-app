@@ -25,7 +25,8 @@ Without a key, each AI feature says where to add one.
   card's "What gets sent to Gemini?" link says the same.
 - **Plan draft**: monthly totals per category and of income for up to 12
   months, the goals and your note, as you wrote it.
-- **Ask**: a summary of the household's data and the conversation.
+- **Ask**: a summary of the household's data (including debts, net worth and
+  regular costs) and the conversation.
 
 Allowances ([Adding](adding.md#allowances)) are left out on the phones they
 aren't shown on.

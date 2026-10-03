@@ -525,7 +525,7 @@ function datesOf(from: string | null, to: string | null): string | null {
   return null
 }
 
-function Frame({
+export function Frame({
   back,
   title,
   color,
@@ -615,7 +615,7 @@ function Actions({ modes, onPick }: { modes: MoneyMode[]; onPick: (m: MoneyMode)
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+export function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
       <p className="truncate text-xs text-muted">{label}</p>

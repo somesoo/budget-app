@@ -31,6 +31,14 @@
     "other": {
       "message": "Other",
       "context": "Savings account kind."
+    },
+    "ppk": {
+      "message": "PPK",
+      "context": "Savings account kind: Polish workplace retirement savings plan (Pracownicze Plany Kapitałowe). Keep the acronym."
+    },
+    "bonds": {
+      "message": "Treasury bonds",
+      "context": "Savings account kind: Polish government savings bonds (EDO, COI, …)."
     }
   },
   "joint": {
@@ -142,5 +150,13 @@
   "delete": {
     "message": "Delete this account",
     "context": "Account sheet: opens the delete confirmation."
+  },
+  "ppkHelp": {
+    "message": "Log what you and your employer pay in (and the state's yearly bonus) as deposits, and update the balance from the PPK statement now and then.",
+    "context": "New/edit savings account sheet: hint under the kind dropdown when PPK is chosen."
+  },
+  "bondsHelp": {
+    "message": "Log what you buy as deposits. Indexed bonds (EDO, COI) grow with inflation: update the balance from your account at the bond office now and then.",
+    "context": "New/edit savings account sheet: hint under the kind dropdown when treasury bonds are chosen. 'Bond office' is the government savings bonds account."
   }
 }

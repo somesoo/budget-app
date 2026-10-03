@@ -18,6 +18,7 @@ function normalizeGoal(row: Record<string, unknown>): Goal {
     note: (row.note as string | null) ?? null,
     // absent until migration 0013
     is_emergency: row.is_emergency === true,
+    is_bills_fund: row.is_bills_fund === true,
   }
 }
 
@@ -92,6 +93,15 @@ export function useUpsertGoal() {
           .update({ is_emergency: false })
           .neq('id', id)
           .eq('is_emergency', true)
+        if (error) throw error
+      }
+      // and one bills fund
+      if (fields.is_bills_fund) {
+        const { error } = await supabase
+          .from('goals')
+          .update({ is_bills_fund: false })
+          .neq('id', id)
+          .eq('is_bills_fund', true)
         if (error) throw error
       }
       return id

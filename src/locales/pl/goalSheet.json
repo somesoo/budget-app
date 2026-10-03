@@ -58,5 +58,13 @@
   "unarchive": {
     "message": "Przywróć",
     "context": "Goal sheet: restores a closed goal."
+  },
+  "billsFund": {
+    "message": "Z tego płacimy rzadsze rachunki",
+    "context": "Goal sheet: switch that marks the goal as the fund for bills that come every few months (car insurance and the like)."
+  },
+  "billsFundHelp": {
+    "message": "Karta stałych kosztów na zakładce Budżet podpowie, ile miesięcznie tu odkładać i czy wystarczy, gdy przyjdzie kolejny rachunek.",
+    "context": "Goal sheet: help under the bills fund switch."
   }
 }

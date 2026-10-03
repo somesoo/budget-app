@@ -1,7 +1,7 @@
 # Savings
 
 An **account** is *where* money is: a savings account, a deposit, IKE or
-IKZE, cash. Its balance is the sum of what's been booked on it. A **goal** is
+IKZE, PPK, treasury bonds, cash. Its balance is the sum of what's been booked on it. A **goal** is
 *what* money is for: a trip, a car, the emergency fund. Part of an account's
 balance is assigned to goals; whatever isn't is *unassigned*. A goal can draw
 on several accounts, an account can fund several goals.
@@ -58,6 +58,47 @@ difference is booked as a balance correction and set aside for the goal, not
 as a deposit, so it's no part of the month's saving, spending or *Safe to
 spend*.
 
+## Debts
+
+A mortgage, a loan, a credit card, instalments, money from family: each one
+with what's owed, its interest and its monthly payment. The list says when
+each is paid off at its own pace; a debt's page has the rest.
+
+- **Update** brings what's owed up to date: *Instalment* (this month's
+  interest added, the payment taken off), *Overpaid* (all of it comes off), or
+  *Bank* (the balance the bank shows, the most accurate). Each update is kept,
+  so the page shows how it went down. The instalment itself is an expense
+  like any other: log it in its category too.
+- When the payment doesn't even cover the interest, the app says so: at that
+  pace the debt never ends.
+- A paid-off debt is put away with *Paid off* in Edit; it stays in the net
+  worth history.
+
+### The way out of debt
+
+With at least one debt, a plan card works out when you'll be debt-free.
+Every debt gets its own payment; *Extra a month* goes on top, onto one debt
+at a time:
+
+- **Dearest first** (the "avalanche"): the highest interest first. It costs
+  the least overall.
+- **Smallest first** (the "snowball"): the smallest balance first. Quick wins
+  keep you going.
+
+When one is paid off, its payment joins the extra for the next. The card
+shows the debt-free month, the interest on the way, how much sooner and
+cheaper that is than paying each debt on its own, and the order with each
+one's payoff month. The extra and the choice are a what-if kept on this
+phone. Interest is worked out monthly; rates change, so it's an estimate.
+
+## Net worth
+
+What you have minus what you owe: everything on the savings accounts minus
+every debt, at each month's end over the last year, with the change since a
+year ago. With a mortgage it's below zero for years, which is normal; what
+matters is that it climbs. A debt counts from the month it was first added;
+before that the bars show savings only, and the card says so.
+
 ## IKE, IKZE and investments: gains and losses
 
 Log what you pay in as deposits: they're what counts toward the yearly limit
@@ -65,6 +106,11 @@ and as saving. The value moves by itself, so now and then (monthly, or each
 quarter) update the balance to what the provider shows. The difference is the
 gain or loss, shown on the account's page as *Put in / Worth now / Gained*,
 and it counts neither as saving nor against the limit.
+
+**PPK**: log what you and your employer pay in, and the state's yearly bonus,
+as deposits, and update the balance from the PPK statement now and then.
+**Treasury bonds**: log a purchase as a deposit; indexed bonds (EDO, COI) grow
+with inflation, so update the balance from your bond account now and then.
 
 ## Hiding or deleting an account
 

@@ -7,6 +7,7 @@ import { useProjectSummaries } from '../hooks/useProjectSummaries'
 import type { BudgetAlert } from '../lib/alerts'
 import type { ProjectSummary } from '../lib/projects'
 import { ForecastCard } from '../components/ForecastCard'
+import { FireCard } from '../components/FireCard'
 import { MonthSwitcher } from '../components/MonthSwitcher'
 import { Screen } from '../components/Screen'
 import { CategoryDeltaBars } from '../components/charts/CategoryDeltaBars'
@@ -203,6 +204,8 @@ function InsightsBody({
           />
 
           <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
+
+          {isCurrent && <FireCard />}
 
           <ChartCard
             title={isCurrent ? t('insights.paceTitle') : t('insights.paceThrough', { month: monthName })}

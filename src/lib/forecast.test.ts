@@ -46,6 +46,7 @@ const goal: Goal = {
   archived: false,
   note: null,
   is_emergency: false,
+  is_bills_fund: false,
 }
 
 beforeEach(() => {

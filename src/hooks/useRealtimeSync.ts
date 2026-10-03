@@ -6,6 +6,8 @@ import { categoriesKey } from './useCategories'
 import { goalsKey } from './useGoal'
 import { chatKey } from './useChat'
 import { savingsKey } from './useSavings'
+import { debtsKey } from './useDebts'
+import { recurringKey } from './useRecurring'
 
 export type SyncStatus = 'connecting' | 'live' | 'offline'
 
@@ -101,6 +103,20 @@ export function useRealtimeSync(): SyncStatus {
       })
       .subscribe()
 
+    // debts and regular costs (migration 0019), apart for the same reason
+    const wealth = supabase
+      .channel('budget-app-wealth')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'debts' }, () => {
+        void qc.invalidateQueries({ queryKey: debtsKey })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'debt_balances' }, () => {
+        void qc.invalidateQueries({ queryKey: debtsKey })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'recurring_costs' }, () => {
+        void qc.invalidateQueries({ queryKey: recurringKey })
+      })
+      .subscribe()
+
     // coming back after the phone was asleep — pull in anything we missed
     const onVisible = () => {
       if (document.visibilityState === 'visible') void qc.invalidateQueries()
@@ -111,6 +127,7 @@ export function useRealtimeSync(): SyncStatus {
       document.removeEventListener('visibilitychange', onVisible)
       void supabase.removeChannel(channel)
       void supabase.removeChannel(savings)
+      void supabase.removeChannel(wealth)
     }
   }, [qc])
 

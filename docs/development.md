@@ -57,7 +57,7 @@ api/              # Vercel functions
 supabase/
 ├── schema.sql    # the database of 1.0.0
 ├── migrations/   # changes since, run on deploy
-└── archive/      # how 1.0.0 was built, 0001–0018
+└── archive/      # how 1.0.0 was built, 0001–0019
 scripts/
 ├── migrate.mjs   # runs schema.sql / migrations, on every production build
 └── i18n.mjs

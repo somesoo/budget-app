@@ -125,7 +125,7 @@
       "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
     },
     "body": {
-      "message": "Three numbers worth watching: how much of the income you save, how much goes on rent and bills, and how many months the emergency fund would last.",
+      "message": "Four numbers worth watching: how much of the income you save, how much goes on rent and bills, how many months the emergency fund would last, and how long pay waits before it's spent.",
       "context": "Guided tour, step 'health' on the Budget screen (pointing at the money health card): main text of the tour card. Keep it roughly the same length; the card is small on a phone."
     }
   },
@@ -239,6 +239,50 @@
     "finish": {
       "message": "Start using it",
       "context": "Guided tour: the main button on the last card; ends the tour."
+    }
+  },
+  "regular-costs": {
+    "title": {
+      "message": "Regular costs",
+      "context": "Guided tour, step 'regular-costs' on the Budget screen (pointing at the regular costs card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "Subscriptions and the bills that come back. You see what they cost a year, what's due soon, and what the rarer ones (like the car insurance) need put aside each month.",
+      "context": "Guided tour, step 'regular-costs' on the Budget screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "tip": {
+      "message": "Every three months it asks whether each subscription is still worth it.",
+      "context": "Guided tour, step 'regular-costs': smaller hint line under the main text. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "savings-debts": {
+    "title": {
+      "message": "Debts",
+      "context": "Guided tour, step 'savings-debts' on the Savings screen (pointing at the debts section): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "A mortgage, loans, cards: when each is paid off, and a plan that puts any extra on the smallest or the dearest first.",
+      "context": "Guided tour, step 'savings-debts' on the Savings screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "net-worth": {
+    "title": {
+      "message": "Net worth",
+      "context": "Guided tour, step 'net-worth' on the Savings screen (pointing at the net worth card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "What you have minus what you owe, month by month. The one number that sums it all up: it should climb.",
+      "context": "Guided tour, step 'net-worth' on the Savings screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
+    }
+  },
+  "fire": {
+    "title": {
+      "message": "Financial independence",
+      "context": "Guided tour, step 'fire' on the Insights screen (pointing at the FIRE card): heading of the tour card. Keep it roughly the same length; the card is small on a phone."
+    },
+    "body": {
+      "message": "How much would let you live off your savings, how far along you are, and how many years away it is at your pace.",
+      "context": "Guided tour, step 'fire' on the Insights screen: main text of the tour card. Keep it roughly the same length; the card is small on a phone."
     }
   }
 }

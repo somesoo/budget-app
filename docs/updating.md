@@ -24,7 +24,7 @@ What has run is recorded in the database, in `app_meta.migrations`.
 ## An install from before 1.0.0
 
 Those were built step by step from the files now in `supabase/archive`
-(0001–0018). The first deploy with `DATABASE_URL` looks at what's there:
+(0001–0019). The first deploy with `DATABASE_URL` looks at what's there:
 
 - **It has all of them**: recorded as 1.0.0, and it carries on from there.
 - **It doesn't**: the deploy stops and says so. Set `MIGRATIONS_BASELINE` on

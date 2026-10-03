@@ -1,0 +1,42 @@
+{
+  "title": {
+    "message": "Majątek netto",
+    "context": "Savings tab: heading of the net worth card (savings minus debts)."
+  },
+  "split": {
+    "message": "{assets} oszczędności, {debts} długów.",
+    "context": "Net worth card: under the big number. Both formatted money."
+  },
+  "up": {
+    "message": "Wzrost o {amount} od: {since}.",
+    "context": "Net worth card: change since the first month with data. {since} is 'March 2026'."
+  },
+  "down": {
+    "message": "Spadek o {amount} od: {since}.",
+    "context": "Net worth card: change since the first month with data."
+  },
+  "month": {
+    "message": "Miesiąc",
+    "context": "Net worth table header."
+  },
+  "assets": {
+    "message": "Oszczędności",
+    "context": "Net worth table header."
+  },
+  "debts": {
+    "message": "Długi",
+    "context": "Net worth table header."
+  },
+  "net": {
+    "message": "Netto",
+    "context": "Net worth table header."
+  },
+  "chartLabel": {
+    "message": "Majątek netto na koniec każdego miesiąca, ostatnie 12 miesięcy",
+    "context": "Net worth chart: accessible label."
+  },
+  "debtsFrom": {
+    "message": "Długi liczą się od miesiąca, w którym je dodano; wcześniej słupki pokazują same oszczędności.",
+    "context": "Net worth card: note when some debt was added within the chart's year."
+  }
+}

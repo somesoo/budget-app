@@ -1,0 +1,178 @@
+{
+  "title": {
+    "message": "Stałe koszty",
+    "context": "Budget tab: heading of the card with subscriptions and recurring bills."
+  },
+  "intro": {
+    "message": "Subskrypcje i powracające rachunki, jak OC auta: dodaj je, żeby zobaczyć, ile kosztują rocznie i ile odkładać.",
+    "context": "Regular costs card: empty state."
+  },
+  "totals": {
+    "message": "{monthly} miesięcznie, {yearly} rocznie.",
+    "context": "Regular costs card: totals. Both formatted money."
+  },
+  "subscriptions": {
+    "message": "Subskrypcje",
+    "context": "Regular costs card: group heading."
+  },
+  "bills": {
+    "message": "Rachunki",
+    "context": "Regular costs card: group heading."
+  },
+  "subsEmpty": {
+    "message": "+ Dodaj subskrypcję (streaming, siłownia, telefon…)",
+    "context": "Regular costs card: empty subscriptions group, tap to add."
+  },
+  "billsEmpty": {
+    "message": "+ Dodaj rachunek (ubezpieczenie, przegląd auta, podatki…)",
+    "context": "Regular costs card: empty bills group, tap to add."
+  },
+  "perMonth": {
+    "message": "{amount}/mies.",
+    "context": "Regular costs: a monthly amount, short."
+  },
+  "yearly": {
+    "message": "{amount} rocznie",
+    "context": "Subscription review: the yearly cost."
+  },
+  "dueToday": {
+    "message": "płatne dziś",
+    "context": "Regular costs list: due today."
+  },
+  "dueIn": {
+    "one": "za {count} dzień, {date}",
+    "few": "za {count} dni, {date}",
+    "many": "za {count} dni, {date}",
+    "other": "za {count} dnia, {date}",
+    "context": "Regular costs list: due soon. {date} is a short date."
+  },
+  "setAside": {
+    "message": "Na rzadsze rachunki trzeba odkładać {amount} miesięcznie.",
+    "context": "Regular costs card: monthly set-aside for bills paid every 2+ months."
+  },
+  "fundOk": {
+    "message": "{name} ma {saved}: wystarczy na to, co nadchodzi.",
+    "context": "Regular costs card: the bills fund is on track. {name} is a goal."
+  },
+  "fundShort": {
+    "message": "{name} ma {saved}; żeby zapłacić rachunki na czas, powinien mieć już {should}.",
+    "context": "Regular costs card: the bills fund is behind."
+  },
+  "noFund": {
+    "message": "Żaden cel nie jest jeszcze funduszem na rachunki.",
+    "context": "Regular costs card: no bills fund."
+  },
+  "pickFund": {
+    "message": "Wybierz lub dodaj go w Oszczędnościach",
+    "context": "Regular costs card: link to the Savings tab to mark a goal as the bills fund."
+  },
+  "reviewDue": {
+    "one": "{count} subskrypcja nie była sprawdzana od 3 miesięcy.",
+    "few": "{count} subskrypcje nie były sprawdzane od 3 miesięcy.",
+    "many": "{count} subskrypcji nie było sprawdzanych od 3 miesięcy.",
+    "other": "{count} subskrypcji nie było sprawdzanych od 3 miesięcy.",
+    "context": "Regular costs card: prompt for the quarterly review."
+  },
+  "reviewNow": {
+    "message": "Przejrzyj",
+    "context": "Regular costs card: link that opens the review."
+  },
+  "reviewTitle": {
+    "message": "Czy nadal warto?",
+    "context": "Subscription review sheet title."
+  },
+  "reviewIntro": {
+    "message": "Przy każdej: czy nadal korzystasz z niej na tyle, by była warta swojej rocznej ceny? Anulowane chowamy tutaj; anuluj je też u dostawcy.",
+    "context": "Subscription review: intro."
+  },
+  "keep": {
+    "message": "Zostaje",
+    "context": "Subscription review: keep this one."
+  },
+  "cancelIt": {
+    "message": "Anuluj",
+    "context": "Regular costs: cancel (stop) this subscription or bill; it's put away."
+  },
+  "restore": {
+    "message": "Wróciła",
+    "context": "Regular cost sheet: restore a cancelled one."
+  },
+  "reviewSaves": {
+    "message": "To {amount} rocznie z powrotem w budżecie.",
+    "context": "Subscription review: what cancelling saves a year."
+  },
+  "reviewDone": {
+    "message": "Gotowe",
+    "context": "Subscription review: submit."
+  },
+  "new": {
+    "message": "Nowy stały koszt",
+    "context": "Regular cost sheet title."
+  },
+  "add": {
+    "message": "Dodaj",
+    "context": "Regular cost sheet: submit."
+  },
+  "subscription": {
+    "message": "Subskrypcja",
+    "context": "Regular cost sheet: kind."
+  },
+  "bill": {
+    "message": "Rachunek",
+    "context": "Regular cost sheet: kind."
+  },
+  "subPlaceholder": {
+    "message": "np. Netflix",
+    "context": "Regular cost sheet: name placeholder for a subscription."
+  },
+  "billPlaceholder": {
+    "message": "np. OC samochodu",
+    "context": "Regular cost sheet: name placeholder for a bill."
+  },
+  "amount": {
+    "message": "Kwota",
+    "context": "Regular cost sheet: label of the amount paid each time."
+  },
+  "how": {
+    "message": "Jak często",
+    "context": "Regular cost sheet: label of the frequency."
+  },
+  "due": {
+    "message": "Najbliższy termin",
+    "context": "Regular cost sheet: label of the due date."
+  },
+  "dueHelp": {
+    "message": "Dowolny termin płatności; kolejne aplikacja wyliczy sama.",
+    "context": "Regular cost sheet: help under the due date."
+  },
+  "category": {
+    "message": "Kategoria",
+    "context": "Regular cost sheet: the spending category it's logged under."
+  },
+  "noCategory": {
+    "message": "Brak",
+    "context": "Regular cost sheet: no category."
+  },
+  "every": {
+    "1": {
+      "message": "Co miesiąc",
+      "context": "Frequency option."
+    },
+    "2": {
+      "message": "Co 2 miesiące",
+      "context": "Frequency option."
+    },
+    "3": {
+      "message": "Co kwartał",
+      "context": "Frequency option."
+    },
+    "6": {
+      "message": "Co pół roku",
+      "context": "Frequency option."
+    },
+    "12": {
+      "message": "Raz w roku",
+      "context": "Frequency option."
+    }
+  }
+}

@@ -10,6 +10,7 @@ import { AlertList } from '../components/alerts/AlertList'
 import { AskLink } from '../components/AskLink'
 import { MonthReviewCard } from '../components/budget/MonthReviewCard'
 import { HealthCard } from '../components/budget/HealthCard'
+import { RegularCostsCard } from '../components/regular/RegularCostsCard'
 import { PaycheckCard } from '../components/budget/PaycheckCard'
 import { ProjectsCard } from '../components/projects/ProjectsCard'
 import { useProjectSummaries } from '../hooks/useProjectSummaries'
@@ -293,6 +294,8 @@ function MonthStatus({
           )}
 
           <HealthCard month={month} categories={shown} />
+
+          {isCurrent && <RegularCostsCard />}
 
           {isCurrent && alerts.length > 0 && (
             <section className="mb-6" aria-label={t('settings.warnings.title')}>

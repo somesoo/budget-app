@@ -46,3 +46,12 @@ export const INSIGHTS_MONTHS = 6
  * on look like your most expensive day.
  */
 export const WEEKDAY_EXCLUDE_FROM = 1000
+
+/**
+ * Financial independence (the FIRE card on Insights): enough is this many
+ * years of spending, the "4% rule" (take out 4% a year and it lasts). The
+ * savings are assumed to grow by FIRE_REAL_RETURN a year after inflation, a
+ * cautious figure for a mix of shares and bonds.
+ */
+export const FIRE_MULTIPLE = 25
+export const FIRE_REAL_RETURN = 0.04

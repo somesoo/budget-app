@@ -58,5 +58,9 @@
   "lineLabel": {
     "message": "{name}: from the paycheck",
     "context": "Budget planner > Savings: accessible label of the amount field of a goal, account or loan {name}."
+  },
+  "forBills": {
+    "message": "for bills: {amount}",
+    "context": "Budget planner > Savings: chip on the bills fund goal that fills in what the rarer regular bills need per month. Lowercase, short, like 'on time: {amount}'."
   }
 }

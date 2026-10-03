@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom'
 import { useMonthMoney } from '../../hooks/useMonthMoney'
 import { useSavingsOverview } from '../../hooks/useSavings'
 import { useTypicalSpending } from '../../hooks/useTypicalSpending'
+import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
+import { useIncomesBetween } from '../../hooks/useIncomes'
+import { ageOfMoney } from '../../lib/wealth'
+import { monthsEndingAt, windowRange } from '../../lib/insights'
 import { moneyHealth, type Health } from '../../lib/allocations'
-import { formatAmount, type MonthKey } from '../../lib/calculations'
+import { currentMonthKey, formatAmount, type MonthKey } from '../../lib/calculations'
 import type { Category } from '../../types'
 import { t } from '../../i18n'
 
@@ -16,10 +20,14 @@ const TONE: Record<Health, string> = {
 
 const percent = (x: number) => `${Math.round(x * 100)}%`
 
+/** Months of income and spending the age of money is worked out over. */
+const AGE_MONTHS = 6
+
 /**
- * Three numbers against the usual rules of thumb: the savings rate, fixed
- * costs as a share of income, and how many months of spending the emergency
- * fund covers. Each says what "good" is, so the colors aren't the only clue.
+ * Four numbers against the usual rules of thumb: the savings rate, fixed
+ * costs as a share of income, how many months of spending the emergency
+ * fund covers, and how long money waits between coming in and going out.
+ * Each says what "good" is, so the colors aren't the only clue.
  */
 export function HealthCard({ month, categories }: { month: MonthKey; categories: Category[] }) {
   const money = useMonthMoney(month)
@@ -31,6 +39,7 @@ export function HealthCard({ month, categories }: { month: MonthKey; categories:
     .filter((c) => !c.show_in_chart && !c.archived)
     .reduce((s, c) => s + c.monthly_limit, 0)
   const emergency = savings.goals.find((g) => g.goal.is_emergency && !g.goal.archived)
+  const age = useAgeOfMoney(savings.movements)
   const h = moneyHealth({
     income,
     savedAside: money.safe?.savedAside ?? money.plan?.savings ?? 0,
@@ -88,9 +97,31 @@ export function HealthCard({ month, categories }: { month: MonthKey; categories:
             </Link>
           )}
         </Row>
+        <Row
+          label={t('health.ageOfMoney')}
+          value={age === null ? '–' : t('health.days', { count: age })}
+          health={age === null ? undefined : age >= 30 ? 'good' : age >= 10 ? 'watch' : 'low'}
+          rule={age === null ? t('health.ageOfMoneyHint') : t('health.ageOfMoneyRule')}
+        />
       </dl>
     </section>
   )
+}
+
+/** Age of money over the last AGE_MONTHS, from logged pay, monthly spending and deposits. */
+function useAgeOfMoney(movements: { kind: string; amount: number; movement_date: string }[]) {
+  const months = monthsEndingAt(currentMonthKey(), AGE_MONTHS)
+  const { from, to } = windowRange(months)
+  const { data: incomes } = useIncomesBetween(from, to, true)
+  const { data: expenses } = useMonthlyExpensesBetween(from, to)
+  if (!incomes || !expenses) return null
+  return ageOfMoney({
+    incomes,
+    expenses,
+    savedAside: movements
+      .filter((m) => m.kind === 'deposit' && m.movement_date >= from && m.movement_date <= to)
+      .map((m) => ({ amount: m.amount, date: m.movement_date })),
+  })
 }
 
 function Row({

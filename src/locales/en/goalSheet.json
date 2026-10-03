@@ -58,5 +58,13 @@
   "unarchive": {
     "message": "Bring it back",
     "context": "Goal sheet: restores a closed goal."
+  },
+  "billsFund": {
+    "message": "Yearly bills are paid from this",
+    "context": "Goal sheet: switch that marks the goal as the fund for bills that come every few months (car insurance and the like)."
+  },
+  "billsFundHelp": {
+    "message": "The Budget tab's regular costs card says how much it should get each month and whether it'll have enough when the next bill comes.",
+    "context": "Goal sheet: help under the bills fund switch."
   }
 }

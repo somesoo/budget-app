@@ -5,8 +5,11 @@ expense is three taps (category → amount → Save), and every phone sees it
 straight away.
 
 - A plan per month, with a limit per category and money put aside first
-- Savings accounts and goals, trips you spend from, IKE/IKZE
-- How much is really free to spend this month
+- Savings accounts and goals, trips you spend from, IKE/IKZE/PPK
+- Debts with a payoff plan (snowball or avalanche), and net worth over time
+- Subscriptions and yearly bills, with what to put aside each month
+- How much is really free to spend, the age of your money, the road to
+  financial independence
 - Charts over the last six months, and optional AI advice (Google Gemini)
 - English and Polish; installs to the home screen like an app
 

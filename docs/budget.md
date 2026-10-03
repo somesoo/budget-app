@@ -68,18 +68,42 @@ month it shows up as a line in *From the paycheck*, noted "Leftover from
 
 ## How healthy it is
 
-Three numbers against the usual rules of thumb, each saying what it's
+Four numbers against the usual rules of thumb, each saying what it's
 measured against:
 
 - the **savings rate**: what the month puts aside, as a share of income; 20%
   or more;
 - **fixed costs**: rent and bills as a share of income; under half;
 - the **emergency fund** in months of typical spending (the last three months
-  averaged); three to six.
+  averaged); three to six;
+- the **age of money**: how many days pay waits before it's spent, averaged
+  over the latest spending (first in, first out). 30 days or more means this
+  month runs on last month's money, which is what makes a budget calm. It
+  counts monthly spending and what goes into savings, from the pay logged in
+  the last six months.
 
 A goal is marked as the emergency fund in its Edit sheet. While it's short, a
 new plan sends last month's leftover there, and borrowing from it warns when
 it would take a large part.
+
+## Regular costs
+
+Subscriptions and the bills that come back every 1, 2, 3, 6 or 12 months,
+on the Budget tab of the running month: what they cost a month and a year,
+and when each is due next (marked when it's within two weeks).
+
+- **The rarer bills** (car insurance, a yearly subscription, the car
+  service) are what catches a budget out. The card says how much they need
+  put aside a month, spread evenly. Mark a goal as the bills fund (its Edit
+  sheet: *Yearly bills are paid from this*) and the card says whether it
+  holds enough to pay each bill on time; in the planner that goal's line gets
+  a *for bills* chip with the monthly amount. Pay the bill from that goal's
+  tile on the Add tab, and it comes off the account.
+- **Subscriptions** get a review every three months: for each, is it still
+  worth what it costs a year? Cancelled ones are put away (cancel them with
+  the provider too), and the card says what that gives back a year.
+- A regular cost isn't logged by itself: when you pay it, log it as an
+  expense as usual.
 
 ## AI draft
 

@@ -112,6 +112,14 @@ export const TOUR_STEPS: TourStep[] = [
     body: 'tour.health.body',
   },
   {
+    id: 'regular-costs',
+    route: '/budget',
+    target: tour('regular-costs'),
+    title: 'tour.regular-costs.title',
+    body: 'tour.regular-costs.body',
+    tip: 'tour.regular-costs.tip',
+  },
+  {
     id: 'budget-categories',
     route: '/budget',
     target: tour('budget-categories'),
@@ -142,6 +150,20 @@ export const TOUR_STEPS: TourStep[] = [
     body: 'tour.savings-goals.body',
     tip: 'tour.savings-goals.tip',
   },
+  {
+    id: 'savings-debts',
+    route: '/savings',
+    target: tour('savings-debts'),
+    title: 'tour.savings-debts.title',
+    body: 'tour.savings-debts.body',
+  },
+  {
+    id: 'net-worth',
+    route: '/savings',
+    target: tour('net-worth'),
+    title: 'tour.net-worth.title',
+    body: 'tour.net-worth.body',
+  },
 
   /* ---------- Insights ---------- */
   {
@@ -150,6 +172,13 @@ export const TOUR_STEPS: TourStep[] = [
     target: tour('insights-advice'),
     title: 'tour.nav-insights.title',
     body: 'tour.nav-insights.body',
+  },
+  {
+    id: 'fire',
+    route: '/insights',
+    target: tour('fire'),
+    title: 'tour.fire.title',
+    body: 'tour.fire.body',
   },
 
   /* ---------- Settings ---------- */

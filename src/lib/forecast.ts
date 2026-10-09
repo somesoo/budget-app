@@ -4,6 +4,7 @@ import type { AccountSummary, GoalSummary } from './savings'
 import type { Category, Expense, Goal, Income, Person } from '../types'
 import { daysInMonth, incomeMonth, monthKeyOfDate, roundMoney, type MonthKey } from './calculations'
 import { elapsedDays, projectMonthEnd } from './insights'
+import { projectSpend, type SpendProjection } from './projection'
 import { personIds, personLabel } from './people'
 
 /*
@@ -71,6 +72,8 @@ export interface MonthForecast {
   spentSoFar: number
   /** Projection for the running month, the actual total for a past one. */
   projectedSpend: number
+  /** How the running month's projection is made up; null for a finished month or without categories. */
+  projection: SpendProjection | null
   projectedSavings: number
   savingsRate: number | null
   /** Break-even: what can still be spent per day without dipping below zero. */
@@ -82,9 +85,13 @@ export interface MonthForecast {
 export function monthForecast(args: {
   month: MonthKey
   isCurrent: boolean
+  /** The month's, and the months before for what's usual (see projectSpend). */
   expenses: Expense[]
   incomes: Income[]
   goal: Goal | null | undefined
+  /** With them, fixed costs count once instead of being spread over the month. */
+  categories?: Category[]
+  billCategoryIds?: ReadonlySet<string>
 }): MonthForecast {
   const { month, isCurrent, expenses, incomes, goal } = args
   const incomeByPerson = expectedIncome(incomes, month, isCurrent)
@@ -95,13 +102,27 @@ export function monthForecast(args: {
       .filter((e) => monthKeyOfDate(e.expense_date) === month)
       .reduce((a, e) => a + e.amount, 0),
   )
-  const projectedSpend = isCurrent ? (projectMonthEnd(spentSoFar, month) ?? spentSoFar) : spentSoFar
+  const projection =
+    isCurrent && args.categories
+      ? projectSpend({
+          month,
+          expenses,
+          categories: args.categories,
+          billCategoryIds: args.billCategoryIds ?? new Set(),
+        })
+      : null
+  const projectedSpend = !isCurrent
+    ? spentSoFar
+    : projection
+      ? Math.max(projection.total, spentSoFar)
+      : (projectMonthEnd(spentSoFar, month) ?? spentSoFar)
   const projectedSavings = roundMoney(income - projectedSpend)
 
   const daysLeft = isCurrent ? daysInMonth(month) - elapsedDays(month) : 0
   const perDayToBreakEven =
     isCurrent && income > 0 && daysLeft > 0
-      ? roundMoney(Math.max(income - spentSoFar, 0) / daysLeft)
+      ? // bills still to come this month aren't money for every day
+        roundMoney(Math.max(income - spentSoFar - (projection?.fixedToCome ?? 0), 0) / daysLeft)
       : null
 
   const remainingToGoal = goal ? Math.max(goal.target_amount - goal.current_amount, 0) : 0
@@ -115,6 +136,7 @@ export function monthForecast(args: {
     incomeByPerson,
     spentSoFar,
     projectedSpend,
+    projection,
     projectedSavings,
     savingsRate: income > 0 ? projectedSavings / income : null,
     perDayToBreakEven,

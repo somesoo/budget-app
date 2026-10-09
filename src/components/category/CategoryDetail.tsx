@@ -26,7 +26,8 @@ import {
   type CategoryHistory,
 } from '../../lib/categoryDetail'
 import { toEntries } from '../../lib/history'
-import { elapsedDays, pacePoints, projectMonthEnd, windowRange } from '../../lib/insights'
+import { elapsedDays, pacePoints, windowRange } from '../../lib/insights'
+import { projectSpend } from '../../lib/projection'
 import type { Category, Expense } from '../../types'
 import { LegendItem, TooltipRow } from '../charts/ChartCard'
 import { ColumnChart } from '../charts/ColumnChart'
@@ -327,7 +328,18 @@ function ForecastPane({
   const isCurrent = month === current
   const inMonth = history.expenses.filter((e) => monthKeyOfDate(e.expense_date) === month)
   const spent = sumExpenses(inMonth)
-  const projected = isCurrent ? (projectMonthEnd(spent, month) ?? spent) : spent
+  // a fixed cost counts once, everyday spending by the day (see projectSpend)
+  const projected = isCurrent
+    ? Math.max(
+        projectSpend({
+          month,
+          expenses: history.expenses,
+          categories: [category],
+          billCategoryIds: new Set(),
+        })?.total ?? spent,
+        spent,
+      )
+    : spent
   const daysLeft = isCurrent ? daysInMonth(month) - elapsedDays(month) : 0
   const perDay = limit > spent && daysLeft > 0 ? (limit - spent) / daysLeft : null
 

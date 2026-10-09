@@ -184,6 +184,16 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
               {t('forecast.soFar', { amount: formatMoney(f.spentSoFar) })}
             </dd>
           )}
+          {f.projection && f.projection.fixed > 0 && (
+            <dd className="text-xs text-muted">
+              {t('forecast.projectionSplit', {
+                fixed: formatMoneyWhole(f.projection.fixed),
+                everyday: formatMoneyWhole(f.projection.everyday),
+              })}
+              {f.projection.oneOffs > 0 &&
+                `, ${t('forecast.projectionOneOffs', { amount: formatMoneyWhole(f.projection.oneOffs) })}`}
+            </dd>
+          )}
         </div>
 
         {f.perDayToBreakEven !== null && (

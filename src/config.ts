@@ -48,6 +48,13 @@ export const INSIGHTS_MONTHS = 6
 export const WEEKDAY_EXCLUDE_FROM = 1000
 
 /**
+ * A single everyday expense this big (a new washing machine, a flight) counts
+ * once in the month-end projection instead of being spread over the days left
+ * as if it were a daily habit.
+ */
+export const PROJECTION_ONE_OFF_FROM = 1000
+
+/**
  * Financial independence (the FIRE card on Insights): enough is this many
  * years of spending, the "4% rule" (take out 4% a year and it lasts). The
  * savings are assumed to grow by FIRE_REAL_RETURN a year after inflation, a

@@ -14,15 +14,10 @@ export function usePaySplit(month: MonthKey) {
   const { data: expenses } = useMonthlyExpensesBetween(from, to)
   const { data: incomes } = useIncomesBetween(from, to)
   const { data: savings } = useSavings()
-  const { data: recurring } = useRecurringCosts()
+  const billCategoryIds = useBillCategoryIds()
 
   return useMemo(() => {
     if (!categories || !expenses || !incomes) return null
-    const billCategoryIds = new Set(
-      (recurring?.costs ?? [])
-        .filter((c) => !c.archived && c.category_id)
-        .map((c) => c.category_id!),
-    )
     return paySplit({
       month,
       incomes,
@@ -32,5 +27,19 @@ export function usePaySplit(month: MonthKey) {
       accounts: savings?.accounts ?? [],
       billCategoryIds,
     })
-  }, [month, categories, expenses, incomes, savings, recurring])
+  }, [month, categories, expenses, incomes, savings, billCategoryIds])
+}
+
+/** Categories a live regular cost is booked to: fixed, like rent. */
+export function useBillCategoryIds(): ReadonlySet<string> {
+  const { data: recurring } = useRecurringCosts()
+  return useMemo(
+    () =>
+      new Set(
+        (recurring?.costs ?? [])
+          .filter((c) => !c.archived && c.category_id)
+          .map((c) => c.category_id!),
+      ),
+    [recurring],
+  )
 }

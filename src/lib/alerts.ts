@@ -9,6 +9,7 @@ import {
   type MonthKey,
 } from './calculations'
 import { elapsedDays, projectMonthEnd } from './insights'
+import { projectSpend } from './projection'
 import { personLabel } from './people'
 
 /* When spending stops keeping to the budget: the thresholds and the arithmetic
@@ -157,13 +158,11 @@ export function budgetAlerts(args: {
   const counted = categories.filter((c) => !c.archived || (spentBy.get(c.id) ?? 0) > 0)
   const limit = roundMoney(counted.reduce((a, c) => a + c.monthly_limit, 0))
   if (limit > 0) {
-    const fixedIds = new Set(counted.filter((c) => c.show_in_chart === false).map((c) => c.id))
     const spent = roundMoney(expenses.reduce((a, e) => a + e.amount, 0))
-    const fixed = expenses
-      .filter((e) => fixedIds.has(e.category_id))
-      .reduce((a, e) => a + e.amount, 0)
+    // bills and debts once, big one-offs as they are, the rest by the day
     const projected = paceOn
-      ? roundMoney(fixed + (projectMonthEnd(spent - fixed, month) ?? 0))
+      ? (projectSpend({ month, expenses, categories: counted, billCategoryIds: new Set() })
+          ?.total ?? null)
       : null
     const kind: AlertKind | null =
       spent > limit ? 'over' : projected !== null && projected > limit * PACE_MARGIN ? 'pace' : null

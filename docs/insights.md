@@ -8,7 +8,23 @@ At the top of Insights, plain arithmetic done in the app:
   is logged, that person's average month, marked "expected". Once a paycheck
   is logged it wins even if it's lower than usual; the forecast errs towards
   caution.
-- *Projected spending*: this month's pace extended to month end.
+- *Projected spending*: where the month is heading, worked out in three
+  parts so that rent paid on the 1st doesn't look like thirty rents:
+  - **bills and debts** (by each category's kind of spending, see below)
+    count once: what's been paid, or what they usually come to if that's
+    more, so rent not yet paid this month is expected too. "Usually" is the
+    middle of the last three months, so a yearly bill paid in July isn't
+    expected every month after;
+  - **big one-offs**, single everyday expenses of 1,000 zł or more
+    (`PROJECTION_ONE_OFF_FROM` in `src/config.ts`), count as they are;
+  - **everyday spending** is extended by the day, blending this month's pace
+    with your usual daily amount (last three months): early in the month the
+    usual weighs most, and this month's own pace takes over as the days go
+    by, so one big shop on the 2nd doesn't set the month.
+
+  The card says how the figure is made up. The same projection is used by
+  the headline numbers, the pace widget, a category's page and the
+  whole-budget warning. *How much a day* leaves out the bills still to come.
 - The **month's balance** first, signed and large: income minus spending
   (projected to month end in the running month), red with a warning when
   it's below zero.

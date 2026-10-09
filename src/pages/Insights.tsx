@@ -18,7 +18,7 @@ import { PersonLines } from '../components/charts/PersonLines'
 import { SpendDonut } from '../components/charts/SpendDonut'
 import { TopCategoriesList, sharePercent } from '../components/TopCategoriesList'
 import { PaySplitCard } from '../components/PaySplitCard'
-import { usePaySplit } from '../hooks/usePaySplit'
+import { useBillCategoryIds, usePaySplit } from '../hooks/usePaySplit'
 import { CHART } from '../components/charts/theme'
 import {
   CURRENCY_SUFFIX,
@@ -55,7 +55,6 @@ import {
   monthsEndingAt,
   pacePoints,
   personByMonth,
-  projectMonthEnd,
   topCategories,
   trimLeadingEmpty,
   weekdayAverages,
@@ -152,6 +151,7 @@ function InsightsBody({
   adviceExtras,
 }: BodyProps) {
   const { person: me } = useDeviceUser()
+  const billCategoryIds = useBillCategoryIds()
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
     return <Notice>{t('insights.empty')}</Notice>
@@ -174,9 +174,18 @@ function InsightsBody({
   const hasPrev = prevSameSpan > 0
   const change = hasPrev ? (spent - prevSameSpan) / prevSameSpan : null
 
-  const projected = isCurrent ? projectMonthEnd(spent, month) : spent
   const points = pacePoints(expenses, month, totalLimit)
-  const forecast = monthForecast({ month, isCurrent, expenses, incomes, goal })
+  const forecast = monthForecast({
+    month,
+    isCurrent,
+    expenses,
+    incomes,
+    goal,
+    categories,
+    billCategoryIds,
+  })
+  // rent paid on the 1st counts once: the same projection as the forecast's
+  const projected = forecast.projectedSpend
 
   // Recommendations first, across the page. Then phone: one column, top to
   // bottom; laptop: this month on the left, comparisons on the right.

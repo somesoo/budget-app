@@ -29,7 +29,6 @@ import {
   elapsedDays,
   monthsEndingAt,
   pacePoints,
-  projectMonthEnd,
   topCategories,
   windowRange,
 } from '../../lib/insights'
@@ -43,7 +42,7 @@ import { SpendDonut } from '../charts/SpendDonut'
 import { ForecastCard } from '../ForecastCard'
 import { PaySplitCard } from '../PaySplitCard'
 import { TopCategoriesList } from '../TopCategoriesList'
-import { usePaySplit } from '../../hooks/usePaySplit'
+import { useBillCategoryIds, usePaySplit } from '../../hooks/usePaySplit'
 import type { Widget } from './WidgetCarousel'
 import { personColor, personIds, personLabel } from '../../lib/people'
 import { dateFormat, t } from '../../i18n'
@@ -129,6 +128,17 @@ export function useAddWidgets({
     monthRange(month).to,
   )
   const paySplit = usePaySplit(month)
+  const billCategoryIds = useBillCategoryIds()
+  // fixed costs once, everyday spending by the day (see projectSpend)
+  const forecast = monthForecast({
+    month,
+    isCurrent: true,
+    expenses: fourMonths.length > 0 ? fourMonths : expenses,
+    incomes,
+    goal,
+    categories: allCategories.filter((c) => c.kind !== 'project'),
+    billCategoryIds,
+  })
 
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
@@ -145,7 +155,7 @@ export function useAddWidgets({
     pace: () => (
       <>
         <p className="text-sm leading-snug text-slate-200">
-          {paceLine(monthTotal, projectMonthEnd(monthTotal, month), monthLimit)}
+          {paceLine(monthTotal, forecast.projectedSpend, monthLimit)}
         </p>
         <PaceChart
           month={month}
@@ -172,7 +182,7 @@ export function useAddWidgets({
     ),
     forecast: () => (
       <ForecastCard
-        forecast={monthForecast({ month, isCurrent: true, expenses, incomes, goal })}
+        forecast={forecast}
         isCurrent
         goal={goal}
         bare

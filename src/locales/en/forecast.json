@@ -92,5 +92,13 @@
   "balanceProjected": {
     "message": "balance at the month's end",
     "context": "Forecast card: label next to the big signed number in the running month, income minus projected spending at the month's end."
+  },
+  "projectionSplit": {
+    "message": "Bills and debts {fixed} counted once, everyday {everyday}",
+    "context": "Forecast card (running month), under the projected spending: how it's made up. {fixed} is bills and debts counted once at what they usually come to, {everyday} the rest at the month's end. Both formatted money."
+  },
+  "projectionOneOffs": {
+    "message": "one-offs {amount}",
+    "context": "Forecast card (running month): added after the projection's make-up when there are big one-off expenses, counted once. {amount} is formatted money."
   }
 }

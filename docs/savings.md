@@ -9,6 +9,13 @@ on several accounts, an account can fund several goals.
 The app doesn't talk to your bank: it books the change and says which
 transfer to make.
 
+## The totals
+
+At the top of the Savings tab: everything saved, what's been put aside this
+month against the plan, and what no goal has claimed yet. With a debt, also
+what's owed in all and the net worth (saved minus owed), so the whole picture
+is on one line.
+
 ## What do you want to do?
 
 Guided steps on the Savings tab for the usual money moves:

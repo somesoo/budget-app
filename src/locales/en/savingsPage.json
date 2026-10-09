@@ -106,5 +106,22 @@
     "one": "Hide {count} hidden account",
     "other": "Hide {count} hidden accounts",
     "context": "Savings tab: hides them again."
+  },
+  "debts": {
+    "message": "Owed",
+    "context": "Savings tab, totals row: label of what's still owed across all open debts."
+  },
+  "netWorth": {
+    "message": "Net worth",
+    "context": "Savings tab, totals row: label of net worth, savings minus debts."
+  },
+  "netWorthSub": {
+    "message": "Saved minus owed.",
+    "context": "Savings tab, totals row: under net worth, how it's worked out."
+  },
+  "debtsCount": {
+    "one": "{count} debt",
+    "other": "{count} debts",
+    "context": "Savings tab, totals row: under the debts total, how many open debts there are."
   }
 }

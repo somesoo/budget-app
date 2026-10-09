@@ -34,6 +34,14 @@ Six months back from the month picked at the top:
   your limits. Scrub with a finger for any day's figures.
 - **Month by month**: totals per month, the selected one highlighted, limits
   as a dashed line.
+- **Where the money went**: the selected month as a donut by category,
+  biggest first. Categories switched out of the chart in Settings (rent and
+  the like) are listed under it with what they cost.
+- **Top 3 categories**: the month's three biggest, each with its share and
+  against its usual cost (the average of up to three months before that have
+  any spending). A finished month says how much more or less than usual,
+  within 10% "about as usual"; the running month only says what's usual,
+  since half a month always looks cheap.
 - **Change by category**: each category up or down against the month before,
   centred on zero.
 - **Who spent what**: each person per month (with two or more people).

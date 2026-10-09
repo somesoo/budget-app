@@ -15,6 +15,7 @@ import { ChartCard, LegendItem, TooltipRow } from '../components/charts/ChartCar
 import { ColumnChart } from '../components/charts/ColumnChart'
 import { PaceChart } from '../components/charts/PaceChart'
 import { PersonLines } from '../components/charts/PersonLines'
+import { SpendDonut } from '../components/charts/SpendDonut'
 import { CHART } from '../components/charts/theme'
 import {
   CURRENCY_SUFFIX,
@@ -38,23 +39,26 @@ import {
   formatMonthShort,
   monthKeyOfDate,
   shiftMonth,
+  sumByCategory,
   sumExpenses,
   weekdayNames,
   type MonthKey,
 } from '../lib/calculations'
 import {
   categoryDeltas,
+  categorySlices,
   elapsedDays,
   monthlyTotals,
   monthsEndingAt,
   pacePoints,
   personByMonth,
   projectMonthEnd,
+  topCategories,
   trimLeadingEmpty,
   weekdayAverages,
   windowRange,
 } from '../lib/insights'
-import { type Expense, type Goal, type Income, type Person } from '../types'
+import { type Category, type Expense, type Goal, type Income, type Person } from '../types'
 import { personColor, personIds, personLabel } from '../lib/people'
 import { t } from '../i18n'
 import { Trans } from '../i18n/Trans'
@@ -246,6 +250,19 @@ function InsightsBody({
         </div>
 
         <div className="space-y-4">
+          <StructureCard
+            month={month}
+            expenses={ownExpenses(inMonth(month), categories, me)}
+            categories={ownCategories(categories, me)}
+          />
+
+          <TopCard
+            month={month}
+            isCurrent={isCurrent}
+            expenses={ownExpenses(expenses, categories, me)}
+            categories={ownCategories(categories, me)}
+          />
+
           <CategoryCard
             month={month}
             expenses={ownExpenses(expenses, categories, me)}
@@ -488,6 +505,137 @@ function MonthlyCard({
           ),
         }))}
       />
+    </ChartCard>
+  )
+}
+
+/* ---------- where the money went ---------- */
+
+function sharePercent(share: number): string {
+  return share < 0.01 ? '<1%' : `${Math.round(share * 100)}%`
+}
+
+function StructureCard({
+  month,
+  expenses,
+  categories,
+}: {
+  month: MonthKey
+  /** The selected month's only. */
+  expenses: Expense[]
+  categories: Category[]
+}) {
+  const slices = categorySlices(expenses, categories)
+  if (slices.length === 0) return null
+  const byCategory = sumByCategory(expenses)
+  // switched out of the donut in Settings (rent and the like), but spent on this month
+  const leftOut = categories.filter((c) => !c.show_in_chart && (byCategory[c.id] ?? 0) > 0)
+
+  return (
+    <ChartCard
+      title={t('insights.structureTitle')}
+      headline={
+        <Trans
+          k="insights.structureHeadline"
+          values={{
+            name: slices[0].name,
+            share: sharePercent(slices[0].share),
+            month: formatMonthName(month),
+          }}
+          tags={{ b: (s) => <strong>{s}</strong> }}
+        />
+      }
+      table={{
+        head: [t('entry.category'), t('common.spent'), t('insights.share')],
+        rows: slices.map((sl) => [sl.name, formatAmount(sl.amount), sharePercent(sl.share)]),
+      }}
+    >
+      <SpendDonut slices={slices} />
+      {leftOut.length > 0 && (
+        <p className="mt-2 text-xs text-muted">
+          {t('widgets.donut.leftOut', {
+            list: leftOut
+              .map((c) => `${c.name} ${formatMoneyWhole(byCategory[c.id])}`)
+              .join(' · '),
+          })}
+        </p>
+      )}
+    </ChartCard>
+  )
+}
+
+/* ---------- the three biggest ---------- */
+
+/** Within this of usual, a category is "about as usual": a few złoty either way is noise. */
+const AS_USUAL = 0.1
+
+function TopCard({
+  month,
+  isCurrent,
+  expenses,
+  categories,
+}: {
+  month: MonthKey
+  isCurrent: boolean
+  expenses: Expense[]
+  categories: Category[]
+}) {
+  const top = topCategories(expenses, categories, month)
+  if (top.length === 0) return null
+  const together = top.reduce((acc, r) => acc + r.share, 0)
+
+  const versus = (amount: number, typical: number | null) => {
+    if (typical === null) return t('insights.topNoTypical')
+    // a running month isn't over: say what's usual, never "less than usual" on the 9th
+    if (isCurrent) return t('insights.topTypical', { amount: formatMoneyWhole(typical) })
+    const diff = amount - typical
+    if (Math.abs(diff) <= typical * AS_USUAL) return t('insights.topAsUsual')
+    return diff > 0
+      ? t('insights.topMore', { amount: formatMoneyWhole(diff) })
+      : t('insights.topLess', { amount: formatMoneyWhole(-diff) })
+  }
+
+  return (
+    <ChartCard
+      title={t('insights.topTitle')}
+      headline={top.length > 1 ? t('insights.topHeadline', { share: sharePercent(together) }) : undefined}
+      table={{
+        head: [t('entry.category'), t('common.spent'), t('insights.share'), t('insights.typical')],
+        rows: top.map((r) => [
+          r.category.name,
+          formatAmount(r.amount),
+          sharePercent(r.share),
+          r.typical === null ? '–' : formatAmount(r.typical),
+        ]),
+      }}
+    >
+      <ol className="space-y-3">
+        {top.map((r, i) => (
+          <li key={r.category.id} className="flex items-center gap-3">
+            <span
+              aria-hidden
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              style={{ backgroundColor: r.category.color }}
+            >
+              {i + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="truncate text-[15px] font-semibold text-white">
+                  {r.category.name}
+                </span>
+                <span className="shrink-0 font-semibold tabular-nums text-white">
+                  {formatMoneyWhole(r.amount)}
+                </span>
+              </div>
+              <div className="flex items-baseline justify-between gap-2 text-sm text-slate-300">
+                <span className="truncate">{versus(r.amount, r.typical)}</span>
+                <span className="shrink-0 tabular-nums text-muted">{sharePercent(r.share)}</span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
     </ChartCard>
   )
 }

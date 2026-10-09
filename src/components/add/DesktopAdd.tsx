@@ -1,7 +1,7 @@
 import { Receipt } from '@phosphor-icons/react'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CURRENCY_SUFFIX } from '../../config'
-import { usePrefs } from '../../hooks/usePrefs'
+import { useFeature, usePrefs } from '../../hooks/usePrefs'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useCategories } from '../../hooks/useCategories'
 import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
@@ -45,6 +45,7 @@ import { GoalPicker, GoalsTile } from './GoalPicker'
 import { RecentEntries } from './RecentEntries'
 import { ownExpenses } from '../../lib/allowance'
 import { personIds } from '../../lib/people'
+import { NextStageBanner } from '../learn/NextStageBanner'
 import { t } from '../../i18n'
 import { Trans } from '../../i18n/Trans'
 
@@ -79,6 +80,7 @@ export function DesktopAdd() {
   const actions = useEntryActions()
   const { alerts } = useBudgetAlerts()
   const prefs = usePrefs()
+  const showSavings = useFeature('savings')
   const goals = useGoalTrips()
 
   const [mode, setMode] = useState<Mode>('expense')
@@ -130,7 +132,8 @@ export function DesktopAdd() {
   const q = query.trim().toLowerCase()
   const matches = (c: Category) => !q || c.name.toLowerCase().includes(q)
   const shown = categories.filter(matches)
-  const shownGoals = goalTiles.filter(matches)
+  // spending from goals is part of saving, which this phone may not show yet
+  const shownGoals = showSavings ? goalTiles.filter(matches) : []
   const selected = [...categories, ...goalTiles].find((c) => c.id === selectedId) ?? null
   const isProjectPick = selected?.kind === 'project'
   // the other one's allowance isn't listed here, as in History
@@ -287,6 +290,8 @@ export function DesktopAdd() {
         )}
       </header>
 
+      <NextStageBanner />
+
       {error && (
         <p className="mb-4 shrink-0 rounded-2xl bg-red-500/10 p-3 text-sm text-red-300">
           {t('add.loadFailed', { error: (error as Error).message })}
@@ -312,7 +317,7 @@ export function DesktopAdd() {
               categories={shown}
               goals={shownGoals}
               goalsTile={
-                goals.open.length > 0
+                showSavings && goals.open.length > 0
                   ? (height) => (
                       <GoalsTile
                         goals={goals.open}

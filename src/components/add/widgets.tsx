@@ -5,7 +5,8 @@ import { useBudgetAlerts } from '../../hooks/useBudgetAlerts'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import { useIncomesBetween } from '../../hooks/useIncomes'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
-import { usePrefs } from '../../hooks/usePrefs'
+import { useFeatures, usePrefs } from '../../hooks/usePrefs'
+import type { FeatureId } from '../../lib/features'
 import { usePrimaryGoal, useSavingsOverview } from '../../hooks/useSavings'
 import {
   currentMonthKey,
@@ -48,8 +49,10 @@ import { personColor, personIds, personLabel } from '../../lib/people'
 import { dateFormat, t } from '../../i18n'
 
 /** Every widget the Add screen can show, in order; each can be switched off in Settings. */
-const widget = <Id extends string>(id: Id) => ({
+const widget = <Id extends string>(id: Id, feature?: FeatureId) => ({
   id,
+  /** Shown only while this phone shows the feature it belongs to. */
+  feature,
   label: () => t(`widgets.${id as AddWidgetKey}.label`),
   help: () => t(`widgets.${id as AddWidgetKey}.help`),
 })
@@ -69,12 +72,12 @@ export const ADD_WIDGETS = [
   widget('donut'),
   widget('top'),
   widget('pay'),
-  widget('pace'),
-  widget('alerts'),
-  widget('delta'),
-  widget('forecast'),
+  widget('pace', 'budget'),
+  widget('alerts', 'budget'),
+  widget('delta', 'charts'),
+  widget('forecast', 'budget'),
   widget('people'),
-  widget('goals'),
+  widget('goals', 'savings'),
   widget('week'),
 ] as const
 
@@ -110,6 +113,7 @@ export function useAddWidgets({
   const month = currentMonthKey()
   const prev = shiftMonth(month, -1)
   const prefs = usePrefs()
+  const shows = useFeatures()
   const { person: me } = useDeviceUser()
   // category by category, the other one's allowance isn't shown
   const own = ownCategories(allCategories, me)
@@ -196,7 +200,10 @@ export function useAddWidgets({
   // who spent what means nothing with one person in the budget
   const solo = personIds().length < 2
   return ADD_WIDGETS.filter(
-    (w) => !prefs.hiddenWidgets.includes(w.id) && !(solo && w.id === 'people'),
+    (w) =>
+      !prefs.hiddenWidgets.includes(w.id) &&
+      !(solo && w.id === 'people') &&
+      (!w.feature || shows(w.feature)),
   ).map((w) => ({
     id: w.id,
     label: w.label(),

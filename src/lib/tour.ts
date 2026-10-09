@@ -7,6 +7,7 @@
  */
 
 import type { MessageKey } from '../i18n'
+import { featureOfPlace, type FeatureId } from './features'
 
 export interface TourStep {
   id: string
@@ -262,4 +263,12 @@ export const tourStore = {
     markTourSeen()
     set({ ...state, step: null })
   },
+}
+
+/** The steps about what this phone shows: a hidden tab isn't toured. */
+export function tourSteps(shows: (feature: FeatureId) => boolean): TourStep[] {
+  return TOUR_STEPS.filter((step) => {
+    const feature = featureOfPlace(step)
+    return !feature || shows(feature)
+  })
 }

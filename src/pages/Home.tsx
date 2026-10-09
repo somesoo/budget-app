@@ -17,7 +17,7 @@ import { useAddExpense, useMonthlyExpenses } from '../hooks/useExpenses'
 import { useDeviceUser } from '../hooks/useDeviceUser'
 import { useAddIncome } from '../hooks/useIncomes'
 import { LAPTOP, useMediaQuery } from '../hooks/useMediaQuery'
-import { usePrefs } from '../hooks/usePrefs'
+import { useFeature, usePrefs } from '../hooks/usePrefs'
 import { useMonthMoney } from '../hooks/useMonthMoney'
 import { useSavingsOverview } from '../hooks/useSavings'
 import { BottomSheet } from '../components/history/BottomSheet'
@@ -39,6 +39,7 @@ import { isOthersAllowance, ownCategories } from '../lib/allowance'
 import { elapsedDays, paceStatus, type PaceStatus } from '../lib/insights'
 import type { Category, Person } from '../types'
 import { personIds, personLabel } from '../lib/people'
+import { NextStageBanner } from '../components/learn/NextStageBanner'
 import { t } from '../i18n'
 
 const PACE_COLOR: Record<PaceStatus, string> = {
@@ -104,6 +105,7 @@ export function Home() {
 
   const laptop = useMediaQuery(LAPTOP)
   const prefs = usePrefs()
+  const showSavings = useFeature('savings')
 
   const goals = useGoalTrips()
   // spending from a goal is measured by all it has cost against its target, not by the month
@@ -244,6 +246,8 @@ export function Home() {
         </p>
       )}
 
+      <NextStageBanner />
+
       {/* all switched off in Settings: the tiles get the room */}
       {widgets.length > 0 && (
         <div data-tour="widgets" className="mb-3 shrink-0">
@@ -275,7 +279,7 @@ export function Home() {
             ),
           }))}
           trailing={
-            goals.open.length > 0
+            showSavings && goals.open.length > 0
               ? (height) => (
                   <GoalsTile goals={goals.open} height={height} onClick={() => setGoalsOpen(true)} />
                 )

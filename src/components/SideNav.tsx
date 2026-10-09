@@ -3,6 +3,7 @@ import { t } from '../i18n'
 import { useBudgetAlerts } from '../hooks/useBudgetAlerts'
 import { AlertCount } from './alerts/AlertList'
 import { TABS } from './BottomNav'
+import { useFeatures } from '../hooks/usePrefs'
 
 /** The four tiles from public/icon.svg. */
 const MARK_TILES = ['#22c55e', '#f97316', '#38bdf8', '#a855f7']
@@ -13,6 +14,7 @@ const MARK_TILES = ['#22c55e', '#f97316', '#38bdf8', '#a855f7']
  */
 export function SideNav() {
   const { alerts } = useBudgetAlerts()
+  const shows = useFeatures()
   return (
     <nav className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col border-r border-white/10 bg-ink px-4 py-6 lg:flex">
       <div className="mb-8 flex items-center gap-3 px-2">
@@ -28,7 +30,7 @@ export function SideNav() {
         <span className="text-lg font-bold tracking-tight text-white">{t('common.appName')}</span>
       </div>
       <ul className="grid gap-1">
-        {TABS.map((tab) => (
+        {TABS.filter((tab) => !tab.feature || shows(tab.feature)).map((tab) => (
           <li key={tab.to}>
             <NavLink
               to={tab.to}

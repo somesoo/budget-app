@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { TOUR_STEPS, tourStore } from '../../lib/tour'
+import { tourSteps, tourStore } from '../../lib/tour'
+import { usePrefs } from '../../hooks/usePrefs'
+import { isOn } from '../../lib/features'
 import { t } from '../../i18n'
 
 /** Room around the element the spotlight picks out. */
@@ -101,6 +103,12 @@ export function Tour() {
   const { step, from } = useSyncExternalStore(tourStore.subscribe, tourStore.get, tourStore.get)
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const prefs = usePrefs()
+  // only what this phone shows (Settings → What the app shows)
+  const TOUR_STEPS = useMemo(
+    () => tourSteps((f) => isOn({ stage: prefs.stage, overrides: prefs.featureOverrides }, f)),
+    [prefs.stage, prefs.featureOverrides],
+  )
 
   /** The step the card is showing; it lags `step` while moving there. */
   const [shown, setShown] = useState<number | null>(null)

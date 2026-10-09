@@ -1,5 +1,6 @@
 import { Sparkle } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
+import { useFeature } from '../hooks/usePrefs'
 import { t } from '../i18n'
 
 /**
@@ -7,6 +8,8 @@ import { t } from '../i18n'
  * edited first). On the phone this is how Ask is reached.
  */
 export function AskLink({ question, label = t('ask.link') }: { question?: string; label?: string }) {
+  // AI not switched on for this phone: no way in
+  if (!useFeature('ai')) return null
   return (
     <Link
       aria-label={label}

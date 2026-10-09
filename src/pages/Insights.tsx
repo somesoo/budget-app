@@ -1,4 +1,5 @@
 import { CaretDown, CaretUp, Check, Warning } from '@phosphor-icons/react'
+import { useFeatures } from '../hooks/usePrefs'
 import { useState, type ReactNode } from 'react'
 import { AdviceCard } from '../components/AdviceCard'
 import { AskLink } from '../components/AskLink'
@@ -152,6 +153,7 @@ function InsightsBody({
 }: BodyProps) {
   const { person: me } = useDeviceUser()
   const billCategoryIds = useBillCategoryIds()
+  const shows = useFeatures()
   const activeMonths = trimLeadingEmpty(expenses, months)
   if (activeMonths.length === 0) {
     return <Notice>{t('insights.empty')}</Notice>
@@ -191,22 +193,24 @@ function InsightsBody({
   // bottom; laptop: this month on the left, comparisons on the right.
   return (
     <div className="space-y-4">
-      <AdviceCard
-        month={month}
-        isCurrent={isCurrent}
-        buildRequest={() =>
-          buildAdviceRequest({
-            month,
-            expenses: ownExpenses(expenses, categories, me),
-            categories: ownCategories(categories, me),
-            goal,
-            forecast,
-            alerts: adviceExtras.alerts,
-            savings: adviceExtras.savings,
-            projects: adviceExtras.projects,
-          })
-        }
-      />
+      {shows('ai') && (
+        <AdviceCard
+          month={month}
+          isCurrent={isCurrent}
+          buildRequest={() =>
+            buildAdviceRequest({
+              month,
+              expenses: ownExpenses(expenses, categories, me),
+              categories: ownCategories(categories, me),
+              goal,
+              forecast,
+              alerts: adviceExtras.alerts,
+              savings: adviceExtras.savings,
+              projects: adviceExtras.projects,
+            })
+          }
+        />
+      )}
       <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
         <div className="space-y-4">
           <KpiRow
@@ -223,44 +227,48 @@ function InsightsBody({
 
           <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
 
-          {isCurrent && <FireCard />}
+          {isCurrent && shows('fire') && <FireCard />}
 
-          <ChartCard
-            title={isCurrent ? t('insights.paceTitle') : t('insights.paceThrough', { month: monthName })}
-            headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
-            legend={
-              totalLimit > 0 && (
-                <div className="flex flex-wrap gap-x-4 gap-y-1">
-                  <LegendItem
-                    color={CHART.accent}
-                    label={isCurrent ? t('forecast.spentSoFar') : t('common.spent')}
-                    shape="line"
-                  />
-                  <LegendItem
-                    color={CHART.textMuted}
-                    label={t('insights.evenSpread')}
-                    shape="dashed"
-                  />
-                </div>
-              )
-            }
-            table={{
-              head: [t('insights.day'), t('insights.spentToDate'), t('charts.pace')],
-              rows: points
-                .filter((p) => p.cumulative !== null)
-                .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
-            }}
-          >
-            <PaceChart month={month} points={points} showPace={totalLimit > 0} />
-          </ChartCard>
+          {shows('charts') && (
+            <>
+              <ChartCard
+                title={isCurrent ? t('insights.paceTitle') : t('insights.paceThrough', { month: monthName })}
+                headline={paceHeadline(spent, projected, totalLimit, isCurrent, monthName)}
+                legend={
+                  totalLimit > 0 && (
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      <LegendItem
+                        color={CHART.accent}
+                        label={isCurrent ? t('forecast.spentSoFar') : t('common.spent')}
+                        shape="line"
+                      />
+                      <LegendItem
+                        color={CHART.textMuted}
+                        label={t('insights.evenSpread')}
+                        shape="dashed"
+                      />
+                    </div>
+                  )
+                }
+                table={{
+                  head: [t('insights.day'), t('insights.spentToDate'), t('charts.pace')],
+                  rows: points
+                    .filter((p) => p.cumulative !== null)
+                    .map((p) => [p.day, formatAmount(p.cumulative!), formatAmount(p.pace)]),
+                }}
+              >
+                <PaceChart month={month} points={points} showPace={totalLimit > 0} />
+              </ChartCard>
 
-          <MonthlyCard
-            month={month}
-            expenses={expenses}
-            activeMonths={activeMonths}
-            totalLimit={totalLimit}
-            projected={isCurrent ? projected : null}
-          />
+              <MonthlyCard
+                month={month}
+                expenses={expenses}
+                activeMonths={activeMonths}
+                totalLimit={totalLimit}
+                projected={isCurrent ? projected : null}
+              />
+            </>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -277,24 +285,28 @@ function InsightsBody({
             categories={ownCategories(categories, me)}
           />
 
-          <CategoryCard
-            month={month}
-            expenses={ownExpenses(expenses, categories, me)}
-            categories={ownCategories(categories, me)}
-            hasPrevMonth={inMonth(prev).length > 0}
-            dayCutoff={isCurrent ? elapsed : undefined}
-          />
+          {shows('charts') && (
+            <>
+              <CategoryCard
+                month={month}
+                expenses={ownExpenses(expenses, categories, me)}
+                categories={ownCategories(categories, me)}
+                hasPrevMonth={inMonth(prev).length > 0}
+                dayCutoff={isCurrent ? elapsed : undefined}
+              />
 
-          {personIds().length > 1 && (
-            <PeopleCard
-              month={month}
-              expenses={expenses}
-              activeMonths={activeMonths}
-              partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
-            />
+              {personIds().length > 1 && (
+                <PeopleCard
+                  month={month}
+                  expenses={expenses}
+                  activeMonths={activeMonths}
+                  partialLast={activeMonths[activeMonths.length - 1] === currentMonthKey()}
+                />
+              )}
+
+              <WeekdayCard expenses={expenses} months={months} />
+            </>
           )}
-
-          <WeekdayCard expenses={expenses} months={months} />
         </div>
       </div>
     </div>

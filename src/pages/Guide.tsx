@@ -7,9 +7,10 @@ import { useGeminiKey } from '../hooks/useGeminiKey'
 import { useIncomesBetween } from '../hooks/useIncomes'
 import { useRecurringCosts } from '../hooks/useRecurring'
 import { useSavingsOverview } from '../hooks/useSavings'
+import { useFeatures } from '../hooks/usePrefs'
 import { useWealth } from '../hooks/useWealth'
 import { currentMonthKey, formatMonthName, monthRange } from '../lib/calculations'
-import { GUIDE, GUIDE_LABELS, startProgress, type GuideCheck, type GuideSection, type GuideStep } from '../lib/guide'
+import { GUIDE_LABELS, startProgress, visibleGuide, type GuideCheck, type GuideSection, type GuideStep } from '../lib/guide'
 import { t, type MessageKey } from '../i18n'
 import { Trans } from '../i18n/Trans'
 
@@ -57,7 +58,8 @@ function useChecks(): Partial<Record<GuideCheck, boolean>> {
 export function Guide() {
   const checks = useChecks()
   const values = labels()
-  const progress = startProgress(checks)
+  const guide = visibleGuide(useFeatures())
+  const progress = startProgress(checks, guide)
   const [open, setOpen] = useState<Set<string>>(
     () => new Set([progress.total > 0 && progress.done === progress.total ? 'daily' : 'start']),
   )
@@ -73,7 +75,7 @@ export function Guide() {
     <Screen title={t('guide.title')}>
       <p className="-mt-2 mb-5 text-[15px] leading-relaxed text-slate-300">{t('guide.intro')}</p>
       <div className="space-y-3">
-        {GUIDE.map((section) => (
+        {guide.map((section) => (
           <Section
             key={section.id}
             section={section}

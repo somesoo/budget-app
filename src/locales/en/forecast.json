@@ -84,5 +84,13 @@
   "expectedNote": {
     "message": "“Expected” is that person’s typical month, used until this month’s paycheck is logged.",
     "context": "Forecast card: footnote explaining 'expected' income."
+  },
+  "balance": {
+    "message": "month's balance",
+    "context": "Forecast card: label next to the big signed number, income minus spending of a finished month."
+  },
+  "balanceProjected": {
+    "message": "balance at the month's end",
+    "context": "Forecast card: label next to the big signed number in the running month, income minus projected spending at the month's end."
   }
 }

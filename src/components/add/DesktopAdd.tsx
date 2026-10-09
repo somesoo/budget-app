@@ -549,6 +549,7 @@ function standIn(goal: Goal): Category {
     ends_on: null,
     goal_id: goal.id,
     owner: null,
+    spending_group: null,
   }
 }
 

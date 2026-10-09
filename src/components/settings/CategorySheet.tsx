@@ -9,7 +9,9 @@ import {
 } from '../../hooks/useCategories'
 import { formatMoneyWhole, roundMoney } from '../../lib/calculations'
 import { roundUpPlan } from '../../lib/planning'
-import type { Category, Person } from '../../types'
+import { SPENDING_GROUPS, guessGroup } from '../../lib/paySplit'
+import { useRecurringCosts } from '../../hooks/useRecurring'
+import type { Category, Person, SpendingGroup } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
 import { ColorChoice } from '../savings/ColorChoice'
@@ -46,6 +48,21 @@ export function CategorySheet({
   // only sent when it's someone's: the column arrives with migration 0013
   const ownerField =
     (owner || null) !== (category?.owner ?? null) ? { owner: (owner || null) as Person | null } : {}
+  const [group, setGroup] = useState<SpendingGroup | ''>(category?.spending_group ?? '')
+  // only sent when changed: the column arrives with migration 0020
+  const groupField =
+    (group || null) !== (category?.spending_group ?? null)
+      ? { spending_group: (group || null) as SpendingGroup | null }
+      : {}
+  const { data: recurring } = useRecurringCosts()
+  const guess = guessGroup(
+    {
+      ...(category ?? { id: '', owner: null, spending_group: null }),
+      name,
+      show_in_chart: inChart,
+    } as Category,
+    new Set((recurring?.costs ?? []).filter((c) => !c.archived).map((c) => c.category_id ?? '')),
+  )
   const [error, setError] = useState<string | null>(null)
 
   const submit = async (e: FormEvent) => {
@@ -60,6 +77,7 @@ export function CategorySheet({
           monthly_limit: roundMoney(limit),
           show_in_chart: inChart,
           ...ownerField,
+          ...groupField,
         })
       } else {
         await add.mutateAsync({
@@ -67,6 +85,7 @@ export function CategorySheet({
           color,
           monthly_limit: roundMoney(limit),
           ...ownerField,
+          ...groupField,
         })
       }
       onClose()
@@ -138,6 +157,18 @@ export function CategorySheet({
           checked={inChart}
           onChange={setInChart}
         />
+        <Field label={t('categorySheet.group')} help={t('categorySheet.groupHelp')}>
+          <Select value={group} onChange={(v) => setGroup(v as SpendingGroup | '')}>
+            <option value="">
+              {t('categorySheet.groupGuess', { group: t(`paySplit.part.${guess}`) })}
+            </option>
+            {SPENDING_GROUPS.map((g) => (
+              <option key={g} value={g}>
+                {t(`paySplit.part.${g}`)}
+              </option>
+            ))}
+          </Select>
+        </Field>
         {getPeople().length > 1 && (
           <Field
             label={t('categorySheet.whose')}

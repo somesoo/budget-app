@@ -1,3 +1,4 @@
+import { Warning } from '@phosphor-icons/react'
 import { ChartCard, LegendItem } from './charts/ChartCard'
 import { CHART } from './charts/theme'
 import { formatAmount, formatMoney, formatMoneyWhole } from '../lib/calculations'
@@ -53,44 +54,63 @@ export function ForecastCard({ forecast: f, isCurrent, goal, bare }: Props) {
 
   const estimate = isCurrent ? formatMoneyWhole : formatMoney
 
+  const sentence = isCurrent ? (
+    saving ? (
+      <Trans
+        k={f.savingsRate !== null ? 'forecast.onCourseSaveRate' : 'forecast.onCourseSave'}
+        values={{
+          amount: formatMoneyWhole(f.projectedSavings),
+          percent: Math.round((f.savingsRate ?? 0) * 100),
+        }}
+        tags={{ b: (s) => <strong>{s}</strong> }}
+      />
+    ) : (
+      <Trans
+        k="forecast.onCourseOverspend"
+        values={{ amount: formatMoneyWhole(-f.projectedSavings) }}
+        tags={{ b: (s) => <strong>{s}</strong> }}
+      />
+    )
+  ) : saving ? (
+    <Trans
+      k={f.savingsRate !== null ? 'forecast.savedRate' : 'forecast.saved'}
+      values={{
+        amount: formatMoney(f.projectedSavings),
+        percent: Math.round((f.savingsRate ?? 0) * 100),
+      }}
+      tags={{ b: (s) => <strong>{s}</strong> }}
+    />
+  ) : (
+    <Trans
+      k="forecast.overspent"
+      values={{ amount: formatMoney(-f.projectedSavings) }}
+      tags={{ b: (s) => <strong>{s}</strong> }}
+    />
+  )
+
   return (
     <ChartCard
       title={t('forecast.title')}
       bare={bare}
       headline={
-        isCurrent ? (
-          saving ? (
-            <Trans
-              k={f.savingsRate !== null ? 'forecast.onCourseSaveRate' : 'forecast.onCourseSave'}
-              values={{
-                amount: formatMoneyWhole(f.projectedSavings),
-                percent: Math.round((f.savingsRate ?? 0) * 100),
-              }}
-              tags={{ b: (s) => <strong>{s}</strong> }}
-            />
-          ) : (
-            <Trans
-              k="forecast.onCourseOverspend"
-              values={{ amount: formatMoneyWhole(-f.projectedSavings) }}
-              tags={{ b: (s) => <strong>{s}</strong> }}
-            />
-          )
-        ) : saving ? (
-          <Trans
-            k={f.savingsRate !== null ? 'forecast.savedRate' : 'forecast.saved'}
-            values={{
-              amount: formatMoney(f.projectedSavings),
-              percent: Math.round((f.savingsRate ?? 0) * 100),
-            }}
-            tags={{ b: (s) => <strong>{s}</strong> }}
-          />
-        ) : (
-          <Trans
-            k="forecast.overspent"
-            values={{ amount: formatMoney(-f.projectedSavings) }}
-            tags={{ b: (s) => <strong>{s}</strong> }}
-          />
-        )
+        <>
+          {/* the signed balance first: a month on the way to a loss shouldn't need reading */}
+          <span className="mb-1 flex items-center gap-2">
+            {!saving && (
+              <Warning aria-hidden weight="fill" className="shrink-0 text-2xl text-amber-300" />
+            )}
+            <span
+              className={`text-3xl font-bold tabular-nums ${saving ? 'text-emerald-300' : 'text-red-300'}`}
+            >
+              {saving ? '+' : '−'}
+              {formatMoneyWhole(Math.abs(f.projectedSavings))}
+            </span>
+            <span className="text-sm text-muted">
+              {isCurrent ? t('forecast.balanceProjected') : t('forecast.balance')}
+            </span>
+          </span>
+          <span className="block">{sentence}</span>
+        </>
       }
       legend={
         <div className="flex flex-wrap gap-x-4 gap-y-1">

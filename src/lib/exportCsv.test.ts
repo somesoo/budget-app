@@ -45,6 +45,7 @@ describe('toCsv', () => {
           ends_on: null,
           goal_id: null,
           owner: null,
+          spending_group: null,
         },
       ],
     )

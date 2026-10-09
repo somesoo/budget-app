@@ -16,6 +16,7 @@ const cat = (id: string, extra: Partial<Category> = {}): Category => ({
   ends_on: null,
   goal_id: null,
   owner: null,
+  spending_group: null,
   ...extra,
 })
 const exp = (category_id: string, amount: number, expense_date: string): Expense => ({

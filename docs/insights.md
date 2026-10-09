@@ -9,12 +9,43 @@ At the top of Insights, plain arithmetic done in the app:
   is logged it wins even if it's lower than usual; the forecast errs towards
   caution.
 - *Projected spending*: this month's pace extended to month end.
+- The **month's balance** first, signed and large: income minus spending
+  (projected to month end in the running month), red with a warning when
+  it's below zero.
 - *Left over*, the savings rate, how much a day you can still spend to break
   even, and roughly how many months to the savings goal at this month's
   surplus.
 
 Under it, *Get recommendations* asks the AI about the month (see
 [AI](ai.md)).
+
+## Where the pay went
+
+Right under the headline numbers: the month's income as one bar, split into
+what it went on. Spending is grouped by each category's *kind of spending*:
+
+- **Everyday spending**: food, transport, the household;
+- **Bills**: rent, utilities, phone, subscriptions, insurance;
+- **Debts**: loan and mortgage instalments, card repayments;
+- **Fun**: eating out, going out, hobbies, travel;
+- **Other**: gifts, health, one-offs, anything else.
+
+Then what went into **savings** and into **investments** (IKE, IKZE, PPK,
+bonds and investment accounts): deposits minus withdrawals that month, as the
+month's saving is counted everywhere else. What's left is **Left**, or
+**Short** when more went out than came in; then a white line marks the
+income on the bar, and everything past it was paid from elsewhere. Money
+taken out of savings beyond what went in counts as money that came in. Tap a
+group to see its categories.
+
+Income is what's logged for the month, one-offs included, not the expected
+pay the forecast uses: this is what happened, not what's coming.
+
+A category's kind is picked in its sheet (Settings → Categories). Until then
+the app guesses: a name it recognises (Polish or English), a regular cost
+booked to it or being left out of the chart means bills, and anything it
+can't tell is *Other*. The card says when some are guessed. Also a widget on
+the Add screen.
 
 ## Financial independence
 
@@ -41,7 +72,7 @@ Six months back from the month picked at the top:
   against its usual cost (the average of up to three months before that have
   any spending). A finished month says how much more or less than usual,
   within 10% "about as usual"; the running month only says what's usual,
-  since half a month always looks cheap.
+  since half a month always looks cheap. Also a widget on the Add screen.
 - **Change by category**: each category up or down against the month before,
   centred on zero.
 - **Who spent what**: each person per month (with two or more people).

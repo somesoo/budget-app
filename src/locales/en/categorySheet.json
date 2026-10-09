@@ -99,5 +99,17 @@
   "moveAndDelete": {
     "message": "Move and delete",
     "context": "Category sheet > delete: moves the expenses, then deletes."
+  },
+  "group": {
+    "message": "Kind of spending",
+    "context": "Category sheet: label of the choice of what kind of spending this is (everyday, bills, debts, fun, other), used by 'Where the pay went'."
+  },
+  "groupGuess": {
+    "message": "Let the app guess ({group})",
+    "context": "Category sheet: the first option of the group choice, leaving it to the app. {group} is the group it guesses, e.g. 'Bills'."
+  },
+  "groupHelp": {
+    "message": "Groups the category in “Where the pay went”.",
+    "context": "Category sheet: help under the group choice."
   }
 }

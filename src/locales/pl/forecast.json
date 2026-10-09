@@ -88,5 +88,13 @@
   "expectedNote": {
     "message": "„Spodziewane” to typowy miesiąc tej osoby, liczony, dopóki nie zostanie zapisana tegomiesięczna wypłata.",
     "context": "Forecast card: footnote explaining 'expected' income."
+  },
+  "balance": {
+    "message": "bilans miesiąca",
+    "context": "Forecast card: label next to the big signed number, income minus spending of a finished month."
+  },
+  "balanceProjected": {
+    "message": "bilans na koniec miesiąca",
+    "context": "Forecast card: label next to the big signed number in the running month, income minus projected spending at the month's end."
   }
 }

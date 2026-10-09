@@ -13,6 +13,7 @@ import {
   formatMoney,
   formatMoneyCompact,
   formatMoneyWhole,
+  formatMonthName,
   formatMonthShort,
   monthRange,
   roundMoney,
@@ -29,6 +30,7 @@ import {
   monthsEndingAt,
   pacePoints,
   projectMonthEnd,
+  topCategories,
   windowRange,
 } from '../../lib/insights'
 import { type Category, type Expense, type Person } from '../../types'
@@ -39,6 +41,9 @@ import { ColumnChart } from '../charts/ColumnChart'
 import { PaceChart } from '../charts/PaceChart'
 import { SpendDonut } from '../charts/SpendDonut'
 import { ForecastCard } from '../ForecastCard'
+import { PaySplitCard } from '../PaySplitCard'
+import { TopCategoriesList } from '../TopCategoriesList'
+import { usePaySplit } from '../../hooks/usePaySplit'
 import type { Widget } from './WidgetCarousel'
 import { personColor, personIds, personLabel } from '../../lib/people'
 import { dateFormat, t } from '../../i18n'
@@ -49,10 +54,22 @@ const widget = <Id extends string>(id: Id) => ({
   label: () => t(`widgets.${id as AddWidgetKey}.label`),
   help: () => t(`widgets.${id as AddWidgetKey}.help`),
 })
-type AddWidgetKey = 'donut' | 'pace' | 'alerts' | 'delta' | 'forecast' | 'people' | 'goals' | 'week'
+type AddWidgetKey =
+  | 'donut'
+  | 'top'
+  | 'pay'
+  | 'pace'
+  | 'alerts'
+  | 'delta'
+  | 'forecast'
+  | 'people'
+  | 'goals'
+  | 'week'
 
 export const ADD_WIDGETS = [
   widget('donut'),
+  widget('top'),
+  widget('pay'),
   widget('pace'),
   widget('alerts'),
   widget('delta'),
@@ -106,6 +123,12 @@ export function useAddWidgets({
   const { data: incomes = [] } = useIncomesBetween(incomeWindow.from, incomeWindow.to)
   const { data: goal } = usePrimaryGoal()
   const savings = useSavingsOverview()
+  // the month and the three before it, for what a category usually costs
+  const { data: fourMonths = [] } = useMonthlyExpensesBetween(
+    monthRange(shiftMonth(month, -3)).from,
+    monthRange(month).to,
+  )
+  const paySplit = usePaySplit(month)
 
   const monthTotal = sumExpenses(expenses)
   const monthLimit = categories.reduce((a, c) => a + c.monthly_limit, 0)
@@ -114,6 +137,11 @@ export function useAddWidgets({
     donut: () => (
       <DonutWidget expenses={ownExpenses(expenses, allCategories, me)} categories={own} />
     ),
+    top: () => <TopWidget expenses={ownExpenses(fourMonths, allCategories, me)} categories={own} />,
+    pay: () =>
+      paySplit ? (
+        <PaySplitCard split={paySplit} monthName={formatMonthName(month)} bare />
+      ) : null,
     pace: () => (
       <>
         <p className="text-sm leading-snug text-slate-200">
@@ -189,6 +217,16 @@ function DonutWidget({ expenses, categories }: { expenses: Expense[]; categories
         </p>
       )}
     </>
+  )
+}
+
+function TopWidget({ expenses, categories }: { expenses: Expense[]; categories: Category[] }) {
+  const top = topCategories(expenses, categories, currentMonthKey())
+  if (top.length === 0) return <Empty>{t('widgets.nothingSpent')}</Empty>
+  return (
+    <div className="pt-1">
+      <TopCategoriesList top={top} isCurrent />
+    </div>
   )
 }
 

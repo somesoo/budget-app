@@ -143,5 +143,25 @@
   "nothingSpent": {
     "message": "W tym miesiącu jeszcze nic nie wydano.",
     "context": "Add screen widgets (donut, who paid) when nothing has been spent this month."
+  },
+  "top": {
+    "label": {
+      "message": "Top 3",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): this month's three biggest spending categories."
+    },
+    "help": {
+      "message": "Trzy największe kategorie na tle tego, ile zwykle kosztują.",
+      "context": "Settings > Widgets: description under the switch of the 'Top 3' widget."
+    }
+  },
+  "pay": {
+    "label": {
+      "message": "Wypłata",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): where this month's income went: kinds of spending, savings, investments, what's left."
+    },
+    "help": {
+      "message": "Na co poszła wypłata: wydatki, rachunki, zobowiązania, oszczędności.",
+      "context": "Settings > Widgets: description under the switch of the 'Pay' widget."
+    }
   }
 }

@@ -40,6 +40,7 @@ import en_movement from './en/movement.json'
 import en_nav from './en/nav.json'
 import en_netWorth from './en/netWorth.json'
 import en_onboarding from './en/onboarding.json'
+import en_paySplit from './en/paySplit.json'
 import en_paycheck from './en/paycheck.json'
 import en_planner from './en/planner.json'
 import en_project from './en/project.json'
@@ -101,6 +102,7 @@ import pl_movement from './pl/movement.json'
 import pl_nav from './pl/nav.json'
 import pl_netWorth from './pl/netWorth.json'
 import pl_onboarding from './pl/onboarding.json'
+import pl_paySplit from './pl/paySplit.json'
 import pl_paycheck from './pl/paycheck.json'
 import pl_planner from './pl/planner.json'
 import pl_project from './pl/project.json'
@@ -164,6 +166,7 @@ const en = {
   nav: en_nav,
   netWorth: en_netWorth,
   onboarding: en_onboarding,
+  paySplit: en_paySplit,
   paycheck: en_paycheck,
   planner: en_planner,
   project: en_project,
@@ -227,6 +230,7 @@ const pl = {
   nav: pl_nav,
   netWorth: pl_netWorth,
   onboarding: pl_onboarding,
+  paySplit: pl_paySplit,
   paycheck: pl_paycheck,
   planner: pl_planner,
   project: pl_project,

@@ -30,7 +30,15 @@ export interface Category {
    * phone, and the other sees its amounts but not its notes. Null: shared.
    */
   owner: Person | null
+  /**
+   * What kind of spending it is, for where the pay went (migration 0020).
+   * Null: not picked, the app guesses (see lib/paySplit).
+   */
+  spending_group: SpendingGroup | null
 }
+
+/** The general kinds of spending a category belongs to. */
+export type SpendingGroup = 'daily' | 'bills' | 'debts' | 'fun' | 'other'
 
 export interface Expense {
   id: string

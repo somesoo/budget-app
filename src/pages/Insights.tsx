@@ -16,6 +16,9 @@ import { ColumnChart } from '../components/charts/ColumnChart'
 import { PaceChart } from '../components/charts/PaceChart'
 import { PersonLines } from '../components/charts/PersonLines'
 import { SpendDonut } from '../components/charts/SpendDonut'
+import { TopCategoriesList, sharePercent } from '../components/TopCategoriesList'
+import { PaySplitCard } from '../components/PaySplitCard'
+import { usePaySplit } from '../hooks/usePaySplit'
 import { CHART } from '../components/charts/theme'
 import {
   CURRENCY_SUFFIX,
@@ -206,6 +209,8 @@ function InsightsBody({
             prevName={prevName}
             sameSpan={isCurrent}
           />
+
+          <PaySplitSection month={month} />
 
           <ForecastCard forecast={forecast} isCurrent={isCurrent} goal={goal} />
 
@@ -509,11 +514,15 @@ function MonthlyCard({
   )
 }
 
-/* ---------- where the money went ---------- */
+/* ---------- where the pay went ---------- */
 
-function sharePercent(share: number): string {
-  return share < 0.01 ? '<1%' : `${Math.round(share * 100)}%`
+function PaySplitSection({ month }: { month: MonthKey }) {
+  const split = usePaySplit(month)
+  if (!split) return null
+  return <PaySplitCard split={split} monthName={formatMonthName(month)} />
 }
+
+/* ---------- where the money went ---------- */
 
 function StructureCard({
   month,
@@ -566,9 +575,6 @@ function StructureCard({
 
 /* ---------- the three biggest ---------- */
 
-/** Within this of usual, a category is "about as usual": a few złoty either way is noise. */
-const AS_USUAL = 0.1
-
 function TopCard({
   month,
   isCurrent,
@@ -584,17 +590,6 @@ function TopCard({
   if (top.length === 0) return null
   const together = top.reduce((acc, r) => acc + r.share, 0)
 
-  const versus = (amount: number, typical: number | null) => {
-    if (typical === null) return t('insights.topNoTypical')
-    // a running month isn't over: say what's usual, never "less than usual" on the 9th
-    if (isCurrent) return t('insights.topTypical', { amount: formatMoneyWhole(typical) })
-    const diff = amount - typical
-    if (Math.abs(diff) <= typical * AS_USUAL) return t('insights.topAsUsual')
-    return diff > 0
-      ? t('insights.topMore', { amount: formatMoneyWhole(diff) })
-      : t('insights.topLess', { amount: formatMoneyWhole(-diff) })
-  }
-
   return (
     <ChartCard
       title={t('insights.topTitle')}
@@ -609,33 +604,7 @@ function TopCard({
         ]),
       }}
     >
-      <ol className="space-y-3">
-        {top.map((r, i) => (
-          <li key={r.category.id} className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{ backgroundColor: r.category.color }}
-            >
-              {i + 1}
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="truncate text-[15px] font-semibold text-white">
-                  {r.category.name}
-                </span>
-                <span className="shrink-0 font-semibold tabular-nums text-white">
-                  {formatMoneyWhole(r.amount)}
-                </span>
-              </div>
-              <div className="flex items-baseline justify-between gap-2 text-sm text-slate-300">
-                <span className="truncate">{versus(r.amount, r.typical)}</span>
-                <span className="shrink-0 tabular-nums text-muted">{sharePercent(r.share)}</span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <TopCategoriesList top={top} isCurrent={isCurrent} />
     </ChartCard>
   )
 }

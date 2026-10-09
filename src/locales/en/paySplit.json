@@ -1,0 +1,76 @@
+{
+  "title": {
+    "message": "Where the pay went",
+    "context": "Card heading (Insights, Add screen widget): the month's income split into kinds of spending, savings, investments and what's left."
+  },
+  "headline": {
+    "message": "<b>{income}</b> came in, <b>{amount}</b> is left.",
+    "context": "Where the pay went: sentence above the bar. Both formatted money. Keep the <b> tags."
+  },
+  "headlineShort": {
+    "message": "<b>{income}</b> came in, and <b>{amount} more</b> went out.",
+    "context": "Where the pay went: sentence above the bar when spending, saving and investing came to more than the income. Keep the <b> tags."
+  },
+  "noIncome": {
+    "message": "No income logged for {month} yet. Add the paycheck to see where it went.",
+    "context": "Where the pay went: when no income is logged for the month. {month} is the name alone."
+  },
+  "ofIncome": {
+    "message": "Of the income",
+    "context": "Where the pay went: table header, a part as a share of the income."
+  },
+  "left": {
+    "message": "Left",
+    "context": "Where the pay went: income minus everything spent, saved and invested."
+  },
+  "short": {
+    "message": "Short",
+    "context": "Where the pay went: how much more went out than came in."
+  },
+  "incomeLine": {
+    "message": "Income",
+    "context": "Where the pay went: tooltip of the line marking the income on the bar."
+  },
+  "incomeLineNote": {
+    "message": "The white line is the income: everything past it was paid from elsewhere.",
+    "context": "Where the pay went: note under the bar when more went out than came in."
+  },
+  "fromSavings": {
+    "message": "{amount} was taken out of savings this month, and counts as money that came in.",
+    "context": "Where the pay went: note when more was withdrawn from savings than put in. {amount} is formatted money."
+  },
+  "guessed": {
+    "message": "Some categories' groups are guessed from their names. Set them in Settings → Categories.",
+    "context": "Where the pay went: note when a category hasn't had its group picked."
+  },
+  "part": {
+    "daily": {
+      "message": "Everyday spending",
+      "context": "Where the pay went, and a category's group: food, transport, household and the like."
+    },
+    "bills": {
+      "message": "Bills",
+      "context": "Where the pay went, and a category's group: rent, utilities, phone, subscriptions, insurance."
+    },
+    "debts": {
+      "message": "Debts",
+      "context": "Where the pay went, and a category's group: loan and mortgage instalments, card repayments."
+    },
+    "fun": {
+      "message": "Fun",
+      "context": "Where the pay went, and a category's group: eating out, going out, hobbies, travel."
+    },
+    "other": {
+      "message": "Other",
+      "context": "Where the pay went, and a category's group: anything else (gifts, health, one-offs)."
+    },
+    "savings": {
+      "message": "Savings",
+      "context": "Where the pay went: put into savings accounts this month, less what was taken out."
+    },
+    "investments": {
+      "message": "Investments",
+      "context": "Where the pay went: put into IKE, IKZE, PPK, bonds and investment accounts this month."
+    }
+  }
+}

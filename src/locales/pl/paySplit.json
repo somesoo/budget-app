@@ -1,0 +1,76 @@
+{
+  "title": {
+    "message": "Na co poszła wypłata",
+    "context": "Card heading (Insights, Add screen widget): the month's income split into kinds of spending, savings, investments and what's left."
+  },
+  "headline": {
+    "message": "Wpłynęło <b>{income}</b>, zostało <b>{amount}</b>.",
+    "context": "Where the pay went: sentence above the bar. Both formatted money. Keep the <b> tags."
+  },
+  "headlineShort": {
+    "message": "Wpłynęło <b>{income}</b>, a wyszło o <b>{amount} więcej</b>.",
+    "context": "Where the pay went: sentence above the bar when spending, saving and investing came to more than the income. Keep the <b> tags."
+  },
+  "noIncome": {
+    "message": "Brak wpływów za miesiąc {month}. Dodaj wypłatę, żeby zobaczyć, na co poszła.",
+    "context": "Where the pay went: when no income is logged for the month. {month} is the name alone."
+  },
+  "ofIncome": {
+    "message": "Z wpływów",
+    "context": "Where the pay went: table header, a part as a share of the income."
+  },
+  "left": {
+    "message": "Zostało",
+    "context": "Where the pay went: income minus everything spent, saved and invested."
+  },
+  "short": {
+    "message": "Zabrakło",
+    "context": "Where the pay went: how much more went out than came in."
+  },
+  "incomeLine": {
+    "message": "Wpływy",
+    "context": "Where the pay went: tooltip of the line marking the income on the bar."
+  },
+  "incomeLineNote": {
+    "message": "Biała kreska to wpływy: wszystko za nią zostało opłacone z innych pieniędzy.",
+    "context": "Where the pay went: note under the bar when more went out than came in."
+  },
+  "fromSavings": {
+    "message": "W tym miesiącu wypłacono {amount} z oszczędności; liczy się to jako wpływ.",
+    "context": "Where the pay went: note when more was withdrawn from savings than put in. {amount} is formatted money."
+  },
+  "guessed": {
+    "message": "Grupy części kategorii są zgadnięte z nazw. Ustawisz je w Ustawieniach → Kategorie.",
+    "context": "Where the pay went: note when a category hasn't had its group picked."
+  },
+  "part": {
+    "daily": {
+      "message": "Wydatki codzienne",
+      "context": "Where the pay went, and a category's group: food, transport, household and the like."
+    },
+    "bills": {
+      "message": "Rachunki",
+      "context": "Where the pay went, and a category's group: rent, utilities, phone, subscriptions, insurance."
+    },
+    "debts": {
+      "message": "Zobowiązania",
+      "context": "Where the pay went, and a category's group: loan and mortgage instalments, card repayments."
+    },
+    "fun": {
+      "message": "Przyjemności",
+      "context": "Where the pay went, and a category's group: eating out, going out, hobbies, travel."
+    },
+    "other": {
+      "message": "Inne",
+      "context": "Where the pay went, and a category's group: anything else (gifts, health, one-offs)."
+    },
+    "savings": {
+      "message": "Oszczędności",
+      "context": "Where the pay went: put into savings accounts this month, less what was taken out."
+    },
+    "investments": {
+      "message": "Inwestycje",
+      "context": "Where the pay went: put into IKE, IKZE, PPK, bonds and investment accounts this month."
+    }
+  }
+}

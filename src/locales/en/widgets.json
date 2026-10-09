@@ -137,5 +137,25 @@
   "nothingSpent": {
     "message": "Nothing spent yet this month.",
     "context": "Add screen widgets (donut, who paid) when nothing has been spent this month."
+  },
+  "top": {
+    "label": {
+      "message": "Top 3",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): this month's three biggest spending categories."
+    },
+    "help": {
+      "message": "The three biggest categories against what they usually cost.",
+      "context": "Settings > Widgets: description under the switch of the 'Top 3' widget."
+    }
+  },
+  "pay": {
+    "label": {
+      "message": "Pay",
+      "context": "Name of a widget on the Add screen (tab above the cards, and a switch in Settings): where this month's income went: kinds of spending, savings, investments, what's left."
+    },
+    "help": {
+      "message": "Where this month's pay went: spending, bills, debts, savings.",
+      "context": "Settings > Widgets: description under the switch of the 'Pay' widget."
+    }
   }
 }

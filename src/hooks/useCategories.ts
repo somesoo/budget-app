@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
+import { SPENDING_GROUPS } from '../lib/paySplit'
 import type { Category } from '../types'
 
 export const categoriesKey = ['categories'] as const
@@ -33,6 +34,8 @@ export function useCategories() {
         goal_id: c.goal_id ?? null,
         // absent until migration 0013: shared
         owner: typeof c.owner === 'string' && c.owner ? c.owner : null,
+        // absent until migration 0020, and null until picked: guessed
+        spending_group: SPENDING_GROUPS.includes(c.spending_group) ? c.spending_group : null,
       }))
     },
     staleTime: 60_000,
@@ -75,7 +78,10 @@ export function useAddCategory() {
     mutationFn: async (
       category: Pick<Category, 'name' | 'color' | 'monthly_limit'> &
         Partial<
-          Pick<Category, 'kind' | 'budget_total' | 'starts_on' | 'ends_on' | 'goal_id' | 'owner'>
+          Pick<
+            Category,
+            'kind' | 'budget_total' | 'starts_on' | 'ends_on' | 'goal_id' | 'owner' | 'spending_group'
+          >
         >,
     ) => {
       const existing = qc.getQueryData<Category[]>(categoriesKey) ?? []

@@ -1,0 +1,286 @@
+{
+  "title": {
+    "message": "What the app shows",
+    "context": "Settings: card heading. The app opens in four stages so a new user isn't overwhelmed; this card picks the stage and switches features on or off."
+  },
+  "help": {
+    "message": "Learn it a step at a time. Each stage adds one habit; nothing is deleted, only hidden, and it's this phone's choice.",
+    "context": "Settings > What the app shows: help under the heading."
+  },
+  "stageN": {
+    "message": "Stage {n}",
+    "context": "Small label above a stage's name. {n} is 1 to 4."
+  },
+  "current": {
+    "message": "You're here",
+    "context": "Settings > What the app shows: badge on the stage this phone is at."
+  },
+  "custom": {
+    "message": "adjusted by hand",
+    "context": "Settings > What the app shows: added to the current stage's badge when features were switched on or off by hand."
+  },
+  "choose": {
+    "message": "Switch to this stage",
+    "context": "Settings > What the app shows: button on a stage card."
+  },
+  "readLesson": {
+    "message": "Read the lesson",
+    "context": "Settings > What the app shows: button that opens a stage's lesson."
+  },
+  "customize": {
+    "message": "Switch features one by one",
+    "context": "Settings > What the app shows: button that shows a switch per feature."
+  },
+  "customizeHide": {
+    "message": "Hide the switches",
+    "context": "Settings > What the app shows: button that hides the per-feature switches."
+  },
+  "reset": {
+    "message": "Back to what the stage shows",
+    "context": "Settings > What the app shows: button that undoes features switched by hand."
+  },
+  "adds": {
+    "message": "Adds",
+    "context": "Stage card and lesson: label before the list of features the stage adds."
+  },
+  "addsNothing": {
+    "message": "Adding expenses and income, History, and the charts of where it goes.",
+    "context": "Stage 1 card: what the first stage shows, as it adds no feature of its own."
+  },
+  "why": {
+    "message": "Why",
+    "context": "Lesson sheet: heading of the paragraph on why this stage's habit matters."
+  },
+  "toDo": {
+    "message": "What to do",
+    "context": "Lesson sheet: heading of the list of things to do in this stage."
+  },
+  "unlock": {
+    "message": "Show stage {n}: {name}",
+    "context": "Lesson sheet: button that moves this phone to the next stage. {name} is the stage's name."
+  },
+  "later": {
+    "message": "Not yet",
+    "context": "Next-stage suggestion: button that puts it off for two weeks."
+  },
+  "nudge": {
+    "message": "Ready for the next step: {name}",
+    "context": "Add screen: a small banner when the habit of the current stage has taken. {name} is the next stage's name."
+  },
+  "nudgeLabel": {
+    "message": "Read about the next stage",
+    "context": "Add screen: accessible label of the next-stage banner."
+  },
+  "dismiss": {
+    "message": "Not now",
+    "context": "Add screen: accessible label of the button that hides the next-stage banner for two weeks."
+  },
+  "stage": {
+    "1": {
+      "name": {
+        "message": "Track",
+        "context": "Stage 1 name: logging what's spent and earned."
+      },
+      "why": {
+        "message": "Before you can plan anything you need to know what a month really costs. Most people guess their spending 20–30% too low: the big buys stick, the small ones don't.",
+        "context": "Stage 1 lesson: why."
+      },
+      "do1": {
+        "message": "Log every expense right away: category, amount, Save. Three taps.",
+        "context": "Stage 1 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "When pay comes in, log it with the arrow next to the amount at the top.",
+        "context": "Stage 1 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Once a week, swipe through the widgets: where it goes, Top 3, where the pay went.",
+        "context": "Stage 1 lesson: third thing to do."
+      },
+      "next": {
+        "message": "After two weeks of logging, the app suggests planning a month.",
+        "context": "Stage 1 lesson: when the next stage is suggested."
+      }
+    },
+    "2": {
+      "name": {
+        "message": "Plan",
+        "context": "Stage 2 name: planning the month."
+      },
+      "why": {
+        "message": "A budget isn't a ban, it's deciding in advance what the money is for. When every złoty has a job (a zero-based budget), you see where the rest slips away.",
+        "context": "Stage 2 lesson: why."
+      },
+      "do1": {
+        "message": "On the Budget tab, plan the month: income, what to put aside, a limit per category.",
+        "context": "Stage 2 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Start from Typical: what each category has cost over the last months.",
+        "context": "Stage 2 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Glance at the amount at the top of the Add screen: that's what's still safe to spend.",
+        "context": "Stage 2 lesson: third thing to do."
+      },
+      "next": {
+        "message": "With a plan and a paycheck logged, the app suggests saving from it.",
+        "context": "Stage 2 lesson: when the next stage is suggested."
+      }
+    },
+    "3": {
+      "name": {
+        "message": "Save",
+        "context": "Stage 3 name: saving first, goals, an emergency fund."
+      },
+      "why": {
+        "message": "Put money aside at the start of the month, not from what's left: usually nothing is. The first goal is an emergency fund, three to six months of spending for what you can't plan.",
+        "context": "Stage 3 lesson: why."
+      },
+      "do1": {
+        "message": "Add your savings accounts with today's balance.",
+        "context": "Stage 3 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Make an emergency fund goal and mark it as one in its sheet.",
+        "context": "Stage 3 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "On payday, use From the paycheck to pay in what the plan puts aside.",
+        "context": "Stage 3 lesson: third thing to do."
+      },
+      "next": {
+        "message": "After two months of it, the app suggests the full picture.",
+        "context": "Stage 3 lesson: when the next stage is suggested."
+      }
+    },
+    "4": {
+      "name": {
+        "message": "Everything",
+        "context": "Stage 4 name: the whole app."
+      },
+      "why": {
+        "message": "Now the whole picture: debts and the way out of them, net worth, bills that come once a year, how old your money is, and the road to living off savings.",
+        "context": "Stage 4 lesson: why."
+      },
+      "do1": {
+        "message": "Add your debts and see when you'd be debt-free, dearest or smallest first.",
+        "context": "Stage 4 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Add subscriptions and yearly bills: the app works out what to put aside a month.",
+        "context": "Stage 4 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Once a quarter, bring account and debt balances up to date.",
+        "context": "Stage 4 lesson: third thing to do."
+      },
+      "next": {
+        "message": "That's all of it. Any feature can still be switched off here.",
+        "context": "Stage 4 lesson: closing line."
+      }
+    }
+  },
+  "feature": {
+    "budget": {
+      "label": {
+        "message": "Budget",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Plan of the month, category limits and warnings.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "insights": {
+      "label": {
+        "message": "Insights",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "The forecast, where the money and the pay went.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "savings": {
+      "label": {
+        "message": "Savings and goals",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Accounts, goals, and the Goals tile on the Add screen.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "paycheck": {
+      "label": {
+        "message": "From the paycheck",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Paying in the plan's savings on payday.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "health": {
+      "label": {
+        "message": "Money health",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Savings rate, fixed costs, emergency fund, age of money.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "regular": {
+      "label": {
+        "message": "Regular costs",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Subscriptions and bills that come back monthly or yearly.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "debts": {
+      "label": {
+        "message": "Debts and net worth",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Debts, the payoff plan, and net worth.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "charts": {
+      "label": {
+        "message": "More charts",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Month by month, change by category, pace, weekdays.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "fire": {
+      "label": {
+        "message": "Financial independence",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "How much would let you live off savings.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "ai": {
+      "label": {
+        "message": "AI",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Ask, recommendations and plan drafts (needs a Gemini key).",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    }
+  }
+}

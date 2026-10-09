@@ -1,3 +1,4 @@
+import { useFeature } from '../../hooks/usePrefs'
 import { ArrowLeft, CaretLeft, CaretRight, Check, Lightbulb, Sparkle } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MoneyInput } from './MoneyInput'
@@ -81,6 +82,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
   const save = useSaveBudget()
   const remove = useDeleteBudget()
   const suggest = useSuggestPlan()
+  const showAi = useFeature('ai')
 
   const ready = plannerReady({
     categoriesLoaded: !categoriesLoading,
@@ -430,21 +432,22 @@ export function BudgetPlanner({ month, onClose }: Props) {
             </section>
 
             {/* ---------- AI draft ---------- */}
-            <section className="rounded-3xl bg-accent/10 p-4 ring-1 ring-accent/25">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
-                  <Sparkle weight="fill" aria-hidden />
-                  {t('planner.aiDraft')}
-                </h2>
-                {ai && (
-                  <button
-                    type="button"
-                    onClick={applyAi}
-                    className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
-                  >
-                    {t('planner.useAll')}
-                  </button>
-                )}
+            {showAi && (
+              <section className="rounded-3xl bg-accent/10 p-4 ring-1 ring-accent/25">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="flex items-center gap-1.5 text-sm font-semibold text-white">
+                    <Sparkle weight="fill" aria-hidden />
+                    {t('planner.aiDraft')}
+                  </h2>
+                  {ai && (
+                    <button
+                      type="button"
+                      onClick={applyAi}
+                      className="rounded-full bg-slate-50 px-3 py-1.5 text-sm font-bold text-ink active:opacity-80"
+                    >
+                      {t('planner.useAll')}
+                    </button>
+            )}
               </div>
               {ai ? (
                 <div className="mt-2 space-y-2">
@@ -499,6 +502,7 @@ export function BudgetPlanner({ month, onClose }: Props) {
                 {t('planner.aiSent')}
               </p>
             </section>
+            )}
 
             {/* ---------- from the history ---------- */}
             {suggestions.length > 0 && (

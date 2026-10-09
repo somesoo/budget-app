@@ -9,6 +9,7 @@
  */
 
 import type { MessageKey } from '../i18n'
+import { featureOfPlace, type FeatureId } from './features'
 
 /** `{name}` in the texts → the label it stands for (planMonth is filled in by the page). */
 export const GUIDE_LABELS: Record<string, MessageKey> = {
@@ -179,13 +180,27 @@ export const GUIDE: GuideSection[] = [
 ]
 
 /** Steps of the getting-started list the app can check, and how many of those are done. */
-export function startProgress(done: Partial<Record<GuideCheck, boolean>>): {
+export function startProgress(
+  done: Partial<Record<GuideCheck, boolean>>,
+  guide: GuideSection[] = GUIDE,
+): {
   done: number
   total: number
 } {
-  const checked = GUIDE[0].steps.filter((s) => s.check && !s.optional && done[s.check] !== undefined)
+  const checked = guide[0].steps.filter((s) => s.check && !s.optional && done[s.check] !== undefined)
   return {
     done: checked.filter((s) => done[s.check!]).length,
     total: checked.length,
   }
+}
+
+/** The guide for what this phone shows: steps about hidden features left out, empty sections too. */
+export function visibleGuide(shows: (feature: FeatureId) => boolean): GuideSection[] {
+  return GUIDE.map((section) => ({
+    ...section,
+    steps: section.steps.filter((step) => {
+      const feature = featureOfPlace(step)
+      return !feature || shows(feature)
+    }),
+  })).filter((section) => section.steps.length > 0)
 }

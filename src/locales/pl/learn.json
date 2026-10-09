@@ -1,0 +1,286 @@
+{
+  "title": {
+    "message": "Co pokazuje aplikacja",
+    "context": "Settings: card heading. The app opens in four stages so a new user isn't overwhelmed; this card picks the stage and switches features on or off."
+  },
+  "help": {
+    "message": "Ucz się krok po kroku. Każdy etap dodaje jeden nawyk; nic nie znika z danych, tylko się nie wyświetla, i to wybór tego telefonu.",
+    "context": "Settings > What the app shows: help under the heading."
+  },
+  "stageN": {
+    "message": "Etap {n}",
+    "context": "Small label above a stage's name. {n} is 1 to 4."
+  },
+  "current": {
+    "message": "Tu jesteś",
+    "context": "Settings > What the app shows: badge on the stage this phone is at."
+  },
+  "custom": {
+    "message": "dostosowany ręcznie",
+    "context": "Settings > What the app shows: added to the current stage's badge when features were switched on or off by hand."
+  },
+  "choose": {
+    "message": "Przełącz na ten etap",
+    "context": "Settings > What the app shows: button on a stage card."
+  },
+  "readLesson": {
+    "message": "Przeczytaj lekcję",
+    "context": "Settings > What the app shows: button that opens a stage's lesson."
+  },
+  "customize": {
+    "message": "Włączaj funkcje pojedynczo",
+    "context": "Settings > What the app shows: button that shows a switch per feature."
+  },
+  "customizeHide": {
+    "message": "Ukryj przełączniki",
+    "context": "Settings > What the app shows: button that hides the per-feature switches."
+  },
+  "reset": {
+    "message": "Wróć do ustawień etapu",
+    "context": "Settings > What the app shows: button that undoes features switched by hand."
+  },
+  "adds": {
+    "message": "Dodaje",
+    "context": "Stage card and lesson: label before the list of features the stage adds."
+  },
+  "addsNothing": {
+    "message": "Dodawanie wydatków i wpływów, Historia i wykresy, na co idą pieniądze.",
+    "context": "Stage 1 card: what the first stage shows, as it adds no feature of its own."
+  },
+  "why": {
+    "message": "Po co",
+    "context": "Lesson sheet: heading of the paragraph on why this stage's habit matters."
+  },
+  "toDo": {
+    "message": "Co robić",
+    "context": "Lesson sheet: heading of the list of things to do in this stage."
+  },
+  "unlock": {
+    "message": "Pokaż etap {n}: {name}",
+    "context": "Lesson sheet: button that moves this phone to the next stage. {name} is the stage's name."
+  },
+  "later": {
+    "message": "Jeszcze nie",
+    "context": "Next-stage suggestion: button that puts it off for two weeks."
+  },
+  "nudge": {
+    "message": "Gotowe na kolejny krok: {name}",
+    "context": "Add screen: a small banner when the habit of the current stage has taken. {name} is the next stage's name."
+  },
+  "nudgeLabel": {
+    "message": "Przeczytaj o kolejnym etapie",
+    "context": "Add screen: accessible label of the next-stage banner."
+  },
+  "dismiss": {
+    "message": "Nie teraz",
+    "context": "Add screen: accessible label of the button that hides the next-stage banner for two weeks."
+  },
+  "stage": {
+    "1": {
+      "name": {
+        "message": "Notuj",
+        "context": "Stage 1 name: logging what's spent and earned."
+      },
+      "why": {
+        "message": "Zanim cokolwiek zaplanujesz, musisz wiedzieć, ile naprawdę kosztuje Twój miesiąc. Większość ludzi zaniża swoje wydatki o 20–30%: duże zakupy się pamięta, drobnych nie.",
+        "context": "Stage 1 lesson: why."
+      },
+      "do1": {
+        "message": "Dodawaj każdy wydatek od razu: kategoria, kwota, Zapisz. Trzy stuknięcia.",
+        "context": "Stage 1 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Gdy przyjdzie wypłata, dodaj ją strzałką obok kwoty u góry.",
+        "context": "Stage 1 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Raz w tygodniu przejrzyj widżety: na co idą pieniądze, Top 3, na co poszła wypłata.",
+        "context": "Stage 1 lesson: third thing to do."
+      },
+      "next": {
+        "message": "Po dwóch tygodniach notowania aplikacja zaproponuje plan miesiąca.",
+        "context": "Stage 1 lesson: when the next stage is suggested."
+      }
+    },
+    "2": {
+      "name": {
+        "message": "Planuj",
+        "context": "Stage 2 name: planning the month."
+      },
+      "why": {
+        "message": "Budżet to nie zakaz, tylko decyzja z góry, na co idą pieniądze. Gdy każda złotówka ma zadanie (budżet „od zera”), widać, gdzie ucieka reszta.",
+        "context": "Stage 2 lesson: why."
+      },
+      "do1": {
+        "message": "W zakładce Budżet zaplanuj miesiąc: wpływy, ile odłożyć, limit na każdą kategorię.",
+        "context": "Stage 2 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Zacznij od „Typowe”: tyle każda kategoria kosztowała w ostatnich miesiącach.",
+        "context": "Stage 2 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Zerkaj na kwotę u góry ekranu dodawania: tyle możesz jeszcze bezpiecznie wydać.",
+        "context": "Stage 2 lesson: third thing to do."
+      },
+      "next": {
+        "message": "Gdy będzie plan i zapisana wypłata, aplikacja zaproponuje oszczędzanie.",
+        "context": "Stage 2 lesson: when the next stage is suggested."
+      }
+    },
+    "3": {
+      "name": {
+        "message": "Oszczędzaj",
+        "context": "Stage 3 name: saving first, goals, an emergency fund."
+      },
+      "why": {
+        "message": "Odkładaj na początku miesiąca, nie z tego, co zostanie: zwykle nic nie zostaje. Pierwszy cel to poduszka finansowa, 3–6 miesięcy wydatków na to, czego nie da się zaplanować.",
+        "context": "Stage 3 lesson: why."
+      },
+      "do1": {
+        "message": "Dodaj konta oszczędnościowe z dzisiejszym saldem.",
+        "context": "Stage 3 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Załóż cel na poduszkę finansową i oznacz go jako fundusz awaryjny.",
+        "context": "Stage 3 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "W dniu wypłaty użyj „Z wypłaty”, żeby od razu odłożyć zaplanowane kwoty.",
+        "context": "Stage 3 lesson: third thing to do."
+      },
+      "next": {
+        "message": "Po dwóch miesiącach aplikacja zaproponuje pełny obraz.",
+        "context": "Stage 3 lesson: when the next stage is suggested."
+      }
+    },
+    "4": {
+      "name": {
+        "message": "Pełny obraz",
+        "context": "Stage 4 name: the whole app."
+      },
+      "why": {
+        "message": "Teraz cały obraz: długi i plan ich spłaty, majątek netto, rachunki płacone raz w roku, wiek pieniądza i droga do życia z oszczędności.",
+        "context": "Stage 4 lesson: why."
+      },
+      "do1": {
+        "message": "Wpisz długi i zobacz, kiedy będziesz bez długów, spłacając najdroższe albo najmniejsze najpierw.",
+        "context": "Stage 4 lesson: first thing to do."
+      },
+      "do2": {
+        "message": "Dodaj subskrypcje i rachunki roczne: aplikacja policzy, ile odkładać co miesiąc.",
+        "context": "Stage 4 lesson: second thing to do."
+      },
+      "do3": {
+        "message": "Raz na kwartał zaktualizuj salda kont i długów.",
+        "context": "Stage 4 lesson: third thing to do."
+      },
+      "next": {
+        "message": "To już wszystko. Każdą funkcję możesz tu nadal wyłączyć.",
+        "context": "Stage 4 lesson: closing line."
+      }
+    }
+  },
+  "feature": {
+    "budget": {
+      "label": {
+        "message": "Budżet",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Plan miesiąca, limity kategorii i ostrzeżenia.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "insights": {
+      "label": {
+        "message": "Analizy",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Prognoza, na co poszły pieniądze i wypłata.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "savings": {
+      "label": {
+        "message": "Oszczędności i cele",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Konta, cele i kafelek Cele przy dodawaniu.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "paycheck": {
+      "label": {
+        "message": "Z wypłaty",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Odkładanie zaplanowanych kwot w dniu wypłaty.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "health": {
+      "label": {
+        "message": "Zdrowie finansów",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Stopa oszczędności, koszty stałe, poduszka, wiek pieniądza.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "regular": {
+      "label": {
+        "message": "Koszty stałe",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Subskrypcje i rachunki, które wracają co miesiąc lub co rok.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "debts": {
+      "label": {
+        "message": "Długi i majątek netto",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Długi, plan spłaty i majątek netto.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "charts": {
+      "label": {
+        "message": "Więcej wykresów",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Miesiąc do miesiąca, zmiany w kategoriach, tempo, dni tygodnia.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "fire": {
+      "label": {
+        "message": "Niezależność finansowa",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Ile potrzeba, żeby żyć z oszczędności.",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    },
+    "ai": {
+      "label": {
+        "message": "AI",
+        "context": "Settings > What the app shows: name of a feature that can be switched on or off."
+      },
+      "help": {
+        "message": "Pytania do AI, rekomendacje i szkic planu (potrzebny klucz Gemini).",
+        "context": "Settings > What the app shows: what the feature is, under its switch."
+      }
+    }
+  }
+}

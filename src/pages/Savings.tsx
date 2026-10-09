@@ -23,6 +23,7 @@ import { DebtCard } from '../components/debts/DebtCard'
 import { DebtSheet } from '../components/debts/DebtSheet'
 import { NetWorthCard } from '../components/debts/NetWorthCard'
 import { PayoffPlanCard } from '../components/debts/PayoffPlanCard'
+import { useFeature } from '../hooks/usePrefs'
 import { useWealth } from '../hooks/useWealth'
 import { payoff } from '../lib/debts'
 import { useGoalTrips } from '../hooks/useGoalTrips'
@@ -54,6 +55,7 @@ export function Savings() {
   const spentFrom = (goalId: string) => trips.tripOf(goalId)?.spent ?? 0
   const emergency = useEmergencyHint()
   const wealth = useWealth()
+  const showDebts = useFeature('debts')
   const [showPaidOff, setShowPaidOff] = useState(false)
   const openDebts = wealth.debts.filter((d) => !d.archived)
   const paidOff = wealth.debts.filter((d) => d.archived)
@@ -102,7 +104,7 @@ export function Savings() {
 
   const planned = s.plannedThisMonth
   // the whole picture at the top, as the net worth card further down has it
-  const withDebts = wealth.available && openDebts.length > 0
+  const withDebts = showDebts && wealth.available && openDebts.length > 0
   const netWorth = wealth.netWorth[wealth.netWorth.length - 1]?.net ?? s.total - wealth.totalOwed
   const toolbar: { mode: MoneyMode; label: string; icon: ReactNode }[] = [
     { mode: 'withdraw', label: t('savingsPage.takeOut'), icon: <ArrowUp aria-hidden /> },
@@ -309,7 +311,7 @@ export function Savings() {
       </div>
 
       {/* ---------- debts and net worth ---------- */}
-      {wealth.available && (
+      {showDebts && wealth.available && (
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
           <section aria-labelledby="debts" data-tour="savings-debts" className="space-y-4">
             <div>

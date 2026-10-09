@@ -1,4 +1,5 @@
 import { CalendarPlus, CaretRight, NotePencil } from '@phosphor-icons/react'
+import { useFeatures } from '../hooks/usePrefs'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { BudgetPlanner } from '../components/budget/BudgetPlanner'
@@ -60,6 +61,7 @@ export function Budget() {
   const isFuture = month > current
 
   const savings = useSavingsOverview()
+  const shows = useFeatures()
   // once savings accounts exist (migration 0007), goals live there
   const savingsSection = savings.available ? (
     <SavingsSummaryCard overview={savings} />
@@ -76,7 +78,7 @@ export function Budget() {
     )
   )
   const projects = useProjectSummaries()
-  const goalSection = (
+  const goalSection = shows('savings') && (
     <>
       {savingsSection}
       {/* goals spent from, like a trip: outside the month's numbers */}
@@ -112,7 +114,7 @@ export function Budget() {
           onPlan={() => setPlanning(month)}
           aside={
             <>
-              {plan && <PaycheckCard month={month} plan={plan} overview={savings} />}
+              {plan && shows('paycheck') && <PaycheckCard month={month} plan={plan} overview={savings} />}
               {goalSection}
             </>
           }
@@ -126,7 +128,7 @@ export function Budget() {
           onOpenMonth={setMonth}
           aside={goalSection}
         >
-          {plan && <PaycheckCard month={month} plan={plan} overview={savings} />}
+          {plan && shows('paycheck') && <PaycheckCard month={month} plan={plan} overview={savings} />}
           {month === current && (
             <button
               type="button"
@@ -197,6 +199,7 @@ function MonthStatus({
   // a hidden category still shows while it has spending this month
   const shown = categories.filter((c) => !c.archived || (byCategory[c.id] ?? 0) > 0)
   const limit = roundMoney(shown.reduce((a, c) => a + c.monthly_limit, 0))
+  const shows = useFeatures()
   const left = roundMoney(limit - spent)
   const isCurrent = month === currentMonthKey()
   const { alerts, all: allAlerts, dismiss } = useBudgetAlerts()
@@ -293,9 +296,9 @@ function MonthStatus({
             />
           )}
 
-          <HealthCard month={month} categories={shown} />
+          {shows('health') && <HealthCard month={month} categories={shown} />}
 
-          {isCurrent && <RegularCostsCard />}
+          {isCurrent && shows('regular') && <RegularCostsCard />}
 
           {isCurrent && alerts.length > 0 && (
             <section className="mb-6" aria-label={t('settings.warnings.title')}>

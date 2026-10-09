@@ -19,6 +19,7 @@ import { Screen } from '../components/Screen'
 import { Segments, Switch } from '../components/savings/fields'
 import { CategorySheet } from '../components/settings/CategorySheet'
 import { CardAction, SettingsCard } from '../components/settings/SettingsCard'
+import { LearningCard } from '../components/learn/LearningCard'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { resetDismissedAlerts, useDismissedCount } from '../hooks/useBudgetAlerts'
 import { useCategories } from '../hooks/useCategories'
@@ -27,7 +28,7 @@ import { usePeople, usePeopleActions } from '../hooks/usePeople'
 import { useMonthlyExpensesBetween } from '../hooks/useExpenses'
 import { GeminiKeyUnavailableError, useGeminiKey, useSaveGeminiKey } from '../hooks/useGeminiKey'
 import { useGoal, useUpsertGoal } from '../hooks/useGoal'
-import { DEFAULT_PREFS, setPrefs, usePrefs } from '../hooks/usePrefs'
+import { DEFAULT_PREFS, setPrefs, useFeatures, usePrefs } from '../hooks/usePrefs'
 import { useRealtimeStatus } from '../hooks/useRealtimeSync'
 import { useSavingsOverview } from '../hooks/useSavings'
 import { useSession } from '../hooks/useSession'
@@ -60,6 +61,7 @@ type CategoryEdit = { category?: Category } | null
 export function Settings() {
   const { data: categories = [] } = useCategories()
   const savings = useSavingsOverview()
+  const shows = useFeatures()
   const [editing, setEditing] = useState<CategoryEdit>(null)
 
   // what each category has actually cost lately, next to its limit
@@ -76,6 +78,7 @@ export function Settings() {
     <Screen title={t('settings.title')} wide>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
         <div className="space-y-4">
+          <LearningCard />
           <PeopleCard />
           <DeviceCard />
           <LanguageCard />
@@ -90,12 +93,14 @@ export function Settings() {
           <AddScreenCard />
           <WidgetsCard />
           <WarningsCard />
-          <SavingsSettings
-            available={savings.available}
-            accounts={savings.accounts.length}
-            goals={savings.goals.length}
-          />
-          <AiCard />
+          {shows('savings') && (
+            <SavingsSettings
+              available={savings.available}
+              accounts={savings.accounts.length}
+              goals={savings.goals.length}
+            />
+          )}
+          {shows('ai') && <AiCard />}
           <HelpCard />
           <DataCard categories={categories} />
           <AccountCard />
@@ -452,6 +457,7 @@ function AddScreenCard() {
 
 function WidgetsCard() {
   const prefs = usePrefs()
+  const shows = useFeatures()
   const toggle = (id: string, on: boolean) =>
     setPrefs({
       hiddenWidgets: on
@@ -464,7 +470,7 @@ function WidgetsCard() {
       help={t('settings.widgets.help')}
     >
       <div className="space-y-3">
-        {ADD_WIDGETS.map((w) => (
+        {ADD_WIDGETS.filter((w) => !w.feature || shows(w.feature)).map((w) => (
           <Switch
             key={w.id}
             label={w.label()}

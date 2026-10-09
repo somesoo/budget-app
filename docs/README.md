@@ -10,6 +10,8 @@
 
 - [People and phones](people-and-phones.md): the shared account, who's in
   the budget, languages, the guide and the tour
+- [A step at a time](stages.md): the four stages, their lessons, switching
+  features on and off
 - [Adding expenses](adding.md): the Add tab, *Safe to spend*, income,
   categories, allowances
 - [Budget](budget.md): a plan per month, *From the paycheck*, last month's

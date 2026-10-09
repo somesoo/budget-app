@@ -284,6 +284,59 @@ export function categorySlices(
   return slices
 }
 
+/* ---------- the biggest categories ---------- */
+
+export interface TopCategory {
+  category: Category
+  amount: number
+  /** Of the month's charted spending. */
+  share: number
+  /** Average over the months before that have any spending; null without any. */
+  typical: number | null
+}
+
+/**
+ * The month's biggest categories, each against what it typically costs.
+ * Same categories as the donut: those switched out of the chart (rent and
+ * the like) would top it every month and say nothing.
+ */
+export function topCategories(
+  expenses: Expense[],
+  categories: Category[],
+  month: MonthKey,
+  count = 3,
+  typicalMonths = 3,
+): TopCategory[] {
+  const byId = categoryById(categories)
+  const charted = expenses.filter((e) => byId[e.category_id]?.show_in_chart !== false)
+  const inMonth = (m: MonthKey) => charted.filter((e) => monthKeyOfDate(e.expense_date) === m)
+
+  const current = inMonth(month)
+  const total = sumExpenses(current)
+  if (total <= 0) return []
+
+  // a month before the first expense isn't a cheap month, it's no data
+  const before = monthsEndingAt(shiftMonth(month, -1), typicalMonths)
+    .map(inMonth)
+    .filter((list) => list.length > 0)
+    .map(sumByCategory)
+
+  return Object.entries(sumByCategory(current))
+    .map(([id, amount]) => ({ category: byId[id], amount }))
+    .filter((row) => row.category && row.amount > 0)
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, count)
+    .map(({ category, amount }) => ({
+      category,
+      amount,
+      share: amount / total,
+      typical:
+        before.length > 0
+          ? roundMoney(before.reduce((acc, m) => acc + (m[category.id] ?? 0), 0) / before.length)
+          : null,
+    }))
+}
+
 /* ---------- pace status: the colour of the money left ---------- */
 
 export type PaceStatus = 'under' | 'on' | 'over'

@@ -209,5 +209,49 @@
     "one": "Leaves out {count} expense of {amount} or more, like rent.",
     "other": "Leaves out {count} expenses of {amount} or more, like rent.",
     "context": "Insights weekday card footnote: big expenses are excluded."
+  },
+  "structureTitle": {
+    "message": "Where the money went",
+    "context": "Insights: title of the card with the donut of the selected month's spending by category."
+  },
+  "structureHeadline": {
+    "message": "<b>{name}</b> takes {share} of {month}'s spending.",
+    "context": "Insights > spending structure card: sentence above the donut. {name} is the biggest category, {share} its percentage like '34%', {month} the month's name alone."
+  },
+  "share": {
+    "message": "Share",
+    "context": "Insights > spending structure and top categories: table header, a category's percentage of the month's spending."
+  },
+  "topTitle": {
+    "message": "Top 3 categories",
+    "context": "Insights: title of the card listing the month's three biggest spending categories."
+  },
+  "topHeadline": {
+    "message": "Together they're {share} of the month's spending.",
+    "context": "Insights > top categories card: sentence above the list. {share} is the percentage like '62%' the listed categories make together."
+  },
+  "topTypical": {
+    "message": "usually {amount} a month",
+    "context": "Insights > top categories: under a category in the running month, what it usually costs. {amount} is formatted money."
+  },
+  "topMore": {
+    "message": "{amount} more than usual",
+    "context": "Insights > top categories: a finished month's category cost more than its average of the months before. {amount} is formatted money."
+  },
+  "topLess": {
+    "message": "{amount} less than usual",
+    "context": "Insights > top categories: a finished month's category cost less than its average of the months before. {amount} is formatted money."
+  },
+  "topAsUsual": {
+    "message": "about as usual",
+    "context": "Insights > top categories: a finished month's category cost within 10% of its average of the months before."
+  },
+  "topNoTypical": {
+    "message": "nothing earlier to compare with",
+    "context": "Insights > top categories: no earlier months to compare a category with."
+  },
+  "typical": {
+    "message": "Usually",
+    "context": "Insights > top categories: table header, average of the up to three months before."
   }
 }

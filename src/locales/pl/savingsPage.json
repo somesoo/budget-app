@@ -114,5 +114,24 @@
     "many": "Zwiń {count} ukrytych kont",
     "other": "Zwiń {count} ukrytego konta",
     "context": "Savings tab: hides them again."
+  },
+  "debts": {
+    "message": "Zobowiązania",
+    "context": "Savings tab, totals row: label of what's still owed across all open debts."
+  },
+  "netWorth": {
+    "message": "Majątek netto",
+    "context": "Savings tab, totals row: label of net worth, savings minus debts."
+  },
+  "netWorthSub": {
+    "message": "Odłożone minus zobowiązania.",
+    "context": "Savings tab, totals row: under net worth, how it's worked out."
+  },
+  "debtsCount": {
+    "one": "{count} dług",
+    "few": "{count} długi",
+    "many": "{count} długów",
+    "other": "{count} długu",
+    "context": "Savings tab, totals row: under the debts total, how many open debts there are."
   }
 }

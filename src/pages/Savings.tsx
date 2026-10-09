@@ -101,6 +101,9 @@ export function Savings() {
   }
 
   const planned = s.plannedThisMonth
+  // the whole picture at the top, as the net worth card further down has it
+  const withDebts = wealth.available && openDebts.length > 0
+  const netWorth = wealth.netWorth[wealth.netWorth.length - 1]?.net ?? s.total - wealth.totalOwed
   const toolbar: { mode: MoneyMode; label: string; icon: ReactNode }[] = [
     { mode: 'withdraw', label: t('savingsPage.takeOut'), icon: <ArrowUp aria-hidden /> },
     { mode: 'transfer', label: t('savingsPage.move'), icon: <ArrowsLeftRight aria-hidden /> },
@@ -122,7 +125,9 @@ export function Savings() {
       {/* ---------- the totals ---------- */}
       <section
         data-tour="savings-totals"
-        className="mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5"
+        className={`mb-6 grid gap-4 rounded-3xl bg-white/5 p-4 ring-1 ring-white/10 sm:grid-cols-3 lg:p-5 ${
+          withDebts ? 'lg:grid-cols-5' : ''
+        }`}
       >
         <Figure label={t('savingsPage.total')} value={formatMoneyWhole(s.total)} big />
         <Figure
@@ -157,6 +162,20 @@ export function Savings() {
             ) : null
           }
         />
+        {withDebts && (
+          <>
+            <Figure
+              label={t('savingsPage.debts')}
+              value={formatMoneyWhole(wealth.totalOwed)}
+              sub={t('savingsPage.debtsCount', { count: openDebts.length })}
+            />
+            <Figure
+              label={t('savingsPage.netWorth')}
+              value={formatMoneyWhole(netWorth)}
+              sub={t('savingsPage.netWorthSub')}
+            />
+          </>
+        )}
       </section>
 
       <SavingsAssistant overview={s} />

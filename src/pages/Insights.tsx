@@ -1,4 +1,4 @@
-import { CaretDown, CaretUp, Check, Warning } from '@phosphor-icons/react'
+import { CaretDown, CaretRight, CaretUp, Check, Warning } from '@phosphor-icons/react'
 import { useFeatures } from '../hooks/usePrefs'
 import { useState, type ReactNode } from 'react'
 import { AdviceCard } from '../components/AdviceCard'
@@ -65,6 +65,10 @@ import { type Category, type Expense, type Goal, type Income, type Person } from
 import { personColor, personIds, personLabel } from '../lib/people'
 import { t } from '../i18n'
 import { Trans } from '../i18n/Trans'
+import { Link } from 'react-router-dom'
+import { useChapters } from '../hooks/useChapters'
+import { EARLIER_ID, chapterSpans } from '../lib/chapters'
+import { spanDates, spanName } from '../components/settings/ChaptersCard'
 
 export function Insights() {
   const [month, setMonth] = useState<MonthKey>(currentMonthKey())
@@ -121,6 +125,7 @@ export function Insights() {
           />
         </div>
       )}
+      <ChapterLinks />
     </Screen>
   )
 }
@@ -865,5 +870,36 @@ function Notice({ children }: { children: ReactNode }) {
     <p className="rounded-3xl bg-white/5 p-5 text-center text-sm text-muted ring-1 ring-white/10">
       {children}
     </p>
+  )
+}
+
+/* ---------- chapters ---------- */
+
+/** Once the budget has chapters, each one's summary is a tap away from here. */
+function ChapterLinks() {
+  const { data } = useChapters()
+  const spans = data ? chapterSpans(data.chapters) : []
+  if (spans.length === 0) return null
+  return (
+    <section className="mt-4 rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10">
+      <h2 className="text-base font-semibold text-white">{t('chapters.title')}</h2>
+      <ul className="mt-1 divide-y divide-white/5">
+        {spans.map((span) => (
+          <li key={span.id ?? EARLIER_ID}>
+            <Link
+              to={`/chapter/${span.id ?? EARLIER_ID}`}
+              className="flex items-center gap-2 py-2.5 hover:bg-white/5"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] text-white">{spanName(span, spans)}</span>
+                <span className="block truncate text-xs text-muted">{spanDates(span)}</span>
+              </span>
+              <span className="text-xs font-semibold text-accent-soft">{t('chapters.summary')}</span>
+              <CaretRight className="shrink-0 text-muted" aria-hidden />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

@@ -1,0 +1,232 @@
+{
+  "title": {
+    "message": "Chapters",
+    "context": "Settings > card heading: stages of the household's budget, e.g. before and after moving in together."
+  },
+  "help": {
+    "message": "A new chapter when life changes, like moving in together. Past ones can be hidden or kept out of the planner; nothing is deleted.",
+    "context": "Settings > Chapters card: one-line description under the heading."
+  },
+  "new": {
+    "message": "New chapter",
+    "context": "Settings > Chapters: corner button that opens the form for starting a chapter."
+  },
+  "nameLabel": {
+    "message": "Name",
+    "context": "Settings > Chapters form: label of the chapter name field."
+  },
+  "nameHelp": {
+    "message": "What this chapter is, in a few words.",
+    "context": "Settings > Chapters form: help under the name field."
+  },
+  "namePlaceholder": {
+    "message": "Living together",
+    "context": "Settings > Chapters form: example name in the empty name field."
+  },
+  "startsLabel": {
+    "message": "Starts on",
+    "context": "Settings > Chapters form: label of the start date field."
+  },
+  "startsHelp": {
+    "message": "Everything before it becomes the previous chapter.",
+    "context": "Settings > Chapters form: help under the start date field."
+  },
+  "start": {
+    "message": "Start chapter",
+    "context": "Settings > Chapters form: save button."
+  },
+  "none": {
+    "message": "No chapters yet: everything is one story.",
+    "context": "Settings > Chapters: shown when no chapter has been started."
+  },
+  "current": {
+    "message": "now",
+    "context": "Settings > Chapters list: small tag next to the chapter that is running now."
+  },
+  "summary": {
+    "message": "Summary",
+    "context": "Settings > Chapters list: link text that opens a chapter's summary."
+  },
+  "confirmDelete": {
+    "message": "Delete?",
+    "context": "Settings > Chapters list: second tap to delete a chapter (only the chapter, not the expenses)."
+  },
+  "delete": {
+    "message": "Delete chapter {name}",
+    "context": "Settings > Chapters list: accessible label of the delete button; {name} is the chapter name."
+  },
+  "before": {
+    "message": "Before “{name}”",
+    "context": "Name of the time before the first chapter; {name} is the first chapter's name."
+  },
+  "until": {
+    "message": "until {date}",
+    "context": "Chapter dates when it has no start; {date} is a long date, e.g. '31 August 2026'."
+  },
+  "since": {
+    "message": "since {date}",
+    "context": "Chapter dates for the running chapter; {date} is a long date."
+  },
+  "between": {
+    "message": "{from} – {to}",
+    "context": "Chapter dates: first and last day, long dates."
+  },
+  "showPast": {
+    "message": "Show past chapters",
+    "context": "Settings > Chapters: switch label."
+  },
+  "showPastHelp": {
+    "message": "In History, Insights, categories and widgets. Off: they start where this chapter does.",
+    "context": "Settings > Chapters: help under the 'show past chapters' switch."
+  },
+  "inPlanner": {
+    "message": "Plan from past chapters too",
+    "context": "Settings > Chapters: switch label."
+  },
+  "inPlannerHelp": {
+    "message": "Typical amounts, limit suggestions and the typical month learn from them. Off: from this chapter only.",
+    "context": "Settings > Chapters: help under the 'plan from past chapters' switch."
+  },
+  "eyebrow": {
+    "message": "Chapter",
+    "context": "Chapter summary screen: small label above the chapter name."
+  },
+  "loadFailed": {
+    "message": "Couldn't load the chapter: {error}",
+    "context": "Chapter summary: shown when loading fails; {error} is the technical message."
+  },
+  "empty": {
+    "message": "Nothing was logged in this chapter.",
+    "context": "Chapter summary: shown when the chapter has no expenses or income."
+  },
+  "spent": {
+    "message": "Spent",
+    "context": "Chapter summary: tile and legend label for money spent."
+  },
+  "income": {
+    "message": "Money in",
+    "context": "Chapter summary: tile, legend and table label for income."
+  },
+  "noIncome": {
+    "message": "none logged",
+    "context": "Chapter summary: note under the income tile when no income was logged."
+  },
+  "saved": {
+    "message": "Left over",
+    "context": "Chapter summary: tile label, income minus spending when positive."
+  },
+  "shortBy": {
+    "message": "Spent more than came in",
+    "context": "Chapter summary: tile label when spending exceeded income."
+  },
+  "savingsRate": {
+    "message": "{percent}% of income",
+    "context": "Chapter summary: note under the left-over tile: the savings rate."
+  },
+  "perMonth": {
+    "message": "A month on average",
+    "context": "Chapter summary: tile and table label for average monthly spending."
+  },
+  "incomePerMonth": {
+    "message": "in: {amount} a month",
+    "context": "Chapter summary: note under the average tile; {amount} is average monthly income."
+  },
+  "average": {
+    "message": "Average",
+    "context": "Chapter summary: legend and tooltip label for the average month line."
+  },
+  "monthsTitle": {
+    "message": "Month by month",
+    "context": "Chapter summary: chart title, spending per month."
+  },
+  "monthsHeadline": {
+    "message": "On average <b>{average}</b> a month; the priciest was {month} {year} at {amount}.",
+    "context": "Chapter summary month-by-month headline; {month} is a month name (Polish nominative), {year} a year. Keep the <b> tags."
+  },
+  "inOutTitle": {
+    "message": "Money in and out",
+    "context": "Chapter summary: chart title, income next to spending per month."
+  },
+  "inOutHeadline": {
+    "message": "<b>{plus} of {count}</b> months ended with money left over.",
+    "context": "Chapter summary money in/out headline; {plus} and {count} are numbers of months. Keep the <b> tags."
+  },
+  "left": {
+    "message": "Left",
+    "context": "Chapter summary: tooltip and table column, income minus spending for a month."
+  },
+  "yearsTitle": {
+    "message": "Year by year",
+    "context": "Chapter summary: chart title, average monthly spending per year of the chapter."
+  },
+  "yearsUp": {
+    "message": "A month cost <b>{percent}% more</b> in {last} than in {first}.",
+    "context": "Chapter summary years headline; {first} and {last} are year labels like '2023/24'. Keep the <b> tags."
+  },
+  "yearsDown": {
+    "message": "A month cost <b>{percent}% less</b> in {last} than in {first}.",
+    "context": "Chapter summary years headline; {first} and {last} are year labels like '2023/24'. Keep the <b> tags."
+  },
+  "year": {
+    "message": "Year",
+    "context": "Chapter summary: table column, the year of the chapter."
+  },
+  "monthsCol": {
+    "message": "Months",
+    "context": "Chapter summary: table column, number of months logged in the year."
+  },
+  "inYear": {
+    "message": "In the year",
+    "context": "Chapter summary: tooltip label, total spent in the year."
+  },
+  "yearsNote": {
+    "message": "Years count twelve months from the chapter's first. Average per month, so a short last year compares fairly.",
+    "context": "Chapter summary: note under the year-by-year chart."
+  },
+  "whereTitle": {
+    "message": "Where it went",
+    "context": "Chapter summary: donut chart title."
+  },
+  "whereHeadline": {
+    "message": "<b>{name}</b> took the biggest share: {share}.",
+    "context": "Chapter summary donut headline; {name} is a category name, {share} a percentage. Keep the <b> tags."
+  },
+  "changeTitle": {
+    "message": "What changed",
+    "context": "Chapter summary: chart title, change per category between the first and last year."
+  },
+  "changeUp": {
+    "message": "<b>{name}</b> grew the most: {amount} more a month in {last} than in {first}.",
+    "context": "Chapter summary change headline; {name} a category, {amount} money, {first}/{last} year labels. Keep the <b> tags."
+  },
+  "changeDown": {
+    "message": "<b>{name}</b> fell the most: {amount} less a month in {last} than in {first}.",
+    "context": "Chapter summary change headline; {name} a category, {amount} money, {first}/{last} year labels. Keep the <b> tags."
+  },
+  "changeNote": {
+    "message": "Average a month in the chapter's first year against its last.",
+    "context": "Chapter summary: note under the change-by-category chart."
+  },
+  "biggestTitle": {
+    "message": "The biggest buys",
+    "context": "Chapter summary: list title, the ten largest single expenses."
+  },
+  "weekdayNote": {
+    "message": "Expenses of {amount} or more left out, so rent doesn't crown a day.",
+    "context": "Chapter summary: note under the weekday chart; {amount} is an amount with currency."
+  },
+  "incomePartial": {
+    "message": "Money in was logged for {count} of {months} months; what was left over counts those only.",
+    "context": "Chapter summary: note under the tiles when income exists for only some months."
+  },
+  "overMonths": {
+    "one": "over {count} month",
+    "other": "over {count} months",
+    "context": "Chapter summary: note under a tile; {count} is a number of months."
+  },
+  "counted": {
+    "one": "{formatted} expense over {months} months.",
+    "other": "{formatted} expenses over {months} months.",
+    "context": "Chapter summary: line under the tiles; {formatted} is the number of expenses formatted, {months} the number of months."
+  }
+}

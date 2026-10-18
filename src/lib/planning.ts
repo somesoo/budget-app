@@ -54,7 +54,10 @@ export interface CategoryBaseline {
 }
 
 export interface PlanBaseline {
-  /** Complete months with data, oldest first — months before the first expense are left out. */
+  /**
+   * Complete months with data, oldest first. Months before the first expense
+   * are left out, and so are months with nothing logged (a gap in the record).
+   */
   months: MonthKey[]
   categories: CategoryBaseline[]
   /** Average income over the last complete months that had any. */
@@ -79,7 +82,14 @@ export function planBaseline(args: {
     const m = monthKeyOfDate(e.expense_date)
     return min === null || m < min ? m : min
   }, null)
-  const months = first ? all.filter((m) => m >= first) : []
+  // a month with nothing logged at all is a gap in the record (nobody kept
+  // track), not a month that cost nothing; counted as zero it would drag every
+  // average down
+  const logged = new Set([
+    ...expenses.map((e) => monthKeyOfDate(e.expense_date)),
+    ...incomes.map(incomeMonth),
+  ])
+  const months = first ? all.filter((m) => m >= first && logged.has(m)) : []
   const index = new Map(months.map((m, i) => [m, i]))
 
   const perCategory = new Map<string, number[]>()

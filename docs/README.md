@@ -19,6 +19,8 @@
 - [Savings](savings.md): accounts and goals, debts and the way out of them,
   net worth, IKE/IKZE/PPK
 - [Insights](insights.md): the forecast, financial independence, the charts
+- [Chapters](chapters.md): a new chapter when life changes, hiding the past
+  or keeping it out of the planner, a chapter's summary
 - [AI](ai.md): the Gemini key, what gets sent, when it's busy
 
 **Behind it**

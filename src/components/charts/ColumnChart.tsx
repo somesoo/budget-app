@@ -29,6 +29,8 @@ const LEFT = 36
 const RIGHT = 8
 const MAX_BAR = 24
 const RADIUS = 4
+/** Room an axis label needs before its neighbour's. */
+const MIN_LABEL_W = 30
 
 /** Column with a rounded data end and a square foot on the baseline. */
 function columnPath(x: number, top: number, w: number, bottom: number): string {
@@ -66,6 +68,8 @@ export function ColumnChart({
   const plotW = Math.max(width - LEFT - RIGHT, 10)
   const band = plotW / columns.length
   const barW = Math.min(MAX_BAR, band * 0.6)
+  // narrow columns (years of months) share their labels: every n-th one is named
+  const labelEvery = Math.max(1, Math.ceil(MIN_LABEL_W / band))
   const height = TOP + plotH + AXIS_BAND
 
   const y = (v: number) => TOP + plotH - (v / max) * plotH
@@ -155,16 +159,18 @@ export function ColumnChart({
                   fill={fill}
                   opacity={isActive && emphasized ? 0.85 : 1}
                 />
-                <text
-                  x={bandX(i) + band / 2}
-                  y={TOP + plotH + 16}
-                  textAnchor="middle"
-                  fontSize={AXIS_FONT}
-                  fontWeight={emphasized ? 600 : 400}
-                  fill={emphasized ? CHART.textSecondary : CHART.textMuted}
-                >
-                  {c.label}
-                </text>
+                {(i % labelEvery === 0 || emphasized) && (
+                  <text
+                    x={bandX(i) + band / 2}
+                    y={TOP + plotH + 16}
+                    textAnchor="middle"
+                    fontSize={AXIS_FONT}
+                    fontWeight={emphasized ? 600 : 400}
+                    fill={emphasized ? CHART.textSecondary : CHART.textMuted}
+                  >
+                    {c.label}
+                  </text>
+                )}
                 {/* selective direct label: only the emphasized column's cap */}
                 {emphasized && c.value > 0 && !activeColumn && (
                   <text

@@ -74,8 +74,9 @@ export function BudgetPlanner({ month, onClose }: Props) {
   )
   const existing = useBudget(month)
   const previous = useBudget(prevMonth)
-  const expenses = useMonthlyExpensesBetween(from, to)
-  const incomes = useIncomesBetween(from, to)
+  // what the history says: this chapter only, unless this phone lets past ones count
+  const expenses = useMonthlyExpensesBetween(from, to, 'plan')
+  const incomes = useIncomesBetween(from, to, false, 'plan')
   const { data: goal } = usePrimaryGoal()
   const savingsOverview = useSavingsOverview()
   const prevMoney = useMonthMoney(prevMonth)

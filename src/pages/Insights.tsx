@@ -42,6 +42,7 @@ import {
   formatMonthName,
   formatMonthShort,
   monthKeyOfDate,
+  monthRange,
   shiftMonth,
   sumByCategory,
   sumExpenses,
@@ -68,6 +69,7 @@ import { Trans } from '../i18n/Trans'
 import { Link } from 'react-router-dom'
 import { useChapters } from '../hooks/useChapters'
 import { EARLIER_ID, chapterSpans } from '../lib/chapters'
+import { incomeByMonth, incomeTrend } from '../lib/income'
 import { spanDates, spanName } from '../components/settings/ChaptersCard'
 
 export function Insights() {
@@ -125,6 +127,7 @@ export function Insights() {
           />
         </div>
       )}
+      <IncomeLink />
       <ChapterLinks />
     </Screen>
   )
@@ -870,6 +873,37 @@ function Notice({ children }: { children: ReactNode }) {
     <p className="rounded-3xl bg-white/5 p-5 text-center text-sm text-muted ring-1 ring-white/10">
       {children}
     </p>
+  )
+}
+
+/* ---------- money in ---------- */
+
+/** Pay over the last year against the one before, and the way to every income. */
+function IncomeLink() {
+  const now = currentMonthKey()
+  const from = shiftMonth(now, -23)
+  const { data: incomes } = useIncomesBetween(monthRange(from).from, monthRange(now).to)
+  const trend = incomes ? incomeTrend(incomeByMonth(incomes, from, now)) : null
+  return (
+    <Link
+      to="/income"
+      className="mt-4 flex items-center gap-3 rounded-3xl bg-white/[0.04] p-4 ring-1 ring-white/10 hover:bg-white/[0.06]"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-semibold text-white">{t('incomePage.title')}</span>
+        <span className="block text-sm text-muted">
+          {trend?.recent != null
+            ? trend.change !== null
+              ? t('incomePage.linkTrend', {
+                  amount: formatMoneyWhole(trend.recent),
+                  change: `${trend.change >= 0 ? '+' : '−'}${Math.abs(Math.round(trend.change * 100))}%`,
+                })
+              : t('incomePage.linkAverage', { amount: formatMoneyWhole(trend.recent) })
+            : t('incomePage.linkEmpty')}
+        </span>
+      </span>
+      <CaretRight className="shrink-0 text-muted" aria-hidden />
+    </Link>
   )
 }
 

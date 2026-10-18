@@ -41,6 +41,22 @@
     "message": "Account",
     "context": "Money sheet: account field label."
   },
+  "depositTo": {
+    "message": "Save it on",
+    "context": "Save money sheet: label of the savings account the money goes onto."
+  },
+  "depositToHelp": {
+    "message": "From your everyday money. It first counts toward this month's planned savings; whatever goes beyond the plan comes off what's left to spend.",
+    "context": "Save money sheet: under the account field. Income isn't on any account in the app; saving moves money from the everyday pool onto this savings account. What's left to spend already sets aside the plan's savings, so only saving beyond the plan lowers it."
+  },
+  "withdrawFrom": {
+    "message": "Take it from",
+    "context": "Take money out sheet: label of the savings account the money comes off."
+  },
+  "withdrawFromHelp": {
+    "message": "Back to your everyday money: what's left to spend this month goes up by as much.",
+    "context": "Take money out sheet: under the account field. The money goes back to the everyday pool (what's left to spend)."
+  },
   "assign": {
     "message": "Assign",
     "context": "Money sheet (assign): option, set aside for the goal."

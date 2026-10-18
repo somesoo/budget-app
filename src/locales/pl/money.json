@@ -41,6 +41,22 @@
     "message": "Konto",
     "context": "Money sheet: account field label."
   },
+  "depositTo": {
+    "message": "Odłóż na konto",
+    "context": "Save money sheet: label of the savings account the money goes onto."
+  },
+  "depositToHelp": {
+    "message": "Z bieżących pieniędzy. Najpierw liczy się do oszczędności z planu na ten miesiąc; to, co ponad plan, zmniejsza kwotę do wydania.",
+    "context": "Save money sheet: under the account field. Income isn't on any account in the app; saving moves money from the everyday pool onto this savings account. What's left to spend already sets aside the plan's savings, so only saving beyond the plan lowers it."
+  },
+  "withdrawFrom": {
+    "message": "Wypłać z konta",
+    "context": "Take money out sheet: label of the savings account the money comes off."
+  },
+  "withdrawFromHelp": {
+    "message": "Wraca do bieżących pieniędzy: kwota do wydania w tym miesiącu wzrośnie o tyle.",
+    "context": "Take money out sheet: under the account field. The money goes back to the everyday pool (what's left to spend)."
+  },
   "assign": {
     "message": "Przypisz",
     "context": "Money sheet (assign): option, set aside for the goal."

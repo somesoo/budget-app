@@ -105,8 +105,9 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
     value: string,
     set: (v: string) => void,
     exclude?: string,
+    help?: string,
   ) => (
-    <Field label={label}>
+    <Field label={label} help={help}>
       <Select value={value} onChange={set}>
         {open
           .filter((a) => a.account.id !== exclude)
@@ -128,10 +129,24 @@ export function MoneySheet({ mode, accounts, goals, accountId, goalId, onClose }
   return (
     <BottomSheet title={title(mode)} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
+        {/* saving and taking out move money between the savings and the
+            everyday money (what's left to spend), so say which way */}
         {accountSelect(
-          mode === 'transfer' ? t('money.from') : t('money.account'),
+          mode === 'transfer'
+            ? t('money.from')
+            : mode === 'deposit'
+              ? t('money.depositTo')
+              : mode === 'withdraw'
+                ? t('money.withdrawFrom')
+                : t('money.account'),
           account,
           setAccount,
+          undefined,
+          mode === 'deposit'
+            ? t('money.depositToHelp')
+            : mode === 'withdraw'
+              ? t('money.withdrawFromHelp')
+              : undefined,
         )}
         {mode === 'transfer' && accountSelect(t('money.to'), target, setTarget, account)}
 

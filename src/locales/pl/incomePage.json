@@ -1,0 +1,126 @@
+{
+  "title": {
+    "message": "Wpływy",
+    "context": "Income screen title, also the Insights link to it."
+  },
+  "add": {
+    "message": "Dodaj",
+    "context": "Income screen: button in the header that opens the pad for logging income."
+  },
+  "range12": {
+    "message": "12 mies.",
+    "context": "Income screen: range choice, the last 12 months."
+  },
+  "range24": {
+    "message": "24 mies.",
+    "context": "Income screen: range choice, the last 24 months."
+  },
+  "rangeAll": {
+    "message": "Wszystko",
+    "context": "Income screen: range choice, everything logged."
+  },
+  "loadFailed": {
+    "message": "Nie udało się wczytać wpływów: {error}",
+    "context": "Income screen: shown when loading fails; {error} is the technical message."
+  },
+  "empty": {
+    "message": "W tym zakresie nie ma wpływów. Dodaj pierwszy przyciskiem u góry.",
+    "context": "Income screen: shown when the range has no income."
+  },
+  "averagePay": {
+    "message": "Średnia wypłata",
+    "context": "Income screen: tile and table label, average monthly pay."
+  },
+  "last12": {
+    "message": "miesięcznie, ostatnie 12 mies.",
+    "context": "Income screen: note under the average pay tile."
+  },
+  "yearOnYear": {
+    "message": "Rok do roku",
+    "context": "Income screen: tile label, change of average pay vs the 12 months before."
+  },
+  "versus": {
+    "message": "wobec {amount} rok wcześniej",
+    "context": "Income screen: note under the year-on-year tile; {amount} is the average pay the 12 months before."
+  },
+  "noYearBefore": {
+    "message": "jeszcze nie ma roku historii",
+    "context": "Income screen: note under the year-on-year tile without enough history."
+  },
+  "total": {
+    "message": "Razem",
+    "context": "Income screen: tile label, all income in the range."
+  },
+  "withOneOffs": {
+    "message": "w tym jednorazowe: {amount}",
+    "context": "Income screen: note under the total tile; {amount} is the one-off income in the range."
+  },
+  "best": {
+    "message": "Najlepszy miesiąc",
+    "context": "Income screen: tile label, the month with the most pay."
+  },
+  "monthsTitle": {
+    "message": "Wypłaty miesiąc po miesiącu",
+    "context": "Income screen: chart title."
+  },
+  "trendUp": {
+    "message": "Wypłaty są <b>o {percent}% wyższe</b> niż rok wcześniej: {recent} miesięcznie wobec {before}.",
+    "context": "Income screen chart headline; amounts with currency. Keep the <b> tags."
+  },
+  "trendDown": {
+    "message": "Wypłaty są <b>o {percent}% niższe</b> niż rok wcześniej: {recent} miesięcznie wobec {before}.",
+    "context": "Income screen chart headline; amounts with currency. Keep the <b> tags."
+  },
+  "trendNone": {
+    "message": "Gdy uzbiera się rok wypłat sprzed ostatniego, zobaczysz tu, czy rosną.",
+    "context": "Income screen chart headline without enough history."
+  },
+  "averageLine": {
+    "message": "Średnia",
+    "context": "Income screen: legend and reference line label, average pay."
+  },
+  "pay": {
+    "message": "Wypłata",
+    "context": "Income screen: tooltip and table label for pay (not one-offs)."
+  },
+  "oneOff": {
+    "message": "Jednorazowe",
+    "context": "Income screen: tooltip and table label for one-off income."
+  },
+  "monthsNote": {
+    "message": "Same wypłaty: jednorazowe wpływy, np. sprzedaż, liczone są osobno. Wpływ liczy się w miesiącu, za który jest.",
+    "context": "Income screen: note under the month-by-month chart."
+  },
+  "peopleTitle": {
+    "message": "Kto ile wnosi",
+    "context": "Income screen: chart title, income per person per month."
+  },
+  "yearsTitle": {
+    "message": "Rok po roku",
+    "context": "Income screen: chart title, average monthly pay per calendar year."
+  },
+  "yearsNote": {
+    "message": "Średnio na miesiąc z wypłatą, więc rozpoczęty rok też da się porównać.",
+    "context": "Income screen: note under the year-by-year chart."
+  },
+  "listTitle": {
+    "message": "Wszystkie wpływy",
+    "context": "Income screen: list title."
+  },
+  "listHelp": {
+    "message": "Dotknij, żeby zmienić albo usunąć.",
+    "context": "Income screen: help under the list title."
+  },
+  "linkTrend": {
+    "message": "Wypłaty {amount} miesięcznie, {change} rok do roku",
+    "context": "Insights: line under the 'Money in' link; {amount} average pay, {change} a signed percentage like '+12%'."
+  },
+  "linkAverage": {
+    "message": "Wypłaty {amount} miesięcznie",
+    "context": "Insights: line under the 'Money in' link; {amount} average pay."
+  },
+  "linkEmpty": {
+    "message": "Wszystkie wpływy i jak zmieniają się wypłaty",
+    "context": "Insights: line under the 'Money in' link with no income yet."
+  }
+}

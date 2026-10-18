@@ -117,3 +117,13 @@ Every chart has a *Show numbers* table under it.
 
 History's ▦ button shows a month as a calendar. A day's colour is relative to
 the month's daily average: twice the average or more is full.
+
+## Money in
+
+At the bottom of Insights, *Money in* opens every income logged: average
+pay over the last twelve months and how it compares with the twelve before,
+pay month by month (one-offs like something sold counted apart), who brings
+it in, year by year, and the list itself, grouped by the month each income is
+for. *Add* opens the same pad as on the Add screen; tap any income to change
+or delete it (with an undo).
+

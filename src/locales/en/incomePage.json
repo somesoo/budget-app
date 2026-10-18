@@ -1,0 +1,126 @@
+{
+  "title": {
+    "message": "Money in",
+    "context": "Income screen title, also the Insights link to it."
+  },
+  "add": {
+    "message": "Add",
+    "context": "Income screen: button in the header that opens the pad for logging income."
+  },
+  "range12": {
+    "message": "12 months",
+    "context": "Income screen: range choice, the last 12 months."
+  },
+  "range24": {
+    "message": "24 months",
+    "context": "Income screen: range choice, the last 24 months."
+  },
+  "rangeAll": {
+    "message": "All",
+    "context": "Income screen: range choice, everything logged."
+  },
+  "loadFailed": {
+    "message": "Couldn't load income: {error}",
+    "context": "Income screen: shown when loading fails; {error} is the technical message."
+  },
+  "empty": {
+    "message": "No income logged in this range. Add one with the button above.",
+    "context": "Income screen: shown when the range has no income."
+  },
+  "averagePay": {
+    "message": "Average pay",
+    "context": "Income screen: tile and table label, average monthly pay."
+  },
+  "last12": {
+    "message": "a month, last 12 months",
+    "context": "Income screen: note under the average pay tile."
+  },
+  "yearOnYear": {
+    "message": "Year on year",
+    "context": "Income screen: tile label, change of average pay vs the 12 months before."
+  },
+  "versus": {
+    "message": "against {amount} a year before",
+    "context": "Income screen: note under the year-on-year tile; {amount} is the average pay the 12 months before."
+  },
+  "noYearBefore": {
+    "message": "not a year of history yet",
+    "context": "Income screen: note under the year-on-year tile without enough history."
+  },
+  "total": {
+    "message": "Total",
+    "context": "Income screen: tile label, all income in the range."
+  },
+  "withOneOffs": {
+    "message": "one-offs included: {amount}",
+    "context": "Income screen: note under the total tile; {amount} is the one-off income in the range."
+  },
+  "best": {
+    "message": "Best month",
+    "context": "Income screen: tile label, the month with the most pay."
+  },
+  "monthsTitle": {
+    "message": "Pay month by month",
+    "context": "Income screen: chart title."
+  },
+  "trendUp": {
+    "message": "Pay is <b>{percent}% up</b> on a year before: {recent} a month against {before}.",
+    "context": "Income screen chart headline; amounts with currency. Keep the <b> tags."
+  },
+  "trendDown": {
+    "message": "Pay is <b>{percent}% down</b> on a year before: {recent} a month against {before}.",
+    "context": "Income screen chart headline; amounts with currency. Keep the <b> tags."
+  },
+  "trendNone": {
+    "message": "Once there's a year of pay before the last one, this says whether it's going up.",
+    "context": "Income screen chart headline without enough history."
+  },
+  "averageLine": {
+    "message": "Average",
+    "context": "Income screen: legend and reference line label, average pay."
+  },
+  "pay": {
+    "message": "Pay",
+    "context": "Income screen: tooltip and table label for pay (not one-offs)."
+  },
+  "oneOff": {
+    "message": "One-off",
+    "context": "Income screen: tooltip and table label for one-off income."
+  },
+  "monthsNote": {
+    "message": "Pay only: one-offs, like something sold, are counted apart. A month counts where its pay is for.",
+    "context": "Income screen: note under the month-by-month chart."
+  },
+  "peopleTitle": {
+    "message": "Who brings it in",
+    "context": "Income screen: chart title, income per person per month."
+  },
+  "yearsTitle": {
+    "message": "Year by year",
+    "context": "Income screen: chart title, average monthly pay per calendar year."
+  },
+  "yearsNote": {
+    "message": "The average month with pay, so a year that's just begun compares fairly.",
+    "context": "Income screen: note under the year-by-year chart."
+  },
+  "listTitle": {
+    "message": "Every income",
+    "context": "Income screen: list title."
+  },
+  "listHelp": {
+    "message": "Tap one to change or delete it.",
+    "context": "Income screen: help under the list title."
+  },
+  "linkTrend": {
+    "message": "Pay {amount} a month, {change} year on year",
+    "context": "Insights: line under the 'Money in' link; {amount} average pay, {change} a signed percentage like '+12%'."
+  },
+  "linkAverage": {
+    "message": "Pay {amount} a month",
+    "context": "Insights: line under the 'Money in' link; {amount} average pay."
+  },
+  "linkEmpty": {
+    "message": "Every income, how pay is changing",
+    "context": "Insights: line under the 'Money in' link with no income yet."
+  }
+}

@@ -29,6 +29,7 @@ import { Insights } from './pages/Insights'
 import { DebtPage } from './pages/DebtPage'
 import { Guide } from './pages/Guide'
 import { ChapterPage } from './pages/ChapterPage'
+import { IncomePage } from './pages/IncomePage'
 import { GuideHighlight } from './components/GuideHighlight'
 
 export default function App() {
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="/debt/:id" element={<DebtPage />} />
           <Route path="/guide" element={<Guide />} />
           <Route path="/chapter/:id" element={<ChapterPage />} />
+          <Route path="/income" element={<IncomePage />} />
           {/* old tabs, kept so a bookmarked or installed link still lands somewhere */}
           <Route path="/calendar" element={<Navigate to="/history" replace />} />
           <Route path="/summary" element={<Navigate to="/budget" replace />} />

@@ -31,6 +31,7 @@ import en_guide from './en/guide.json'
 import en_health from './en/health.json'
 import en_history from './en/history.json'
 import en_home from './en/home.json'
+import en_incomePage from './en/incomePage.json'
 import en_insights from './en/insights.json'
 import en_learn from './en/learn.json'
 import en_loans from './en/loans.json'
@@ -95,6 +96,7 @@ import pl_guide from './pl/guide.json'
 import pl_health from './pl/health.json'
 import pl_history from './pl/history.json'
 import pl_home from './pl/home.json'
+import pl_incomePage from './pl/incomePage.json'
 import pl_insights from './pl/insights.json'
 import pl_learn from './pl/learn.json'
 import pl_loans from './pl/loans.json'
@@ -161,6 +163,7 @@ const en = {
   health: en_health,
   history: en_history,
   home: en_home,
+  incomePage: en_incomePage,
   insights: en_insights,
   learn: en_learn,
   loans: en_loans,
@@ -227,6 +230,7 @@ const pl = {
   health: pl_health,
   history: pl_history,
   home: pl_home,
+  incomePage: pl_incomePage,
   insights: pl_insights,
   learn: pl_learn,
   loans: pl_loans,

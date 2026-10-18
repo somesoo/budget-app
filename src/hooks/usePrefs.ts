@@ -24,6 +24,10 @@ export interface Prefs {
   featureOverrides: FeatureChoice['overrides']
   /** Until when the next stage isn't suggested again (ISO date); null: not put off. */
   nextStageSnoozedUntil: string | null
+  /** Show what was logged in chapters before the current one (lib/chapters). */
+  showPastChapters: boolean
+  /** Let the planner and the typical month learn from past chapters. */
+  pastChaptersInPlanner: boolean
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -35,6 +39,9 @@ export const DEFAULT_PREFS: Prefs = {
   stage: 4,
   featureOverrides: {},
   nextStageSnoozedUntil: null,
+  showPastChapters: true,
+  // a past chapter is usually a different household: plan from this one
+  pastChaptersInPlanner: false,
 }
 
 const STORAGE_KEY = 'budget-app.prefs'
@@ -72,6 +79,12 @@ function read(): Prefs {
           : {},
       nextStageSnoozedUntil:
         typeof p.nextStageSnoozedUntil === 'string' ? p.nextStageSnoozedUntil : null,
+      showPastChapters:
+        typeof p.showPastChapters === 'boolean' ? p.showPastChapters : DEFAULT_PREFS.showPastChapters,
+      pastChaptersInPlanner:
+        typeof p.pastChaptersInPlanner === 'boolean'
+          ? p.pastChaptersInPlanner
+          : DEFAULT_PREFS.pastChaptersInPlanner,
     }
   } catch {
     return DEFAULT_PREFS

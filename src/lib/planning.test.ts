@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { BudgetPlan, Expense, Income } from '../types'
+import type { BudgetPlan, Category, Expense, Income } from '../types'
 import {
   draftFrom,
   evenShares,
@@ -135,5 +135,18 @@ describe('planBaseline', () => {
     })
     expect(b.typicalIncome).toBe(13_000)
     expect(b.incomeHistory).toEqual([13_000, 13_000])
+  })
+
+  it('skips months with nothing logged instead of counting them as zero', () => {
+    const food = { ...expense, id: 'e2', expense_date: '2026-09-03', amount: 300 }
+    const b = planBaseline({
+      target: '2026-11',
+      // June and September logged; July and August a gap in the record
+      expenses: [{ ...expense, amount: 300 }, food],
+      incomes: [],
+      categories: [{ id: 'food' } as Category],
+    })
+    expect(b.months).toEqual(['2026-06', '2026-09'])
+    expect(b.categories[0].typical).toBe(300)
   })
 })

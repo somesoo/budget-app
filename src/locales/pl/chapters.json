@@ -1,0 +1,236 @@
+{
+  "title": {
+    "message": "Rozdziały",
+    "context": "Settings > card heading: stages of the household's budget, e.g. before and after moving in together."
+  },
+  "help": {
+    "message": "Nowy rozdział, kiedy życie się zmienia, np. gdy zamieszkacie razem. Wcześniejsze można schować albo wyłączyć z plannera; nic nie znika.",
+    "context": "Settings > Chapters card: one-line description under the heading."
+  },
+  "new": {
+    "message": "Nowy rozdział",
+    "context": "Settings > Chapters: corner button that opens the form for starting a chapter."
+  },
+  "nameLabel": {
+    "message": "Nazwa",
+    "context": "Settings > Chapters form: label of the chapter name field."
+  },
+  "nameHelp": {
+    "message": "Czym jest ten rozdział, w kilku słowach.",
+    "context": "Settings > Chapters form: help under the name field."
+  },
+  "namePlaceholder": {
+    "message": "Razem",
+    "context": "Settings > Chapters form: example name in the empty name field."
+  },
+  "startsLabel": {
+    "message": "Zaczyna się",
+    "context": "Settings > Chapters form: label of the start date field."
+  },
+  "startsHelp": {
+    "message": "Wszystko wcześniej staje się poprzednim rozdziałem.",
+    "context": "Settings > Chapters form: help under the start date field."
+  },
+  "start": {
+    "message": "Zacznij rozdział",
+    "context": "Settings > Chapters form: save button."
+  },
+  "none": {
+    "message": "Nie ma jeszcze rozdziałów: wszystko to jedna historia.",
+    "context": "Settings > Chapters: shown when no chapter has been started."
+  },
+  "current": {
+    "message": "teraz",
+    "context": "Settings > Chapters list: small tag next to the chapter that is running now."
+  },
+  "summary": {
+    "message": "Podsumowanie",
+    "context": "Settings > Chapters list: link text that opens a chapter's summary."
+  },
+  "confirmDelete": {
+    "message": "Usunąć?",
+    "context": "Settings > Chapters list: second tap to delete a chapter (only the chapter, not the expenses)."
+  },
+  "delete": {
+    "message": "Usuń rozdział {name}",
+    "context": "Settings > Chapters list: accessible label of the delete button; {name} is the chapter name."
+  },
+  "before": {
+    "message": "Przed „{name}”",
+    "context": "Name of the time before the first chapter; {name} is the first chapter's name."
+  },
+  "until": {
+    "message": "do {date}",
+    "context": "Chapter dates when it has no start; {date} is a long date, e.g. '31 August 2026'."
+  },
+  "since": {
+    "message": "od {date}",
+    "context": "Chapter dates for the running chapter; {date} is a long date."
+  },
+  "between": {
+    "message": "{from} – {to}",
+    "context": "Chapter dates: first and last day, long dates."
+  },
+  "showPast": {
+    "message": "Pokazuj wcześniejsze rozdziały",
+    "context": "Settings > Chapters: switch label."
+  },
+  "showPastHelp": {
+    "message": "W Historii, Analizach, kategoriach i widżetach. Wyłączone: wszystko zaczyna się od początku tego rozdziału.",
+    "context": "Settings > Chapters: help under the 'show past chapters' switch."
+  },
+  "inPlanner": {
+    "message": "Planuj też na podstawie wcześniejszych",
+    "context": "Settings > Chapters: switch label."
+  },
+  "inPlannerHelp": {
+    "message": "Typowe kwoty, podpowiedzi limitów i typowy miesiąc uczą się też z nich. Wyłączone: tylko z tego rozdziału.",
+    "context": "Settings > Chapters: help under the 'plan from past chapters' switch."
+  },
+  "eyebrow": {
+    "message": "Rozdział",
+    "context": "Chapter summary screen: small label above the chapter name."
+  },
+  "loadFailed": {
+    "message": "Nie udało się wczytać rozdziału: {error}",
+    "context": "Chapter summary: shown when loading fails; {error} is the technical message."
+  },
+  "empty": {
+    "message": "W tym rozdziale nic nie zapisano.",
+    "context": "Chapter summary: shown when the chapter has no expenses or income."
+  },
+  "spent": {
+    "message": "Wydane",
+    "context": "Chapter summary: tile and legend label for money spent."
+  },
+  "income": {
+    "message": "Wpływy",
+    "context": "Chapter summary: tile, legend and table label for income."
+  },
+  "noIncome": {
+    "message": "nie zapisano",
+    "context": "Chapter summary: note under the income tile when no income was logged."
+  },
+  "saved": {
+    "message": "Zostało",
+    "context": "Chapter summary: tile label, income minus spending when positive."
+  },
+  "shortBy": {
+    "message": "Wydane ponad wpływy",
+    "context": "Chapter summary: tile label when spending exceeded income."
+  },
+  "savingsRate": {
+    "message": "{percent}% wpływów",
+    "context": "Chapter summary: note under the left-over tile: the savings rate."
+  },
+  "perMonth": {
+    "message": "Średnio miesięcznie",
+    "context": "Chapter summary: tile and table label for average monthly spending."
+  },
+  "incomePerMonth": {
+    "message": "wpływy: {amount} miesięcznie",
+    "context": "Chapter summary: note under the average tile; {amount} is average monthly income."
+  },
+  "average": {
+    "message": "Średnia",
+    "context": "Chapter summary: legend and tooltip label for the average month line."
+  },
+  "monthsTitle": {
+    "message": "Miesiąc po miesiącu",
+    "context": "Chapter summary: chart title, spending per month."
+  },
+  "monthsHeadline": {
+    "message": "Średnio <b>{average}</b> miesięcznie; najdroższy był {month} {year}: {amount}.",
+    "context": "Chapter summary month-by-month headline; {month} is a month name (Polish nominative), {year} a year. Keep the <b> tags."
+  },
+  "inOutTitle": {
+    "message": "Wpływy i wydatki",
+    "context": "Chapter summary: chart title, income next to spending per month."
+  },
+  "inOutHeadline": {
+    "message": "<b>{plus} z {count}</b> miesięcy skończyło się na plusie.",
+    "context": "Chapter summary money in/out headline; {plus} and {count} are numbers of months. Keep the <b> tags."
+  },
+  "left": {
+    "message": "Zostało",
+    "context": "Chapter summary: tooltip and table column, income minus spending for a month."
+  },
+  "yearsTitle": {
+    "message": "Rok po roku",
+    "context": "Chapter summary: chart title, average monthly spending per year of the chapter."
+  },
+  "yearsUp": {
+    "message": "Miesiąc kosztował <b>{percent}% więcej</b> w {last} niż w {first}.",
+    "context": "Chapter summary years headline; {first} and {last} are year labels like '2023/24'. Keep the <b> tags."
+  },
+  "yearsDown": {
+    "message": "Miesiąc kosztował <b>{percent}% mniej</b> w {last} niż w {first}.",
+    "context": "Chapter summary years headline; {first} and {last} are year labels like '2023/24'. Keep the <b> tags."
+  },
+  "year": {
+    "message": "Rok",
+    "context": "Chapter summary: table column, the year of the chapter."
+  },
+  "monthsCol": {
+    "message": "Miesiące",
+    "context": "Chapter summary: table column, number of months logged in the year."
+  },
+  "inYear": {
+    "message": "W roku",
+    "context": "Chapter summary: tooltip label, total spent in the year."
+  },
+  "yearsNote": {
+    "message": "Lata liczone są po dwanaście miesięcy od pierwszego miesiąca rozdziału. Średnia na miesiąc, więc krótszy ostatni rok też da się porównać.",
+    "context": "Chapter summary: note under the year-by-year chart."
+  },
+  "whereTitle": {
+    "message": "Gdzie poszły pieniądze",
+    "context": "Chapter summary: donut chart title."
+  },
+  "whereHeadline": {
+    "message": "Największa część poszła na <b>{name}</b>: {share}.",
+    "context": "Chapter summary donut headline; {name} is a category name, {share} a percentage. Keep the <b> tags."
+  },
+  "changeTitle": {
+    "message": "Co się zmieniło",
+    "context": "Chapter summary: chart title, change per category between the first and last year."
+  },
+  "changeUp": {
+    "message": "Największy wzrost: <b>{name}</b>, o {amount} miesięcznie więcej w {last} niż w {first}.",
+    "context": "Chapter summary change headline; {name} a category, {amount} money, {first}/{last} year labels. Keep the <b> tags."
+  },
+  "changeDown": {
+    "message": "Największy spadek: <b>{name}</b>, o {amount} miesięcznie mniej w {last} niż w {first}.",
+    "context": "Chapter summary change headline; {name} a category, {amount} money, {first}/{last} year labels. Keep the <b> tags."
+  },
+  "changeNote": {
+    "message": "Średnio miesięcznie w pierwszym roku rozdziału wobec ostatniego.",
+    "context": "Chapter summary: note under the change-by-category chart."
+  },
+  "biggestTitle": {
+    "message": "Największe wydatki",
+    "context": "Chapter summary: list title, the ten largest single expenses."
+  },
+  "weekdayNote": {
+    "message": "Bez wydatków od {amount} w górę, żeby czynsz nie wygrał żadnego dnia.",
+    "context": "Chapter summary: note under the weekday chart; {amount} is an amount with currency."
+  },
+  "incomePartial": {
+    "message": "Wpływy są zapisane za {count} z {months} miesięcy; to, co zostało, liczone jest tylko z nich.",
+    "context": "Chapter summary: note under the tiles when income exists for only some months."
+  },
+  "overMonths": {
+    "one": "przez {count} miesiąc",
+    "few": "przez {count} miesiące",
+    "many": "przez {count} miesięcy",
+    "other": "przez {count} miesiąca",
+    "context": "Chapter summary: note under a tile; {count} is a number of months."
+  },
+  "counted": {
+    "one": "{formatted} wydatek w {months} miesiącach.",
+    "few": "{formatted} wydatki w {months} miesiącach.",
+    "many": "{formatted} wydatków w {months} miesiącach.",
+    "other": "{formatted} wydatku w {months} miesiącach.",
+    "context": "Chapter summary: line under the tiles; {formatted} is the number of expenses formatted, {months} the number of months."
+  }
+}

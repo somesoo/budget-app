@@ -14,6 +14,7 @@ import en_budget from './en/budget.json'
 import en_carryover from './en/carryover.json'
 import en_category from './en/category.json'
 import en_categorySheet from './en/categorySheet.json'
+import en_chapters from './en/chapters.json'
 import en_charts from './en/charts.json'
 import en_common from './en/common.json'
 import en_date from './en/date.json'
@@ -77,6 +78,7 @@ import pl_budget from './pl/budget.json'
 import pl_carryover from './pl/carryover.json'
 import pl_category from './pl/category.json'
 import pl_categorySheet from './pl/categorySheet.json'
+import pl_chapters from './pl/chapters.json'
 import pl_charts from './pl/charts.json'
 import pl_common from './pl/common.json'
 import pl_date from './pl/date.json'
@@ -142,6 +144,7 @@ const en = {
   carryover: en_carryover,
   category: en_category,
   categorySheet: en_categorySheet,
+  chapters: en_chapters,
   charts: en_charts,
   common: en_common,
   date: en_date,
@@ -207,6 +210,7 @@ const pl = {
   carryover: pl_carryover,
   category: pl_category,
   categorySheet: pl_categorySheet,
+  chapters: pl_chapters,
   charts: pl_charts,
   common: pl_common,
   date: pl_date,

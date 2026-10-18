@@ -8,6 +8,7 @@ import { chatKey } from './useChat'
 import { savingsKey } from './useSavings'
 import { debtsKey } from './useDebts'
 import { recurringKey } from './useRecurring'
+import { chaptersKey } from './useChapters'
 
 export type SyncStatus = 'connecting' | 'live' | 'offline'
 
@@ -117,6 +118,14 @@ export function useRealtimeSync(): SyncStatus {
       })
       .subscribe()
 
+    // chapters (migration 0021), apart for the same reason
+    const chapters = supabase
+      .channel('budget-app-chapters')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chapters' }, () => {
+        void qc.invalidateQueries({ queryKey: chaptersKey })
+      })
+      .subscribe()
+
     // coming back after the phone was asleep — pull in anything we missed
     const onVisible = () => {
       if (document.visibilityState === 'visible') void qc.invalidateQueries()
@@ -128,6 +137,7 @@ export function useRealtimeSync(): SyncStatus {
       void supabase.removeChannel(channel)
       void supabase.removeChannel(savings)
       void supabase.removeChannel(wealth)
+      void supabase.removeChannel(chapters)
     }
   }, [qc])
 

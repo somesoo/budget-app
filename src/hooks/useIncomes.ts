@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
-import { incomeMonth, monthRange, shiftMonth } from '../lib/calculations'
+import { incomeMonth, monthKeyOfDate, monthRange, shiftMonth } from '../lib/calculations'
+import { useCallback } from 'react'
+import { useHistoryFloor, type HistoryScope } from './useChapters'
 import type { Income, NewIncome } from '../types'
 import { t } from '../i18n'
 
@@ -39,9 +41,16 @@ function normalize(row: Record<string, unknown>): Income {
  * counted there; `byDate` lists what arrived between the dates instead, as
  * History does.
  */
-export function useIncomesBetween(from: string, to: string, byDate = false) {
+export function useIncomesBetween(
+  from: string,
+  to: string,
+  byDate = false,
+  scope: HistoryScope = 'view',
+) {
+  const select = useSinceFloor(scope, byDate)
   return useQuery({
     queryKey: ['incomes', from, to, byDate ? 'date' : 'month'],
+    select,
     queryFn: async (): Promise<Income[]> => {
       // a paycheck can pay for the month before or after the one it arrived in
       const [lo, hi] = byDate
@@ -68,6 +77,23 @@ export function useIncomesBetween(from: string, to: string, byDate = false) {
     },
     placeholderData: (previous) => previous,
   })
+}
+
+/**
+ * Leaves out income from before the first day `scope` reaches back to (see
+ * useHistoryFloor): by the day it arrived, or by the month it pays for.
+ */
+function useSinceFloor(scope: HistoryScope, byDate: boolean) {
+  const floor = useHistoryFloor(scope)
+  return useCallback(
+    (rows: Income[]) => {
+      if (!floor) return rows
+      return byDate
+        ? rows.filter((i) => i.income_date >= floor)
+        : rows.filter((i) => incomeMonth(i) >= monthKeyOfDate(floor))
+    },
+    [floor, byDate],
+  )
 }
 
 /** The most recent paycheck per person — lets "same as last time" be one tap. */
@@ -208,8 +234,10 @@ export function useRestoreIncome() {
 export function useSearchIncomes(query: string) {
   const q = sanitizeSearch(query)
   const amount = parseAmountQuery(query)
+  const select = useSinceFloor('view', true)
   return useQuery({
     queryKey: ['incomes', 'search', q],
+    select,
     enabled: q.length >= 2 || amount !== null,
     queryFn: async (): Promise<Income[]> => {
       const clauses = [`note.ilike."%${q}%"`]

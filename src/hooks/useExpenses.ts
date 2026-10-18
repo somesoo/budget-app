@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react'
 import { monthlyOnly } from '../lib/projects'
 import { useCategories } from './useCategories'
 import { savingsKey } from './useSavings'
+import { useHistoryFloor, type HistoryScope } from './useChapters'
 import { supabase } from '../lib/supabaseClient'
 import { monthKeyOfDate, monthRange, type MonthKey } from '../lib/calculations'
 import { parseAmountQuery, sanitizeSearch } from '../lib/history'
@@ -36,9 +37,24 @@ function normalize(row: Record<string, unknown>): Expense {
   }
 }
 
-export function useExpenses(month: MonthKey) {
+/**
+ * Leaves out what was logged before the first day `scope` reaches back to
+ * (see useHistoryFloor). A filter on what's cached rather than part of the
+ * query, so the cache and its optimistic updates stay as they are.
+ */
+function useSinceFloor(scope: HistoryScope) {
+  const floor = useHistoryFloor(scope)
+  return useCallback(
+    (rows: Expense[]) => (floor ? rows.filter((e) => e.expense_date >= floor) : rows),
+    [floor],
+  )
+}
+
+export function useExpenses(month: MonthKey, scope: HistoryScope = 'view') {
+  const select = useSinceFloor(scope)
   return useQuery({
     queryKey: expensesKey(month),
+    select,
     queryFn: async (): Promise<Expense[]> => {
       const { from, to } = monthRange(month)
       const { data, error } = await supabase
@@ -62,9 +78,11 @@ const PAGE_SIZE = 1000 // Supabase's default max rows per response
  * silently truncated list would make every chart quietly wrong.
  * The key sits under ['expenses'], so realtime invalidation covers it too.
  */
-export function useExpensesBetween(from: string, to: string) {
+export function useExpensesBetween(from: string, to: string, scope: HistoryScope = 'view') {
+  const select = useSinceFloor(scope)
   return useQuery({
     queryKey: ['expenses', 'range', from, to],
+    select,
     queryFn: async (): Promise<Expense[]> => {
       const rows: Expense[] = []
       for (let offset = 0; ; offset += PAGE_SIZE) {
@@ -190,8 +208,10 @@ export function useRestoreExpense() {
 export function useSearchExpenses(query: string, categoryIds: string[]) {
   const q = sanitizeSearch(query)
   const amount = parseAmountQuery(query)
+  const select = useSinceFloor('view')
   return useQuery({
     queryKey: ['expenses', 'search', q, categoryIds],
+    select,
     enabled: q.length >= 2 || amount !== null,
     queryFn: async (): Promise<Expense[]> => {
       const clauses = [`note.ilike."%${q}%"`]
@@ -248,8 +268,8 @@ export function useDeleteExpense() {
  * The month's expenses without trips and other projects: what every monthly
  * number (limits, warnings, forecasts) is made of. Same query as useExpenses.
  */
-export function useMonthlyExpenses(month: MonthKey) {
-  const query = useExpenses(month)
+export function useMonthlyExpenses(month: MonthKey, scope: HistoryScope = 'view') {
+  const query = useExpenses(month, scope)
   const { data: categories } = useCategories()
   const data = useMemo(
     () => (query.data && categories ? monthlyOnly(query.data, categories) : query.data),
@@ -259,8 +279,12 @@ export function useMonthlyExpenses(month: MonthKey) {
 }
 
 /** useExpensesBetween without trips and other projects; see useMonthlyExpenses. */
-export function useMonthlyExpensesBetween(from: string, to: string) {
-  const query = useExpensesBetween(from, to)
+export function useMonthlyExpensesBetween(
+  from: string,
+  to: string,
+  scope: HistoryScope = 'view',
+) {
+  const query = useExpensesBetween(from, to, scope)
   const { data: categories } = useCategories()
   const data = useMemo(
     () => (query.data && categories ? monthlyOnly(query.data, categories) : query.data),

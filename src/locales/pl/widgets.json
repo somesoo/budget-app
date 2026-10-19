@@ -19,7 +19,7 @@
       "context": "Name of an Add screen widget: spending so far against an even spread of the month's limits."
     },
     "help": {
-      "message": "Dotychczasowe wydatki na tle limitów rozłożonych równo na miesiąc.",
+      "message": "Dotychczasowe wydatki na tle limitów: stałe koszty od 1., reszta rozłożona równo na miesiąc.",
       "context": "Settings > Widgets: description under the 'Pace' switch."
     },
     "soFar": {

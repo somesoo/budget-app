@@ -29,8 +29,8 @@
     "context": "Insights: pace chart card title for a past month."
   },
   "evenSpread": {
-    "message": "Even spread of limits",
-    "context": "Insights: legend of the dashed pace line."
+    "message": "Fixed costs first, then an even spread",
+    "context": "Insights: legend of the dashed pace line: limits of rent and bills count from day 1, the rest of the limits spread evenly over the month."
   },
   "day": {
     "message": "Day",

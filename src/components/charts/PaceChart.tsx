@@ -22,8 +22,8 @@ const RIGHT = 14
 
 /**
  * Cumulative spending through the month (the series that matters, in the
- * accent) against an even spread of the monthly limit (dashed — it's a
- * threshold, not data). Scrub with a finger or the arrow keys.
+ * accent) against the limit: fixed costs from day 1, the rest spread evenly
+ * (dashed — it's a threshold, not data). Scrub with a finger or the arrow keys.
  */
 export function PaceChart({ month, points, showPace, plotHeight = PLOT_H }: Props) {
   const { ref, width } = useElementWidth<HTMLDivElement>()

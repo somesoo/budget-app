@@ -19,7 +19,7 @@
       "context": "Name of an Add screen widget: spending so far against an even spread of the month's limits."
     },
     "help": {
-      "message": "Spending so far against an even spread of the limits.",
+      "message": "Spending so far against the limits: fixed costs from the 1st, the rest spread evenly.",
       "context": "Settings > Widgets: description under the 'Pace' switch."
     },
     "soFar": {

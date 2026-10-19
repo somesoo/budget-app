@@ -20,6 +20,7 @@ import { SpendDonut } from '../components/charts/SpendDonut'
 import { TopCategoriesList, sharePercent } from '../components/TopCategoriesList'
 import { PaySplitCard } from '../components/PaySplitCard'
 import { useBillCategoryIds, usePaySplit } from '../hooks/usePaySplit'
+import { fixedLimitOf } from '../lib/paySplit'
 import { CHART } from '../components/charts/theme'
 import {
   CURRENCY_SUFFIX,
@@ -184,7 +185,8 @@ function InsightsBody({
   const hasPrev = prevSameSpan > 0
   const change = hasPrev ? (spent - prevSameSpan) / prevSameSpan : null
 
-  const points = pacePoints(expenses, month, totalLimit)
+  // rent and bills are paid at the start: the pace line starts at their limits
+  const points = pacePoints(expenses, month, totalLimit, fixedLimitOf(categories, billCategoryIds))
   const forecast = monthForecast({
     month,
     isCurrent,

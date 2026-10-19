@@ -3,6 +3,7 @@ import { CURRENCY_SUFFIX } from '../../config'
 import { useMonthCategories } from '../../hooks/useBudgets'
 import { useMonthlyExpensesBetween } from '../../hooks/useExpenses'
 import { useDeviceUser } from '../../hooks/useDeviceUser'
+import { useBillCategoryIds } from '../../hooks/usePaySplit'
 import { isOthersAllowance, ownCategories, ownExpenses } from '../../lib/allowance'
 import {
   categoryById,
@@ -27,6 +28,7 @@ import {
 } from '../../lib/categoryDetail'
 import { toEntries } from '../../lib/history'
 import { elapsedDays, pacePoints, windowRange } from '../../lib/insights'
+import { isFixedGroup } from '../../lib/paySplit'
 import { projectSpend } from '../../lib/projection'
 import type { Category, Expense } from '../../types'
 import { LegendItem, TooltipRow } from '../charts/ChartCard'
@@ -268,6 +270,8 @@ function ForecastPane({
 }) {
   const current = currentMonthKey()
   const limit = category.monthly_limit
+  // rent and the like are paid at the start: the pace line starts at the limit
+  const fixed = isFixedGroup(category, useBillCategoryIds())
   const editor = limitEditor && (
     <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
       <span className="text-sm font-medium text-white">
@@ -387,7 +391,7 @@ function ForecastPane({
         )}
       </p>
       <div className="mt-3">
-        <PaceChart month={month} points={pacePoints(inMonth, month, limit)} showPace={limit > 0} />
+        <PaceChart month={month} points={pacePoints(inMonth, month, limit, fixed ? limit : 0)} showPace={limit > 0} />
       </div>
     </Pane>
   )

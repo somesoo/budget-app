@@ -40,17 +40,28 @@ export function elapsedDays(month: MonthKey): number {
   return Number(today.slice(-2))
 }
 
-/* ---------- pace: cumulative spend vs an even spread of the limit ---------- */
+/* ---------- pace: cumulative spend vs fixed costs up front, the rest spread evenly ---------- */
 
 export interface PacePoint {
   day: number
   /** Spent up to and including this day; null for days that haven't happened yet. */
   cumulative: number | null
-  /** Where you'd be spending the monthly limit evenly. */
+  /** Where you'd be: fixed costs' limits from day 1, the rest of the limit spread evenly. */
   pace: number
 }
 
-export function pacePoints(expenses: Expense[], month: MonthKey, totalLimit: number): PacePoint[] {
+/**
+ * `fixedLimit` is the part of `totalLimit` paid at the start of the month —
+ * rent, bills — so the line starts there instead of at zero and doesn't call
+ * the month over budget the day the rent goes out.
+ */
+export function pacePoints(
+  expenses: Expense[],
+  month: MonthKey,
+  totalLimit: number,
+  fixedLimit = 0,
+): PacePoint[] {
+  const fixed = Math.min(Math.max(fixedLimit, 0), totalLimit)
   const days = daysInMonth(month)
   const elapsed = elapsedDays(month)
   const perDay = new Array<number>(days + 1).fill(0)
@@ -67,7 +78,7 @@ export function pacePoints(expenses: Expense[], month: MonthKey, totalLimit: num
     points.push({
       day,
       cumulative: day <= elapsed ? roundMoney(running) : null,
-      pace: roundMoney((totalLimit * day) / days),
+      pace: roundMoney(fixed + ((totalLimit - fixed) * day) / days),
     })
   }
   return points

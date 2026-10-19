@@ -44,6 +44,7 @@ import { ForecastCard } from '../ForecastCard'
 import { PaySplitCard } from '../PaySplitCard'
 import { TopCategoriesList } from '../TopCategoriesList'
 import { useBillCategoryIds, usePaySplit } from '../../hooks/usePaySplit'
+import { fixedLimitOf } from '../../lib/paySplit'
 import type { Widget } from './WidgetCarousel'
 import { personColor, personIds, personLabel } from '../../lib/people'
 import { dateFormat, t } from '../../i18n'
@@ -163,7 +164,7 @@ export function useAddWidgets({
         </p>
         <PaceChart
           month={month}
-          points={pacePoints(expenses, month, monthLimit)}
+          points={pacePoints(expenses, month, monthLimit, fixedLimitOf(categories, billCategoryIds))}
           showPace={monthLimit > 0}
           plotHeight={PLOT}
         />

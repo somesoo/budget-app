@@ -17,7 +17,7 @@
   },
   "pace": {
     "message": "Pace",
-    "context": "Pace chart: the dashed line where spending would be if the limits were spread evenly over the month."
+    "context": "Pace chart: the dashed line where spending would be if fixed costs went out on the 1st and the rest of the limits were spread evenly over the month."
   },
   "personLabel": {
     "message": "Monthly spending per person",

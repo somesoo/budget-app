@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Category, Expense } from '../types'
-import { paceStatus, topCategories } from './insights'
+import { pacePoints, paceStatus, topCategories } from './insights'
 
 const cat = (id: string, extra: Partial<Category> = {}): Category => ({
   id,
@@ -84,5 +84,20 @@ describe('topCategories', () => {
   it('has no typical without earlier months, and nothing for an empty month', () => {
     expect(topCategories([exp('food', 50, '2026-09-10')], cats, '2026-09')[0].typical).toBeNull()
     expect(topCategories([exp('food', 50, '2026-08-10')], cats, '2026-09')).toEqual([])
+  })
+})
+
+describe('pacePoints', () => {
+  it('starts the line at the fixed costs, the rest spread evenly', () => {
+    const points = pacePoints([], '2025-04', 3000, 1500)
+    expect(points[0].pace).toBe(1550)
+    expect(points[14].pace).toBe(2250)
+    expect(points[29].pace).toBe(3000)
+  })
+
+  it('spreads everything evenly without fixed costs', () => {
+    const points = pacePoints([], '2025-04', 3000)
+    expect(points[0].pace).toBe(100)
+    expect(points[29].pace).toBe(3000)
   })
 })

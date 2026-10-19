@@ -9,7 +9,7 @@ import {
   type MonthKey,
 } from './calculations'
 import { elapsedDays } from './insights'
-import { groupOf } from './paySplit'
+import { isFixedGroup } from './paySplit'
 
 /* Where the month's spending is heading. A straight line through everything
    (spent ÷ days so far × days in the month) turns rent paid on the 1st into
@@ -58,9 +58,7 @@ export function projectSpend(args: {
   const byId = categoryById(categories)
   const isFixed = (categoryId: string) => {
     const c = byId[categoryId]
-    if (!c) return false
-    const group = groupOf(c, billCategoryIds)
-    return group === 'bills' || group === 'debts'
+    return c ? isFixedGroup(c, billCategoryIds) : false
   }
 
   // the months before with anything logged: a month before the first expense is no data

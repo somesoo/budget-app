@@ -55,6 +55,21 @@ export function groupOf(category: Category, billCategoryIds: ReadonlySet<string>
   return guessGroup(category, billCategoryIds)
 }
 
+/** Bills and debts: paid once a month, usually at its start. */
+export function isFixedGroup(category: Category, billCategoryIds: ReadonlySet<string>): boolean {
+  const group = groupOf(category, billCategoryIds)
+  return group === 'bills' || group === 'debts'
+}
+
+/** The part of the month's limits that goes to fixed costs. */
+export function fixedLimitOf(categories: Category[], billCategoryIds: ReadonlySet<string>): number {
+  return roundMoney(
+    categories
+      .filter((c) => !c.archived && isFixedGroup(c, billCategoryIds))
+      .reduce((a, c) => a + c.monthly_limit, 0),
+  )
+}
+
 export function guessGroup(category: Category, billCategoryIds: ReadonlySet<string>): SpendingGroup {
   const byName = GUESSES.find(([, re]) => re.test(category.name))?.[0]
   if (byName === 'debts') return 'debts'

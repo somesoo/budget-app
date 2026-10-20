@@ -321,5 +321,7 @@ export interface RecurringCost {
   /** When it was last checked it's still wanted (subscriptions). */
   reviewed_on: string | null
   note: string | null
+  /** Logs itself as an expense on each due date (migration 0022). */
+  auto_log: boolean
   created_at: string
 }

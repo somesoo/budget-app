@@ -102,8 +102,20 @@ and when each is due next (marked when it's within two weeks).
 - **Subscriptions** get a review every three months: for each, is it still
   worth what it costs a year? Cancelled ones are put away (cancel them with
   the provider too), and the card says what that gives back a year.
-- A regular cost isn't logged by itself: when you pay it, log it as an
-  expense as usual.
+- **Paying them.** From two weeks before a due date until two weeks after
+  it, a cost has a *Paid* button: it logs the cost as an expense in its
+  category, dated today, and the row says *paid*. One that has passed its
+  date unpaid says *was due …* and goes to the top. A cost needs a category
+  for this; tapping *Paid* on one without opens it to pick one.
+- **Adding themselves.** Switch on *Add it as an expense by itself* in a
+  cost's sheet (it needs a category) and on each due date it's logged,
+  dated that day, by the first phone that opens the app then or later that
+  month; it says *adds itself* on the list. Earlier months aren't filled in,
+  nor dates from before the cost was added.
+- Each such expense remembers the cost and the due date it paid (migration
+  0022), and a due date can be logged only once, so two phones never log it
+  twice. Deleting the expense makes the due date unpaid again; deleting the
+  cost keeps its expenses.
 
 ## AI draft
 

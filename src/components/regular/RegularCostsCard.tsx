@@ -1,7 +1,8 @@
-import { CalendarBlank, Check, Plus, Warning } from '@phosphor-icons/react'
+import { ArrowsClockwise, CalendarBlank, Check, Plus, Warning } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useRecurringCosts } from '../../hooks/useRecurring'
+import { useDeviceUser } from '../../hooks/useDeviceUser'
+import { usePaidDues, usePayRecurring, useRecurringCosts } from '../../hooks/useRecurring'
 import { useSavingsOverview } from '../../hooks/useSavings'
 import { formatDayShort, formatMoneyWhole, todayKey } from '../../lib/calculations'
 import {
@@ -10,8 +11,10 @@ import {
   fundShouldHold,
   isRare,
   nextDue,
+  payState,
   perMonth,
   regularTotals,
+  type PaidDue,
 } from '../../lib/recurring'
 import type { RecurringCost } from '../../types'
 import { CHART } from '../charts/theme'
@@ -22,7 +25,10 @@ import { t } from '../../i18n'
 /** Due within this many days: marked on the list. */
 const SOON_DAYS = 14
 
-type Sheet = { kind: 'edit'; cost?: RecurringCost; as?: RecurringCost['kind'] } | { kind: 'review' } | null
+type Sheet =
+  | { kind: 'edit'; cost?: RecurringCost; as?: RecurringCost['kind']; note?: string }
+  | { kind: 'review' }
+  | null
 
 /**
  * Subscriptions and the bills that come back: what they cost a month and a
@@ -34,7 +40,20 @@ export function RegularCostsCard() {
   const { data } = useRecurringCosts()
   const savings = useSavingsOverview()
   const [sheet, setSheet] = useState<Sheet>(null)
+  const { data: paidDues } = usePaidDues()
+  const pay = usePayRecurring()
+  const { person } = useDeviceUser()
   if (!data?.available) return null
+
+  // marking one paid logs it as an expense in its category, dated today
+  const paid = paidDues?.available ? paidDues.paid : null
+  const markPaid = (cost: RecurringCost, due: string) => {
+    if (!cost.category_id) {
+      setSheet({ kind: 'edit', cost, note: t('regular.needsCategory') })
+      return
+    }
+    if (person) pay.mutate({ cost, due, date: todayKey(), person })
+  }
 
   const today = todayKey()
   const open = data.costs.filter((c) => !c.archived)
@@ -45,7 +64,12 @@ export function RegularCostsCard() {
   const fund = savings.goals.find((g) => g.goal.is_bills_fund && !g.goal.archived)
   const shouldHold = fundShouldHold(open, today)
   const rare = open.filter(isRare)
-  const byDue = (a: RecurringCost, b: RecurringCost) => nextDue(a, today).localeCompare(nextDue(b, today))
+  // by the date each shows: one waiting to be marked paid first
+  const shownDue = (c: RecurringCost) => {
+    const state = paidDues?.available ? payState(c, today, paidDues.paid) : null
+    return state?.kind === 'due' ? state.due : nextDue(c, today)
+  }
+  const byDue = (a: RecurringCost, b: RecurringCost) => shownDue(a).localeCompare(shownDue(b))
 
   return (
     <section
@@ -98,6 +122,8 @@ export function RegularCostsCard() {
         onAdd={() => setSheet({ kind: 'edit', as: 'subscription' })}
         costs={[...subs].sort(byDue)}
         today={today}
+        paid={paid}
+        onPay={markPaid}
         onPick={(cost) => setSheet({ kind: 'edit', cost })}
       />
       <Group
@@ -107,6 +133,8 @@ export function RegularCostsCard() {
         onAdd={() => setSheet({ kind: 'edit', as: 'bill' })}
         costs={[...bills].sort(byDue)}
         today={today}
+        paid={paid}
+        onPay={markPaid}
         onPick={(cost) => setSheet({ kind: 'edit', cost })}
       />
 
@@ -144,7 +172,12 @@ export function RegularCostsCard() {
       )}
 
       {sheet?.kind === 'edit' && (
-        <RecurringSheet cost={sheet.cost} kind={sheet.as} onClose={() => setSheet(null)} />
+        <RecurringSheet
+          cost={sheet.cost}
+          kind={sheet.as}
+          note={sheet.note}
+          onClose={() => setSheet(null)}
+        />
       )}
       {sheet?.kind === 'review' && <ReviewSheet costs={review} onClose={() => setSheet(null)} />}
     </section>
@@ -158,6 +191,8 @@ function Group({
   onAdd,
   costs,
   today,
+  paid,
+  onPay,
   onPick,
 }: {
   title: string
@@ -166,6 +201,9 @@ function Group({
   onAdd: () => void
   costs: RecurringCost[]
   today: string
+  /** Due dates logged as expenses; null before migration 0022, when there's no paying. */
+  paid: PaidDue[] | null
+  onPay: (cost: RecurringCost, due: string) => void
   onPick: (cost: RecurringCost) => void
 }) {
   return (
@@ -185,27 +223,38 @@ function Group({
       ) : (
         <ul className="divide-y divide-white/5">
           {costs.map((c) => {
-            const due = nextDue(c, today)
+            const state = paid ? payState(c, today, paid) : ({ kind: 'none' } as const)
+            // one waiting to be marked paid shows the date it was due, not the next
+            const overdue = state.kind === 'due' && state.due < today
+            const due = overdue ? state.due : nextDue(c, today)
             const days = daysUntil(due, today)
             const soon = days <= SOON_DAYS
             return (
-              <li key={c.id}>
+              <li key={c.id} className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => onPick(c)}
-                  className="flex w-full items-center gap-3 py-2 text-left hover:bg-white/[0.02]"
+                  className="flex min-w-0 flex-1 items-center gap-3 py-2 text-left hover:bg-white/[0.02]"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] text-white">{c.name}</span>
                     <span className={`flex items-center gap-1 text-xs ${soon ? 'text-amber-200' : 'text-muted'}`}>
                       <CalendarBlank aria-hidden />
-                      {days === 0
+                      {overdue
+                        ? t('regular.wasDue', { date: formatDayShort(due) })
+                        : days === 0
                         ? t('regular.dueToday')
                         : soon
                           ? t('regular.dueIn', { count: days, date: formatDayShort(due) })
                           : formatDayShort(due)}
                       {' · '}
                       {everyLabel(c.every_months)}
+                      {c.auto_log && (
+                        <span className="ml-1 inline-flex items-center gap-0.5 text-accent-soft">
+                          <ArrowsClockwise aria-hidden />
+                          {t('regular.auto')}
+                        </span>
+                      )}
                     </span>
                   </span>
                   <span className="shrink-0 text-right">
@@ -219,6 +268,28 @@ function Group({
                     )}
                   </span>
                 </button>
+                {state.kind === 'paid' ? (
+                  <span className="flex w-[4.75rem] shrink-0 items-center justify-center gap-1 text-xs font-semibold text-positive">
+                    <Check weight="bold" aria-hidden />
+                    {t('regular.paidDone')}
+                  </span>
+                ) : state.kind === 'due' || state.kind === 'soon' ? (
+                  <button
+                    type="button"
+                    onClick={() => onPay(c, state.due)}
+                    aria-label={t('regular.markPaidLabel', {
+                      name: c.name,
+                      amount: formatMoneyWhole(c.amount),
+                    })}
+                    className={`w-[4.75rem] shrink-0 rounded-full py-1.5 text-xs font-semibold ring-1 transition ${
+                      state.kind === 'due'
+                        ? 'bg-amber-300/15 text-amber-100 ring-amber-300/30 hover:bg-amber-300/25'
+                        : 'text-slate-200 ring-white/15 hover:bg-white/5'
+                    }`}
+                  >
+                    {t('regular.markPaid')}
+                  </button>
+                ) : null}
               </li>
             )
           })}

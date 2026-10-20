@@ -11,6 +11,7 @@ import { SetupNotice } from './components/SetupNotice'
 import { Tour } from './components/tour/Tour'
 import { tourSeen, tourStore } from './lib/tour'
 import { useDeviceUser } from './hooks/useDeviceUser'
+import { useAutoLogRecurring } from './hooks/useRecurring'
 import { usePeople } from './hooks/usePeople'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { useSession } from './hooks/useSession'
@@ -33,7 +34,7 @@ import { IncomePage } from './pages/IncomePage'
 import { GuideHighlight } from './components/GuideHighlight'
 
 export default function App() {
-  const { isChosen, setPerson } = useDeviceUser()
+  const { person, isChosen, setPerson } = useDeviceUser()
   const { session, loading } = useSession()
   // signed out: a new install with no account yet opens on the welcome screen
   const qc = useQueryClient()
@@ -47,6 +48,8 @@ export default function App() {
   const people = usePeople(!!session)
   useRealtimeSync()
   const signedIn = !!session && isChosen && !people.needsSetup
+  // subscriptions and bills set to log themselves, once their day has come
+  useAutoLogRecurring(signedIn ? person : null)
   // a new device gets the tour once, right after saying whose it is
   useEffect(() => {
     if (signedIn && !tourSeen() && tourStore.get().step === null) tourStore.start('/')

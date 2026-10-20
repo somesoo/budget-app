@@ -170,5 +170,41 @@
       "message": "Yearly",
       "context": "Frequency option."
     }
+  },
+  "markPaid": {
+    "message": "Paid",
+    "context": "Regular costs list: button that logs this due date of a subscription or bill as an expense. Very short."
+  },
+  "markPaidLabel": {
+    "message": "Mark {name} paid: log {amount} as an expense",
+    "context": "Regular costs list: accessible label of the 'Paid' button. {amount} includes the currency."
+  },
+  "paidDone": {
+    "message": "paid",
+    "context": "Regular costs list: this due date has been logged as an expense. Short, lowercase."
+  },
+  "needsCategory": {
+    "message": "Pick a category first: that's where the expense goes.",
+    "context": "Regular cost sheet: shown when 'Paid' was tapped on a cost without a category."
+  },
+  "auto": {
+    "message": "adds itself",
+    "context": "Regular costs list: tag on a cost that logs itself as an expense on its due date. Short, lowercase."
+  },
+  "autoLog": {
+    "message": "Add it as an expense by itself",
+    "context": "Regular cost sheet: switch label."
+  },
+  "autoLogHelp": {
+    "message": "On each due date it's logged in its category, from the first phone that opens the app that day or later in the month.",
+    "context": "Regular cost sheet: help under the switch."
+  },
+  "autoLogNoCategory": {
+    "message": "Pick a category above to turn this on.",
+    "context": "Regular cost sheet: help under the switch when no category is set."
+  },
+  "wasDue": {
+    "message": "was due {date}",
+    "context": "Regular costs list: a due date that has passed without the cost being marked paid. {date} e.g. '10 Oct'. Short, lowercase."
   }
 }

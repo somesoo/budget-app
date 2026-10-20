@@ -5,7 +5,10 @@ import {
   dueForReview,
   dueSoon,
   fundShouldHold,
+  autoDue,
+  lastDue,
   nextDue,
+  payState,
   regularTotals,
 } from './recurring'
 
@@ -21,6 +24,7 @@ const cost = (over: Partial<RecurringCost>): RecurringCost => ({
   archived: false,
   reviewed_on: null,
   note: null,
+  auto_log: false,
   created_at: '2026-01-01T00:00:00Z',
   ...over,
 })
@@ -85,5 +89,41 @@ describe('dueForReview', () => {
     const never = cost({ name: 'c', kind: 'subscription', created_at: '2026-01-01T00:00:00Z' })
     const bill = cost({ name: 'd' })
     expect(dueForReview([fresh, stale, never, bill], '2026-10-03').map((c) => c.name)).toEqual(['b', 'c'])
+  })
+})
+
+describe('paying regular costs', () => {
+  it('finds the last due date, today included, keeping the day', () => {
+    const c = cost({ due_on: '2026-01-31' })
+    expect(lastDue(c, '2026-03-15')).toBe('2026-02-28')
+    expect(lastDue(c, '2026-03-31')).toBe('2026-03-31')
+    expect(lastDue(cost({ due_on: '2026-03-10', every_months: 12 }), '2026-10-20')).toBe('2026-03-10')
+    // set a cycle ahead: the one before still counts
+    expect(lastDue(cost({ due_on: '2026-11-05' }), '2026-10-20')).toBe('2026-10-05')
+  })
+
+  it('asks to mark a passed due date paid, then says it is', () => {
+    const c = cost({ id: 'netflix', due_on: '2026-01-10' })
+    expect(payState(c, '2026-10-12', [])).toEqual({ kind: 'due', due: '2026-10-10' })
+    const paid = [{ recurring_id: 'netflix', recurring_due: '2026-10-10' }]
+    expect(payState(c, '2026-10-12', paid)).toEqual({ kind: 'paid', due: '2026-10-10' })
+    // with the next one close it can be paid ahead
+    expect(payState(c, '2026-10-30', paid)).toEqual({ kind: 'soon', due: '2026-11-10' })
+  })
+
+  it('leaves alone a due date long passed or from before it was added', () => {
+    const yearly = cost({ id: 'oc', due_on: '2026-03-10', every_months: 12 })
+    expect(payState(yearly, '2026-10-20', [])).toEqual({ kind: 'none' })
+    const added = cost({ id: 'new', due_on: '2026-10-10', created_at: '2026-10-15T09:00:00Z' })
+    expect(payState(added, '2026-10-20', [])).toEqual({ kind: 'none' })
+  })
+
+  it('logs by itself only this month\'s due date, once, for one set to', () => {
+    const c = cost({ id: 'spotify', due_on: '2026-01-05', auto_log: true, category_id: 'subs' })
+    expect(autoDue(c, '2026-10-04', [])).toBeNull()
+    expect(autoDue(c, '2026-10-05', [])).toBe('2026-10-05')
+    expect(autoDue(c, '2026-10-05', [{ recurring_id: 'spotify', recurring_due: '2026-10-05' }])).toBeNull()
+    expect(autoDue({ ...c, auto_log: false }, '2026-10-05', [])).toBeNull()
+    expect(autoDue({ ...c, category_id: null }, '2026-10-05', [])).toBeNull()
   })
 })

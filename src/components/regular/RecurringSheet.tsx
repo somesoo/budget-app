@@ -6,7 +6,7 @@ import { getPeople } from '../../lib/people'
 import type { RecurringCost } from '../../types'
 import { MoneyInput } from '../budget/MoneyInput'
 import { BottomSheet } from '../history/BottomSheet'
-import { Field, Segments, Select, SubmitRow, inputClass } from '../savings/fields'
+import { Field, Segments, Select, SubmitRow, Switch, inputClass } from '../savings/fields'
 import { t } from '../../i18n'
 
 const EVERY: RecurringCost['every_months'][] = [1, 2, 3, 6, 12]
@@ -17,10 +17,13 @@ export const everyLabel = (n: RecurringCost['every_months']) => t(`regular.every
 export function RecurringSheet({
   cost,
   kind: startKind = 'subscription',
+  note,
   onClose,
 }: {
   cost?: RecurringCost
   kind?: RecurringCost['kind']
+  /** Why it opened, when it wasn't to edit (marking it paid needs a category). */
+  note?: string
   onClose: () => void
 }) {
   const save = useSaveRecurring()
@@ -35,6 +38,7 @@ export function RecurringSheet({
   const [due, setDue] = useState(cost?.due_on ?? todayKey())
   const [category, setCategory] = useState(cost?.category_id ?? '')
   const [owner, setOwner] = useState(cost?.owner ?? '')
+  const [autoLog, setAutoLog] = useState(cost?.auto_log ?? false)
   const [error, setError] = useState<string | null>(null)
   const monthly = categories.filter((c) => c.kind === 'monthly' && !c.archived)
 
@@ -51,6 +55,10 @@ export function RecurringSheet({
         due_on: due,
         category_id: category || null,
         owner: owner || null,
+        // only when it changes: the column comes with migration 0022
+        ...((autoLog && !!category) !== (cost?.auto_log ?? false) && {
+          auto_log: autoLog && !!category,
+        }),
       })
       onClose()
     } catch (err) {
@@ -67,6 +75,11 @@ export function RecurringSheet({
   return (
     <BottomSheet title={cost ? t('project.edit', { name: cost.name }) : t('regular.new')} onClose={onClose}>
       <form onSubmit={submit} className="grid gap-4 pb-2">
+        {note && (
+          <p className="rounded-xl bg-amber-300/10 px-3 py-2 text-sm text-amber-100 ring-1 ring-amber-300/20">
+            {note}
+          </p>
+        )}
         <Segments
           value={kind}
           onChange={setKind}
@@ -129,6 +142,12 @@ export function RecurringSheet({
             </Select>
           </Field>
         </div>
+        <Switch
+          label={t('regular.autoLog')}
+          help={category ? t('regular.autoLogHelp') : t('regular.autoLogNoCategory')}
+          checked={autoLog && !!category}
+          onChange={(v) => category && setAutoLog(v)}
+        />
         <SubmitRow
           label={cost ? t('entry.saveChanges') : t('regular.add')}
           disabled={!name.trim() || amount <= 0}

@@ -174,5 +174,41 @@
       "message": "Raz w roku",
       "context": "Frequency option."
     }
+  },
+  "markPaid": {
+    "message": "Opłacone",
+    "context": "Regular costs list: button that logs this due date of a subscription or bill as an expense. Very short."
+  },
+  "markPaidLabel": {
+    "message": "Oznacz {name} jako opłacone: zapisz {amount} jako wydatek",
+    "context": "Regular costs list: accessible label of the 'Paid' button. {amount} includes the currency."
+  },
+  "paidDone": {
+    "message": "opłacone",
+    "context": "Regular costs list: this due date has been logged as an expense. Short, lowercase."
+  },
+  "needsCategory": {
+    "message": "Najpierw wybierz kategorię: tam trafi wydatek.",
+    "context": "Regular cost sheet: shown when 'Paid' was tapped on a cost without a category."
+  },
+  "auto": {
+    "message": "dodaje się samo",
+    "context": "Regular costs list: tag on a cost that logs itself as an expense on its due date. Short, lowercase."
+  },
+  "autoLog": {
+    "message": "Dodawaj jako wydatek automatycznie",
+    "context": "Regular cost sheet: switch label."
+  },
+  "autoLogHelp": {
+    "message": "W dniu płatności zapisze się w swojej kategorii, z pierwszego telefonu, który otworzy aplikację tego dnia albo później w miesiącu.",
+    "context": "Regular cost sheet: help under the switch."
+  },
+  "autoLogNoCategory": {
+    "message": "Wybierz wyżej kategorię, żeby to włączyć.",
+    "context": "Regular cost sheet: help under the switch when no category is set."
+  },
+  "wasDue": {
+    "message": "płatne {date}",
+    "context": "Regular costs list: a due date that has passed without the cost being marked paid. {date} e.g. '10 Oct'. Short, lowercase."
   }
 }

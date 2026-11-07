@@ -43,9 +43,6 @@ export default defineConfig(({ mode }) => {
         manifest,
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
-          // standalone static pages, served by Vercel, not by the SPA
-          globIgnores: ['mapa.html'],
-          navigateFallbackDenylist: [/^\/api\//, /^\/mapa/],
         },
       }),
     ],

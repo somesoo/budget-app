@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Garmin vs Apple</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root { --bg:#000; --panel:#111; --line:#2a2a2a; --text:#e8e8e8; --muted:#9a9a9a; --g:#ff9f1c; --a:#4ea8ff; --hl:#ff3b6b; --ok:#5fd38d; --warn:#ffcc66; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font:14px/1.45 -apple-system, system-ui, sans-serif; }
+  h1 { font-size:16px; margin:0 0 8px; } h2 { font-size:15px; margin:18px 0 6px; } h3 { font-size:13px; margin:16px 0 6px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .muted { color:var(--muted); font-size:12px; }
+  .g { color:var(--g); } .a { color:var(--a); }
+  button { background:none; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 10px; cursor:pointer; font:inherit; }
+  button:hover { border-color:#555; }
+
+  #lock { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; }
+  #lock form { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; width:100%; max-width:340px; }
+  #lock input { width:100%; padding:10px 12px; margin:12px 0 10px; background:#000; color:var(--text); border:1px solid var(--line); border-radius:8px; font:inherit; }
+  #lock button { width:100%; text-align:center; background:var(--text); color:#000; border-color:var(--text); font-weight:600; }
+  #lock button[disabled] { opacity:.5; cursor:wait; }
+  #err { color:var(--hl); min-height:1.4em; margin:8px 0 0; font-size:13px; }
+
+  #app { display:none; height:100%; flex-direction:column; }
+  nav { display:flex; gap:6px; padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--line); overflow-x:auto; flex:none; }
+  nav button { flex:none; }
+  nav button.on { background:var(--text); color:#000; border-color:var(--text); font-weight:600; }
+  .view { display:none; flex:1; min-height:0; }
+  .view.track.on { display:grid; grid-template-columns:430px 1fr; }
+  .view.page.on { display:block; overflow-y:auto; }
+  .page > div { max-width:980px; margin:0 auto; padding:16px 16px 60px; }
+  .panel { overflow-y:auto; padding:14px 16px 40px; background:var(--panel); border-right:1px solid var(--line); min-height:0; }
+  .map { background:#111; min-height:0; }
+  .leaflet-container { font:inherit; } .leaflet-popup-content { font-size:13px; }
+  @media (max-width:860px) {
+    .view.track.on { grid-template-columns:1fr; grid-template-rows:40% 1fr; }
+    .map { order:-1; } .panel { border-right:none; border-top:1px solid var(--line); }
+  }
+
+  .k { display:inline-block; width:22px; height:3px; vertical-align:middle; margin-right:6px; }
+  table.t { border-collapse:collapse; width:100%; margin:4px 0 8px; font-variant-numeric:tabular-nums; }
+  table.t th { font-weight:600; font-size:11px; color:var(--muted); text-align:right; padding:3px 0 3px 8px; border-bottom:1px solid var(--line); }
+  table.t th:first-child { text-align:left; padding-left:0; }
+  table.t td { padding:3px 0 3px 8px; border-bottom:1px solid var(--line); text-align:right; }
+  table.t td:first-child { text-align:left; padding-left:0; color:var(--text); }
+  table.t tr.sub td { color:var(--muted); font-size:12px; }
+  td.d { color:var(--muted); }
+  .note { color:var(--muted); font-size:12px; margin:2px 0 10px; }
+  .ctl { position:sticky; top:-14px; z-index:5; background:var(--panel); padding:10px 0 6px; margin-top:8px; border-bottom:1px solid var(--line); }
+  input[type=range] { width:100%; }
+  .row { display:flex; gap:6px; } .row button { flex:1; text-align:center; }
+  .now { font-variant-numeric:tabular-nums; margin:6px 0 2px; font-size:13px; }
+  .spots button { display:block; width:100%; text-align:left; margin:3px 0; }
+  label.ck { display:block; margin:6px 0; cursor:pointer; }
+  svg.chart { width:100%; height:auto; display:block; touch-action:none; cursor:crosshair; }
+  .chartbox { margin:6px 0 12px; } .chartbox .cap { display:flex; justify-content:space-between; align-items:baseline; font-size:12px; }
+  .zbar { display:flex; height:10px; border-radius:3px; overflow:hidden; margin:3px 0; background:#000; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .card .big { font-size:20px; font-variant-numeric:tabular-nums; }
+  .card .what { color:var(--muted); font-size:12px; margin-bottom:4px; }
+  .pill { display:inline-block; padding:1px 7px; border-radius:99px; font-size:11px; border:1px solid var(--line); color:var(--muted); }
+  .pill.g { color:var(--g); border-color:#5a3d0c; } .pill.a { color:var(--a); border-color:#173a5c; } .pill.b { color:var(--ok); border-color:#1f4d33; }
+  .legend span { margin-right:12px; white-space:nowrap; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:baseline; }
+  ul.tight { padding-left:18px; margin:6px 0; } ul.tight li { margin:3px 0; }
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <form id="f" autocomplete="off">
+    <h1>Garmin vs Apple Watch</h1>
+    <div class="muted">Ta strona jest zabezpieczona hasłem. Dane są zaszyfrowane i odszyfrowują się tylko w Twojej przeglądarce.</div>
+    <input id="pw" type="password" placeholder="Hasło" autocomplete="current-password" autofocus>
+    <button id="go" type="submit">Odblokuj</button>
+    <div id="err" role="alert"></div>
+  </form>
+</div>
+
+<div id="app">
+  <nav id="nav">
+    <button data-v="rower">Rower</button>
+    <button data-v="bieg">Bieg</button>
+    <button data-v="sen">Sen</button>
+    <button data-v="zegarki">Zegarki: różnice</button>
+  </nav>
+  <div class="view track" id="v-rower"></div>
+  <div class="view track" id="v-bieg"></div>
+  <div class="view page" id="v-sen"><div></div></div>
+  <div class="view page" id="v-zegarki"><div></div></div>
+</div>
+
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const TZ = 'Europe/Warsaw';
+const fmtT = ts => new Date(ts * 1000).toLocaleTimeString('pl-PL', { timeZone: TZ });
+const fmtHM = ts => new Date(ts * 1000).toLocaleTimeString('pl-PL', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
+const fmt = (v, d = 0) => (v == null || Number.isNaN(v)) ? '—' : Number(v).toLocaleString('pl-PL', { minimumFractionDigits: d, maximumFractionDigits: d });
+const sgn = (v, d = 0) => (v == null || Number.isNaN(v)) ? '—' : (v > 0.0000001 ? '+' : v < -0.0000001 ? '−' : '±') + fmt(Math.abs(v), d);
+const hm = min => min == null ? '—' : Math.floor(Math.round(min) / 60) + ':' + String(Math.round(min) % 60).padStart(2, '0');
+const mmss = s => s == null ? '—' : Math.floor(Math.round(s) / 60) + ':' + String(Math.round(s) % 60).padStart(2, '0');
+const kmh = v => v == null ? '—' : (v * 3.6).toFixed(1) + ' km/h';
+const num = v => (v == null || Number.isNaN(+v)) ? null : +v;
+const hav = (a, b, c, d) => { const p = Math.PI / 180, h = Math.sin((c - a) * p / 2) ** 2 + Math.cos(a * p) * Math.cos(c * p) * Math.sin((d - b) * p / 2) ** 2; return 12742000 * Math.asin(Math.sqrt(h)); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+let DATA = null;
+
+/* ---------- unlock ---------- */
+async function decrypt(pw) {
+  const res = await fetch('/mapa-data.enc', { cache: 'no-store' });
+  if (!res.ok) throw new Error('Nie udało się pobrać danych (' + res.status + ').');
+  const buf = new Uint8Array(await res.arrayBuffer());
+  if (String.fromCharCode(...buf.subarray(0, 5)) !== 'MAPA1') throw new Error('Nieznany format danych.');
+  const iter = new DataView(buf.buffer).getUint32(5);
+  const salt = buf.subarray(9, 25), iv = buf.subarray(25, 37), ct = buf.subarray(37);
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  let plain;
+  try { plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct); }
+  catch { const e = new Error('Złe hasło.'); e.bad = true; throw e; }
+  const text = await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  return JSON.parse(text);
+}
+async function tryUnlock(pw) {
+  const btn = $('#go'), err = $('#err');
+  btn.disabled = true; err.textContent = '';
+  try {
+    DATA = await decrypt(pw);
+    try { sessionStorage.setItem('mapa-pw', pw); } catch {}
+    $('#lock').style.display = 'none';
+    $('#app').style.display = 'flex';
+    start();
+  } catch (e) {
+    err.textContent = e.bad ? 'Złe hasło.' : (e.message || 'Błąd.');
+    try { sessionStorage.removeItem('mapa-pw'); } catch {}
+  } finally { btn.disabled = false; }
+}
+$('#f').addEventListener('submit', e => { e.preventDefault(); const v = $('#pw').value; if (v) tryUnlock(v); });
+try { const saved = sessionStorage.getItem('mapa-pw'); if (saved) tryUnlock(saved); } catch {}
+
+/* ---------- navigation ---------- */
+const mounted = {}, maps = {};
+function start() {
+  document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.v));
+  const h = location.hash.slice(1);
+  go(['rower', 'bieg', 'sen', 'zegarki'].includes(h) ? h : 'rower');
+}
+function go(name) {
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + name));
+  history.replaceState(null, '', '#' + name);
+  if (!mounted[name]) {
+    mounted[name] = true;
+    if (name === 'rower') mountTrack('rower', 'ride');
+    else if (name === 'bieg') mountTrack('bieg', 'run');
+    else if (name === 'sen') mountSleep();
+    else mountWatches();
+  }
+  if (maps[name]) setTimeout(() => maps[name].invalidateSize(), 0);
+}
+
+/* ---------- helpers: interpolation, stats, charts ---------- */
+// row: [lat, lon, ts, dist_m, hr, speed_ms, acc_m, ele_m, power_w, cadence]
+function at(arr, ts) {
+  const hi0 = arr.length - 1;
+  if (ts <= arr[0][2]) return arr[0].concat([0]);
+  if (ts >= arr[hi0][2]) return arr[hi0].concat([0]);
+  let lo = 0, hi = hi0;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (arr[m][2] <= ts) lo = m; else hi = m; }
+  const a = arr[lo], b = arr[hi], f = (ts - a[2]) / Math.max(1, b[2] - a[2]);
+  const L = i => a[i] == null || b[i] == null ? (a[i] ?? b[i] ?? null) : a[i] + (b[i] - a[i]) * f;
+  return [L(0), L(1), ts, L(3), L(4), L(5), a[6], L(7), L(8), a[9], b[2] - a[2]];
+}
+const pathLen = r => { let s = 0; for (let i = 1; i < r.length; i++) s += hav(r[i - 1][0], r[i - 1][1], r[i][0], r[i][1]); return s; };
+const quant = (arr, q) => { if (!arr.length) return null; const s = [...arr].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(q * s.length))]; };
+const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+function pearson(p) {
+  if (p.length < 3) return null;
+  const mx = mean(p.map(x => x[0])), my = mean(p.map(x => x[1]));
+  let sxy = 0, sxx = 0, syy = 0;
+  p.forEach(([x, y]) => { sxy += (x - mx) * (y - my); sxx += (x - mx) ** 2; syy += (y - my) ** 2; });
+  return sxx && syy ? sxy / Math.sqrt(sxx * syy) : null;
+}
+function smooth(pts, k) {
+  if (k <= 1) return pts;
+  return pts.map((p, i) => { const w = pts.slice(Math.max(0, i - k), i + k + 1).map(q => q[1]).filter(v => v != null); return [p[0], w.length ? mean(w) : null]; });
+}
+function trackStats(G, A) {
+  const t0 = Math.max(G[0][2], A[0][2]), t1 = Math.min(G.at(-1)[2], A.at(-1)[2]);
+  const sep = [], hrp = [], dd = [];
+  G.forEach(g => {
+    if (g[2] < t0 || g[2] > t1) return;
+    const a = at(A, g[2]);
+    sep.push([g[2], hav(g[0], g[1], a[0], a[1])]);
+    if (g[4] != null && a[4] != null) hrp.push([g[4], a[4]]);
+    if (g[3] != null && a[3] != null) dd.push([g[2], a[3] - g[3]]);
+  });
+  const s = sep.map(x => x[1]);
+  return {
+    t0, t1, sep, dd,
+    gLen: pathLen(G), aLen: pathLen(A),
+    sepMean: mean(s), sepMed: quant(s, .5), sepP95: quant(s, .95), sepMax: Math.max(...s),
+    hrDiff: hrp.length ? mean(hrp.map(p => p[1] - p[0])) : null,
+    hrAbs: hrp.length ? mean(hrp.map(p => Math.abs(p[1] - p[0]))) : null,
+    hrR: pearson(hrp), hrN: hrp.length,
+  };
+}
+
+function lineChart(host, o) {
+  const W = 400, H = 132, pl = 36, pr = 8, pt = 8, pb = 18;
+  const { series, t0, t1 } = o;
+  let ymin = Infinity, ymax = -Infinity;
+  series.forEach(s => s.pts.forEach(p => { if (p[1] != null) { ymin = Math.min(ymin, p[1]); ymax = Math.max(ymax, p[1]); } }));
+  if (!isFinite(ymin)) { host.remove(); return null; }
+  if (o.zero) ymin = Math.min(0, ymin);
+  const pad = (ymax - ymin) * .08 || 1; if (!o.zero) ymin -= pad; ymax += pad;
+  const X = t => pl + (t - t0) / (t1 - t0) * (W - pl - pr), Y = v => H - pb - (v - ymin) / (ymax - ymin) * (H - pt - pb);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.title)}">`;
+  for (let i = 0; i <= 3; i++) {
+    const v = ymin + (ymax - ymin) * i / 3, y = Y(v);
+    s += `<line x1="${pl}" x2="${W - pr}" y1="${y}" y2="${y}" stroke="#2a2a2a" stroke-width=".6"/><text x="${pl - 4}" y="${y + 3}" fill="#9a9a9a" font-size="9" text-anchor="end">${fmt(v, o.dec ?? 0)}</text>`;
+  }
+  const spanMin = (t1 - t0) / 60, step = [1, 2, 5, 10, 15, 30].find(x => spanMin / x <= 7) || 60;
+  for (let m = 0; m * 60 <= t1 - t0; m += step) s += `<text x="${X(t0 + m * 60)}" y="${H - 4}" fill="#9a9a9a" font-size="9" text-anchor="middle">${m} min</text>`;
+  series.forEach(se => {
+    let d = '', pen = false, last = null;
+    se.pts.forEach(p => {
+      if (p[1] == null || (last != null && p[0] - last > (o.gap ?? 30))) pen = false;
+      if (p[1] == null) { last = null; return; }
+      d += (pen ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1); pen = true; last = p[0];
+    });
+    s += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="1.4" stroke-linejoin="round"/>`;
+  });
+  s += `<line class="cur" x1="${pl}" x2="${pl}" y1="${pt}" y2="${H - pb}" stroke="#fff" stroke-width=".8" opacity=".8"/></svg>`;
+  host.insertAdjacentHTML('beforeend', s);
+  const svg = host.querySelector('svg'), cur = svg.querySelector('.cur');
+  const scrub = e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+    o.onScrub(Math.max(t0, Math.min(t1, t0 + (x - pl) / (W - pl - pr) * (t1 - t0))));
+  };
+  svg.addEventListener('pointerdown', e => { svg.setPointerCapture(e.pointerId); scrub(e); });
+  svg.addEventListener('pointermove', e => { if (e.buttons) scrub(e); });
+  return { setCursor: ts => { const x = X(Math.max(t0, Math.min(t1, ts))); cur.setAttribute('x1', x); cur.setAttribute('x2', x); } };
+}
+
+/* ---------- activity comparison table ---------- */
+const SPORT = {
+  ride: { title: 'Przejazd rowerowy 6.11', gTxt: 'Garmin', speedRows: true },
+  run: { title: 'Bieg 8.11', gTxt: 'Garmin', speedRows: false },
+};
+function metricRows(key, X, Y) {
+  const stride = o => o.stride_m == null ? null : (o.stride_m > 5 ? o.stride_m / 100 : o.stride_m);
+  const rows = [
+    ['Dystans (w aplikacji)', 'km', X.distance_km, Y.distance_km, 2],
+    ['Czas całkowity', 'min', X.duration_min, Y.duration_min, 1],
+    ['Czas w ruchu', 'min', X.moving_min, Y.moving_min, 1],
+  ];
+  if (key === 'run') rows.push(['Tempo średnie', 'min/km', X.pace_min_km, Y.pace_min_km, 2, 'pace']);
+  rows.push(['Prędkość średnia', 'km/h', X.speed_kmh, Y.speed_kmh, 1]);
+  rows.push(
+    ['Tętno średnie', 'bpm', X.avg_hr, Y.avg_hr, 0],
+    ['Tętno maks.', 'bpm', X.max_hr, Y.max_hr, 0],
+    ['Kalorie', 'kcal', X.calories, Y.calories, 0, 'pct'],
+    ['Przewyższenie', 'm', X.elevation_gain_m, Y.elevation_gain_m, 0, 'pct'],
+    ['Moc średnia', 'W', X.avg_power, Y.avg_power, 0, 'pct'],
+    ['Kadencja', key === 'run' ? 'spm' : 'rpm', X.cadence, Y.cadence, 0],
+  );
+  if (key === 'run') rows.push(['Długość kroku', 'm', stride(X), stride(Y), 2]);
+  rows.push(['Obciążenie treningowe', '', X.training_load, Y.training_load, 0, 'pct']);
+  return rows;
+}
+function diffCell(g, a, dec, kind) {
+  if (g == null || a == null) return '—';
+  const d = a - g;
+  if (kind === 'pace') return sgn(d * 60, 0) + ' s/km';
+  if (kind === 'pct' && g) return sgn((d / g) * 100, 0) + '%';
+  return sgn(d, dec);
+}
+function cmpTable(key, acts) {
+  const X = acts.x, Y = acts.y;
+  const fm = (v, dec, kind) => kind === 'pace' ? (v == null ? '—' : mmss(v * 60)) : fmt(v, dec);
+  let h = `<table class="t"><tr><th>Pomiar</th><th class="g">Garmin</th><th class="a">Apple</th><th>Apple − Garmin</th></tr>`;
+  metricRows(key, X, Y).forEach(([n, u, g, a, dec, kind]) => {
+    h += `<tr><td>${n}${u ? ` <span class="muted">${u}</span>` : ''}</td><td>${fm(g, dec, kind)}</td><td>${fm(a, dec, kind)}</td><td class="d">${diffCell(g, a, dec, kind)}</td></tr>`;
+  });
+  h += `<tr class="sub"><td>Metoda obciążenia</td><td>${esc(X.load_source || '—')}</td><td>${esc(Y.load_source || '—')}</td><td></td></tr></table>`;
+  // heart-rate zones
+  const zs = o => [1, 2, 3, 4, 5].map(i => num(o['hr_z' + i + '_s']) || 0);
+  const zc = ['#4a6a8a', '#4ea8ff', '#5fd38d', '#ffcc66', '#ff5c5c'];
+  const bar = (name, cls, o) => {
+    const z = zs(o), tot = z.reduce((x, y) => x + y, 0) || 1;
+    return `<div class="muted ${cls}">${name}</div><div class="zbar">${z.map((v, i) => `<span style="width:${v / tot * 100}%;background:${zc[i]}" title="Z${i + 1}: ${fmt(v / 60, 0)} min"></span>`).join('')}</div><div class="muted">${z.map((v, i) => `Z${i + 1} ${fmt(v / 60, 0)} min`).join(' · ')}</div>`;
+  };
+  h += `<h3>Czas w strefach tętna</h3>${bar('Garmin', 'g', X)}${bar('Apple', 'a', Y)}<div class="note">Strefy każdy zegarek liczy od własnego tętna maksymalnego${Y.hr_max_used ? ` (Apple: ${fmt(Y.hr_max_used, 0)} bpm w dashboardzie)` : ''}, więc podział nie jest porównywalny 1:1.</div>`;
+  // vendor-only
+  const only = [];
+  if (X.te_aerobic != null) only.push(`Training Effect ${fmt(X.te_aerobic, 1)} / ${fmt(X.te_anaerobic, 1)}`);
+  if (X.vo2max_activity != null) only.push(`VO₂max z aktywności ${fmt(X.vo2max_activity, 0)}`);
+  if (X.best_1k_s != null) only.push(`najlepszy km ${mmss(X.best_1k_s)}`);
+  if (X.gap_speed != null) only.push(`tempo GAP ${mmss(1000 / X.gap_speed)}/km`);
+  if (X.temperature_max != null) only.push(`temp. maks. ${fmt(X.temperature_max, 0)}°C`);
+  if (X.lap_count != null) only.push(`${X.lap_count} okrążeń`);
+  const aonly = [];
+  if (Y.vertical_oscillation_cm != null) aonly.push(`oscylacja pionowa ${fmt(Y.vertical_oscillation_cm, 1)} cm`);
+  if (Y.ground_contact_ms != null) aonly.push(`czas kontaktu z podłożem ${fmt(Y.ground_contact_ms, 0)} ms`);
+  if (only.length) h += `<div class="note"><span class="pill g">tylko Garmin</span> ${only.join(' · ')}</div>`;
+  if (aonly.length) h += `<div class="note"><span class="pill a">tylko Apple</span> ${aonly.join(' · ')}</div>`;
+  return h;
+}
+
+/* ---------- track view (ride / run) ---------- */
+function mountTrack(name, key) {
+  const D = DATA[key], G = D.g, A = D.a, cfg = SPORT[key];
+  const root = $('#v-' + name);
+  const st = trackStats(G, A);
+  root.innerHTML = `
+    <div class="panel">
+      <h1>${cfg.title} — Garmin vs Apple Watch</h1>
+      <div class="legend"><span><i class="k" style="background:var(--g)"></i>Garmin <span class="muted">(${G.length} punktów)</span></span><span><i class="k" style="background:var(--a)"></i>Apple Watch <span class="muted">(${A.length} punktów)</span></span></div>
+      <div class="ctl">
+        <input class="slider" type="range" min="0" max="1" value="0">
+        <div class="row"><button class="back">−10 s</button><button class="play">▶</button><button class="fwd">+10 s</button></div>
+        <div class="now"></div>
+      </div>
+      <h3>Różnice w pomiarach</h3>
+      <div class="cmp"></div>
+      <h3>Ślad GPS: jak bardzo się rozjeżdżają</h3>
+      <table class="t gps"></table>
+      <h3>Wykresy w czasie</h3>
+      <div class="note">Kliknij lub przeciągnij po wykresie, żeby przesunąć moment na mapie.</div>
+      <div class="charts"></div>
+      <h3>Miejsca rozjazdu</h3>
+      <div class="spots"></div>
+      <h3>Widok mapy</h3>
+      <label class="ck"><input type="checkbox" class="c-pts" checked> punkty pomiarowe (od zbliżenia 17)</label>
+      <label class="ck"><input type="checkbox" class="c-links"> łączniki Garmin↔Apple w tej samej sekundzie</label>
+      <label class="ck"><input type="checkbox" class="c-acc"> okręgi dokładności Apple (hAcc)</label>
+      <p class="muted">Podkład: satelita Esri lub OSM, kafle do zbliżenia 19; dalej (do 24) mapa jest tylko powiększana, a ślady rysowane wektorowo. Kliknij punkt, żeby zobaczyć jego szczegóły.</p>
+    </div>
+    <div class="map"></div>`;
+  const q = s => root.querySelector(s);
+
+  /* map */
+  const map = L.map(q('.map'), { preferCanvas: true, maxZoom: 24, zoomSnap: 0.25 });
+  maps[name] = map;
+  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxNativeZoom: 19, maxZoom: 24, attribution: 'Esri World Imagery' });
+  const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxNativeZoom: 19, maxZoom: 24, attribution: '© OpenStreetMap' });
+  sat.addTo(map);
+  L.control.layers({ 'Satelita': sat, 'OpenStreetMap': osm }).addTo(map);
+  L.control.scale({ imperial: false, maxWidth: 160 }).addTo(map);
+  const ll = p => [p[0], p[1]];
+  const gLine = L.polyline(G.map(ll), { color: '#ff9f1c', weight: 2.5, opacity: .95 }).addTo(map);
+  const aLine = L.polyline(A.map(ll), { color: '#4ea8ff', weight: 2.5, opacity: .95 }).addTo(map);
+  map.fitBounds(gLine.getBounds().extend(aLine.getBounds()), { padding: [20, 20] });
+
+  /* tables */
+  q('.cmp').innerHTML = cmpTable(key, D.acts);
+  q('.gps').innerHTML = `
+    <tr><th>Pomiar</th><th class="g">Garmin</th><th class="a">Apple</th><th>Apple − Garmin</th></tr>
+    <tr><td>Długość śladu GPS <span class="muted">m</span></td><td>${fmt(st.gLen, 0)}</td><td>${fmt(st.aLen, 0)}</td><td class="d">${sgn(st.aLen - st.gLen, 0)} (${sgn((st.aLen / st.gLen - 1) * 100, 1)}%)</td></tr>
+    <tr><td>Odległość między zegarkami, mediana <span class="muted">m</span></td><td colspan="3" class="d">${fmt(st.sepMed, 1)}</td></tr>
+    <tr><td>Odległość między zegarkami, średnia <span class="muted">m</span></td><td colspan="3" class="d">${fmt(st.sepMean, 1)}</td></tr>
+    <tr><td>95% czasu bliżej niż <span class="muted">m</span></td><td colspan="3" class="d">${fmt(st.sepP95, 1)}</td></tr>
+    <tr><td>Największy rozjazd <span class="muted">m</span></td><td colspan="3" class="d">${fmt(st.sepMax, 1)}</td></tr>
+    <tr><td>Tętno: średnia różnica Apple − Garmin <span class="muted">bpm</span></td><td colspan="3" class="d">${sgn(st.hrDiff, 1)}</td></tr>
+    <tr><td>Tętno: średnia |różnica| <span class="muted">bpm</span></td><td colspan="3" class="d">${fmt(st.hrAbs, 1)}</td></tr>
+    <tr><td>Tętno: korelacja krzywych <span class="muted">r, n = ${st.hrN}</span></td><td colspan="3" class="d">${fmt(st.hrR, 2)}</td></tr>`;
+
+  /* time controls */
+  const tStart = Math.min(G[0][2], A[0][2]), tEnd = Math.max(G.at(-1)[2], A.at(-1)[2]);
+  const slider = q('.slider'); slider.min = tStart; slider.max = tEnd; slider.value = tStart;
+  const gNow = L.circleMarker([0, 0], { radius: 7, color: '#fff', weight: 2, fillColor: '#ff9f1c', fillOpacity: 1 }).addTo(map);
+  const aNow = L.circleMarker([0, 0], { radius: 7, color: '#fff', weight: 2, fillColor: '#4ea8ff', fillOpacity: 1 }).addTo(map);
+  const link = L.polyline([], { color: '#ff3b6b', weight: 2, dashArray: '4 4' }).addTo(map);
+  const charts = [];
+  function show(ts, pan) {
+    ts = Math.max(tStart, Math.min(tEnd, +ts)); slider.value = ts;
+    const g = at(G, ts), a = at(A, ts);
+    gNow.setLatLng(ll(g)); aNow.setLatLng(ll(a)); link.setLatLngs([ll(g), ll(a)]);
+    const d = map.distance(ll(g), ll(a));
+    const pause = (g[10] > 20 || a[10] > 20) ? ' <span class="muted">(przerwa w zapisie — pauza)</span>' : '';
+    q('.now').innerHTML = `<b>${fmtT(ts)}</b>${pause}<br>odległość między zegarkami: <b>${d.toFixed(1)} m</b><br>` +
+      `<span class="g">Garmin</span> ${kmh(g[5])}, tętno ${fmt(g[4], 0)}, ślad ${fmt(g[3], 0)} m<br>` +
+      `<span class="a">Apple</span> ${kmh(a[5])}, tętno ${fmt(a[4], 0)}, ślad ${fmt(a[3], 0)} m${a[6] != null ? ', ±' + fmt(a[6], 1) + ' m' : ''}`;
+    charts.forEach(c => c.setCursor(ts));
+    if (pan && !map.getBounds().pad(-0.2).contains(ll(g))) map.panTo(ll(g), { animate: false });
+  }
+  slider.addEventListener('input', e => show(e.target.value, true));
+  q('.back').onclick = () => show(+slider.value - 10, true);
+  q('.fwd').onclick = () => show(+slider.value + 10, true);
+  let timer = null;
+  q('.play').onclick = e => {
+    if (timer) { clearInterval(timer); timer = null; e.target.textContent = '▶'; return; }
+    e.target.textContent = '❚❚';
+    timer = setInterval(() => { if (+slider.value >= tEnd) { clearInterval(timer); timer = null; e.target.textContent = '▶'; } else show(+slider.value + 1, true); }, 250);
+  };
+
+  /* charts */
+  const box = q('.charts');
+  const addChart = (title, unit, series, o = {}) => {
+    const host = document.createElement('div'); host.className = 'chartbox';
+    host.innerHTML = `<div class="cap"><b>${title}</b><span class="muted">${unit}</span></div>`;
+    box.appendChild(host);
+    const c = lineChart(host, { title, series, t0: tStart, t1: tEnd, onScrub: t => show(t, true), ...o });
+    if (c) charts.push(c);
+  };
+  const ser = (rows, idx, f = v => v) => rows.map(r => [r[2], r[idx] == null ? null : f(r[idx])]);
+  addChart('Tętno', 'bpm', [{ color: '#ff9f1c', pts: ser(G, 4) }, { color: '#4ea8ff', pts: ser(A, 4) }]);
+  addChart('Prędkość (wygładzona)', 'km/h', [{ color: '#ff9f1c', pts: smooth(ser(G, 5, v => v * 3.6), 2) }, { color: '#4ea8ff', pts: smooth(ser(A, 5, v => v * 3.6), 2) }], { zero: true, dec: 0 });
+  addChart('Odległość między zegarkami', 'm', [{ color: '#ff3b6b', pts: st.sep }], { zero: true, dec: 0 });
+  addChart('Różnica przebytego dystansu (Apple − Garmin)', 'm, wg własnego śladu każdego zegarka', [{ color: '#ffcc66', pts: st.dd }], { dec: 0 });
+  addChart('Wysokość', 'm n.p.m.', [{ color: '#ff9f1c', pts: ser(G, 7) }, { color: '#4ea8ff', pts: ser(A, 7) }], { dec: 0 });
+
+  /* spots: named (ride) or auto-detected (run) */
+  const spotsEl = q('.spots');
+  const toTs = hms => { const [h, m, s] = hms.split(':').map(Number); return Date.UTC(2026, 10, 6, h - 1, m, s) / 1000; };
+  let spots = [];
+  if (D.spots) spots = D.spots.map(s => ({ n: s.n, a: toTs(s.t0), b: toTs(s.t1) }));
+  else {
+    const sm = smooth(st.sep, 3), used = [];
+    sm.slice().sort((x, y) => y[1] - x[1]).forEach(p => {
+      if (spots.length >= 4 || p[1] < Math.max(3, (st.sepMed || 0) * 2)) return;
+      if (used.some(u => Math.abs(u - p[0]) < 90)) return;
+      used.push(p[0]); spots.push({ n: `rozjazd ${fmt(p[1], 0)} m`, a: p[0] - 20, b: p[0] + 20, at: p[0] });
+    });
+    spots.sort((x, y) => x.a - y.a);
+  }
+  if (!spots.length) spotsEl.innerHTML = '<div class="muted">Brak wyraźnych miejsc rozjazdu.</div>';
+  spots.forEach(s => {
+    const b = document.createElement('button'); b.textContent = `${s.n} · ${fmtHM(s.a)}`;
+    b.onclick = () => {
+      const sel = G.concat(A).filter(p => p[2] >= s.a && p[2] <= s.b).map(ll);
+      if (sel.length) map.fitBounds(L.latLngBounds(sel), { padding: [30, 30], maxZoom: 21 });
+      show(s.at ?? s.a, false);
+    };
+    spotsEl.appendChild(b);
+  });
+
+  /* points / links / accuracy layers */
+  const ptsLayer = L.layerGroup(), accLayer = L.layerGroup(), linkLayer = L.layerGroup();
+  const popG = p => `<b style="color:#ff9f1c">Garmin</b> ${fmtT(p[2])}<br>tętno ${fmt(p[4], 0)} · ${kmh(p[5])}${p[8] != null ? ' · ' + fmt(p[8], 0) + ' W' : ''}<br>od startu ${fmt(p[3], 0)} m (ślad)`;
+  const popA = p => `<b style="color:#4ea8ff">Apple</b> ${fmtT(p[2])}<br>tętno ${fmt(p[4], 0)} · ${kmh(p[5])}<br>od startu ${fmt(p[3], 0)} m (ślad)${p[6] != null ? '<br>dokładność (hAcc) ±' + fmt(p[6], 1) + ' m' : ''}`;
+  G.forEach(p => L.circleMarker(ll(p), { radius: 3, color: '#ff9f1c', weight: 1, fillOpacity: .9 }).bindPopup(() => popG(p)).addTo(ptsLayer));
+  A.forEach(p => L.circleMarker(ll(p), { radius: 3, color: '#4ea8ff', weight: 1, fillOpacity: .9 }).bindPopup(() => popA(p)).addTo(ptsLayer));
+  A.forEach(p => { if (p[6]) L.circle(ll(p), { radius: p[6], color: '#4ea8ff', weight: .5, opacity: .4, fill: false, interactive: false }).addTo(accLayer); });
+  G.forEach(p => { const a = at(A, p[2]); if (p[2] >= A[0][2] && p[2] <= A.at(-1)[2]) L.polyline([ll(p), ll(a)], { color: '#ff3b6b', weight: 1, opacity: .7, interactive: false }).addTo(linkLayer); });
+  const sync = () => {
+    const z = map.getZoom();
+    const on = (sel, layer, minZ) => { const want = q(sel).checked && z >= minZ; if (want && !map.hasLayer(layer)) layer.addTo(map); if (!want && map.hasLayer(layer)) map.removeLayer(layer); };
+    on('.c-pts', ptsLayer, 17); on('.c-acc', accLayer, 16); on('.c-links', linkLayer, 15);
+  };
+  map.on('zoomend', sync);
+  root.querySelectorAll('.panel input[type=checkbox]').forEach(c => c.addEventListener('change', sync));
+  show(tStart, false);
+  sync();
+}
+
+/* ---------- sleep ---------- */
+const QUAL = { EXCELLENT: 'doskonały', GOOD: 'dobry', FAIR: 'średni', POOR: 'słaby' }, HRVS = { BALANCED: 'w normie', UNBALANCED: 'poza normą', LOW: 'niskie', POOR: 'słabe', NONE: 'brak' };
+const STAGE = { awake: { l: 0, c: '#ff7a7a', n: 'Wybudzenia' }, rem: { l: 1, c: '#c78cff', n: 'REM' }, light: { l: 2, c: '#7fa8ff', n: 'Płytki' }, deep: { l: 3, c: '#2b5fd9', n: 'Głęboki' } };
+function stageMins(segs) {
+  const m = { awake: 0, rem: 0, light: 0, deep: 0 };
+  segs.forEach(([s, a, b]) => { if (m[s] != null) m[s] += (b - a) / 60; });
+  return m;
+}
+function hypnogram(segs, t0, t1) {
+  const W = 720, pl = 6, pr = 6, H = 84, bh = 15, gap = 4;
+  const X = t => pl + (t - t0) / (t1 - t0) * (W - pl - pr);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
+  for (let t = Math.ceil(t0 / 3600) * 3600; t <= t1; t += 3600) s += `<line x1="${X(t)}" x2="${X(t)}" y1="0" y2="${H - 12}" stroke="#2a2a2a" stroke-width=".6"/><text x="${X(t)}" y="${H - 2}" fill="#9a9a9a" font-size="9" text-anchor="middle">${fmtHM(t)}</text>`;
+  segs.forEach(([st, a, b]) => {
+    const d = STAGE[st]; if (!d) return;
+    s += `<rect x="${X(a)}" y="${d.l * (bh + gap) / 1.3 + 2}" width="${Math.max(1, X(b) - X(a))}" height="${bh}" fill="${d.c}" rx="2"><title>${d.n} ${fmtHM(a)}–${fmtHM(b)}</title></rect>`;
+  });
+  return s + '</svg>';
+}
+function mountSleep() {
+  const host = $('#v-sen > div');
+  let h = `<h1>Sen: Garmin vs Apple Watch</h1>
+  <div class="legend muted">${Object.values(STAGE).map(d => `<span><i class="sw" style="background:${d.c}"></i>${d.n}</span>`).join('')}</div>`;
+  DATA.sleep.forEach(n => {
+    const gs = n.x.stages, as = n.y.stages;
+    const gm = stageMins(gs), am = stageMins(as);
+    const t0 = Math.min(gs[0][1], as[0][1]) - 300, t1 = Math.max(gs.at(-1)[2], as.at(-1)[2]) + 300;
+    const d = new Date(n.day + 'T12:00:00'), prev = new Date(d.getTime() - 86400000);
+    const lbl = prev.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' }) + ' → ' + d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' });
+    const gx = n.x.daily, ay = n.y.daily;
+    const sleepG = gm.deep + gm.light + gm.rem, sleepA = am.deep + am.light + am.rem;
+    const bar = (m, max) => `<div style="display:flex;height:16px;border-radius:3px;overflow:hidden;width:${(m.deep + m.light + m.rem + m.awake) / max * 100}%">${['deep', 'light', 'rem', 'awake'].map(k => `<span title="${STAGE[k].n} ${hm(m[k])}" style="width:${m[k] / (m.deep + m.light + m.rem + m.awake) * 100}%;background:${STAGE[k].c}"></span>`).join('')}</div>`;
+    const mx = Math.max(sleepG + gm.awake, sleepA + am.awake);
+    const row = (label, g, a, dec, kind) => `<tr><td>${label}</td><td>${g == null ? '—' : (kind === 'hm' ? hm(g) : kind === 'time' ? fmtHM(g) : fmt(g, dec))}</td><td>${a == null ? '—' : (kind === 'hm' ? hm(a) : kind === 'time' ? fmtHM(a) : fmt(a, dec))}</td><td class="d">${g == null || a == null ? '—' : kind === 'time' ? sgn((a - g) / 60, 0) + ' min' : kind === 'hm' ? sgn(a - g, 0) + ' min' : sgn(a - g, dec)}</td></tr>`;
+    h += `<h2>Noc ${lbl}</h2>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="card"><div class="what"><span class="pill g">Garmin</span></div>${hypnogram(gs, t0, t1)}${bar(gm, mx)}
+        <div class="what" style="margin-top:12px"><span class="pill a">Apple Watch</span></div>${hypnogram(as, t0, t1)}${bar(am, mx)}</div>
+    </div>
+    <table class="t"><tr><th>Pomiar</th><th class="g">Garmin</th><th class="a">Apple</th><th>Apple − Garmin</th></tr>
+      ${row('Zasnięcie', gx.sleep_start / 1000, ay.sleep_start / 1000, 0, 'time')}
+      ${row('Pobudka', gx.sleep_end / 1000, ay.sleep_end / 1000, 0, 'time')}
+      ${row('Czas snu <span class="muted">h:mm</span>', sleepG, sleepA, 0, 'hm')}
+      ${row('Głęboki <span class="muted">h:mm</span>', gm.deep, am.deep, 0, 'hm')}
+      ${row('Płytki <span class="muted">h:mm</span>', gm.light, am.light, 0, 'hm')}
+      ${row('REM <span class="muted">h:mm</span>', gm.rem, am.rem, 0, 'hm')}
+      ${row('Wybudzenia <span class="muted">h:mm</span>', gm.awake, am.awake, 0, 'hm')}
+      ${row('Tętno spoczynkowe <span class="muted">bpm</span>', num(gx.rhr), num(ay.rhr), 0)}
+      ${row('Oddech podczas snu <span class="muted">/min</span>', num(gx.sleep_respiration), num(ay.sleep_respiration), 1)}
+      ${row('HRV <span class="muted">ms — Garmin RMSSD, Apple SDNN</span>', num(gx.overnight_hrv ?? gx.hrv_last_night), num(ay.hrv_sdnn), 0)}
+      ${row('SpO₂ <span class="muted">%</span>', num(gx.spo2_avg), num(ay.spo2_avg), 1)}
+      ${row('Wynik snu <span class="muted">0–100</span>', num(gx.sleep_score), null, 0)}
+    </table>
+    <div class="note">Garmin dodatkowo: ${gx.sleep_qualifier ? esc(QUAL[gx.sleep_qualifier] || gx.sleep_qualifier.toLowerCase()) : '—'}, ruchliwość ${fmt(gx.sleep_restless, 0)}, stres we śnie ${fmt(gx.sleep_stress, 0)}, status HRV: ${esc(HRVS[gx.hrv_status] || (gx.hrv_status || '—').toLowerCase())}.</div>`;
+  });
+  h += `<h3>Jak to czytać</h3><ul class="tight muted">
+    <li>Porównanie obejmuje tylko noce, w które Apple Watch zapisał sen z zegarka (7.11 i 8.11). Wcześniejsze noce w koncie Apple pochodzą z innych źródeł, więc nie są niezależnym pomiarem.</li>
+    <li>Godzina zaśnięcia i pobudki, a więc całkowity czas snu, zgadzają się u obu zegarków do kilku minut. Rozkład faz różni się wyraźnie, a kierunek różnicy zmienia się z nocy na noc (np. głęboki sen: Apple więcej pierwszej nocy, mniej drugiej). Dwie noce to za mało na wniosek, który zegarek „ma rację”.</li>
+    <li>HRV nie jest tą samą liczbą: Garmin podaje RMSSD, Apple SDNN. Różnica wartości nie oznacza błędu jednego z nich.</li>
+    <li>Tętno spoczynkowe też liczą po swojemu (Garmin z nocy, Apple jako dobową wartość z dnia), więc to nie jest to samo porównanie.</li>
+  </ul>`;
+  host.innerHTML = h;
+}
+
+/* ---------- watches overview ---------- */
+const FEAT = [
+  ['Sen: fazy (głęboki / płytki / REM)', ['sleep_deep_h', 'sleep_rem_h']],
+  ['Sen: wynik i ocena jakości', ['sleep_score', 'sleep_qualifier']],
+  ['Sen: ruchliwość, stres we śnie', ['sleep_restless', 'sleep_stress']],
+  ['Oddech podczas snu', ['sleep_respiration']],
+  ['HRV z nocy', ['hrv_last_night']],
+  ['HRV: status i zakres bazowy', ['hrv_status', 'hrv_baseline_low']],
+  ['Body Battery', ['bb_high', 'bb_low', 'bb_wake']],
+  ['Stres w ciągu dnia', ['stress_avg']],
+  ['Gotowość do treningu, czas regeneracji', ['readiness', 'recovery_time_h']],
+  ['Status treningowy, bilans obciążenia', ['training_status', 'load_acute', 'load_ratio']],
+  ['VO₂max', ['vo2max']],
+  ['Prognozy czasów (5 km … maraton)', ['race_5k_s']],
+  ['Minuty intensywne', ['intensity_moderate', 'intensity_vigorous']],
+  ['Oddech w czuwaniu', ['respiration_waking']],
+  ['Tętno spoczynkowe', ['rhr']],
+  ['Tętno min/maks w dobie', ['hr_min', 'hr_max']],
+  ['SpO₂', ['spo2_avg']],
+  ['Minuty ćwiczeń (pierścień)', ['exercise_min']],
+  ['Kroki, kalorie, dystans dobowy', ['steps', 'calories', 'distance_m']],
+  ['Piętra', ['floors_up']],
+];
+function mountWatches() {
+  const host = $('#v-zegarki > div');
+  const R = DATA.ride.acts, N = DATA.run.acts;
+  const cov = DATA.cov, dx = cov.day[0], dy = cov.day[1];
+  // headline cards computed from the recorded activities
+  const pair = (label, unit, getter, dec, kind) => {
+    const parts = [['Rower', R], ['Bieg', N]].map(([nm, A]) => {
+      const g = getter(A.x), a = getter(A.y);
+      return `<div style="display:flex;justify-content:space-between;gap:8px"><span class="muted">${nm}</span><span><span class="g">${kind === 'pace' ? (g == null ? '—' : mmss(g * 60)) : fmt(g, dec)}</span> → <span class="a">${kind === 'pace' ? (a == null ? '—' : mmss(a * 60)) : fmt(a, dec)}</span> <b>${diffCell(g, a, dec, kind)}</b></span></div>`;
+    }).join('');
+    return `<div class="card"><div class="what">${label}${unit ? ` <span class="muted">(${unit})</span>` : ''}</div>${parts}</div>`;
+  };
+  const stR = trackStats(DATA.ride.g, DATA.ride.a), stN = trackStats(DATA.run.g, DATA.run.a);
+  const sleep = DATA.sleep.map(n => {
+    const g = stageMins(n.x.stages), a = stageMins(n.y.stages);
+    return { day: n.day, dg: g.deep, da: a.deep, rg: g.rem, ra: a.rem, tg: g.deep + g.light + g.rem, ta: a.deep + a.light + a.rem };
+  });
+  let h = `<h1>Zegarki: co je różni</h1>
+  <p class="muted">Wszystko poniżej liczy się z Twoich zapisów: przejazd 6.11, bieg 8.11 i dwie noce (7.11 i 8.11), kiedy oba zegarki były noszone jednocześnie. Dla jednego treningu na sport i dwóch nocy to są obserwacje, a nie statystyka.</p>
+
+  <h2>Sprzęt</h2>
+  <table class="t"><tr><th>Zegarek</th><th>Co wiadomo z danych</th></tr>
+    <tr><td><span class="pill g">Garmin</span></td><td style="text-align:left">dane z Garmin Connect (aktywności, sen, HRV, Body Battery …); model nie jest zapisany w danych dashboardu</td></tr>
+    <tr><td><span class="pill a">Apple Watch</span></td><td style="text-align:left">${esc(DATA.dev.apple)} (z eksportu Apple Zdrowie)</td></tr></table>
+
+  <h2>Najważniejsze różnice w pomiarach <span class="muted">(Garmin → Apple, różnica Apple − Garmin)</span></h2>
+  <div class="grid">
+    ${pair('Dystans w aplikacji', 'km', o => o.distance_km, 2)}
+    ${pair('Tętno średnie', 'bpm', o => o.avg_hr, 0)}
+    ${pair('Tętno maks.', 'bpm', o => o.max_hr, 0)}
+    ${pair('Kalorie', 'kcal', o => o.calories, 0, 'pct')}
+    ${pair('Przewyższenie', 'm', o => o.elevation_gain_m, 0, 'pct')}
+    ${pair('Moc średnia', 'W', o => o.avg_power, 0, 'pct')}
+    ${pair('Obciążenie treningowe', 'inna metoda u każdego', o => o.training_load, 0, 'pct')}
+    <div class="card"><div class="what">Ślad GPS: długość <span class="muted">(m)</span></div>
+      ${[['Rower', stR], ['Bieg', stN]].map(([n, s]) => `<div style="display:flex;justify-content:space-between"><span class="muted">${n}</span><span><span class="g">${fmt(s.gLen, 0)}</span> → <span class="a">${fmt(s.aLen, 0)}</span> <b>${sgn((s.aLen / s.gLen - 1) * 100, 1)}%</b></span></div>`).join('')}</div>
+    <div class="card"><div class="what">Odległość między zegarkami <span class="muted">(mediana / 95% / maks., m)</span></div>
+      ${[['Rower', stR], ['Bieg', stN]].map(([n, s]) => `<div style="display:flex;justify-content:space-between"><span class="muted">${n}</span><b>${fmt(s.sepMed, 1)} / ${fmt(s.sepP95, 1)} / ${fmt(s.sepMax, 0)}</b></div>`).join('')}</div>
+    <div class="card"><div class="what">Tętno: średnia różnica Apple − Garmin <span class="muted">(bpm, r)</span></div>
+      ${[['Rower', stR], ['Bieg', stN]].map(([n, s]) => `<div style="display:flex;justify-content:space-between"><span class="muted">${n}</span><b>${sgn(s.hrDiff, 1)} (r = ${fmt(s.hrR, 2)})</b></div>`).join('')}</div>
+    <div class="card"><div class="what">Sen: czas snu <span class="muted">(h:mm)</span></div>
+      ${sleep.map(s => `<div style="display:flex;justify-content:space-between"><span class="muted">noc do ${new Date(s.day + 'T12:00:00').toLocaleDateString('pl-PL', { day: 'numeric', month: 'numeric' })}</span><span><span class="g">${hm(s.tg)}</span> → <span class="a">${hm(s.ta)}</span> <b>${sgn(s.ta - s.tg, 0)} min</b></span></div>`).join('')}</div>
+    <div class="card"><div class="what">Sen: głęboki / REM <span class="muted">(min)</span></div>
+      ${sleep.map(s => `<div style="display:flex;justify-content:space-between"><span class="muted">noc do ${new Date(s.day + 'T12:00:00').toLocaleDateString('pl-PL', { day: 'numeric', month: 'numeric' })}</span><span><span class="g">${fmt(s.dg, 0)} / ${fmt(s.rg, 0)}</span> → <span class="a">${fmt(s.da, 0)} / ${fmt(s.ra, 0)}</span></span></div>`).join('')}</div>
+  </div>
+
+  <h2>Czym się różnią te liczby</h2>
+  <ul class="tight">
+    <li><b>Trasa i dystans:</b> mediana odległości między zegarkami to ${fmt(stR.sepMed, 0)} m na rowerze i ${fmt(stN.sepMed, 0)} m w biegu, a przez 95% czasu były bliżej niż ${fmt(stR.sepP95, 0)} m i ${fmt(stN.sepP95, 0)} m. Dystans w aplikacji różni się o ${fmt(Math.abs(R.y.distance_km - R.x.distance_km) / R.x.distance_km * 100, 1)}% (rower) i ${fmt(Math.abs(N.y.distance_km - N.x.distance_km) / N.x.distance_km * 100, 1)}% (bieg). Konkretne miejsca rozjazdu masz pod przyciskami „Miejsca rozjazdu” w zakładkach Rower i Bieg; w przejeździe 6.11 wypadają przy zakrętach i postojach.</li>
+    <li><b>Przewyższenie</b> różni się wyraźnie: ${fmt(R.x.elevation_gain_m, 0)} → ${fmt(R.y.elevation_gain_m, 0)} m na rowerze i ${fmt(N.x.elevation_gain_m, 0)} → ${fmt(N.y.elevation_gain_m, 0)} m w biegu. Bez znanej, zmierzonej wysokości trasy nie da się powiedzieć, który wynik jest bliższy prawdy.</li>
+    <li><b>Kalorie i moc</b> to wartości szacowane modelem każdego producenta, więc inne algorytmy dają inne liczby (kalorie: ${diffCell(R.x.calories, R.y.calories, 0, 'pct')} na rowerze, ${diffCell(N.x.calories, N.y.calories, 0, 'pct')} w biegu; moc biegowa ${diffCell(N.x.avg_power, N.y.avg_power, 0, 'pct')}).</li>
+    <li><b>Obciążenie treningowe:</b> przy Garminie to wartość z Garmin Connect, a przy Apple dashboard liczy je sam z tętna (TRIMP). To dwie różne skale, więc porównanie liczb jest tylko orientacyjne.</li>
+    <li><b>Tętno:</b> w biegu średnia różnica Apple − Garmin to ${sgn(stN.hrDiff, 1)} bpm (korelacja krzywych r = ${fmt(stN.hrR, 2)}), na rowerze ${sgn(stR.hrDiff, 1)} bpm przy r = ${fmt(stR.hrR, 2)}. Nie mam odniesienia (pas piersiowy), żeby powiedzieć, który optyczny pomiar jest dokładniejszy. Miejsce i ciasność noszenia zegarka też wpływają na odczyt, a nie wiem, jak je nosiłeś.</li>
+    <li><b>HRV</b> to dwie różne miary: Garmin podaje RMSSD, Apple SDNN. Wartości nie są wymienne.</li>
+  </ul>
+
+  <h2>Co mierzy tylko jeden zegarek <span class="muted">(w listopadzie, liczba dni z danymi)</span></h2>
+  <table class="t"><tr><th>Dane</th><th class="g">Garmin (${dx} dni)</th><th class="a">Apple (${dy} dni)</th></tr>
+  ${FEAT.map(([n, keys]) => {
+    const c = keys.map(k => cov[k] || [0, 0]);
+    const g = Math.max(...c.map(x => x[0])), a = Math.max(...c.map(x => x[1]));
+    const f = (v, tot) => v ? `${v}/${tot}` : '—';
+    return `<tr><td>${n}</td><td>${f(g, dx)}</td><td>${f(a, dy)}</td></tr>`;
+  }).join('')}</table>
+  <div class="note">„—” oznacza brak tej metryki w danych z danego źródła w tym okresie. Konto Apple obejmuje też dane z telefonu (kroki, kalorie), a faz snu i HRV jest tylko z dwóch nocy z zegarka.</div>
+
+  <h2>Dane, które w treningu ma tylko jeden zegarek</h2>
+  <ul class="tight">
+    <li><span class="pill g">Garmin</span> Training Effect (tlenowy i beztlenowy), VO₂max z aktywności, najlepszy kilometr i 5 km, tempo GAP, temperatura, okrążenia, ciągła moc.</li>
+    <li><span class="pill a">Apple</span> oscylacja pionowa, czas kontaktu z podłożem, dokładność pozycji GPS w każdym punkcie (hAcc, widoczna na mapie).</li>
+  </ul>
+
+  <h2>Ograniczenia</h2>
+  <ul class="tight muted">
+    <li>Jeden przejazd, jeden bieg, dwie noce. Różnice mogą być przypadkowe.</li>
+    <li>Gęstość zapisu: Garmin w biegu zapisuje punkty co kilka sekund, Apple co ~4 s w tym widoku (oryginał jest co sekundę); rower ma zapis co 1 s w obu.</li>
+    <li>Nie wiem, na którym nadgarstku nosisz zegarki, a to wpływa na pomiar tętna.</li>
+  </ul>`;
+  host.innerHTML = h;
+}
+</script>
+</body>
+</html>

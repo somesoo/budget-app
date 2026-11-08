@@ -43,6 +43,9 @@ export default defineConfig(({ mode }) => {
         manifest,
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+          // /mapa is a standalone password-protected page served by Vercel, not part of the SPA
+          globIgnores: ['mapa.html'],
+          navigateFallbackDenylist: [/^\/api\//, /^\/mapa/],
         },
       }),
     ],

@@ -84,13 +84,15 @@
 <div id="app">
   <nav id="nav">
     <button data-v="rower">Rower</button>
-    <button data-v="bieg">Bieg</button>
+    <button data-v="bieg">Bieg 8.11</button>
+    <button data-v="start">Start 11.11</button>
     <button data-v="sen">Sen</button>
     <button data-v="dzien">Cały dzień</button>
     <button data-v="zegarki">Zegarki: różnice</button>
   </nav>
   <div class="view track" id="v-rower"></div>
   <div class="view track" id="v-bieg"></div>
+  <div class="view track" id="v-start"></div>
   <div class="view page" id="v-sen"><div></div></div>
   <div class="view page" id="v-dzien"><div></div></div>
   <div class="view page" id="v-zegarki"><div></div></div>
@@ -151,7 +153,7 @@ const mounted = {}, maps = {};
 function start() {
   document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.v));
   const h = location.hash.slice(1);
-  go(['rower', 'bieg', 'sen', 'dzien', 'zegarki'].includes(h) ? h : 'rower');
+  go(['rower', 'bieg', 'start', 'sen', 'dzien', 'zegarki'].includes(h) ? h : 'rower');
 }
 function go(name) {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === name));
@@ -161,6 +163,7 @@ function go(name) {
     mounted[name] = true;
     if (name === 'rower') mountTrack('rower', 'ride');
     else if (name === 'bieg') mountTrack('bieg', 'run');
+    else if (name === 'start') mountTrack('start', 'race');
     else if (name === 'sen') mountSleep();
     else if (name === 'dzien') mountDay();
     else mountWatches();
@@ -271,6 +274,7 @@ function lineChart(host, o) {
 const SPORT = {
   ride: { title: 'Przejazd rowerowy 6.11', gTxt: 'Garmin', speedRows: true },
   run: { title: 'Bieg 8.11', gTxt: 'Garmin', speedRows: false },
+  race: { title: 'Bieg Niepodległości 11.11 (10 km)', gTxt: 'Garmin', speedRows: false },
 };
 function metricRows(key, X, Y) {
   const stride = o => o.stride_m == null ? null : (o.stride_m > 5 ? o.stride_m / 100 : o.stride_m);
@@ -279,7 +283,7 @@ function metricRows(key, X, Y) {
     ['Czas całkowity', 'min', X.duration_min, Y.duration_min, 1],
     ['Czas w ruchu', 'min', X.moving_min, Y.moving_min, 1],
   ];
-  if (key === 'run') rows.push(['Tempo średnie', 'min/km', X.pace_min_km, Y.pace_min_km, 2, 'pace']);
+  if (key !== 'ride') rows.push(['Tempo średnie', 'min/km', X.pace_min_km, Y.pace_min_km, 2, 'pace']);
   rows.push(['Prędkość średnia', 'km/h', X.speed_kmh, Y.speed_kmh, 1]);
   rows.push(
     ['Tętno średnie', 'bpm', X.avg_hr, Y.avg_hr, 0],
@@ -287,9 +291,10 @@ function metricRows(key, X, Y) {
     ['Kalorie', 'kcal', X.calories, Y.calories, 0, 'pct'],
     ['Przewyższenie', 'm', X.elevation_gain_m, Y.elevation_gain_m, 0, 'pct'],
     ['Moc średnia', 'W', X.avg_power, Y.avg_power, 0, 'pct'],
-    ['Kadencja', key === 'run' ? 'spm' : 'rpm', X.cadence, Y.cadence, 0],
+    ['Kadencja', key !== 'ride' ? 'spm' : 'rpm', X.cadence, Y.cadence, 0],
   );
-  if (key === 'run') rows.push(['Długość kroku', 'm', stride(X), stride(Y), 2]);
+  if (key !== 'ride') rows.push(['Długość kroku', 'm', stride(X), stride(Y), 2]);
+  if (key === 'race') rows.splice(2, 0, ['Czas na 10 km (dystans startu)', '', X.t10k_s, Y.t10k_s, 0, 'time']);
   rows.push(['Obciążenie treningowe', '', X.training_load, Y.training_load, 0, 'pct']);
   return rows;
 }
@@ -297,12 +302,13 @@ function diffCell(g, a, dec, kind) {
   if (g == null || a == null) return '—';
   const d = a - g;
   if (kind === 'pace') return sgn(d * 60, 0) + ' s/km';
+  if (kind === 'time') return sgn(d, 0) + ' s';
   if (kind === 'pct' && g) return sgn((d / g) * 100, 0) + '%';
   return sgn(d, dec);
 }
 function cmpTable(key, acts) {
   const X = acts.x, Y = acts.y;
-  const fm = (v, dec, kind) => kind === 'pace' ? (v == null ? '—' : mmss(v * 60)) : fmt(v, dec);
+  const fm = (v, dec, kind) => kind === 'time' ? (v == null ? '—' : mmss(v)) : kind === 'pace' ? (v == null ? '—' : mmss(v * 60)) : fmt(v, dec);
   let h = `<table class="t"><tr><th>Pomiar</th><th class="g">Garmin</th><th class="a">Apple</th><th>Apple − Garmin</th></tr>`;
   metricRows(key, X, Y).forEach(([n, u, g, a, dec, kind]) => {
     h += `<tr><td>${n}${u ? ` <span class="muted">${u}</span>` : ''}</td><td>${fm(g, dec, kind)}</td><td>${fm(a, dec, kind)}</td><td class="d">${diffCell(g, a, dec, kind)}</td></tr>`;
@@ -706,7 +712,7 @@ function mountWatches() {
   const cov = DATA.cov, dx = cov.day[0], dy = cov.day[1];
   // headline cards computed from the recorded activities
   const pair = (label, unit, getter, dec, kind) => {
-    const parts = [['Rower', R], ['Bieg', N]].map(([nm, A]) => {
+    const parts = [['Rower', R], ['Bieg 8.11', N], ['Start 11.11', DATA.race ? DATA.race.acts : null]].filter(x => x[1]).map(([nm, A]) => {
       const g = getter(A.x), a = getter(A.y);
       return `<div style="display:flex;justify-content:space-between;gap:8px"><span class="muted">${nm}</span><span><span class="g">${kind === 'pace' ? (g == null ? '—' : mmss(g * 60)) : fmt(g, dec)}</span> → <span class="a">${kind === 'pace' ? (a == null ? '—' : mmss(a * 60)) : fmt(a, dec)}</span> <b>${diffCell(g, a, dec, kind)}</b></span></div>`;
     }).join('');

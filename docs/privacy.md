@@ -19,6 +19,10 @@ this app.
 - **Keys stay on the server.** The Supabase secret key and the Gemini key are
   read only by the `/api` functions. A Gemini key saved in Settings is in a
   table the app itself can't read.
+- **Other apps get a key, not the password.** A key made in Settings → Other
+  apps opens only the month's totals and category status and, if you tick it,
+  adding an expense: no notes, no savings, no editing or deleting. Only its
+  hash is stored; revoking it stops it at once. See [For other apps](api.md).
 - **What goes to Google**, when the AI features are on: see [AI](ai.md).
 - **Your data is yours to take**: Settings → Your data → *Download CSV*
   gives every expense and income as a spreadsheet.

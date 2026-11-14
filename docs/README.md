@@ -22,6 +22,8 @@
 - [Chapters](chapters.md): a new chapter when life changes, hiding the past
   or keeping it out of the planner, a chapter's summary
 - [AI](ai.md): the Gemini key, what gets sent, when it's busy
+- [For other apps](api.md): keys made in Settings, reading the month and
+  adding an expense from a dashboard or a script
 
 **Behind it**
 

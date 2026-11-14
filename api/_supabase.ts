@@ -42,6 +42,22 @@ function adminHeaders(): Record<string, string> {
     : { apikey: key }
 }
 
+/**
+ * A PostgREST call with the secret key, past row level security. Only for
+ * the functions that have checked who is asking themselves (a signed-in
+ * session, or an app token: see _tokens.ts). `path` starts after /rest/v1/.
+ */
+export function adminRest(path: string, init: RequestInit = {}): Promise<Response> {
+  return fetch(`${supabaseUrl()}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      ...adminHeaders(),
+      'content-type': 'application/json',
+      ...(init.headers as Record<string, string> | undefined),
+    },
+  })
+}
+
 /** Whether the request carries a valid session of this budget's account. */
 export async function isSignedIn(req: VercelRequest): Promise<boolean> {
   const url = supabaseUrl()

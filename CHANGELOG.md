@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Keys for other apps.** Settings → Other apps makes a key that lets a home
+  dashboard read the month (`/api/v1/summary`, `/api/v1/month`) and, if
+  allowed, add an expense (`POST /api/v1/expenses`) without the shared
+  password. Shown once, stored as a hash, revocable; migration
+  `0023_api_tokens`. See [docs/api.md](docs/api.md).
+
 ## 1.0.0
 
 The first release meant for other people to install.

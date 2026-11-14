@@ -348,6 +348,112 @@
       "context": "Settings > AI: button that deletes the saved key and turns AI off."
     }
   },
+  "apps": {
+    "title": {
+      "message": "Inne aplikacje",
+      "context": "Settings > card heading: keys that let another app (a home dashboard) read the month and add expenses."
+    },
+    "help": {
+      "message": "Klucz pozwala innej aplikacji pokazać ten miesiąc i dodać wydatek, bez hasła.",
+      "context": "Settings > Other apps card: description."
+    },
+    "checking": {
+      "message": "Sprawdzanie…",
+      "context": "Settings > Other apps: shown while the list of keys loads."
+    },
+    "none": {
+      "message": "Nie ma jeszcze kluczy.",
+      "context": "Settings > Other apps: shown when no key has been made."
+    },
+    "cantStore": {
+      "message": "Aby tworzyć klucze, serwer potrzebuje SUPABASE_SERVICE_ROLE_KEY. W docs/install.md jest opisane, gdzie go dodać.",
+      "context": "Settings > Other apps: note when the server cannot store keys. Keep SUPABASE_SERVICE_ROLE_KEY and docs/install.md as they are."
+    },
+    "namePlaceholder": {
+      "message": "Do czego służy, np. Pulpit domowy",
+      "context": "Settings > Other apps: placeholder and label of the field naming a new key."
+    },
+    "read": {
+      "message": "Odczyt miesiąca",
+      "context": "Settings > Other apps: checkbox, the key may read the month's summary and category status."
+    },
+    "write": {
+      "message": "Dodawanie wydatków",
+      "context": "Settings > Other apps: checkbox, the key may add expenses."
+    },
+    "person": {
+      "message": "Dodaje wydatki jako",
+      "context": "Settings > Other apps: label of the picker choosing whose expenses the key adds."
+    },
+    "anyone": {
+      "message": "Kogo wskaże aplikacja",
+      "context": "Settings > Other apps: option in the person picker, the other app names the person with each expense."
+    },
+    "create": {
+      "message": "Utwórz klucz",
+      "context": "Settings > Other apps: button that creates a key."
+    },
+    "creating": {
+      "message": "Tworzenie…",
+      "context": "Settings > Other apps: the create button while the key is being made."
+    },
+    "shownOnce": {
+      "message": "Skopiuj go teraz: pokazujemy go tylko raz i nie da się go odczytać ponownie.",
+      "context": "Settings > Other apps: warning above a freshly made key."
+    },
+    "copy": {
+      "message": "Kopiuj",
+      "context": "Settings > Other apps: button that copies the new key."
+    },
+    "copied": {
+      "message": "Skopiowano",
+      "context": "Settings > Other apps: the copy button after copying."
+    },
+    "done": {
+      "message": "Zapisane",
+      "context": "Settings > Other apps: button that hides the freshly made key."
+    },
+    "revoke": {
+      "message": "Unieważnij",
+      "context": "Settings > Other apps: button that makes a key stop working."
+    },
+    "revokeLabel": {
+      "message": "Unieważnij klucz {name}",
+      "context": "Settings > Other apps: accessible label of the revoke button; {name} is the name the user gave the key."
+    },
+    "scopeRead": {
+      "message": "czyta",
+      "context": "Settings > Other apps: short tag on a key that may read the month."
+    },
+    "scopeWrite": {
+      "message": "dodaje",
+      "context": "Settings > Other apps: short tag on a key that may add expenses."
+    },
+    "as": {
+      "message": "jako {name}",
+      "context": "Settings > Other apps: on a key that adds one person's expenses; {name} is that person."
+    },
+    "lastUsed": {
+      "message": "ostatnio użyty {date}",
+      "context": "Settings > Other apps: when a key was last used; {date} is a formatted date."
+    },
+    "neverUsed": {
+      "message": "jeszcze nieużyty",
+      "context": "Settings > Other apps: shown for a key that was never used."
+    },
+    "tooMany": {
+      "message": "To maksymalna liczba kluczy. Najpierw unieważnij któryś.",
+      "context": "Settings > Other apps: error when the limit of keys is reached."
+    },
+    "invalid": {
+      "message": "Nadaj nazwę i wybierz, co klucz może robić.",
+      "context": "Settings > Other apps: error when the name is empty or nothing is ticked."
+    },
+    "docs": {
+      "message": "Jak inna aplikacja używa klucza: docs/api.md.",
+      "context": "Settings > Other apps: pointer to the documentation. Keep docs/api.md as it is."
+    }
+  },
   "help": {
     "title": {
       "message": "Pomoc",

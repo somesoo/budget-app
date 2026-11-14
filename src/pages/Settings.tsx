@@ -20,6 +20,7 @@ import { Segments, Switch } from '../components/savings/fields'
 import { CategorySheet } from '../components/settings/CategorySheet'
 import { CardAction, SettingsCard } from '../components/settings/SettingsCard'
 import { ChaptersCard } from '../components/settings/ChaptersCard'
+import { TokensCard } from '../components/settings/TokensCard'
 import { LearningCard } from '../components/learn/LearningCard'
 import { UserSwitcher } from '../components/UserSwitcher'
 import { resetDismissedAlerts, useDismissedCount } from '../hooks/useBudgetAlerts'
@@ -102,6 +103,7 @@ export function Settings() {
             />
           )}
           {shows('ai') && <AiCard />}
+          <TokensCard />
           <ChaptersCard />
           <HelpCard />
           <DataCard categories={categories} />
